@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import MedicineCard from '../components/medicine/MedicineCard';
 
-
-
 const Home = () => {
   const navigate = useNavigate();
   const { addToCart, showNotification } = useCart();
@@ -18,8 +16,6 @@ const Home = () => {
   const [featured, setFeatured] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [currentBanner, setCurrentBanner] = useState(0);
-
-  
 
   // 1. TATA 1MG STYLE BANNER DATA
   const banners = useMemo(() => [
@@ -50,18 +46,21 @@ const Home = () => {
     { title: "Skin Care", img: "✨", desc: "Dermatologist Approved", color: "text-pink-600" },
   ];
 
-  // Fetch Logic
+  // Fetch Logic with RENDER API_BASE support
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         const [allRes, topRes] = await Promise.all([
-          fetch('http://localhost:5000/api/medicines'),
-          fetch('http://localhost:5000/api/medicines/top')
+          fetch(`${API_BASE}/api/medicines`),
+          fetch(`${API_BASE}/api/medicines/top`)
         ]);
         const allData = await allRes.json();
         const topData = await topRes.json();
         setMedicines(allData);
         setFeatured(topData);
+      } catch (err) {
+        console.error("Hub data sync failed:", err);
       } finally {
         setLoading(false);
       }
@@ -74,14 +73,15 @@ const Home = () => {
     return () => clearInterval(timer);
   }, [banners.length]);
 
-  // Upload Logic
+  // Upload Logic with RENDER API_BASE support
   const handleUploadPrescription = async () => {
     if (!selectedFile) return alert("Select a file first!");
     setIsUploading(true);
+    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     const formData = new FormData();
     formData.append('prescription', selectedFile);
     try {
-      const response = await fetch('http://localhost:5000/api/prescriptions/scan-and-check', {
+      const response = await fetch(`${API_BASE}/api/prescriptions/scan-and-check`, {
         method: 'POST',
         body: formData,
       });
@@ -106,9 +106,6 @@ const Home = () => {
           <div className="absolute inset-0 flex flex-col justify-center px-12 z-10">
             <h1 className="text-3xl md:text-5xl font-black mb-2 italic uppercase tracking-tighter leading-none">{banners[currentBanner].title}</h1>
             <p className="text-lg opacity-90 max-w-md font-bold italic">{banners[currentBanner].desc}</p>
-            <div className="mt-4 flex items-center gap-4">
-              <span className="text-[10px] font-black border-2 border-dashed border-white/50 px-3 py-1.5 rounded uppercase tracking-widest">Code: {banners[currentBanner].code}</span>
-            </div>
           </div>
         </div>
       </div>
@@ -129,10 +126,7 @@ const Home = () => {
         <div className="bg-[#FFF4E8] rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-[#FFD9B1]">
           <div className="flex items-center gap-6">
             <div className="text-5xl">📄</div>
-            <div>
-              <h2 className="text-xl font-black italic uppercase text-[#4D2C00]">Order with Prescription</h2>
-              <p className="text-sm text-[#8B5E3C] font-bold">Upload and we'll handle the rest.</p>
-            </div>
+            <h2 className="text-xl font-black italic uppercase text-[#4D2C00]">Order with Prescription</h2>
           </div>
           <div className="flex gap-4">
             <input type="file" className="hidden" ref={fileInputRef} onChange={(e) => setSelectedFile(e.target.files[0])} />
@@ -146,48 +140,19 @@ const Home = () => {
         </div>
       </div>
 
-      {/* 4. SCAN RESULT BOX */}
-      {scanResult && (
-        <div className="max-w-7xl mx-auto px-4 mb-8 animate-fadeIn">
-          <div className="bg-white border-2 border-[#2874f0] p-6 rounded-sm shadow-xl relative">
-            <button onClick={() => setScanResult(null)} className="absolute top-2 right-4 text-gray-400 font-black">✕</button>
-            <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-[3px] mb-4">Scan Results for: <span className="text-[#2874f0] italic underline">{scanResult.medicineName}</span></h4>
-            {scanResult.foundProduct ? (
-              <div className="flex flex-col md:flex-row items-center gap-8">
-                <img src={scanResult.foundProduct.image} className="w-40 h-40 object-contain p-4 border" alt="" />
-                <div className="text-center md:text-left">
-                  <h3 className="text-2xl font-black text-gray-900 uppercase italic tracking-tighter">{scanResult.foundProduct.name}</h3>
-                  <p className="text-green-600 font-black text-xs uppercase mt-2 italic tracking-widest">✓ Recognized & In Stock @ Amritsar Hub</p>
-                  <button onClick={() => addToCart(scanResult.foundProduct)} className="mt-6 bg-[#fb641b] text-white px-10 py-3 font-black uppercase text-xs shadow-lg">Add to Cart — ₹{scanResult.foundProduct.price}</button>
-                </div>
-              </div>
-            ) : (
-              <div className="p-6 bg-red-50 border border-red-100 flex items-center gap-6 rounded-sm">
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl shadow-sm">⚠️</div>
-                <div className="flex-1 text-red-600 font-black uppercase text-sm italic tracking-tighter">Inventory Status: Out of Stock</div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* 5. DAILY DEALS (REMOVED REDUNDANT NAVIGATE) */}
+      {/* 4. DAILY DEALS (MedicineCard handles details navigation) */}
       <section className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex items-center gap-4 mb-6">
-          <h3 className="text-xl font-black italic uppercase tracking-tighter">Daily Flash Deals</h3>
-          <span className="bg-red-500 text-white text-[10px] px-2 py-1 rounded font-black animate-pulse">04:12:55 LEFT</span>
-        </div>
+        <h3 className="text-xl font-black italic uppercase tracking-tighter mb-6">Daily Flash Deals</h3>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           {featured.map((med) => (
             <div key={med._id}>
-              {/* MedicineCard already has its own navigation to product details! */}
               <MedicineCard {...med} />
             </div>
           ))}
         </div>
       </section>
 
-      {/* 6. FEATURED BRANDS */}
+      {/* 5. FEATURED BRANDS (As per image_3f4f7d.png) */}
       <section className="max-w-7xl mx-auto px-4 py-12 bg-gray-50/50">
         <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-2">
           <h2 className="text-xl font-bold text-[#212121]">Featured brands</h2>
@@ -201,31 +166,33 @@ const Home = () => {
                   <img src={brand.img} alt={brand.name} className="w-[85%] h-[85%] object-contain group-hover:scale-110 transition-transform duration-300" />
                 </div>
               </div>
-              <span className="mt-2 text-[10px] font-bold text-gray-500 uppercase tracking-tighter text-center">{brand.name}</span>
+              <span className="mt-2 text-[10px] font-bold text-gray-500 uppercase text-center">{brand.name}</span>
             </div>
           ))}
         </div>
       </section>
 
-      {/* 7. BESTSELLERS (REMOVED REDUNDANT NAVIGATE) */}
+      {/* 6. BESTSELLERS (Targeting Categories Section - FIXES BACK BUTTON LOOP) */}
       <section className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex justify-between items-end mb-8">
           <h3 className="text-2xl font-black italic uppercase tracking-tighter leading-none">Bestsellers in Amritsar Hub</h3>
-          <button onClick={() => navigate('/medicines')} className="text-[#ff6f61] font-black text-xs uppercase">View All</button>
+          <button onClick={() => navigate('/medicines')} className="text-[#ff6f61] font-black text-xs uppercase underline">View All Categories</button>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
           {medicines.slice(0, 10).map((med) => (
             <div key={med._id} className="group flex flex-col">
-              {/* MedicineCard already has its own navigation to product details! */}
+              {/* Card click correctly goes to Details page via internal MedicineCard navigate */}
               <MedicineCard {...med} />
+              
+              {/* Separate sub-link click goes to Category page */}
               <div 
                 onClick={(e) => {
-                    e.stopPropagation(); // Stops the Details navigation from triggering
-                    navigate(`/medicines?category=${med.category}`);
+                    e.stopPropagation(); // Prevents MedicineCard Details click
+                    navigate(`/medicines?category=${med.category || 'All'}`);
                 }}
-                className="mt-2 text-[9px] font-black text-blue-500 uppercase opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:underline"
+                className="mt-2 text-[9px] font-black text-blue-500 uppercase opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:underline text-center"
               >
-                View similar in {med.brand} →
+                View similar in {med.category} →
               </div>
             </div>
           ))}
@@ -233,8 +200,6 @@ const Home = () => {
       </section>
 
       <style>{`
-        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        .animate-marquee { animation: marquee 20s linear infinite; }
         .animate-fadeIn { animation: fadeIn 0.4s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
