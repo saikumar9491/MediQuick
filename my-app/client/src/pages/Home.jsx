@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import MedicineCard from '../components/medicine/MedicineCard';
 
+
+
 const Home = () => {
   const navigate = useNavigate();
   const { addToCart, showNotification } = useCart();
@@ -16,6 +18,8 @@ const Home = () => {
   const [featured, setFeatured] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [currentBanner, setCurrentBanner] = useState(0);
+
+  
 
   // 1. TATA 1MG STYLE BANNER DATA
   const banners = useMemo(() => [

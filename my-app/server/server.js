@@ -5,33 +5,48 @@ import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js'; 
 import medicineRoutes from './routes/medicineRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
-import prescriptionRoutes from './routes/prescriptionRoutes.js'; // Added import
+import prescriptionRoutes from './routes/prescriptionRoutes.js';
 
 dotenv.config();
 
-// Connect to MongoDB
+// Connect to MongoDB using the updated Atlas URI
 connectDB();
 
 const app = express();
 
-// Middlewares - Must come BEFORE routes
+// --- DYNAMIC CORS CONFIGURATION ---
+// This allows both your local testing and your future hosted frontend (Vercel)
+const allowedOrigins = [
+  'http://localhost:5173', 
+  'https://your-frontend-domain.vercel.app' // Replace this after hosting your frontend
+];
+
 app.use(cors({
-  origin: 'http://localhost:5173', 
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) === -1) {
+      return callback(new Error('CORS Policy: This origin is not allowed'), false);
+    }
+    return callback(null, true);
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true
 }));
 
 app.use(express.json()); 
 
-// Routes
+// API Routes
 app.use('/api/users', userRoutes); 
 app.use('/api/medicines', medicineRoutes);
 app.use('/api/orders', orderRoutes);
-app.use('/api/prescriptions', prescriptionRoutes); // Registering the new route
+app.use('/api/prescriptions', prescriptionRoutes);
 
+// Health Check / Root Route
 app.get('/', (req, res) => {
-  res.send('🚀 MediQuick+ API is running and healthy!');
+  res.send('🚀 MediQuick+ API is running and healthy on the cloud!');
 });
 
+// Use the PORT from environment variables (important for Render/Heroku)
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
