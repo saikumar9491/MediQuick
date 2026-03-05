@@ -15,10 +15,11 @@ connectDB();
 const app = express();
 
 // --- DYNAMIC CORS CONFIGURATION ---
-// This allows both your local testing and your future hosted frontend (Vercel)
 const allowedOrigins = [
   'http://localhost:5173', 
-  'https://your-frontend-domain.vercel.app' // Replace this after hosting your frontend
+  'https://mediquick-53b1.onrender.com', // Your backend URL
+  // --- ADD YOUR NEW FRONTEND RENDER LINK BELOW ---
+  'https://mediquick-1.onrender.com' 
 ];
 
 app.use(cors({
@@ -47,6 +48,6 @@ app.get('/', (req, res) => {
   res.send('🚀 MediQuick+ API is running and healthy on the cloud!');
 });
 
-// Use the PORT from environment variables (important for Render/Heroku)
+// Use the PORT from environment variables (important for Render)
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
