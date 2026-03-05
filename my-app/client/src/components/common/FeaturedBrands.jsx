@@ -1,64 +1,59 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-
-const brands = [
-  { name: 'Cetaphil', logo: 'https://brandlogos.net/wp-content/uploads/2022/06/cetaphil-logo_brandlogos.net_e7mys.png' },
-  { name: 'Himalaya', logo: 'https://zerocreativity0.wordpress.com/wp-content/uploads/2017/01/himalaya-logo.jpg' },
-  { name: 'Abbott', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0cb9mh8T2WrdZ9OnjwGzq0rG2hcuNCZ5Tsw&s' },
-  { name: 'Cipla', logo: 'https://cdn.thepharmaletter.com/convert/files/2024/04/d048f3d0-0153-11ef-a588-e798d47e404e-cipla-big.png/r%5Bwidth%5D=320/d048f3d0-0153-11ef-a588-e798d47e404e-cipla-big.webp' },
-  { name: 'Dettol', logo: 'https://1000logos.net/wp-content/uploads/2020/04/Dettol-Logo-2010.jpg' },
-  { name: 'Nivea', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRiREgSU9NaKl9HrEiyo-IH-xPSeOd_Tb5_zA&s' },
-  { name: 'Omron', logo: 'https://industrial.omron.eu/images/video_default_thumbnail.jpg' },
-  { name: 'PentaSure', logo: 'https://pentasurenutrition.com/cdn/shop/files/PentaSure-logo.png?v=1718862987' },
-  { name: 'Dr. Morepen', logo: 'https://media.licdn.com/dms/image/v2/C4E0BAQFj9xmjoi9Ccg/company-logo_200_200/company-logo_200_200/0/1630643946445?e=2147483647&v=beta&t=EGJjuMhTrRnMXN4MN74ZpN6nj5f0jjjOPC1NphqvgfE' },
-  { name: 'Tata 1mg', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ3uwK-Jo4awLWQbvrSASmkKaRsguDcG98V4Q&s' },
-];
+import { useNavigate } from 'react-router-dom';
 
 const FeaturedBrands = () => {
+  const navigate = useNavigate();
+
+  const brands = [
+    { name: "Pilgrim", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/e8e604d5-072e-4b77-8051-9310a08e6587.png" },
+    { name: "Dr. Morepen", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/6ec7a4f5-9377-4959-992e-360e676104bc.png" },
+    { name: "Miduty", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/8b46e9df-9884-482d-8007-881b212f0290.png" },
+    { name: "Omron", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/72574e4c-1e81-432d-82d2-83b53c713b1d.png" },
+    { name: "PentaSure", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/43773177-3e2b-435f-846c-2f941198642a.png" },
+    { name: "Optimum Nutrition", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/d6f4661a-283e-4d4b-97e3-0c460d3d5f57.png" },
+    { name: "Prohance", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/80d07525-412f-48e0-a430-671c08007323.png" },
+    { name: "Tejasya", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/273d6118-977a-426b-967b-232506e76315.png" }
+  ];
+
   return (
-    <div className="my-12 px-2">
-      {/* Header Section */}
-      <div className="mb-8">
-        <h2 className="text-xl font-black text-gray-800 tracking-tight border-l-4 border-blue-600 pl-4">
-          Featured Brands
-        </h2>
-      </div>
-
-      {/* Horizontal Scroll Container */}
-      <div className="flex space-x-6 overflow-x-auto pb-6 overflow-y-hidden">
-        {brands.map((brand, index) => (
-          /* Wrap the content in a Link to enable brand-specific routing */
-          <Link 
-            key={index} 
-            to={`/brand/${brand.name}`}
-            className="flex-shrink-0 flex flex-col items-center group cursor-pointer no-underline"
+    <section className="bg-white py-6">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Header with Title and See All Button */}
+        <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-2">
+          <h2 className="text-xl font-bold text-[#212121]">Featured brands</h2>
+          <button 
+            onClick={() => navigate('/all-brands')}
+            className="text-[#ff6f61] font-bold text-xs uppercase border border-[#ff6f61] px-3 py-1 rounded hover:bg-[#ff6f61] hover:text-white transition-all"
           >
-            <div className="w-24 h-24 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center p-4 group-hover:shadow-lg group-hover:border-blue-200 transition-all duration-300">
-              <img 
-                src={brand.logo} 
-                alt={brand.name} 
-                className="max-w-full max-h-full object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
-                onError={(e) => { e.target.src = 'https://placehold.co/100?text=Brand'; }} 
-              />
-            </div>
-            <span className="mt-3 text-xs font-bold text-gray-400 group-hover:text-blue-600 uppercase tracking-widest transition-colors">
-              {brand.name}
-            </span>
-          </Link>
-        ))}
-      </div>
+            See All
+          </button>
+        </div>
 
-      {/* Internal CSS for hidden scrollbar */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        .overflow-x-auto::-webkit-scrollbar {
-          display: none;
-        }
-        .overflow-x-auto {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}} />
-    </div>
+        {/* Circular Logo Grid */}
+        <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
+          {brands.map((brand, idx) => (
+            <div 
+              key={idx}
+              onClick={() => navigate(`/brand/${brand.name}`)}
+              className="group cursor-pointer flex flex-col items-center"
+            >
+              <div className="w-full aspect-square bg-white border border-gray-100 rounded-lg flex items-center justify-center p-2 hover:shadow-md transition-shadow">
+                <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center shadow-inner bg-white">
+                  <img 
+                    src={brand.logo} 
+                    alt={brand.name} 
+                    className="w-[85%] h-[85%] object-contain group-hover:scale-110 transition-transform duration-300"
+                  />
+                </div>
+              </div>
+              <span className="mt-2 text-[10px] font-bold text-gray-600 text-center uppercase tracking-tighter">
+                {brand.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   );
 };
 
