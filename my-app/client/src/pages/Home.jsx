@@ -36,17 +36,17 @@ const Home = () => {
     { name: "Tejasya", img: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/273d6118-977a-426b-967b-232506e76315.png" }
   ];
 
-  // 3. SERVICE GRID DATA
+  // 3. SERVICE GRID DATA - UPDATED WITH PATHS
   const services = [
-    { title: "Medicines", img: "💊", desc: "Flat 25% Off", color: "text-orange-600" },
-    { title: "Lab Tests", img: "🔬", desc: "Up to 70% Off", color: "text-blue-600" },
-    { title: "Consult Doctor", img: "👨‍⚕️", desc: "Online Chat", color: "text-teal-600" },
-    { title: "Ayurveda", img: "🌿", desc: "Pure Herbal", color: "text-green-600" },
-    { title: "Care Plan", img: "💳", desc: "Extra Savings", color: "text-red-600" },
-    { title: "Skin Care", img: "✨", desc: "Dermatologist Approved", color: "text-pink-600" },
+    { title: "Medicines", img: "💊", desc: "Flat 25% Off", color: "text-orange-600", path: "/medicines" },
+    { title: "Lab Tests", img: "🔬", desc: "Up to 70% Off", color: "text-blue-600", path: "/lab-tests" },
+    { title: "Consult Doctor", img: "👨‍⚕️", desc: "Online Chat", color: "text-teal-600", path: "/consult" },
+    { title: "Ayurveda", img: "🌿", desc: "Pure Herbal", color: "text-green-600", path: "/ayurveda" },
+    { title: "Care Plan", img: "💳", desc: "Extra Savings", color: "text-red-600", path: "/care-plan" },
+    { title: "Skin Care", img: "✨", desc: "Dermatologist Approved", color: "text-pink-600", path: "/skin-care" },
   ];
 
-  // Fetch Logic with RENDER API_BASE support
+  // Fetch Logic
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -73,7 +73,6 @@ const Home = () => {
     return () => clearInterval(timer);
   }, [banners.length]);
 
-  // Upload Logic with RENDER API_BASE support
   const handleUploadPrescription = async () => {
     if (!selectedFile) return alert("Select a file first!");
     setIsUploading(true);
@@ -110,10 +109,14 @@ const Home = () => {
         </div>
       </div>
 
-      {/* 2. SERVICE GRID */}
+      {/* 2. SERVICE GRID - NAVIGATION LOGIC ADDED */}
       <div className="max-w-7xl mx-auto px-4 py-2 grid grid-cols-3 md:grid-cols-6 gap-4 border-b border-gray-100">
         {services.map((service, idx) => (
-          <div key={idx} className="cursor-pointer flex flex-col items-center p-4 hover:shadow-md rounded-xl transition-all group">
+          <div 
+            key={idx} 
+            onClick={() => navigate(service.path)} // TRIGGERS NAVIGATION
+            className="cursor-pointer flex flex-col items-center p-4 hover:shadow-md rounded-xl transition-all group"
+          >
             <div className="text-4xl mb-2 group-hover:scale-110 transition-transform">{service.img}</div>
             <span className="text-[12px] font-black uppercase tracking-tight">{service.title}</span>
             <span className={`text-[10px] font-bold ${service.color}`}>{service.desc}</span>
@@ -140,7 +143,7 @@ const Home = () => {
         </div>
       </div>
 
-      {/* 4. DAILY DEALS (MedicineCard handles details navigation) */}
+      {/* 4. DAILY DEALS */}
       <section className="max-w-7xl mx-auto px-4 py-8">
         <h3 className="text-xl font-black italic uppercase tracking-tighter mb-6">Daily Flash Deals</h3>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -152,7 +155,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 5. FEATURED BRANDS (As per image_3f4f7d.png) */}
+      {/* 5. FEATURED BRANDS */}
       <section className="max-w-7xl mx-auto px-4 py-12 bg-gray-50/50">
         <div className="flex justify-between items-center mb-6 border-b border-gray-200 pb-2">
           <h2 className="text-xl font-bold text-[#212121]">Featured brands</h2>
@@ -172,7 +175,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* 6. BESTSELLERS (Targeting Categories Section - FIXES BACK BUTTON LOOP) */}
+      {/* 6. BESTSELLERS */}
       <section className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex justify-between items-end mb-8">
           <h3 className="text-2xl font-black italic uppercase tracking-tighter leading-none">Bestsellers in Amritsar Hub</h3>
@@ -181,13 +184,10 @@ const Home = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
           {medicines.slice(0, 10).map((med) => (
             <div key={med._id} className="group flex flex-col">
-              {/* Card click correctly goes to Details page via internal MedicineCard navigate */}
               <MedicineCard {...med} />
-              
-              {/* Separate sub-link click goes to Category page */}
               <div 
                 onClick={(e) => {
-                    e.stopPropagation(); // Prevents MedicineCard Details click
+                    e.stopPropagation(); 
                     navigate(`/medicines?category=${med.category || 'All'}`);
                 }}
                 className="mt-2 text-[9px] font-black text-blue-500 uppercase opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:underline text-center"
