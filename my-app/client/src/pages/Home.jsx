@@ -73,28 +73,41 @@ const Home = () => {
     return () => clearInterval(timer);
   }, [banners.length]);
 
-  const handleUploadPrescription = async () => {
-    if (!selectedFile) return alert("Select a file first!");
+ const handleUploadPrescription = async () => {
+  if (!selectedFile) return alert("Please select a file first!");
+
+  try {
     setIsUploading(true);
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    
+    // 1. Prepare FormData
     const formData = new FormData();
-    formData.append('prescription', selectedFile);
-    try {
-      const response = await fetch(`${API_BASE}/api/prescriptions/scan-and-check`, {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setScanResult(data);
-        setSelectedFile(null);
-      }
-    } catch (error) {
-      console.error("Scan error", error);
-    } finally {
-      setIsUploading(false);
+    formData.append('prescription', selectedFile); 
+
+    // 2. Make the call
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/prescriptions/scan-and-check`, {
+      method: 'POST',
+      headers: {
+        // DO NOT include 'Content-Type' here!
+        'Authorization': `Bearer ${token}` 
+      },
+      body: formData, 
+    });
+
+    const data = await response.json();
+    console.log("Response from server:", data);
+
+    if (response.ok) {
+       // logic to show the found medicine (e.g., alert or modal)
+       alert(`Scanning Complete: Found ${data.medicineName}`);
+    } else {
+       alert("Upload failed: " + data.message);
     }
-  };
+  } catch (error) {
+    console.error("CRITICAL FRONTEND ERROR:", error);
+  } finally {
+    setIsUploading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-white font-sans text-[#212121]">
@@ -124,24 +137,72 @@ const Home = () => {
         ))}
       </div>
 
-      {/* 3. QUICK UPLOAD STRIP */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="bg-[#FFF4E8] rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-[#FFD9B1]">
-          <div className="flex items-center gap-6">
-            <div className="text-5xl">📄</div>
-            <h2 className="text-xl font-black italic uppercase text-[#4D2C00]">Order with Prescription</h2>
-          </div>
-          <div className="flex gap-4">
-            <input type="file" className="hidden" ref={fileInputRef} onChange={(e) => setSelectedFile(e.target.files[0])} />
-            <button onClick={() => fileInputRef.current.click()} className="bg-white border-2 border-[#ff6f61] text-[#ff6f61] px-8 py-3 rounded-lg font-black text-xs uppercase">
-              {selectedFile ? "Ready" : "Select Prescription"}
-            </button>
-            <button onClick={handleUploadPrescription} disabled={isUploading} className="bg-[#ff6f61] text-white px-10 py-3 rounded-lg font-black text-xs uppercase shadow-lg">
-              {isUploading ? "Scanning..." : "Upload Now"}
-            </button>
-          </div>
-        </div>
+     {/* 3. QUICK UPLOAD STRIP */}
+<div className="max-w-7xl mx-auto px-4 py-8">
+  <div className="bg-[#FFF4E8] rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-[#FFD9B1] relative overflow-hidden">
+    
+    {/* Decorative Background Icon */}
+    <div className="absolute -right-4 -bottom-4 opacity-5 text-9xl transform rotate-12 select-none">📄</div>
+
+    <div className="flex items-center gap-6 z-10">
+      <div className="text-5xl drop-shadow-md">📄</div>
+      <div>
+        <h2 className="text-xl font-black italic uppercase text-[#4D2C00]">Order with Prescription</h2>
+        <p className="text-[10px] font-bold text-[#8B5E3C] uppercase tracking-tighter">Verified pharmacists will review your order</p>
       </div>
+    </div>
+
+    <div className="flex flex-col items-end gap-2 z-10">
+      <div className="flex gap-4">
+        <input 
+          type="file" 
+          className="hidden" 
+          ref={fileInputRef} 
+          accept="image/*,.pdf"
+          onChange={(e) => setSelectedFile(e.target.files[0])} 
+        />
+        
+        <button 
+          onClick={() => fileInputRef.current.click()} 
+          className={`px-8 py-3 rounded-lg font-black text-xs uppercase transition-all border-2 ${
+            selectedFile 
+            ? "bg-green-50 border-green-500 text-green-600" 
+            : "bg-white border-[#ff6f61] text-[#ff6f61] hover:bg-[#fff5f4]"
+          }`}
+        >
+          {selectedFile ? "📎 Change File" : "Select Prescription"}
+        </button>
+
+        <button 
+          onClick={handleUploadPrescription} 
+          disabled={isUploading || !selectedFile} 
+          className={`px-10 py-3 rounded-lg font-black text-xs uppercase shadow-lg transition-all ${
+            !selectedFile 
+            ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+            : "bg-[#ff6f61] text-white hover:bg-[#e65a50] active:scale-95"
+          }`}
+        >
+          {isUploading ? "Scanning..." : "Upload Now"}
+        </button>
+      </div>
+
+      {/* --- THIS IS THE MISSING PIECE: FILE DISPLAY --- */}
+      {selectedFile && (
+        <div className="flex items-center gap-2 bg-white/50 px-3 py-1 rounded-full border border-[#FFD9B1] animate-bounce-short">
+          <span className="text-[10px] font-black text-[#4D2C00] uppercase italic">
+            Selected: {selectedFile.name.length > 20 ? selectedFile.name.substring(0, 20) + "..." : selectedFile.name}
+          </span>
+          <button 
+            onClick={() => setSelectedFile(null)} 
+            className="text-red-500 font-bold text-xs hover:scale-125 transition-transform"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
 
       {/* 4. DAILY DEALS */}
       <section className="max-w-7xl mx-auto px-4 py-8">

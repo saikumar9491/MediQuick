@@ -7,11 +7,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check local storage to keep the user logged in after page refresh
     const savedUser = localStorage.getItem('mediQuickUser');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
+    if (savedUser) setUser(JSON.parse(savedUser));
     setLoading(false);
   }, []);
 
@@ -23,12 +20,12 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('mediQuickUser');
-    localStorage.removeItem('userToken');
+    localStorage.clear(); // Security: Wipe browser memory
+    window.location.href = '/login'; // Force hard reload to reset all Contexts
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );

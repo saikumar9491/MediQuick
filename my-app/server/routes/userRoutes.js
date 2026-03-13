@@ -5,7 +5,9 @@ import {
   getUserProfile, 
   verifyOtp,
   forgotPassword, 
-  resetPassword 
+  resetPassword,
+  updateCart,         // Added
+  removeFromWishlist  // Added
 } from '../controllers/userController.js';
 import { verifyToken } from '../middleware/authMiddleware.js';
 
@@ -32,10 +34,16 @@ router.post('/reset-password', resetPassword);
 
 /**
  * @description PRIVATE ROUTES
- * Requires 'verifyToken' middleware
+ * Requires 'verifyToken' middleware to ensure users only access their own data
  */
 
-// Fetch user profile data
+// Fetch user profile data (Now includes populated Cart and Wishlist)
 router.get('/profile', verifyToken, getUserProfile);
+
+// Update/Sync the user's cart in the database
+router.post('/cart/update', verifyToken, updateCart);
+
+// Remove a specific product from the user's wishlist
+router.post('/wishlist/remove', verifyToken, removeFromWishlist);
 
 export default router;

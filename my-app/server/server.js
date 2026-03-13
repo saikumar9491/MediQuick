@@ -6,7 +6,7 @@ import userRoutes from './routes/userRoutes.js';
 import medicineRoutes from './routes/medicineRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import prescriptionRoutes from './routes/prescriptionRoutes.js';
-
+import cartRoutes from './routes/cartRoutes.js';
 // 1. Load Environment Variables FIRST
 dotenv.config();
 
@@ -43,11 +43,14 @@ app.use(cors({
 app.use(express.json()); // Body parser
 app.use(express.urlencoded({ extended: true })); // Allows URL-encoded data
 
+
+
 // 5. --- API ROUTES ---
 app.use('/api/users', userRoutes); 
 app.use('/api/medicines', medicineRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
+app.use('/api/cart', cartRoutes);
 
 // 6. --- HEALTH CHECK / ROOT ROUTE ---
 app.get('/', (req, res) => {

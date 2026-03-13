@@ -81,7 +81,6 @@ export const verifyOtp = async (req, res) => {
 };
 
 // @desc    Forgot Password - Send OTP
-// @route   POST /api/users/forgot-password
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
@@ -103,7 +102,6 @@ export const forgotPassword = async (req, res) => {
 };
 
 // @desc    Reset Password with OTP
-// @route   POST /api/users/reset-password
 export const resetPassword = async (req, res) => {
   const { email, otp, newPassword } = req.body;
   try {
@@ -121,12 +119,60 @@ export const resetPassword = async (req, res) => {
   }
 };
 
-// @desc    Get user profile (Private)
-export const getUserProfile = async (req, res) => {
+// --- NEW PERSISTENCE LOGIC ADDED BELOW ---
+
+// @desc    Update/Sync User Cart
+// @route   POST /api/users/cart/update
+export const updateCart = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Expects req.body.cart to be [{productId, quantity}, ...]
+    user.cart = req.body.cart; 
+    await user.save();
+    res.status(200).json({ message: "Cart updated successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Cart sync failed", error: error.message });
+  }
+};
+
+// @desc    Remove Item from Wishlist
+// @route   POST /api/users/wishlist/remove
+export const removeFromWishlist = async (req, res) => {
+  try {
+    const { productId } = req.body;
+    const user = await User.findById(req.user.id);
+    
+    // Pull the ID from the wishlist array
+    user.wishlist = user.wishlist.filter(id => id.toString() !== productId);
+    
+    await user.save();
+    res.status(200).json({ message: "Removed from wishlist" });
+  } catch (error) {
+    res.status(500).json({ message: "Wishlist update failed" });
+  }
+};
+
+// @desc    Get user profile (Private) - UPDATED WITH POPULATE
+// @route   GET /api/users/profile
+export const getUserProfile = async (req, res) => {
+  try {
+    // .populate('wishlist') fills the ID with actual medicine data
+    // .populate('cart.productId') fills the productId field in cart objects
+    const user = await User.findById(req.user.id)
+      .populate('wishlist')
+      .populate('cart.productId');
+
     if (user) {
-      res.json({ _id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin });
+      res.json({ 
+        _id: user._id, 
+        name: user.name, 
+        email: user.email, 
+        isAdmin: user.isAdmin,
+        cart: user.cart,
+        wishlist: user.wishlist
+      });
     } else {
       res.status(404).json({ message: 'User not found' });
     }

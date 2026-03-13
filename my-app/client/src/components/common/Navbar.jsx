@@ -35,6 +35,7 @@ const Navbar = ({ medicines = [] }) => {
 
   const handleLogoutAction = () => {
     logout(); 
+    // Redirect to login after logout
     navigate('/login');
   };
 
@@ -45,12 +46,10 @@ const Navbar = ({ medicines = [] }) => {
         {/* UNIQUE MINIMALIST LOGO DESIGN */}
         <Link to="/" className="flex items-center group relative">
           <div className="relative">
-            {/* Geometric Shield Icon */}
             <div className="bg-gradient-to-br from-blue-600 to-blue-800 text-white w-11 h-11 flex items-center justify-center rounded-xl shadow-lg shadow-blue-200 group-hover:rotate-[10deg] transition-all duration-300">
                <span className="text-xl font-black tracking-tighter italic">M</span>
                <span className="text-green-400 font-bold text-lg leading-none">+</span>
             </div>
-            {/* Visual Flare */}
             <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse"></div>
           </div>
           
@@ -83,7 +82,6 @@ const Navbar = ({ medicines = [] }) => {
             </div>
           </div>
 
-          {/* SEARCH DROPDOWN */}
           {showSearchDropdown && searchTerm && (
             <div className="absolute top-full left-0 right-0 bg-white border border-gray-100 rounded-xl mt-3 shadow-2xl overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2">
               {results.length > 0 ? (
@@ -155,11 +153,12 @@ const Navbar = ({ medicines = [] }) => {
           
           <Link to="/cart" className="relative group">
             <div className="bg-gray-50 p-3 rounded-full group-hover:bg-blue-50 transition-colors">
-               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700 group-hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-               </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700 group-hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
             </div>
-            {cartItems?.length > 0 && (
+            {/* FIX: Check both user existence and cartItems length */}
+            {user && cartItems?.length > 0 && (
               <span className="absolute -top-1 -right-1 bg-[#fb641b] text-white text-[9px] font-black rounded-full h-5 w-5 flex items-center justify-center border-2 border-white shadow-lg animate-pulse">
                 {cartItems.length}
               </span>

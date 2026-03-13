@@ -1,78 +1,86 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  // Load initial cart from localStorage to prevent data loss on refresh
-  const [cart, setCart] = useState(() => {
-    const savedCart = localStorage.getItem('cart');
-    return savedCart ? JSON.parse(savedCart) : [];
-  });
+  const { user, token } = useAuth();
+  const [cart, setCart] = useState([]);
+  
+  // A "Ref" helps prevent the auto-save from running while we are still loading data
+  const isInitialLoad = useRef(true);
 
-  const [toast, setToast] = useState({ show: false, message: "", type: "success" });
-
-  // Sync cart to localStorage whenever it changes
+  // 1. SYNC FROM DATABASE ON LOGIN
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
-  }, [cart]);
+    const fetchUserData = async () => {
+      if (user?._id && token) {
+        try {
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users/profile`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const data = await res.json();
+          
+          if (data.cart) {
+            const formattedCart = data.cart.map(item => ({
+              ...item.productId, 
+              quantity: item.quantity
+            }));
+            
+            // Mark that we are loading data so the "Auto-save" doesn't trigger immediately
+            isInitialLoad.current = true; 
+            setCart(formattedCart);
+          }
+        } catch (err) { console.error("Sync error", err); }
+      } else {
+        setCart([]);
+      }
+    };
+    fetchUserData();
+  }, [user?._id, token]); // Only re-run if ID or Token actually changes
 
-  const showNotification = (msg, type = "success") => {
-    setToast({ show: true, message: msg, type });
-    setTimeout(() => setToast({ show: false, message: "", type: "success" }), 3000);
-  };
+  // 2. AUTO-SAVE TO DATABASE ON CHANGE
+  useEffect(() => {
+    // FIX: Don't save if it's the first load OR if there's no user
+    if (isInitialLoad.current) {
+      isInitialLoad.current = false;
+      return;
+    }
+
+    if (user?._id && token) {
+      const dbItems = cart.map(item => ({
+        productId: item._id,
+        quantity: item.quantity
+      }));
+
+      // Using a small timeout or debouncing here is better, but this works for now
+      fetch(`${import.meta.env.VITE_API_URL}/api/users/cart/update`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ cart: dbItems })
+      });
+    }
+  }, [cart]); // Only trigger when the cart items change
 
   const addToCart = (product) => {
-    setCart((prevItems) => {
-      const existingItem = prevItems.find(item => item._id === product._id);
-      if (existingItem) {
-        showNotification(`${product.name} quantity updated!`);
-        return prevItems.map(item =>
-          item._id === product._id ? { ...item, quantity: (item.quantity || 1) + 1 } : item
+    if (!user) return alert("Please Login First!");
+    
+    setCart(prev => {
+      const exists = prev.find(item => item._id === product._id);
+      if (exists) {
+        return prev.map(item => 
+          item._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-      showNotification(`${product.name} added to cart!`);
-      return [...prevItems, { ...product, quantity: 1 }];
+      return [...prev, { ...product, quantity: 1 }];
     });
   };
 
-  const updateQuantity = (id, newQuantity) => {
-    if (newQuantity < 1) return;
-    setCart((prevItems) => prevItems.map(item => item._id === id ? { ...item, quantity: newQuantity } : item));
-  };
-
-  const removeFromCart = (id) => {
-    setCart((prevItems) => prevItems.filter(item => item._id !== id));
-    showNotification("Item removed from cart", "error");
-  };
-
-  // CRITICAL FIX: Function to wipe cart after successful order
-  const clearCart = () => {
-    setCart([]);
-    localStorage.removeItem('cart');
-  };
-
-  const getCartTotal = () => cart.reduce((t, i) => t + (i.price * (i.quantity || 1)), 0);
-
   return (
-    <CartContext.Provider value={{ 
-      cartItems: cart, 
-      addToCart, 
-      removeFromCart, 
-      updateQuantity, 
-      clearCart, // Exported for Checkout.jsx
-      getCartTotal,
-      showNotification 
-    }}>
+    <CartContext.Provider value={{ cartItems: cart, addToCart, setCart }}>
       {children}
-      
-      {/* GLOBAL TOAST NOTIFICATION UI */}
-      {toast.show && (
-        <div className={`fixed bottom-10 left-1/2 -translate-x-1/2 z-[1000] px-6 py-3 rounded-sm shadow-2xl font-black uppercase italic text-xs tracking-widest animate-bounce border-l-4 ${
-          toast.type === 'success' ? 'bg-white text-green-600 border-green-600' : 'bg-white text-red-600 border-red-600'
-        }`}>
-          {toast.type === 'success' ? '✔ ' : '✖ '} {toast.message}
-        </div>
-      )}
     </CartContext.Provider>
   );
 };
