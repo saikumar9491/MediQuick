@@ -5,7 +5,7 @@ const FeaturedBrands = () => {
   const navigate = useNavigate();
 
   const brands = [
-    { name: "Pilgrim", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/e8e604d5-072e-4b77-8051-9310a08e6587.png" },
+    { name: "Fhzer", logo: "https://www.watsons.com.sg/medias/04-Brand-Story-Banner-750x530px-01-IL-01.jpg?context=bWFzdGVyfHJvb3R8NjAxNjF8aW1hZ2UvanBlZ3xoZmMvaGU1LzkwNzMyOTQyNDU5MTguanBnfGQ5ZWI3NGQyMTJkOTU5MzA5YTkzNGNjOWM2NjVhZDBiMjFkZjdkZDQzNDNhNjBhNTUwYjBiZjk3OWQyZGEwMTI" },
     { name: "Dr. Morepen", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/6ec7a4f5-9377-4959-992e-360e676104bc.png" },
     { name: "Miduty", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/8b46e9df-9884-482d-8007-881b212f0290.png" },
     { name: "Omron", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/72574e4c-1e81-432d-82d2-83b53c713b1d.png" },

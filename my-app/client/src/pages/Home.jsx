@@ -26,14 +26,14 @@ const Home = () => {
 
   // 2. BRAND DATA
   const brandLogos = [
-    { name: "Pilgrim", img: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/e8e604d5-072e-4b77-8051-9310a08e6587.png" },
-    { name: "Dr. Morepen", img: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/6ec7a4f5-9377-4959-992e-360e676104bc.png" },
-    { name: "Miduty", img: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/8b46e9df-9884-482d-8007-881b212f0290.png" },
-    { name: "Omron", img: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/72574e4c-1e81-432d-82d2-83b53c713b1d.png" },
-    { name: "PentaSure", img: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/43773177-3e2b-435f-846c-2f941198642a.png" },
-    { name: "Optimum Nutrition", img: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/d6f4661a-283e-4d4b-97e3-0c460d3d5f57.png" },
-    { name: "Prohance", img: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/80d07525-412f-48e0-a430-671c08007323.png" },
-    { name: "Tejasya", img: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/273d6118-977a-426b-967b-232506e76315.png" }
+    { name: "himalaya", img: "https://www.watsons.com.sg/medias/04-Brand-Story-Banner-750x530px-01-IL-01.jpg?context=bWFzdGVyfHJvb3R8NjAxNjF8aW1hZ2UvanBlZ3xoZmMvaGU1LzkwNzMyOTQyNDU5MTguanBnfGQ5ZWI3NGQyMTJkOTU5MzA5YTkzNGNjOWM2NjVhZDBiMjFkZjdkZDQzNDNhNjBhNTUwYjBiZjk3OWQyZGEwMTI" },
+    { name: "cetaphil", img: "https://mir-s3-cdn-cf.behance.net/projects/404/fd66d1160593807.Y3JvcCw2MjcsNDkwLDEzNiw5MQ.jpg" },
+    { name: "Pilgrim", img: "https://images.yourstory.com/cs/images/companies/Pilgrim-1624019483873.jpg" },
+    { name: "Accu-chek", img: "https://www.logosvgpng.com/wp-content/uploads/2018/09/accu-chek-logo-vector.png" },
+    { name: "PentaSure", img: "https://th.bing.com/th/id/R.d4bebbe9a31ce35ca40a48b8229aa163?rik=aMVwFck4mff8aQ&riu=http%3a%2f%2fpentasurenutrition.com%2fcdn%2fshop%2ffiles%2fPentaSure-logo.png%3fv%3d1718862987&ehk=%2fm4SFCnatztjh5EbTsNKewqUJpAt5lwkB7Ogmjo0eUE%3d&risl=&pid=ImgRaw&r=0" },
+    { name: "Optimum Nutrition", img: "https://tse4.mm.bing.net/th/id/OIP.Fz9_NbeoX05Pm7ZWHwlr4wHaEK?rs=1&pid=ImgDetMain&o=7&rm=3" },
+    { name: "Prohance", img: "https://pbs.twimg.com/profile_images/654650890335334400/oxTrSWLY_400x400.png" },
+    { name: "Tejasya", img: "https://aniportalimages.s3.amazonaws.com/media/details/Capture_2QlQdnb.jpg" }
   ];
 
   // 3. SERVICE GRID DATA - UPDATED WITH PATHS
