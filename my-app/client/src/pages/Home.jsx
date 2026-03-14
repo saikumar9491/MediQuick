@@ -1,17 +1,19 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 import MedicineCard from '../components/medicine/MedicineCard';
 
 const Home = () => {
   const navigate = useNavigate();
   const { addToCart, showNotification } = useCart();
+  const { token, user } = useAuth();
   const fileInputRef = useRef(null);
   
   // State Management
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [scanResult, setScanResult] = useState(null);
+  const [scanResult, setScanResult] = useState(null); // Used for the dropdown
   const [medicines, setMedicines] = useState([]);
   const [featured, setFeatured] = useState([]); 
   const [loading, setLoading] = useState(true);
@@ -36,7 +38,7 @@ const Home = () => {
     { name: "Tejasya", img: "https://aniportalimages.s3.amazonaws.com/media/details/Capture_2QlQdnb.jpg" }
   ];
 
-  // 3. SERVICE GRID DATA - UPDATED WITH PATHS
+  // 3. SERVICE GRID DATA
   const services = [
     { title: "Medicines", img: "💊", desc: "Flat 25% Off", color: "text-orange-600", path: "/medicines" },
     { title: "Lab Tests", img: "🔬", desc: "Up to 70% Off", color: "text-blue-600", path: "/lab-tests" },
@@ -73,41 +75,42 @@ const Home = () => {
     return () => clearInterval(timer);
   }, [banners.length]);
 
- const handleUploadPrescription = async () => {
-  if (!selectedFile) return alert("Please select a file first!");
+  const handleUploadPrescription = async () => {
+    if (!user) return alert("Please Login First to upload prescriptions!"); 
+    if (!selectedFile) return alert("Please select a file first!");
 
-  try {
-    setIsUploading(true);
-    
-    // 1. Prepare FormData
-    const formData = new FormData();
-    formData.append('prescription', selectedFile); 
+    try {
+      setIsUploading(true);
+      setScanResult(null); // Reset previous scan
+      
+      const formData = new FormData();
+      formData.append('prescription', selectedFile); 
 
-    // 2. Make the call
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/prescriptions/scan-and-check`, {
-      method: 'POST',
-      headers: {
-        // DO NOT include 'Content-Type' here!
-        'Authorization': `Bearer ${token}` 
-      },
-      body: formData, 
-    });
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      
+      const response = await fetch(`${API_BASE}/api/prescriptions/scan-and-check`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}` 
+        },
+        body: formData, 
+      });
 
-    const data = await response.json();
-    console.log("Response from server:", data);
+      const data = await response.json();
 
-    if (response.ok) {
-       // logic to show the found medicine (e.g., alert or modal)
-       alert(`Scanning Complete: Found ${data.medicineName}`);
-    } else {
-       alert("Upload failed: " + data.message);
+      if (response.ok) {
+         // Successfully found medicine, set it to show dropdown
+         setScanResult(data.foundProduct);
+         setSelectedFile(null); 
+      } else {
+         alert("Upload failed: " + data.message);
+      }
+    } catch (error) {
+      console.error("CRITICAL FRONTEND ERROR:", error);
+    } finally {
+      setIsUploading(false);
     }
-  } catch (error) {
-    console.error("CRITICAL FRONTEND ERROR:", error);
-  } finally {
-    setIsUploading(false);
-  }
-};
+  };
 
   return (
     <div className="min-h-screen bg-white font-sans text-[#212121]">
@@ -122,12 +125,12 @@ const Home = () => {
         </div>
       </div>
 
-      {/* 2. SERVICE GRID - NAVIGATION LOGIC ADDED */}
+      {/* 2. SERVICE GRID */}
       <div className="max-w-7xl mx-auto px-4 py-2 grid grid-cols-3 md:grid-cols-6 gap-4 border-b border-gray-100">
         {services.map((service, idx) => (
           <div 
             key={idx} 
-            onClick={() => navigate(service.path)} // TRIGGERS NAVIGATION
+            onClick={() => navigate(service.path)} 
             className="cursor-pointer flex flex-col items-center p-4 hover:shadow-md rounded-xl transition-all group"
           >
             <div className="text-4xl mb-2 group-hover:scale-110 transition-transform">{service.img}</div>
@@ -137,72 +140,97 @@ const Home = () => {
         ))}
       </div>
 
-     {/* 3. QUICK UPLOAD STRIP */}
-<div className="max-w-7xl mx-auto px-4 py-8">
-  <div className="bg-[#FFF4E8] rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-[#FFD9B1] relative overflow-hidden">
-    
-    {/* Decorative Background Icon */}
-    <div className="absolute -right-4 -bottom-4 opacity-5 text-9xl transform rotate-12 select-none">📄</div>
+      {/* 3. QUICK UPLOAD STRIP WITH RESULT DROPDOWN */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="flex flex-col">
+          <div className={`bg-[#FFF4E8] p-8 flex flex-col md:flex-row items-center justify-between gap-6 border border-[#FFD9B1] relative overflow-hidden transition-all duration-500 ${scanResult ? 'rounded-t-2xl' : 'rounded-2xl'}`}>
+            
+            <div className="absolute -right-4 -bottom-4 opacity-5 text-9xl transform rotate-12 select-none">📄</div>
 
-    <div className="flex items-center gap-6 z-10">
-      <div className="text-5xl drop-shadow-md">📄</div>
-      <div>
-        <h2 className="text-xl font-black italic uppercase text-[#4D2C00]">Order with Prescription</h2>
-        <p className="text-[10px] font-bold text-[#8B5E3C] uppercase tracking-tighter">Verified pharmacists will review your order</p>
-      </div>
-    </div>
+            <div className="flex items-center gap-6 z-10">
+              <div className="text-5xl drop-shadow-md">📄</div>
+              <div>
+                <h2 className="text-xl font-black italic uppercase text-[#4D2C00]">Order with Prescription</h2>
+                <p className="text-[10px] font-bold text-[#8B5E3C] uppercase tracking-tighter">Verified pharmacists will review your order</p>
+              </div>
+            </div>
 
-    <div className="flex flex-col items-end gap-2 z-10">
-      <div className="flex gap-4">
-        <input 
-          type="file" 
-          className="hidden" 
-          ref={fileInputRef} 
-          accept="image/*,.pdf"
-          onChange={(e) => setSelectedFile(e.target.files[0])} 
-        />
-        
-        <button 
-          onClick={() => fileInputRef.current.click()} 
-          className={`px-8 py-3 rounded-lg font-black text-xs uppercase transition-all border-2 ${
-            selectedFile 
-            ? "bg-green-50 border-green-500 text-green-600" 
-            : "bg-white border-[#ff6f61] text-[#ff6f61] hover:bg-[#fff5f4]"
-          }`}
-        >
-          {selectedFile ? "📎 Change File" : "Select Prescription"}
-        </button>
+            <div className="flex flex-col items-end gap-2 z-10">
+              <div className="flex gap-4">
+                <input 
+                  type="file" 
+                  className="hidden" 
+                  ref={fileInputRef} 
+                  accept="image/*,.pdf"
+                  onChange={(e) => setSelectedFile(e.target.files[0])} 
+                />
+                
+                <button 
+                  onClick={() => fileInputRef.current.click()} 
+                  className={`px-8 py-3 rounded-lg font-black text-xs uppercase transition-all border-2 ${
+                    selectedFile ? "bg-green-50 border-green-500 text-green-600" : "bg-white border-[#ff6f61] text-[#ff6f61] hover:bg-[#fff5f4]"
+                  }`}
+                >
+                  {selectedFile ? "📎 Change File" : "Select Prescription"}
+                </button>
 
-        <button 
-          onClick={handleUploadPrescription} 
-          disabled={isUploading || !selectedFile} 
-          className={`px-10 py-3 rounded-lg font-black text-xs uppercase shadow-lg transition-all ${
-            !selectedFile 
-            ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
-            : "bg-[#ff6f61] text-white hover:bg-[#e65a50] active:scale-95"
-          }`}
-        >
-          {isUploading ? "Scanning..." : "Upload Now"}
-        </button>
-      </div>
+                <button 
+                  onClick={handleUploadPrescription} 
+                  disabled={isUploading || !selectedFile} 
+                  className={`px-10 py-3 rounded-lg font-black text-xs uppercase shadow-lg transition-all ${
+                    !selectedFile ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-[#ff6f61] text-white hover:bg-[#e65a50] active:scale-95"
+                  }`}
+                >
+                  {isUploading ? "Scanning..." : "Upload Now"}
+                </button>
+              </div>
 
-      {/* --- THIS IS THE MISSING PIECE: FILE DISPLAY --- */}
-      {selectedFile && (
-        <div className="flex items-center gap-2 bg-white/50 px-3 py-1 rounded-full border border-[#FFD9B1] animate-bounce-short">
-          <span className="text-[10px] font-black text-[#4D2C00] uppercase italic">
-            Selected: {selectedFile.name.length > 20 ? selectedFile.name.substring(0, 20) + "..." : selectedFile.name}
-          </span>
-          <button 
-            onClick={() => setSelectedFile(null)} 
-            className="text-red-500 font-bold text-xs hover:scale-125 transition-transform"
-          >
-            ✕
-          </button>
+              {selectedFile && (
+                <div className="flex items-center gap-2 bg-white/50 px-3 py-1 rounded-full border border-[#FFD9B1] animate-bounce-short">
+                  <span className="text-[10px] font-black text-[#4D2C00] uppercase italic">
+                    Selected: {selectedFile.name.length > 20 ? selectedFile.name.substring(0, 20) + "..." : selectedFile.name}
+                  </span>
+                  <button onClick={() => setSelectedFile(null)} className="text-red-500 font-bold text-xs hover:scale-125 transition-transform">✕</button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* MEDICINE RESULT DROPDOWN */}
+          {scanResult && (
+            <div className="bg-white border-x border-b border-[#FFD9B1] rounded-b-2xl p-6 shadow-xl animate-fadeIn flex items-center justify-between">
+              <div className="flex items-center gap-6">
+                <div className="w-20 h-20 bg-gray-50 rounded-xl overflow-hidden border p-2">
+                  <img src={scanResult.image} alt={scanResult.name} className="w-full h-full object-contain" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-black uppercase">Medicine Found</span>
+                  </div>
+                  <h4 className="text-lg font-black uppercase text-gray-800 mt-1">{scanResult.name}</h4>
+                  <p className="text-[10px] font-bold text-gray-400 uppercase">{scanResult.brand} | {scanResult.category}</p>
+                  <p className="text-xl font-black text-[#ff6f61] mt-1">₹{scanResult.price}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <button 
+                  onClick={() => { addToCart(scanResult); setScanResult(null); }}
+                  className="bg-[#2874f0] text-white px-10 py-3 rounded-lg font-black text-xs uppercase shadow-lg hover:bg-blue-700 transition-all active:scale-95"
+                >
+                  Add to Cart
+                </button>
+                <button 
+                  onClick={() => setScanResult(null)}
+                  className="text-gray-300 hover:text-red-500 transition-colors px-2"
+                >
+                  <span className="text-2xl font-bold">✕</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    </div>
-  </div>
-</div>
+      </div>
 
       {/* 4. DAILY DEALS */}
       <section className="max-w-7xl mx-auto px-4 py-8">
@@ -262,7 +290,9 @@ const Home = () => {
 
       <style>{`
         .animate-fadeIn { animation: fadeIn 0.4s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-bounce-short { animation: bounce 1s infinite; }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
       `}</style>
 
     </div>

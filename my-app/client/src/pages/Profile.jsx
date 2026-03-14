@@ -1,32 +1,72 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
-  const { user, logout } = useAuth();
+  const { user, token, logout, setUser, loading } = useAuth();
   const navigate = useNavigate();
 
   // State for Profile Edit Mode
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: user?.name || "Member",
-    email: user?.email || "",
-    phone: user?.phone || "98765-43210",
+    name: "",
+    email: "",
+    phone: "",
     address: "Amritsar Hub, Punjab"
   });
+
+  // CRITICAL FIX: Sync form data when user profile is loaded from Cloud
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        address: user.address || "Amritsar Hub, Punjab"
+      });
+    }
+  }, [user]);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const handleSave = () => {
-    // Place API logic here to save to MongoDB
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      
+      const res = await fetch(`${API_BASE}/api/users/profile/update`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (res.ok) {
+        const updatedUser = await res.json();
+        // Update global context so other pages see the new name/phone
+        setUser(updatedUser); 
+        setIsEditing(false);
+        alert("Medical Identity Updated ✅");
+      }
+    } catch (err) {
+      console.error("Profile update failed:", err);
+      alert("Update failed. Check Hub connection.");
+    }
   };
 
+  // Prevent rendering empty fields while syncing
+  if (loading) return (
+    <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="w-10 h-10 border-4 border-[#a855f7] border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-white pb-20 pt-10 px-6">
+    <div className="min-h-screen bg-white pb-20 pt-28 px-6">
       <div className="max-w-6xl mx-auto">
         
         {/* HEADER SECTION */}
@@ -57,21 +97,21 @@ const Profile = () => {
           {/* AVATAR SECTION */}
           <div className="lg:col-span-4">
             <div className="bg-gray-50 rounded-[50px] p-12 text-center border border-gray-100 relative overflow-hidden group">
-              <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#a855f7]/10 rounded-full blur-3xl transition-colors duration-700"></div>
+              <div className="absolute -top-20 -right-20 w-40 h-40 bg-[#a855f7]/10 rounded-full blur-3xl"></div>
               
               <div className="relative z-10">
                 <div className="w-32 h-32 bg-white rounded-[40px] mx-auto flex items-center justify-center text-5xl font-black text-[#a855f7] shadow-2xl border border-gray-50 mb-8 group-hover:scale-110 transition-transform">
-                  {formData.name.charAt(0)}
+                  {formData.name ? formData.name.charAt(0).toUpperCase() : '?'}
                 </div>
                 
                 {isEditing ? (
                   <input 
-                    className="w-full bg-white border-2 border-[#a855f7] rounded-xl px-4 py-2 text-center font-black uppercase italic tracking-tighter outline-none text-xl"
+                    className="w-full bg-white border-2 border-[#a855f7] rounded-xl px-4 py-2 text-center font-black uppercase italic tracking-tighter outline-none text-xl text-gray-900"
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                   />
                 ) : (
-                  <h2 className="text-3xl font-black text-gray-900 uppercase italic tracking-tighter">{formData.name}</h2>
+                  <h2 className="text-3xl font-black text-gray-900 uppercase italic tracking-tighter">{formData.name || "N/A"}</h2>
                 )}
                 
                 <p className="text-[#00dfc4] text-[10px] font-black uppercase tracking-widest mt-3 italic">Verified Pro Patient</p>

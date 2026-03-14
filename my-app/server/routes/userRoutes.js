@@ -6,8 +6,11 @@ import {
   verifyOtp,
   forgotPassword, 
   resetPassword,
-  updateCart,         // Added
-  removeFromWishlist  // Added
+  updateCart,
+  addToWishlist,      
+  removeFromWishlist,
+  updateUserProfile,
+  googleLogin // <--- ADDED THIS IMPORT
 } from '../controllers/userController.js';
 import { verifyToken } from '../middleware/authMiddleware.js';
 
@@ -15,35 +18,29 @@ const router = express.Router();
 
 /**
  * @description PUBLIC ROUTES
- * No token required for these
  */
-
-// Route for initial registration
 router.post('/signup', registerUser);
-
-// Route for OTP verification
 router.post('/verify-otp', verifyOtp);
-
-// Route for standard login
 router.post('/login', authUser);
-
-// Routes for the password recovery feature
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 
+// Added the Google Login Public Route
+router.post('/google-login', googleLogin); // <--- NOW DEFINED
 
 /**
- * @description PRIVATE ROUTES
- * Requires 'verifyToken' middleware to ensure users only access their own data
+ * @description PRIVATE ROUTES (Token Required)
  */
 
-// Fetch user profile data (Now includes populated Cart and Wishlist)
+// 1. Profile & Identity
 router.get('/profile', verifyToken, getUserProfile);
+router.put('/profile/update', verifyToken, updateUserProfile); 
 
-// Update/Sync the user's cart in the database
+// 2. Cart Persistence
 router.post('/cart/update', verifyToken, updateCart);
 
-// Remove a specific product from the user's wishlist
+// 3. Wishlist Persistence
+router.post('/wishlist/add', verifyToken, addToWishlist); 
 router.post('/wishlist/remove', verifyToken, removeFromWishlist);
 
 export default router;

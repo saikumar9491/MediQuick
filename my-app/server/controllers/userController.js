@@ -1,10 +1,64 @@
 import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import { OAuth2Client } from 'google-auth-library'; // Added for Google Auth
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Helper: Generate JWT Token
 const generateToken = (id, isAdmin) => {
   return jwt.sign({ id, isAdmin }, process.env.JWT_SECRET, { expiresIn: '30d' });
+};
+
+// @desc    Google Login / Signup
+// @route   POST /api/users/google-login
+export const googleLogin = async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    // 1. Verify the Google Token
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const { name, email, picture } = ticket.getPayload();
+
+    // 2. Check if user exists in MongoDB
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // 3. Create new user if they don't exist (Auto-Signup)
+      // Generate a random password since they are using Google
+      const randomPassword = Math.random().toString(36).slice(-10);
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(randomPassword, salt);
+
+      user = await User.create({
+        name,
+        email,
+        phone: "Not Provided", 
+        password: hashedPassword,
+        isVerified: true, // Google accounts are pre-verified
+        image: picture 
+      });
+    }
+
+    // 4. Send back JWT and User Info
+    res.json({
+      user: { 
+        _id: user._id, 
+        name: user.name, 
+        email: user.email, 
+        phone: user.phone,
+        isAdmin: user.isAdmin 
+      },
+      token: generateToken(user._id, user.isAdmin),
+    });
+  } catch (error) {
+    console.error("Google Auth Error:", error);
+    res.status(400).json({ message: "Google Authentication Failed" });
+  }
 };
 
 // @desc    Auth user & get token (Login)
@@ -17,7 +71,13 @@ export const authUser = async (req, res) => {
         return res.status(401).json({ message: 'Please verify your account first' });
       }
       res.json({
-        user: { _id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin },
+        user: { 
+          _id: user._id, 
+          name: user.name, 
+          email: user.email, 
+          phone: user.phone,
+          isAdmin: user.isAdmin 
+        },
         token: generateToken(user._id, user.isAdmin),
       });
     } else {
@@ -36,9 +96,7 @@ export const registerUser = async (req, res) => {
     if (userExists) return res.status(400).json({ message: 'User already exists' });
 
     const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log("-----------------------------------------");
     console.log(`🔐 NEW SIGNUP OTP FOR ${email}: ${generatedOtp}`);
-    console.log("-----------------------------------------");
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -80,7 +138,7 @@ export const verifyOtp = async (req, res) => {
   }
 };
 
-// @desc    Forgot Password - Send OTP
+// @desc    Forgot Password
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
@@ -90,18 +148,13 @@ export const forgotPassword = async (req, res) => {
     const resetOtp = Math.floor(100000 + Math.random() * 900000).toString();
     user.otp = resetOtp;
     await user.save();
-
-    console.log("-----------------------------------------");
-    console.log(`🔑 PASSWORD RESET OTP FOR ${email}: ${resetOtp}`);
-    console.log("-----------------------------------------");
-
     res.status(200).json({ message: "Reset OTP sent to terminal" });
   } catch (error) {
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// @desc    Reset Password with OTP
+// @desc    Reset Password
 export const resetPassword = async (req, res) => {
   const { email, otp, newPassword } = req.body;
   try {
@@ -112,71 +165,117 @@ export const resetPassword = async (req, res) => {
     user.password = await bcrypt.hash(newPassword, salt);
     user.otp = undefined;
     await user.save();
-
     res.status(200).json({ message: "Password updated successfully" });
   } catch (error) {
     res.status(500).json({ message: "Reset failed" });
   }
 };
 
-// --- NEW PERSISTENCE LOGIC ADDED BELOW ---
+/**
+ * --- HUB PERSISTENCE & PROFILE LOGIC ---
+ */
+
+// @desc    Update User Profile (Identity Edit)
+export const updateUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (user) {
+      user.name = req.body.name || user.name;
+      user.email = req.body.email || user.email;
+      user.phone = req.body.phone || user.phone;
+      if (req.body.address) user.address = req.body.address;
+
+      const updatedUser = await user.save();
+
+      res.json({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        isAdmin: updatedUser.isAdmin,
+        cart: updatedUser.cart,
+        wishlist: updatedUser.wishlist
+      });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating identity', error: error.message });
+  }
+};
 
 // @desc    Update/Sync User Cart
-// @route   POST /api/users/cart/update
 export const updateCart = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    // Expects req.body.cart to be [{productId, quantity}, ...]
-    user.cart = req.body.cart; 
-    await user.save();
-    res.status(200).json({ message: "Cart updated successfully" });
+    if (req.body.cart && Array.isArray(req.body.cart)) {
+      user.cart = req.body.cart.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity
+      }));
+      await user.save();
+      res.status(200).json({ message: "Cart synced", cart: user.cart });
+    } else {
+      res.status(400).json({ message: "Invalid cart data" });
+    }
   } catch (error) {
-    res.status(500).json({ message: "Cart sync failed", error: error.message });
+    res.status(500).json({ message: "Cart sync failed" });
   }
 };
 
-// @desc    Remove Item from Wishlist
-// @route   POST /api/users/wishlist/remove
-export const removeFromWishlist = async (req, res) => {
+// @desc    Add Item to Wishlist
+export const addToWishlist = async (req, res) => {
   try {
     const { productId } = req.body;
     const user = await User.findById(req.user.id);
-    
-    // Pull the ID from the wishlist array
-    user.wishlist = user.wishlist.filter(id => id.toString() !== productId);
-    
-    await user.save();
-    res.status(200).json({ message: "Removed from wishlist" });
+    if (!user.wishlist.includes(productId)) {
+      user.wishlist.push(productId);
+      await user.save();
+    }
+    res.status(200).json({ message: "Added to wishlist" });
   } catch (error) {
     res.status(500).json({ message: "Wishlist update failed" });
   }
 };
 
-// @desc    Get user profile (Private) - UPDATED WITH POPULATE
-// @route   GET /api/users/profile
+// @desc    Remove Item from Wishlist
+export const removeFromWishlist = async (req, res) => {
+  try {
+    const { productId } = req.body;
+    const user = await User.findById(req.user.id);
+    user.wishlist = user.wishlist.filter(id => id.toString() !== productId);
+    await user.save();
+    res.status(200).json({ message: "Removed from wishlist" });
+  } catch (error) {
+    res.status(500).json({ message: "Wishlist remove failed" });
+  }
+};
+
+// @desc    Get user profile (Private)
 export const getUserProfile = async (req, res) => {
   try {
-    // .populate('wishlist') fills the ID with actual medicine data
-    // .populate('cart.productId') fills the productId field in cart objects
     const user = await User.findById(req.user.id)
-      .populate('wishlist')
-      .populate('cart.productId');
+      .populate({ path: 'wishlist', model: 'Medicine' })
+      .populate({ path: 'cart.productId', model: 'Medicine' })
+      .populate('orders'); 
 
     if (user) {
       res.json({ 
         _id: user._id, 
         name: user.name, 
         email: user.email, 
+        phone: user.phone, 
         isAdmin: user.isAdmin,
-        cart: user.cart,
-        wishlist: user.wishlist
+        cart: user.cart.filter(item => item.productId !== null),
+        wishlist: user.wishlist.filter(item => item !== null),
+        orders: user.orders || [] 
       });
     } else {
       res.status(404).json({ message: 'User not found' });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error fetching profile' });
   }
 };

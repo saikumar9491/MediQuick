@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 const Checkout = () => {
   const { cartItems, clearCart } = useCart();
-  const { user } = useAuth();
+  const { user, token } = useAuth(); // Added token here
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -47,30 +47,48 @@ const Checkout = () => {
     if (!addressData.building || !addressData.pincode) return alert("Please complete address details");
 
     try {
+      // Mapping items to ensure 'productId' is used as per Mongoose Schema
+      const formattedItems = activeCart.map(item => ({
+        productId: item._id, 
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity || 1,
+        image: item.image,
+        brand: item.brand
+      }));
+
       const orderPayload = {
         userId: user?._id,
-        items: activeCart,
+        items: formattedItems,
         totalAmount: total,
         shippingAddress: addressData,
         paymentMethod: paymentMethod,
-        status: "Confirmed",
-        createdAt: new Date().toISOString()
+        status: "Confirmed"
       };
 
       const response = await fetch('http://localhost:5000/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // CRITICAL: Added Auth Token
+        },
         body: JSON.stringify(orderPayload)
       });
+
+      const data = await response.json();
 
       if (response.ok) {
         setOrderPlaced(true);
         if (!isDirectBuy && clearCart) clearCart(); 
         setTimeout(() => { navigate('/my-orders'); }, 3000);
       } else {
-        alert("Server error. Please try again.");
+        // Show specific error from server if available
+        alert(data.message || "Server error. Please try again.");
       }
-    } catch (error) { console.error("Order process error:", error); }
+    } catch (error) { 
+      console.error("Order process error:", error); 
+      alert("Hub Connection Failed. Is your backend running?");
+    }
   };
 
   if (orderPlaced) {
@@ -87,6 +105,8 @@ const Checkout = () => {
   return (
     <div className="bg-[#fcfcfd] min-h-screen pt-24 pb-20 selection:bg-blue-100">
       <div className="max-w-6xl mx-auto px-6">
+        
+        {/* Step Indicator */}
         <div className="flex justify-between items-center mb-12 max-w-2xl mx-auto">
           {[1, 2, 3].map((step) => (
             <div key={step} className="flex flex-col items-center flex-1 relative">
@@ -96,9 +116,11 @@ const Checkout = () => {
             </div>
           ))}
         </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           <div className="lg:col-span-7 space-y-6">
-            {/* Delivery Details Block */}
+            
+            {/* Step 1: Delivery Details */}
             <div className={`bg-white rounded-3xl p-8 border border-gray-100 shadow-sm transition-all duration-500 ${activeStep !== 1 && 'opacity-60 grayscale scale-[0.98]'}`}>
               <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2 italic uppercase tracking-tighter"><span className="w-2 h-6 bg-blue-600 rounded-full"></span> Delivery Details</h2>
               {activeStep === 1 ? (
@@ -116,13 +138,13 @@ const Checkout = () => {
               )}
             </div>
 
-            {/* Review Block */}
+            {/* Step 2: Review Block */}
             <div className={`bg-white rounded-3xl p-8 border border-gray-100 shadow-sm transition-all duration-500 ${activeStep !== 2 && 'opacity-60 grayscale'}`}>
                 <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2 italic uppercase tracking-tighter"><span className="w-2 h-6 bg-blue-600 rounded-full"></span> Review Order</h2>
                 {activeStep === 2 && (<div className="space-y-4 animate-fadeIn"><p className="text-[10px] text-gray-400 font-black uppercase tracking-[3px] italic">{isDirectBuy ? "Processing Direct Hub Purchase Protocol" : `Verifying ${activeCart.length} Inventory Units`}</p><button onClick={() => setActiveStep(3)} className="w-full bg-black text-white py-4 rounded-2xl font-black uppercase text-xs mt-4 italic tracking-widest shadow-xl active:scale-[0.99]">Proceed to Payment</button></div>)}
             </div>
 
-            {/* Payment Block */}
+            {/* Step 3: Payment Block */}
             <div className={`bg-white rounded-3xl p-8 border border-gray-100 shadow-sm transition-all duration-500 ${activeStep !== 3 && 'opacity-60 grayscale'}`}>
               <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2 italic uppercase tracking-tighter"><span className="w-2 h-6 bg-blue-600 rounded-full"></span> Payment Method</h2>
               {activeStep === 3 && (
@@ -135,7 +157,7 @@ const Checkout = () => {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: SUMMARY & NEW FEATURE */}
+          {/* RIGHT COLUMN: SUMMARY */}
           <div className="lg:col-span-5 h-fit sticky top-28">
             <div className="bg-white rounded-[40px] border border-gray-100 shadow-2xl p-8 overflow-hidden relative">
               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-50 blur-3xl rounded-full -mr-16 -mt-16 opacity-40"></div>
@@ -157,7 +179,7 @@ const Checkout = () => {
               </div>
             </div>
 
-            {/* --- UNIQUE FEATURE 3: LOGISTICS PROTOCOL TRACKER --- */}
+            {/* LOGISTICS PROTOCOL TRACKER */}
             <div className="mt-6 bg-[#0a0f18] p-6 rounded-sm text-white relative overflow-hidden shadow-xl">
               <div className="absolute top-0 right-0 w-20 h-20 bg-[#2874f0]/20 blur-2xl rounded-full"></div>
               <h4 className="text-[10px] font-black text-[#2874f0] uppercase tracking-[3px] mb-4">Logistics Protocol</h4>
@@ -173,8 +195,6 @@ const Checkout = () => {
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-ping"></div>
               </div>
             </div>
-            {/* ---------------------------------------------------------------- */}
-            
           </div>
         </div>
       </div>

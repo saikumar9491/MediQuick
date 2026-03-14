@@ -4,14 +4,17 @@ import App from './App.jsx'
 import './index.css'
 import { CartProvider } from './context/CartContext'
 import { AuthProvider } from './context/AuthContext' 
+import { GoogleOAuthProvider } from '@react-oauth/google'; // 1. Import Provider
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    {/* AuthProvider must be on top so CartProvider can see the user state */}
-    <AuthProvider>
-      <CartProvider>
-        <App />
-      </CartProvider>
-    </AuthProvider>
+    {/* 2. Wrap everything with the Google Provider */}
+    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com">
+      <AuthProvider>
+        <CartProvider>
+          <App />
+        </CartProvider>
+      </AuthProvider>
+    </GoogleOAuthProvider>
   </React.StrictMode>,
 )

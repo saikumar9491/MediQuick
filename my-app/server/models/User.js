@@ -14,7 +14,13 @@ const userSchema = new mongoose.Schema({
     productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Medicine' },
     quantity: { type: Number, default: 1 }
   }],
-  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Medicine' }]
+
+  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Medicine' }],
+
+  // ADDED: This connects the user to their orders
+  // Note: Ensure your Order model is named 'Order' in its own file
+  orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }] 
+  
   // -------------------------------------
   
 }, { timestamps: true });

@@ -7,15 +7,13 @@ import medicineRoutes from './routes/medicineRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import prescriptionRoutes from './routes/prescriptionRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
-// 1. Load Environment Variables FIRST
-dotenv.config();
 
-// 2. Connect to MongoDB
+dotenv.config();
 connectDB();
 
 const app = express();
 
-// 3. --- DYNAMIC CORS CONFIGURATION ---
+// 1. SECURITY & PARSING MIDDLEWARE
 const allowedOrigins = [
   'http://localhost:5173', 
   'http://localhost:3000',
@@ -25,9 +23,7 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps, Postman, or curl)
     if (!origin) return callback(null, true);
-    
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     } else {
@@ -39,20 +35,21 @@ app.use(cors({
   credentials: true
 }));
 
-// 4. --- MIDDLEWARE ---
-app.use(express.json()); // Body parser
-app.use(express.urlencoded({ extended: true })); // Allows URL-encoded data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+// 2. STATIC FILES
+// This allows your frontend to view uploaded prescriptions via URL
+app.use('/uploads', express.static('uploads'));
 
-
-// 5. --- API ROUTES ---
+// 3. API ROUTES
 app.use('/api/users', userRoutes); 
 app.use('/api/medicines', medicineRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/cart', cartRoutes);
 
-// 6. --- HEALTH CHECK / ROOT ROUTE ---
+// 4. HEALTH CHECK
 app.get('/', (req, res) => {
   res.status(200).json({
     status: "Healthy",
@@ -61,7 +58,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// 7. --- GLOBAL ERROR HANDLER (Bonus for unique apps) ---
+// 5. GLOBAL ERROR HANDLER
 app.use((err, req, res, next) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   res.status(statusCode).json({
@@ -70,12 +67,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 8. --- START SERVER ---
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`
-  🚀 Server running on port ${PORT}
-  🔗 Local: http://localhost:${PORT}
-  🌟 Mode: ${process.env.NODE_ENV || 'development'}
-  `);
+  console.log(`🚀 Server running on port ${PORT}`);
 });

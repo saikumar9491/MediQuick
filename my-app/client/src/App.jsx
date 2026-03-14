@@ -35,11 +35,11 @@ const ProtectedRoute = () => {
     </div>
   );
   
-  // FIXED: Ensure we return the Navigate component correctly
   return user ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
 function App() {
+  const { loading: authLoading } = useAuth(); // Hook into global auth loading
   const [medicines, setMedicines] = useState([]);
 
   useEffect(() => {
@@ -50,6 +50,22 @@ function App() {
       .then(data => setMedicines(Array.isArray(data) ? data : []))
       .catch(err => console.error("Search sync error:", err));
   }, []);
+
+  // GLOBAL SHIELD: If AuthContext is still syncing with the Cloud Hub, 
+  // we wait here to prevent Contexts from initializing with empty data.
+  if (authLoading) {
+    return (
+      <div className="min-h-screen w-screen flex flex-col items-center justify-center bg-white">
+        <div className="relative">
+          <div className="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
+          <div className="absolute inset-0 flex items-center justify-center text-xl">🏥</div>
+        </div>
+        <p className="mt-6 font-black uppercase italic text-[10px] tracking-[5px] text-gray-400 animate-pulse">
+          Securing Medical Hub Connection...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <Router>
@@ -81,10 +97,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
         </Route>
 
-        {/* FIX: Catch-all route. 
-           If a user hits a 'Not Found' path, we redirect them to home 
-           instead of showing a blank screen.
-        */}
+        {/* Catch-all Redirect */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       

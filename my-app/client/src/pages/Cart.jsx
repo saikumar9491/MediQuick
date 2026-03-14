@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { Loader2, Trash2, Plus, Minus, ShoppingBag } from 'lucide-react'; // Added for better UI
 
 const Cart = () => {
-  const { cartItems, removeFromCart, updateQuantity, getCartTotal } = useCart();
+  const { cartItems, removeFromCart, updateQuantity, getCartTotal, saveStatus } = useCart();
   const navigate = useNavigate();
 
   // --- Dynamic Pricing Logic ---
@@ -22,7 +23,7 @@ const Cart = () => {
       <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center justify-center pt-28 px-4">
         <div className="bg-white p-12 shadow-xl rounded-[40px] text-center border border-gray-100 max-w-md w-full">
           <div className="w-24 h-24 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
-             <span className="text-4xl grayscale opacity-50">🛒</span>
+             <ShoppingBag className="text-gray-300" size={48} />
           </div>
           <h2 className="text-2xl font-black uppercase italic tracking-tighter text-gray-900">Your Hub Cart is Empty</h2>
           <p className="text-gray-400 text-[10px] font-bold mt-2 uppercase tracking-[3px]">Secure medical supplies for your inventory</p>
@@ -38,24 +39,39 @@ const Cart = () => {
   }
 
   return (
-    <div className="bg-[#f8fafc] min-h-screen pb-20 pt-32"> {/* Increased padding for Nav */}
+    <div className="bg-[#f8fafc] min-h-screen pb-20 pt-32">
       <div className="max-w-7xl mx-auto px-6 flex flex-col lg:flex-row gap-8">
         
         {/* LEFT: ITEM LIST */}
         <div className="flex-1 flex flex-col gap-6"> 
           <div className="bg-white shadow-sm border border-gray-100 rounded-[35px] overflow-hidden">
             <div className="p-6 border-b border-gray-50 flex justify-between items-center">
-               <h2 className="font-black uppercase italic tracking-tighter text-lg text-gray-900">Medical Hub Inventory ({cartItems.length})</h2>
+               <div className="flex flex-col">
+                 <h2 className="font-black uppercase italic tracking-tighter text-lg text-gray-900">Medical Hub Inventory ({cartItems.length})</h2>
+                 {/* SAVING INDICATOR */}
+                 <div className="h-4">
+                    {saveStatus === 'saving' && (
+                      <span className="text-[9px] font-bold text-blue-500 animate-pulse uppercase tracking-widest flex items-center gap-1">
+                        <Loader2 size={10} className="animate-spin" /> Syncing with Hub...
+                      </span>
+                    )}
+                    {saveStatus === 'saved' && (
+                      <span className="text-[9px] font-bold text-green-500 uppercase tracking-widest">
+                        ✅ Hub Inventory Secured
+                      </span>
+                    )}
+                 </div>
+               </div>
                <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-3 py-1 rounded-full uppercase tracking-widest">Verified Hub</span>
             </div>
             
             <div className="flex flex-col divide-y divide-gray-50">
               {cartItems.map((item) => (
-                <div key={item._id || item.id} className="p-8 flex flex-col md:flex-row gap-8 hover:bg-gray-50/30 transition-colors group">
+                <div key={item._id} className="p-8 flex flex-col md:flex-row gap-8 hover:bg-gray-50/30 transition-colors group">
                   {/* Image Container */}
                   <div 
                     className="w-32 h-32 bg-gray-50 rounded-[25px] flex-shrink-0 cursor-pointer overflow-hidden p-4" 
-                    onClick={() => navigate(`/product/${item._id || item.id}`)}
+                    onClick={() => navigate(`/product/${item._id}`)}
                   >
                     <img 
                       src={item.image} 
@@ -69,7 +85,7 @@ const Cart = () => {
                     <div>
                       <h3 
                         className="font-black text-gray-900 text-xl uppercase italic tracking-tighter leading-none cursor-pointer hover:text-blue-600 transition-colors"
-                        onClick={() => navigate(`/product/${item._id || item.id}`)}
+                        onClick={() => navigate(`/product/${item._id}`)}
                       >
                         {item.name}
                       </h3>
@@ -79,30 +95,30 @@ const Cart = () => {
                     <div className="flex items-center gap-6 mt-6 md:mt-0">
                       <div className="flex items-center bg-gray-100 rounded-xl p-1">
                         <button 
-                          onClick={() => updateQuantity(item._id || item.id, (item.quantity || 1) - 1)} 
+                          onClick={() => updateQuantity(item._id, item.quantity - 1)} 
                           className="w-8 h-8 flex items-center justify-center bg-white rounded-lg font-black shadow-sm disabled:opacity-30" 
-                          disabled={(item.quantity || 1) <= 1}
-                        > - </button>
-                        <span className="px-5 font-black text-sm text-gray-900">{item.quantity || 1}</span>
+                          disabled={item.quantity <= 1}
+                        > <Minus size={14} /> </button>
+                        <span className="px-5 font-black text-sm text-gray-900">{item.quantity}</span>
                         <button 
-                          onClick={() => updateQuantity(item._id || item.id, (item.quantity || 1) + 1)} 
+                          onClick={() => updateQuantity(item._id, item.quantity + 1)} 
                           className="w-8 h-8 flex items-center justify-center bg-white rounded-lg font-black shadow-sm"
-                        > + </button>
+                        > <Plus size={14} /> </button>
                       </div>
                       <button 
-                        onClick={() => removeFromCart(item._id || item.id)} 
-                        className="text-[9px] font-black text-red-400 uppercase tracking-widest hover:text-red-600 transition-colors"
+                        onClick={() => removeFromCart(item._id)} 
+                        className="flex items-center gap-1 text-[9px] font-black text-red-400 uppercase tracking-widest hover:text-red-600 transition-colors"
                       >
-                        Remove From Hub
+                        <Trash2 size={12} /> Remove From Hub
                       </button>
                     </div>
                   </div>
 
                   {/* Pricing */}
                   <div className="text-right flex flex-col justify-between">
-                    <p className="text-3xl font-black text-gray-900 tracking-tighter italic leading-none">₹{item.price * (item.quantity || 1)}</p>
+                    <p className="text-3xl font-black text-gray-900 tracking-tighter italic leading-none">₹{item.price * item.quantity}</p>
                     <div className="bg-green-50 px-3 py-1 rounded-lg">
-                       <p className="text-[8px] text-green-600 font-black uppercase tracking-widest">In Stock: Amritsar</p>
+                       <p className="text-[8px] text-green-600 font-black uppercase tracking-widest text-center">In Stock: Amritsar</p>
                     </div>
                   </div>
                 </div>
