@@ -5,16 +5,19 @@ import { useAuth } from '../context/AuthContext';
 const Login = () => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth(); // Accesses central login logic
+  const { login } = useAuth(); 
   const navigate = useNavigate();
+
+  // FIX: Dynamic API Base URL
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      // UPDATED ENDPOINT: Changed to /api/users/login to match your backend routes
-      const response = await fetch('http://localhost:5000/api/users/login', {
+      // UPDATED: Replaced hardcoded localhost with dynamic API_BASE
+      const response = await fetch(`${API_BASE}/api/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials)
@@ -23,16 +26,15 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Saves user to localStorage and state via Context
         login(data.user, data.token); 
         alert("Login Successful! Welcome back.");
         navigate('/'); 
       } else {
-        // Handles errors like "Invalid credentials" or "Unverified account"
         alert(data.message || "Login failed");
       }
     } catch (err) {
-      alert("Server error. Ensure your backend is running on port 5000.");
+      // More helpful error message for deployment
+      alert(`Connection failed. Make sure your backend at ${API_BASE} is live.`);
     } finally {
       setLoading(false);
     }
@@ -72,6 +74,7 @@ const Login = () => {
             <input 
               type="email" 
               placeholder="Enter Email" 
+              value={credentials.email}
               required 
               className="w-full border-b-2 py-3 outline-none focus:border-[#2874f0] text-sm font-bold transition-colors"
               onChange={(e) => setCredentials({...credentials, email: e.target.value})}
@@ -81,6 +84,7 @@ const Login = () => {
               <input 
                 type="password" 
                 placeholder="Enter Password" 
+                value={credentials.password}
                 required 
                 className="w-full border-b-2 py-3 outline-none focus:border-[#2874f0] text-sm font-bold transition-colors"
                 onChange={(e) => setCredentials({...credentials, password: e.target.value})}
@@ -91,6 +95,7 @@ const Login = () => {
             </div>
 
             <button 
+              type="submit"
               disabled={loading}
               className="w-full bg-[#fb641b] text-white py-4 font-black uppercase shadow-lg hover:bg-[#f05a18] transition-all transform active:scale-95 text-sm disabled:bg-gray-400"
             >
