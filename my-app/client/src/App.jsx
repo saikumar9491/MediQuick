@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import { CartProvider } from './context/CartContext';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import { useAuth } from './context/AuthContext';
 
 // Pages
 import Home from './pages/Home';
@@ -19,20 +18,23 @@ import MedicinesPage from './pages/MedicinesPage';
 import LabTestsPage from './pages/LabTestsPage'; 
 import ConsultPage from './pages/ConsultPage'; 
 import AyurvedaPage from './pages/AyurvedaPage';
-import CarePlanPage from './pages/CarePlanPage'; // REAL PAGE IMPORTED
-import SkinCarePage from './pages/SkinCarePage'; // REAL PAGE IMPORTED
+import CarePlanPage from './pages/CarePlanPage'; 
+import SkinCarePage from './pages/SkinCarePage'; 
 
 // Global Components
 import WhatsAppSupport from './components/common/WhatsAppSupport';
 import Navbar from './components/common/Navbar';
 
+// Protected Route Component
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
+  
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-white">
-      <div className="animate-spin text-4xl text-[#a855f7]">💊</div>
+      <div className="animate-spin text-4xl">💊</div>
     </div>
   );
+  
   return user ? <Outlet /> : <Navigate to="/login" />;
 };
 
@@ -50,45 +52,42 @@ function App() {
   }, []);
 
   return (
-    <AuthProvider>
-      <CartProvider>
-        <Router>
-          <Navbar medicines={medicines} />
+    <Router>
+      {/* Navbar receives the medicines list for the search bar */}
+      <Navbar medicines={medicines} />
 
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Home medicines={medicines} />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/brand/:brandName" element={<BrandPage />} />
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Home medicines={medicines} />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/brand/:brandName" element={<BrandPage />} />
 
-            {/* --- REAL SERVICE ROUTES --- */}
-            <Route path="/medicines" element={<MedicinesPage />} />
-            <Route path="/lab-tests" element={<LabTestsPage />} />
-            <Route path="/consult" element={<ConsultPage />} />
-            <Route path="/ayurveda" element={<AyurvedaPage />} />
-            <Route path="/care-plan" element={<CarePlanPage />} /> {/* UPDATED */}
-            <Route path="/skin-care" element={<SkinCarePage />} /> {/* UPDATED */}
+        {/* --- REAL SERVICE ROUTES --- */}
+        <Route path="/medicines" element={<MedicinesPage />} />
+        <Route path="/lab-tests" element={<LabTestsPage />} />
+        <Route path="/consult" element={<ConsultPage />} />
+        <Route path="/ayurveda" element={<AyurvedaPage />} />
+        <Route path="/care-plan" element={<CarePlanPage />} /> 
+        <Route path="/skin-care" element={<SkinCarePage />} /> 
 
-            {/* Protected Routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/product/:id" element={<MedicineDetails />} />
-              <Route path="/checkout" element={<Checkout />} />
-              <Route path="/my-orders" element={<MyOrders />} />
-              <Route path="/wishlist" element={<Wishlist />} />
-              <Route path="/profile" element={<Profile />} />
-            </Route>
+        {/* Protected Routes - Only accessible when logged in */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/product/:id" element={<MedicineDetails />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/my-orders" element={<MyOrders />} />
+          <Route path="/wishlist" element={<Wishlist />} />
+          <Route path="/profile" element={<Profile />} />
+        </Route>
 
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-          
-          <WhatsAppSupport />
-        </Router>
-      </CartProvider>
-    </AuthProvider>
+        {/* Fallback to Home */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+      
+      <WhatsAppSupport />
+    </Router>
   );
 }
 

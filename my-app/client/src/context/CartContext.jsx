@@ -6,8 +6,6 @@ const CartContext = createContext();
 export const CartProvider = ({ children }) => {
   const { user, token } = useAuth();
   const [cart, setCart] = useState([]);
-  
-  // A "Ref" helps prevent the auto-save from running while we are still loading data
   const isInitialLoad = useRef(true);
 
   // 1. SYNC FROM DATABASE ON LOGIN
@@ -20,13 +18,12 @@ export const CartProvider = ({ children }) => {
           });
           const data = await res.json();
           
-          if (data.cart) {
+          if (data && data.cart) {
             const formattedCart = data.cart.map(item => ({
               ...item.productId, 
               quantity: item.quantity
             }));
             
-            // Mark that we are loading data so the "Auto-save" doesn't trigger immediately
             isInitialLoad.current = true; 
             setCart(formattedCart);
           }
@@ -36,11 +33,10 @@ export const CartProvider = ({ children }) => {
       }
     };
     fetchUserData();
-  }, [user?._id, token]); // Only re-run if ID or Token actually changes
+  }, [user?._id, token]);
 
   // 2. AUTO-SAVE TO DATABASE ON CHANGE
   useEffect(() => {
-    // FIX: Don't save if it's the first load OR if there's no user
     if (isInitialLoad.current) {
       isInitialLoad.current = false;
       return;
@@ -52,7 +48,6 @@ export const CartProvider = ({ children }) => {
         quantity: item.quantity
       }));
 
-      // Using a small timeout or debouncing here is better, but this works for now
       fetch(`${import.meta.env.VITE_API_URL}/api/users/cart/update`, {
         method: 'POST',
         headers: { 
@@ -62,7 +57,7 @@ export const CartProvider = ({ children }) => {
         body: JSON.stringify({ cart: dbItems })
       });
     }
-  }, [cart]); // Only trigger when the cart items change
+  }, [cart]);
 
   const addToCart = (product) => {
     if (!user) return alert("Please Login First!");
