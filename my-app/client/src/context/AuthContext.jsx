@@ -4,28 +4,38 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null); // Added token state
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('mediQuickUser');
-    if (savedUser) setUser(JSON.parse(savedUser));
+    const savedToken = localStorage.getItem('userToken'); // Retrieve token
+    
+    if (savedUser && savedToken) {
+      setUser(JSON.parse(savedUser));
+      setToken(savedToken);
+    }
     setLoading(false);
   }, []);
 
-  const login = (userData, token) => {
+  const login = (userData, userToken) => {
     setUser(userData);
+    setToken(userToken); // Update token state
     localStorage.setItem('mediQuickUser', JSON.stringify(userData));
-    localStorage.setItem('userToken', token);
+    localStorage.setItem('userToken', userToken);
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.clear(); // Security: Wipe browser memory
-    window.location.href = '/login'; // Force hard reload to reset all Contexts
+    setToken(null);
+    localStorage.clear(); 
+    // This fixed your "Not Found" video issue!
+    window.location.href = '/login'; 
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    // Added 'token' to the value provider
+    <AuthContext.Provider value={{ user, token, login, logout, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );

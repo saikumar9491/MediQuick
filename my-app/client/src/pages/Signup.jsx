@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // Added to handle the session
+import { useAuth } from '../context/AuthContext';
 
 const Signup = () => {
-  const [step, setStep] = useState(1); // 1: Registration, 2: OTP Verification
+  const [step, setStep] = useState(1); 
   const [formData, setFormData] = useState({
     name: '', phone: '', email: '', password: '', confirmPassword: ''
   });
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   
-  const { login } = useAuth(); // Destructured login from context
+  const { login } = useAuth();
   const navigate = useNavigate();
+
+  // FIX: Use dynamic API URL from environment variables
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
@@ -19,8 +22,8 @@ const Signup = () => {
     
     setLoading(true);
     try {
-      // Hits the registration endpoint we built in the backend
-      const response = await fetch('http://localhost:5000/api/users/signup', {
+      // UPDATED: Replaced localhost with dynamic API_BASE
+      const response = await fetch(`${API_BASE}/api/users/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -34,13 +37,12 @@ const Signup = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Backend successfully created user and logged OTP to terminal
         setStep(2); 
       } else {
         alert(data.message || "Signup failed");
       }
     } catch (err) {
-      alert("Server error. Ensure your backend is running on port 5000.");
+      alert(`Connection failed. Ensure your backend at ${API_BASE} is live.`);
     } finally {
       setLoading(false);
     }
@@ -50,7 +52,8 @@ const Signup = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/users/verify-otp', {
+      // UPDATED: Replaced localhost with dynamic API_BASE
+      const response = await fetch(`${API_BASE}/api/users/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: formData.email, otp })
@@ -59,10 +62,9 @@ const Signup = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Log user in automatically so they don't have to go to /login
         login(data.user, data.token); 
         alert("Verification successful! Welcome to the Hub.");
-        navigate('/'); // Redirect to Home/Dashboard
+        navigate('/'); 
       } else {
         alert(data.message || "Invalid OTP code");
       }

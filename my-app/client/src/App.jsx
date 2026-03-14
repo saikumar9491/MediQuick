@@ -35,14 +35,14 @@ const ProtectedRoute = () => {
     </div>
   );
   
-  return user ? <Outlet /> : <Navigate to="/login" />;
+  // FIXED: Ensure we return the Navigate component correctly
+  return user ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
 function App() {
   const [medicines, setMedicines] = useState([]);
 
   useEffect(() => {
-    // API Sync logic using Render environment variables
     const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     
     fetch(`${API_BASE}/api/medicines`)
@@ -53,7 +53,6 @@ function App() {
 
   return (
     <Router>
-      {/* Navbar receives the medicines list for the search bar */}
       <Navbar medicines={medicines} />
 
       <Routes>
@@ -64,7 +63,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/brand/:brandName" element={<BrandPage />} />
 
-        {/* --- REAL SERVICE ROUTES --- */}
+        {/* Service Routes */}
         <Route path="/medicines" element={<MedicinesPage />} />
         <Route path="/lab-tests" element={<LabTestsPage />} />
         <Route path="/consult" element={<ConsultPage />} />
@@ -72,7 +71,7 @@ function App() {
         <Route path="/care-plan" element={<CarePlanPage />} /> 
         <Route path="/skin-care" element={<SkinCarePage />} /> 
 
-        {/* Protected Routes - Only accessible when logged in */}
+        {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/cart" element={<Cart />} />
           <Route path="/product/:id" element={<MedicineDetails />} />
@@ -82,8 +81,11 @@ function App() {
           <Route path="/profile" element={<Profile />} />
         </Route>
 
-        {/* Fallback to Home */}
-        <Route path="*" element={<Navigate to="/" />} />
+        {/* FIX: Catch-all route. 
+           If a user hits a 'Not Found' path, we redirect them to home 
+           instead of showing a blank screen.
+        */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       
       <WhatsAppSupport />
