@@ -7,28 +7,38 @@ import MedicineCard from '../components/medicine/MedicineCard';
 const MedicineDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
-  const { addToCart } = useCart();
+  const { user, token, setUser, loading: authLoading } = useAuth(); // Added token & setUser
+  const { addToCart, showNotification } = useCart();
 
   const [medicine, setMedicine] = useState(null);
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isWishlisted, setIsWishlisted] = useState(false);
 
+  // FIX 1: Use dynamic API_BASE for Render Deployment
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
   useEffect(() => {
     const fetchProductData = async () => {
       try {
         setLoading(true);
         window.scrollTo(0, 0);
-        const res = await fetch(`http://localhost:5000/api/medicines/${id}`);
+
+        // Fetch Medicine Details
+        const res = await fetch(`${API_BASE}/api/medicines/${id}`);
         if (!res.ok) throw new Error("Medicine not found");
         const data = await res.json();
         setMedicine(data);
 
-        const savedWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-        setIsWishlisted(savedWishlist.some(item => item._id === id));
+        // SYNC WISHLIST STATE WITH CLOUD
+        if (user?.wishlist) {
+          setIsWishlisted(user.wishlist.some(item => 
+            (item._id ? item._id.toString() : item.toString()) === id.toString()
+          ));
+        }
 
-        const relRes = await fetch(`http://localhost:5000/api/medicines/related/${id}`);
+        // Fetch Related Products
+        const relRes = await fetch(`${API_BASE}/api/medicines/related/${id}`);
         if (relRes.ok) {
           const relData = await relRes.json();
           setRelated(Array.isArray(relData) ? relData : []);
@@ -39,34 +49,60 @@ const MedicineDetails = () => {
         setLoading(false);
       }
     };
-    if (!authLoading) fetchProductData();
-  }, [id, authLoading]);
 
-  const toggleWishlist = () => {
-    let savedWishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-    if (isWishlisted) {
-      savedWishlist = savedWishlist.filter(item => item._id !== id);
-      setIsWishlisted(false);
-    } else {
-      savedWishlist.push(medicine);
-      setIsWishlisted(true);
+    if (!authLoading) fetchProductData();
+  }, [id, authLoading, user?.wishlist, API_BASE]);
+
+  // FIX 2: Cloud-Synced Wishlist Logic
+  const toggleWishlist = async () => {
+    if (!user) {
+      if (showNotification) showNotification("Please Login First!", "error");
+      return;
     }
-    localStorage.setItem('wishlist', JSON.stringify(savedWishlist));
+
+    const isRemoving = isWishlisted;
+    const endpoint = isRemoving ? '/api/users/wishlist/remove' : '/api/users/wishlist/add';
+
+    try {
+      const res = await fetch(`${API_BASE}${endpoint}`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ productId: id }),
+      });
+
+      if (res.ok) {
+        let updatedWishlist;
+        if (isRemoving) {
+          updatedWishlist = user.wishlist.filter(item => 
+            (item._id ? item._id.toString() : item.toString()) !== id.toString()
+          );
+          setIsWishlisted(false);
+        } else {
+          updatedWishlist = [...user.wishlist, medicine];
+          setIsWishlisted(true);
+        }
+        setUser({ ...user, wishlist: updatedWishlist });
+      }
+    } catch (err) {
+      console.error("Wishlist sync error:", err);
+    }
   };
 
-  // --- FIXED BUY NOW LOGIC ---
   const handleBuyNow = () => {
     if (medicine) {
-      // Pass isDirectBuy and the item data through navigation state
       navigate('/checkout', { 
         state: { isDirectBuy: true, directItem: { ...medicine, quantity: 1 } } 
       }); 
     }
   };
 
+  // --- UI REMAINS THE SAME ---
   if (loading) return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white">
-      <div className="animate-spin text-5xl mb-4 text-[#2874f0]">💊</div>
+      <div className="animate-spin text-5xl mb-4">💊</div>
       <p className="font-black text-gray-400 uppercase tracking-widest italic">Syncing with Amritsar Hub...</p>
     </div>
   );
