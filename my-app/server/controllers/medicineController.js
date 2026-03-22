@@ -12,14 +12,13 @@ export const getMedicines = async (req, res) => {
     }
 
     if (search) {
-      // 'i' makes it case-insensitive
       query.name = { $regex: search, $options: 'i' };
     }
 
     const medicines = await Medicine.find(query).sort({ createdAt: -1 });
     res.status(200).json(medicines);
   } catch (error) {
-    res.status(500).json({ message: "Failed to fetch medicines from Hub" });
+    res.status(500).json({ message: 'Failed to fetch medicines from Hub' });
   }
 };
 
@@ -28,17 +27,18 @@ export const getMedicines = async (req, res) => {
 export const getRelatedMedicines = async (req, res) => {
   try {
     const medicine = await Medicine.findById(req.params.id);
-    if (!medicine) return res.status(404).json({ message: "Medicine not found" });
+    if (!medicine) {
+      return res.status(404).json({ message: 'Medicine not found' });
+    }
 
-    // Finds items in the same category, excluding the current one
     const related = await Medicine.find({
       category: medicine.category,
-      _id: { $ne: medicine._id }
+      _id: { $ne: medicine._id },
     }).limit(5);
 
     res.status(200).json(related || []);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching related items" });
+    res.status(500).json({ message: 'Error fetching related items' });
   }
 };
 
@@ -46,18 +46,22 @@ export const getRelatedMedicines = async (req, res) => {
 // @route   GET /api/medicines/top
 export const getTopMedicines = async (req, res) => {
   try {
-    // Attempt to find medicines with 4 stars or higher
+    // Try to find high-rated medicines first
     let medicines = await Medicine.find({ rating: { $gte: 4 } })
-      .sort({ rating: -1 })
-      .limit(5);
+      .sort({ rating: -1, createdAt: -1 })
+      .limit(8);
 
-    // Fallback: If no high-rated items, just show the latest 5
+    // Fallback: if no high-rated medicines exist, return latest 8 medicines
     if (!medicines || medicines.length === 0) {
-      medicines = await Medicine.find({}).sort({ createdAt: -1 }).limit(5);
+      medicines = await Medicine.find({})
+        .sort({ createdAt: -1 })
+        .limit(8);
     }
+
     res.status(200).json(medicines || []);
   } catch (error) {
-    res.status(200).json([]); // Silent fail to keep UI clean
+    console.error('getTopMedicines error:', error);
+    res.status(200).json([]);
   }
 };
 
@@ -66,10 +70,12 @@ export const getTopMedicines = async (req, res) => {
 export const getMedicineById = async (req, res) => {
   try {
     const medicine = await Medicine.findById(req.params.id);
-    if (!medicine) return res.status(404).json({ message: "Medicine not found" });
+    if (!medicine) {
+      return res.status(404).json({ message: 'Medicine not found' });
+    }
     res.status(200).json(medicine);
   } catch (error) {
-    res.status(500).json({ message: "Invalid ID format or Hub Sync error" });
+    res.status(500).json({ message: 'Invalid ID format or Hub Sync error' });
   }
 };
 
@@ -85,7 +91,10 @@ export const addMedicine = async (req, res) => {
     const savedMedicine = await newMedicine.save();
     res.status(201).json(savedMedicine);
   } catch (error) {
-    res.status(400).json({ message: "Error adding medicine to inventory", error: error.message });
+    res.status(400).json({
+      message: 'Error adding medicine to inventory',
+      error: error.message,
+    });
   }
 };
 
@@ -94,15 +103,18 @@ export const addMedicine = async (req, res) => {
 export const updateMedicine = async (req, res) => {
   try {
     const updatedMedicine = await Medicine.findByIdAndUpdate(
-      req.params.id, 
-      { $set: req.body }, 
+      req.params.id,
+      { $set: req.body },
       { new: true, runValidators: true }
     );
-    
-    if (!updatedMedicine) return res.status(404).json({ message: "Medicine not found" });
+
+    if (!updatedMedicine) {
+      return res.status(404).json({ message: 'Medicine not found' });
+    }
+
     res.status(200).json(updatedMedicine);
   } catch (error) {
-    res.status(400).json({ message: "Update failed", error: error.message });
+    res.status(400).json({ message: 'Update failed', error: error.message });
   }
 };
 
@@ -111,12 +123,14 @@ export const updateMedicine = async (req, res) => {
 export const deleteMedicine = async (req, res) => {
   try {
     const medicine = await Medicine.findById(req.params.id);
-    if (!medicine) return res.status(404).json({ message: "Medicine not found" });
+    if (!medicine) {
+      return res.status(404).json({ message: 'Medicine not found' });
+    }
 
     await Medicine.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: "Unit successfully purged from Hub" });
+    res.status(200).json({ message: 'Unit successfully purged from Hub' });
   } catch (error) {
-    res.status(500).json({ message: "Delete operation failed" });
+    res.status(500).json({ message: 'Delete operation failed' });
   }
 };
 
@@ -132,13 +146,12 @@ export const createMedicineReview = async (req, res) => {
     const medicine = await Medicine.findById(req.params.id);
 
     if (medicine) {
-      // CHECK: Has user already reviewed this?
       const alreadyReviewed = medicine.reviews.find(
         (r) => r.user.toString() === req.user._id.toString()
       );
 
       if (alreadyReviewed) {
-        return res.status(400).json({ message: "Product already reviewed by you" });
+        return res.status(400).json({ message: 'Product already reviewed by you' });
       }
 
       const review = {
@@ -150,18 +163,20 @@ export const createMedicineReview = async (req, res) => {
 
       medicine.reviews.push(review);
       medicine.numReviews = medicine.reviews.length;
-      
-      // Calculate new average rating
-      medicine.rating = 
-        medicine.reviews.reduce((acc, item) => item.rating + acc, 0) / 
+
+      medicine.rating =
+        medicine.reviews.reduce((acc, item) => item.rating + acc, 0) /
         medicine.reviews.length;
 
       await medicine.save();
-      res.status(201).json({ message: "Review added successfully" });
+      res.status(201).json({ message: 'Review added successfully' });
     } else {
-      res.status(404).json({ message: "Medicine not found" });
+      res.status(404).json({ message: 'Medicine not found' });
     }
   } catch (error) {
-    res.status(500).json({ message: "Review submission failed", error: error.message });
+    res.status(500).json({
+      message: 'Review submission failed',
+      error: error.message,
+    });
   }
 };

@@ -9,12 +9,10 @@ const MedicineCard = ({ _id, name, price, brand, needsPrescription, category, im
   const { user, token, setUser } = useAuth();
   const [isWishlisted, setIsWishlisted] = useState(false);
 
-  // 1. IMPROVED SYNC: Check if product ID exists in the cloud wishlist
   useEffect(() => {
     if (user && user.wishlist) {
-      // Use .toString() to ensure ID comparison works regardless of type
-      const found = user.wishlist.some(item => 
-        (item._id ? item._id.toString() : item.toString()) === _id.toString()
+      const found = user.wishlist.some(
+        (item) => (item._id ? item._id.toString() : item.toString()) === _id.toString()
       );
       setIsWishlisted(found);
     } else {
@@ -23,13 +21,12 @@ const MedicineCard = ({ _id, name, price, brand, needsPrescription, category, im
   }, [user?.wishlist, _id]);
 
   const safePrice = price || 0;
-  const mrp = Math.round(safePrice * 1.33); 
+  const mrp = Math.round(safePrice * 1.33);
   const discount = mrp > 0 ? Math.round(((mrp - safePrice) / mrp) * 100) : 0;
 
-  // 2. UPDATED TOGGLE LOGIC
   const toggleWishlist = async (e) => {
-    e.stopPropagation(); 
-    
+    e.stopPropagation();
+
     if (!user || !token) {
       if (showNotification) showNotification("Please Login First!", "error");
       return;
@@ -37,8 +34,7 @@ const MedicineCard = ({ _id, name, price, brand, needsPrescription, category, im
 
     const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     const isRemoving = isWishlisted;
-    
-    // OPTIMISTIC UI UPDATE: Change heart color immediately
+
     setIsWishlisted(!isRemoving);
 
     const endpoint = isRemoving ? '/api/users/wishlist/remove' : '/api/users/wishlist/add';
@@ -46,115 +42,120 @@ const MedicineCard = ({ _id, name, price, brand, needsPrescription, category, im
     try {
       const res = await fetch(`${API_BASE}${endpoint}`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ productId: _id }),
       });
 
       if (res.ok) {
         let updatedWishlist;
+
         if (isRemoving) {
-          updatedWishlist = user.wishlist.filter(item => 
-            (item._id ? item._id.toString() : item.toString()) !== _id.toString()
+          updatedWishlist = user.wishlist.filter(
+            (item) => (item._id ? item._id.toString() : item.toString()) !== _id.toString()
           );
           if (showNotification) showNotification("Removed from Wishlist", "error");
         } else {
-          // Add the full object so the Wishlist page doesn't show "Empty" names
           const productSnapshot = { _id, name, price: safePrice, brand, category, image };
           updatedWishlist = [...user.wishlist, productSnapshot];
           if (showNotification) showNotification("Added to Wishlist!");
         }
-        
-        // Update the Global Auth Context
+
         setUser({ ...user, wishlist: updatedWishlist });
       } else {
-        // Rollback on failure
         setIsWishlisted(isRemoving);
         if (showNotification) showNotification("Sync failed. Try again.", "error");
       }
     } catch (err) {
       console.error("Wishlist sync error:", err);
-      setIsWishlisted(isRemoving); // Rollback on error
+      setIsWishlisted(isRemoving);
     }
   };
 
   const handleAddToCart = (e) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
     addToCart({ _id, name, price: safePrice, brand, category, image });
   };
 
   return (
-    <div 
+    <div
       onClick={() => navigate(`/product/${_id}`)}
-      className="group bg-white cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.1)] transition-all duration-500 flex flex-col h-full rounded-2xl overflow-hidden relative border border-transparent hover:border-blue-100"
+      className="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-transparent bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-500 hover:border-blue-100 hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.1)]"
     >
-      <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
+      <div className="absolute left-2 top-2 sm:left-3 sm:top-3 z-10 flex flex-col gap-1.5 sm:gap-2">
         {discount > 0 && (
-          <span className="bg-blue-600 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-lg rotate-[-2deg]">
+          <span className="rounded-lg bg-blue-600 px-2 py-1 text-[9px] sm:text-[10px] font-black text-white shadow-lg rotate-[-2deg]">
             {discount}% OFF
           </span>
         )}
+
         {needsPrescription && (
-          <span className="bg-white/90 backdrop-blur-sm text-red-500 border border-red-100 text-[9px] font-black px-2 py-1 rounded-md uppercase">
+          <span className="rounded-md border border-red-100 bg-white/90 px-2 py-1 text-[8px] sm:text-[9px] font-black uppercase text-red-500 backdrop-blur-sm">
             Rx Required
           </span>
         )}
       </div>
 
-      <div className="relative p-6 bg-gradient-to-b from-slate-50 to-white flex items-center justify-center h-56 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-50/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-        <img 
-          src={image || `https://placehold.co/400x400/f3f4f6/3b82f6?text=${name || 'Medicine'}`} 
+      <div className="relative flex h-44 sm:h-52 md:h-56 items-center justify-center overflow-hidden bg-gradient-to-b from-slate-50 to-white p-4 sm:p-5 md:p-6">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-50/50 via-transparent to-transparent opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
+
+        <img
+          src={image || `https://placehold.co/400x400/f3f4f6/3b82f6?text=${name || 'Medicine'}`}
           alt={name}
-          className="object-contain w-full h-full group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-700"
+          className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-3"
         />
-        
-        <button 
+
+        <button
           onClick={toggleWishlist}
-          className={`absolute top-3 right-3 p-2.5 rounded-full bg-white shadow-lg transition-all z-20 hover:scale-110 active:scale-90 border border-gray-50`}
+          className="absolute right-2 top-2 sm:right-3 sm:top-3 z-20 rounded-full border border-gray-50 bg-white p-2 sm:p-2.5 shadow-lg transition-all hover:scale-110 active:scale-90"
         >
           {isWishlisted ? (
-            <span className="text-red-500 text-xl block leading-none">❤️</span>
+            <span className="block text-lg sm:text-xl leading-none text-red-500">❤️</span>
           ) : (
-            <span className="text-gray-300 hover:text-red-400 text-xl block leading-none">🤍</span>
+            <span className="block text-lg sm:text-xl leading-none text-gray-300 hover:text-red-400">🤍</span>
           )}
         </button>
       </div>
 
-      <div className="p-5 flex flex-col flex-grow relative bg-white">
-        <p className="text-[10px] font-black text-blue-500 uppercase tracking-[0.2em] mb-1">
+      <div className="relative flex flex-grow flex-col bg-white p-4 sm:p-5">
+        <p className="mb-1 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.18em] sm:tracking-[0.2em] text-blue-500">
           {brand || "Generic"}
         </p>
-        
-        <h3 className="text-base font-extrabold text-slate-800 line-clamp-2 h-12 leading-tight group-hover:text-blue-600 transition-colors">
+
+        <h3 className="line-clamp-2 h-11 sm:h-12 text-sm sm:text-base font-extrabold leading-tight text-slate-800 transition-colors group-hover:text-blue-600">
           {name || "Unnamed Medicine"}
         </h3>
-        
-        <div className="flex items-center gap-2 mt-3">
-          <div className="flex items-center gap-1 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">
-            <span className="text-amber-600 text-[10px] font-black">4.4</span>
-            <span className="text-amber-500 text-[10px]">★</span>
+
+        <div className="mt-3 flex items-center gap-2">
+          <div className="flex items-center gap-1 rounded-full border border-amber-100 bg-amber-50 px-2 py-0.5">
+            <span className="text-[9px] sm:text-[10px] font-black text-amber-600">4.4</span>
+            <span className="text-[9px] sm:text-[10px] text-amber-500">★</span>
           </div>
-          <span className="text-slate-400 text-[10px] font-bold">1,240 Verified</span>
+          <span className="text-[9px] sm:text-[10px] font-bold text-slate-400">1,240 Verified</span>
         </div>
 
-        <div className="mt-5 flex flex-col">
+        <div className="mt-4 sm:mt-5 flex flex-col">
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-slate-900 tracking-tighter">₹{safePrice}</span>
+            <span className="text-xl sm:text-2xl font-black tracking-tighter text-slate-900">
+              ₹{safePrice}
+            </span>
             {mrp > safePrice && (
-              <span className="text-sm text-slate-300 line-through font-bold">₹{mrp}</span>
+              <span className="text-xs sm:text-sm font-bold text-slate-300 line-through">
+                ₹{mrp}
+              </span>
             )}
           </div>
-          <p className="text-[9px] font-black text-green-600 uppercase tracking-widest mt-1">
+
+          <p className="mt-1 text-[8px] sm:text-[9px] font-black uppercase tracking-[0.18em] sm:tracking-widest text-green-600">
             Free Delivery on Hub
           </p>
         </div>
 
-        <button 
+        <button
           onClick={handleAddToCart}
-          className="mt-6 w-full bg-slate-900 text-white py-3.5 rounded-xl font-black text-[11px] uppercase tracking-widest hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-200 transition-all active:scale-[0.98]"
+          className="mt-5 sm:mt-6 w-full rounded-xl bg-slate-900 py-3 sm:py-3.5 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.18em] sm:tracking-widest text-white transition-all hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-200 active:scale-[0.98]"
         >
           Add to Bag — ₹{safePrice}
         </button>

@@ -13,21 +13,25 @@ const ConsultPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pt-24 pb-12 px-4">
-      <div className="max-w-7xl mx-auto">
-        
+    <div className="min-h-screen bg-slate-50/50 px-4 pb-12 pt-20 sm:pt-24 sm:pb-14">
+      <div className="mx-auto max-w-7xl">
         {/* Hero Section */}
-        <div className="bg-gradient-to-br from-teal-500 to-teal-700 rounded-[3rem] p-10 md:p-16 text-white mb-12 shadow-xl shadow-teal-100 relative overflow-hidden">
-          <div className="absolute top-0 right-0 opacity-10 text-[15rem] translate-x-20 -translate-y-10">👨‍⚕️</div>
+        <div className="relative mb-10 sm:mb-12 overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] md:rounded-[3rem] bg-gradient-to-br from-teal-500 to-teal-700 p-6 sm:p-10 md:p-16 text-white shadow-xl shadow-teal-100">
+          <div className="absolute top-0 right-0 translate-x-10 sm:translate-x-16 md:translate-x-20 -translate-y-6 sm:-translate-y-8 md:-translate-y-10 text-[7rem] sm:text-[10rem] md:text-[15rem] opacity-10">
+            👨‍⚕️
+          </div>
+
           <div className="relative z-10 max-w-2xl">
-            <h1 className="text-4xl md:text-6xl font-black italic uppercase tracking-tighter leading-none mb-4">
+            <h1 className="mb-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black italic uppercase tracking-tighter leading-none">
               Consult Top <span className="text-teal-200">Doctors Online</span>
             </h1>
-            <p className="text-lg font-bold italic opacity-90 mb-8">
+
+            <p className="mb-6 sm:mb-8 max-w-xl text-sm sm:text-base md:text-lg font-bold italic opacity-90">
               Private video & chat consultations with verified specialists within 10 minutes.
             </p>
-            <div className="flex flex-wrap gap-4">
-              <button className="bg-white text-teal-700 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg hover:scale-105 transition-transform">
+
+            <div className="flex flex-wrap gap-3 sm:gap-4">
+              <button className="rounded-2xl bg-white px-5 sm:px-8 py-3 sm:py-4 text-[10px] sm:text-xs font-black uppercase tracking-[0.15em] sm:tracking-widest text-teal-700 shadow-lg transition-transform hover:scale-105">
                 Start Consultation Now
               </button>
             </div>
@@ -35,25 +39,34 @@ const ConsultPage = () => {
         </div>
 
         {/* Specialists Grid */}
-        <h2 className="text-2xl font-black italic uppercase tracking-tighter text-slate-800 mb-8 px-2">
+        <h2 className="mb-6 sm:mb-8 px-2 text-xl sm:text-2xl font-black italic uppercase tracking-tighter text-slate-800">
           Pick a <span className="text-teal-600">Speciality</span>
         </h2>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+
+        <div className="mb-14 sm:mb-16 grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
           {specialists.map((doc) => (
-            <div key={doc.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 hover:shadow-2xl transition-all duration-500 group text-center flex flex-col items-center">
-              <div className="text-6xl mb-6 transform transition-transform group-hover:scale-125 group-hover:-rotate-6">
+            <div
+              key={doc.id}
+              className="group flex flex-col items-center rounded-[2rem] sm:rounded-[2.5rem] border border-slate-100 bg-white p-6 sm:p-8 text-center transition-all duration-500 hover:shadow-2xl"
+            >
+              <div className="mb-5 sm:mb-6 text-5xl sm:text-6xl transition-transform group-hover:scale-125 group-hover:-rotate-6">
                 {doc.img}
               </div>
-              <h3 className="text-lg font-black text-slate-800 uppercase tracking-tight mb-2">
+
+              <h3 className="mb-2 text-base sm:text-lg font-black uppercase tracking-tight text-slate-800">
                 {doc.role}
               </h3>
-              <p className="text-xs font-bold text-slate-400 mb-6 leading-relaxed">
+
+              <p className="mb-5 sm:mb-6 text-[11px] sm:text-xs font-bold leading-relaxed text-slate-400">
                 {doc.desc}
               </p>
+
               <div className="mt-auto">
-                <p className="text-xs font-black text-teal-600 mb-4 italic">FEE STARTS @ ₹{doc.fee}</p>
-                <button className="bg-slate-900 text-white px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-teal-600 transition-colors shadow-lg shadow-slate-100">
+                <p className="mb-4 text-[10px] sm:text-xs font-black italic text-teal-600">
+                  FEE STARTS @ ₹{doc.fee}
+                </p>
+
+                <button className="rounded-xl bg-slate-900 px-5 sm:px-6 py-2.5 sm:py-3 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.15em] sm:tracking-widest text-white shadow-lg shadow-slate-100 transition-colors hover:bg-teal-600">
                   Consult Now
                 </button>
               </div>
@@ -62,23 +75,32 @@ const ConsultPage = () => {
         </div>
 
         {/* Trust Section */}
-        <div className="bg-white rounded-[2rem] p-8 border border-slate-100 flex flex-col md:flex-row justify-around items-center gap-8 text-center">
+        <div className="flex flex-col items-center justify-around gap-6 sm:gap-8 rounded-[1.5rem] sm:rounded-[2rem] border border-slate-100 bg-white p-6 sm:p-8 text-center md:flex-row">
           <div>
-            <h4 className="text-3xl font-black text-slate-900 leading-none">100%</h4>
-            <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mt-1">Private & Secure</p>
+            <h4 className="text-2xl sm:text-3xl font-black leading-none text-slate-900">100%</h4>
+            <p className="mt-1 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Private & Secure
+            </p>
           </div>
-          <div className="h-12 w-px bg-slate-100 hidden md:block" />
+
+          <div className="hidden h-12 w-px bg-slate-100 md:block" />
+
           <div>
-            <h4 className="text-3xl font-black text-slate-900 leading-none">500+</h4>
-            <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mt-1">Verified Doctors</p>
+            <h4 className="text-2xl sm:text-3xl font-black leading-none text-slate-900">500+</h4>
+            <p className="mt-1 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Verified Doctors
+            </p>
           </div>
-          <div className="h-12 w-px bg-slate-100 hidden md:block" />
+
+          <div className="hidden h-12 w-px bg-slate-100 md:block" />
+
           <div>
-            <h4 className="text-3xl font-black text-slate-900 leading-none">24/7</h4>
-            <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest mt-1">Available Always</p>
+            <h4 className="text-2xl sm:text-3xl font-black leading-none text-slate-900">24/7</h4>
+            <p className="mt-1 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Available Always
+            </p>
           </div>
         </div>
-
       </div>
     </div>
   );

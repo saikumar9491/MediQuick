@@ -17,36 +17,38 @@ const FeaturedBrands = () => {
 
   return (
     <section className="bg-white py-6">
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Header with Title and See All Button */}
-        <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-2">
-          <h2 className="text-xl font-bold text-[#212121]">Featured brands</h2>
-          <button 
+      <div className="max-w-7xl mx-auto px-3 sm:px-4">
+        <div className="flex items-center justify-between mb-5 border-b border-gray-100 pb-2">
+          <h2 className="text-base sm:text-xl font-bold text-[#212121]">
+            Featured brands
+          </h2>
+
+          <button
             onClick={() => navigate('/all-brands')}
-            className="text-[#ff6f61] font-bold text-xs uppercase border border-[#ff6f61] px-3 py-1 rounded hover:bg-[#ff6f61] hover:text-white transition-all"
+            className="text-[#ff6f61] font-bold text-[10px] sm:text-xs uppercase border border-[#ff6f61] px-2 py-1 sm:px-3 rounded hover:bg-[#ff6f61] hover:text-white transition-all"
           >
             See All
           </button>
         </div>
 
-        {/* Circular Logo Grid */}
-        <div className="grid grid-cols-4 md:grid-cols-8 gap-4">
+        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2 sm:gap-4">
           {brands.map((brand, idx) => (
-            <div 
+            <div
               key={idx}
-              onClick={() => navigate(`/brand/${brand.name}`)}
+              onClick={() => navigate(`/brand/${encodeURIComponent(brand.name)}`)}
               className="group cursor-pointer flex flex-col items-center"
             >
-              <div className="w-full aspect-square bg-white border border-gray-100 rounded-lg flex items-center justify-center p-2 hover:shadow-md transition-shadow">
+              <div className="w-full aspect-square bg-white border border-gray-100 rounded-lg flex items-center justify-center p-1.5 sm:p-3 hover:shadow-md transition-shadow">
                 <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center shadow-inner bg-white">
-                  <img 
-                    src={brand.logo} 
-                    alt={brand.name} 
-                    className="w-[85%] h-[85%] object-contain group-hover:scale-110 transition-transform duration-300"
+                  <img
+                    src={brand.logo}
+                    alt={brand.name}
+                    className="w-[78%] h-[78%] sm:w-[80%] sm:h-[80%] object-contain group-hover:scale-110 transition-transform duration-300"
                   />
                 </div>
               </div>
-              <span className="mt-2 text-[10px] font-bold text-gray-600 text-center uppercase tracking-tighter">
+
+              <span className="mt-1.5 sm:mt-2 text-[7px] sm:text-[10px] font-bold text-gray-600 text-center uppercase tracking-tight leading-tight line-clamp-2 min-h-[20px] sm:min-h-[28px]">
                 {brand.name}
               </span>
             </div>
