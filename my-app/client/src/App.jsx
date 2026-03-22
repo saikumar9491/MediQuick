@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import { Toaster } from 'react-hot-toast'; // Added for global notifications
 
 // Pages
 import Home from './pages/Home';
@@ -20,12 +21,16 @@ import ConsultPage from './pages/ConsultPage';
 import AyurvedaPage from './pages/AyurvedaPage';
 import CarePlanPage from './pages/CarePlanPage'; 
 import SkinCarePage from './pages/SkinCarePage'; 
+import AdminDashboard from './pages/AdminDashboard'; // Import Admin Page
 
 // Global Components
 import WhatsAppSupport from './components/common/WhatsAppSupport';
 import Navbar from './components/common/Navbar';
 
-// Protected Route Component
+/**
+ * --- SECURITY SHIELD: PROTECTED ROUTE ---
+ * Redirects to login if user is not authenticated.
+ */
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
   
@@ -38,8 +43,21 @@ const ProtectedRoute = () => {
   return user ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
+/**
+ * --- SECURITY SHIELD: ADMIN ROUTE ---
+ * Only allows users with isAdmin: true.
+ */
+const AdminRoute = () => {
+  const { user, loading } = useAuth();
+  
+  if (loading) return null;
+  
+  // If user is logged in AND is an admin, let them through
+  return user && user.isAdmin ? <Outlet /> : <Navigate to="/" replace />;
+};
+
 function App() {
-  const { loading: authLoading } = useAuth(); // Hook into global auth loading
+  const { loading: authLoading } = useAuth();
   const [medicines, setMedicines] = useState([]);
 
   useEffect(() => {
@@ -51,8 +69,7 @@ function App() {
       .catch(err => console.error("Search sync error:", err));
   }, []);
 
-  // GLOBAL SHIELD: If AuthContext is still syncing with the Cloud Hub, 
-  // we wait here to prevent Contexts from initializing with empty data.
+  // Global Loading Screen
   if (authLoading) {
     return (
       <div className="min-h-screen w-screen flex flex-col items-center justify-center bg-white">
@@ -69,6 +86,9 @@ function App() {
 
   return (
     <Router>
+      {/* Global Notifications Handler */}
+      <Toaster position="top-center" reverseOrder={false} />
+      
       <Navbar medicines={medicines} />
 
       <Routes>
@@ -87,7 +107,7 @@ function App() {
         <Route path="/care-plan" element={<CarePlanPage />} /> 
         <Route path="/skin-care" element={<SkinCarePage />} /> 
 
-        {/* Protected Routes */}
+        {/* Protected Customer Routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/cart" element={<Cart />} />
           <Route path="/product/:id" element={<MedicineDetails />} />
@@ -95,6 +115,11 @@ function App() {
           <Route path="/my-orders" element={<MyOrders />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/profile" element={<Profile />} />
+        </Route>
+
+        {/* --- THE COMMAND CENTER: ADMIN ONLY --- */}
+        <Route element={<AdminRoute />}>
+          <Route path="/admin-dashboard" element={<AdminDashboard medicines={medicines} />} />
         </Route>
 
         {/* Catch-all Redirect */}

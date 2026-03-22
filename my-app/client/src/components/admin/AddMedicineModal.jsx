@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
   const [formData, setFormData] = useState({
     name: '', price: '', brand: '', category: 'Wellness', image: '', needsRx: false
   });
+  const [loading, setLoading] = useState(false);
+
+  const { token } = useAuth();
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   // Effect to pre-fill form if editing (initialData exists)
   useEffect(() => {
@@ -16,37 +22,42 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
+    // Determine if we are adding (POST) or updating (PUT)
+    const url = initialData 
+      ? `${API_BASE}/api/medicines/${initialData._id}` 
+      : `${API_BASE}/api/medicines`;
     
-    // Retrieve the JWT token for authorization
-    const token = localStorage.getItem('userToken');
+    const method = initialData ? 'PUT' : 'POST';
+
+    const savePromise = fetch(url, {
+      method: method,
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` 
+      },
+      body: JSON.stringify(formData)
+    }).then(async (response) => {
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || "Hub sync failed");
+      return data;
+    });
+
+    toast.promise(savePromise, {
+      loading: initialData ? 'Updating Unit...' : 'Uploading to Hub...',
+      success: initialData ? 'Unit Updated Successfully!' : 'New Unit Added to Hub!',
+      error: (err) => `❌ ${err.message}`,
+    });
 
     try {
-      // Determine if we are adding (POST) or updating (PUT)
-      const url = initialData 
-        ? `http://localhost:5000/api/medicines/${initialData._id}` 
-        : 'http://localhost:5000/api/medicines/add';
-      
-      const method = initialData ? 'PUT' : 'POST';
-
-      const response = await fetch(url, {
-        method: method,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // Added Authorization Header
-        },
-        body: JSON.stringify(formData)
-      });
-      
-      const data = await response.json();
-
-      if (response.ok) {
-        onAdd(data); // Update the UI in AdminDashboard
-        onClose(); // Close modal
-      } else {
-        alert(data.message || "Operation failed. Check admin permissions.");
-      }
+      const data = await savePromise;
+      onAdd(data); // Trigger UI refresh in AdminDashboard
+      onClose();   // Close modal
     } catch (err) {
-      alert("Server error. Ensure your backend is running on port 5000.");
+      console.error("Medicine Save Error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -58,8 +69,8 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
         
         {/* Header */}
         <div className="p-6 border-b flex justify-between items-center bg-gray-50">
-          <h2 className="font-black text-gray-800 uppercase italic">
-            {initialData ? 'Edit Product' : 'Add New Product'}
+          <h2 className="font-black text-gray-800 uppercase italic tracking-tighter">
+            {initialData ? 'Edit Unit Protocol' : 'Register New Inventory'}
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-800 text-2xl leading-none">×</button>
         </div>
@@ -67,17 +78,17 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase text-gray-400">Medicine Name</label>
+            <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Medicine Name</label>
             <input 
               type="text" value={formData.name} required 
-              className="w-full border p-3 text-sm font-bold outline-none focus:border-blue-500" 
+              className="w-full border p-3 text-sm font-bold outline-none focus:border-blue-500 uppercase italic tracking-tighter" 
               onChange={(e) => setFormData({...formData, name: e.target.value})} 
             />
           </div>
 
           <div className="flex gap-4">
             <div className="w-1/2 space-y-1">
-              <label className="text-[10px] font-black uppercase text-gray-400">Price (₹)</label>
+              <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Price (₹)</label>
               <input 
                 type="number" value={formData.price} required 
                 className="w-full border p-3 text-sm font-bold outline-none focus:border-blue-500" 
@@ -85,17 +96,17 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
               />
             </div>
             <div className="w-1/2 space-y-1">
-              <label className="text-[10px] font-black uppercase text-gray-400">Brand</label>
+              <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Brand</label>
               <input 
                 type="text" value={formData.brand} required 
-                className="w-full border p-3 text-sm font-bold outline-none focus:border-blue-500" 
+                className="w-full border p-3 text-sm font-bold outline-none focus:border-blue-500 uppercase tracking-tighter" 
                 onChange={(e) => setFormData({...formData, brand: e.target.value})} 
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase text-gray-400">Category</label>
+            <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Category Classification</label>
             <select 
               className="w-full border p-3 text-sm font-bold outline-none focus:border-blue-500 bg-white" 
               value={formData.category}
@@ -106,11 +117,12 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
               <option value="Skin Care">Skin Care</option>
               <option value="Vitamins">Vitamins</option>
               <option value="Energy Drinks">Energy Drinks</option>
+              <option value="Ayurveda">Ayurveda</option>
             </select>
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] font-black uppercase text-gray-400">Image URL</label>
+            <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest ml-1">Cloud Image Link</label>
             <input 
               type="text" value={formData.image} placeholder="https://..." 
               className="w-full border p-3 text-sm font-bold outline-none focus:border-blue-500" 
@@ -124,13 +136,17 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
               className="w-4 h-4 accent-red-500" 
               onChange={(e) => setFormData({...formData, needsRx: e.target.checked})} 
             />
-            <span className="text-[10px] font-black text-gray-500 group-hover:text-red-500 uppercase transition-colors">
-              Prescription Required (Amritsar Hub Safety)
+            <span className="text-[10px] font-black text-gray-500 group-hover:text-red-600 uppercase transition-colors tracking-widest">
+              Requires Rx Protocol (Amritsar Hub Safety)
             </span>
           </label>
 
-          <button type="submit" className="w-full bg-[#fb641b] text-white py-4 font-black uppercase text-sm shadow-lg hover:bg-[#f05a18] transition-all transform active:scale-95">
-            {initialData ? 'Update Inventory' : 'Save to Inventory'}
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full bg-[#fb641b] text-white py-4 font-black uppercase text-sm shadow-lg hover:bg-[#f05a18] transition-all transform active:scale-95 disabled:bg-gray-400 tracking-[2px] italic"
+          >
+            {loading ? "Establishing Hub Link..." : (initialData ? 'Confirm Update' : 'Authorize New Entry')}
           </button>
         </form>
       </div>
