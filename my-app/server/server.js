@@ -18,7 +18,8 @@ const app = express();
 // 1. DYNAMIC CORS PROTOCOL
 const allowedOrigins = [
   'http://localhost:5173', 
-  'http://localhost:5174', // Port for your current local session
+  'http://localhost:5174',
+  'http://localhost:5175', // Port for your current local session
   'http://localhost:3000',
   'https://mediquick-53b1.onrender.com', 
   'https://mediquick-1.onrender.com'      
