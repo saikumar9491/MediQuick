@@ -9,7 +9,6 @@ import orderRoutes from './routes/orderRoutes.js';
 import prescriptionRoutes from './routes/prescriptionRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 
-// Load Env & Connect Database
 dotenv.config();
 connectDB();
 
@@ -19,16 +18,18 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:5173', 
   'http://localhost:3000',
-  'https://mediquick-53b1.onrender.com', // Backend URL
-  'https://mediquick-1.onrender.com'      // Frontend URL
+  'https://mediquick-1.onrender.com' // YOUR FRONTEND URL
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
+    // 1. Allow internal server-to-server or Postman requests (no origin)
     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV !== 'production') {
+    // 2. Dynamic check
+    const isAllowed = allowedOrigins.some(authOrigin => origin.startsWith(authOrigin));
+    
+    if (isAllowed || process.env.NODE_ENV !== 'production') {
       callback(null, true);
     } else {
       console.warn(`⚠️ CORS blocked an unauthorized origin: ${origin}`);
@@ -36,24 +37,23 @@ app.use(cors({
     }
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'] // Added for extra safety with JWT
 }));
 
-// 2. MIDDLEWARE FOR DATA PARSING
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 3. STATIC STORAGE PROTOCOL
 app.use('/uploads', express.static('uploads'));
 
-// 4. MASTER HUB ROUTES
+// API ROUTES
 app.use('/api/users', userRoutes); 
 app.use('/api/medicines', medicineRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/cart', cartRoutes);
 
-// 5. CLOUD HEALTH MONITOR & HEARTBEAT
+// 5. CLOUD HEALTH MONITOR
 app.get('/', (req, res) => {
   res.status(200).json({
     status: "Active",
@@ -64,11 +64,12 @@ app.get('/', (req, res) => {
 });
 
 /**
- * KEEP-ALIVE PROTOCOL
- * Prevents Render free tier from sleeping (Spinning down)
+ * SELF-PING PROTOCOL
+ * Automatically wakes up the server if it's on Render Free Tier
  */
 const keepAlive = () => {
-  const url = `https://mediquick-53b1.onrender.com/`; 
+  // Use the environment variable if available, otherwise fallback to hardcoded
+  const url = process.env.BACKEND_URL || `https://mediquick-53b1.onrender.com/`; 
   setInterval(async () => {
     try {
       const response = await axios.get(url);
@@ -76,10 +77,9 @@ const keepAlive = () => {
     } catch (err) {
       console.error('❌ Heartbeat Interrupted:', err.message);
     }
-  }, 840000); // Every 14 minutes
+  }, 840000); // 14 Minutes
 };
 
-// 6. GLOBAL ERROR SHIELD
 app.use((err, req, res, next) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   res.status(statusCode).json({
@@ -89,15 +89,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 7. SERVER INITIALIZATION
-const PORT = process.env.PORT || 10000; // Render uses 10000 by default
-app.listen(PORT, () => {
-  console.log(`--- PROTOCOL START ---`);
-  console.log(`🚀 Node Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`📡 Server Port: ${PORT}`);
-  console.log(`----------------------`);
+const PORT = process.env.PORT || 10000; 
+app.listen(PORT, '0.0.0.0', () => { // Explicitly bind to 0.0.0.0 for Render
+  console.log(`--- HUB ONLINE ---`);
+  console.log(`🚀 Mode: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`📡 Port: ${PORT}`);
   
-  // Start Keep-Alive only in production to save local resources
   if (process.env.NODE_ENV === 'production') {
     keepAlive();
   }

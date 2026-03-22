@@ -13,7 +13,7 @@ const ForgotPassword = () => {
   const [canResend, setCanResend] = useState(false);
 
   const navigate = useNavigate();
-  const API_BASE = import.meta.env.VITE_API_URL || 'https://mediquick-53b1.onrender.com';
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   // Countdown Logic for OTP Resend
   useEffect(() => {
@@ -35,10 +35,10 @@ const ForgotPassword = () => {
     const resetRequest = fetch(`${API_BASE}/api/users/forgot-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.toLowerCase() }) // Force Lowercase
+      body: JSON.stringify({ email })
     }).then(async (res) => {
       const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Email not found in Hub.");
+      if (!res.ok) throw new Error(data.message || "Email not found.");
       return data;
     });
 
@@ -72,7 +72,7 @@ const ForgotPassword = () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        email: email.toLowerCase(),
+        email,
         otp: details.otp,
         newPassword: details.newPassword
       })
@@ -103,7 +103,7 @@ const ForgotPassword = () => {
     const resendRequest = fetch(`${API_BASE}/api/users/forgot-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email.toLowerCase() })
+      body: JSON.stringify({ email })
     });
 
     toast.promise(resendRequest, {
@@ -144,10 +144,8 @@ const ForgotPassword = () => {
               type="email" 
               placeholder="Enter Registered Email" 
               required 
-              value={email}
-              // Force lowercase state for database matching
-              className="w-full border-b-2 p-3 outline-none focus:border-[#2874f0] text-sm font-bold transition-colors lowercase placeholder:text-gray-200"
-              onChange={(e) => setEmail(e.target.value.toLowerCase())}
+              className="w-full border-b-2 p-3 outline-none focus:border-[#2874f0] text-sm font-bold transition-colors placeholder:text-gray-200"
+              onChange={(e) => setEmail(e.target.value)}
             />
             <button 
               disabled={loading}
@@ -159,9 +157,8 @@ const ForgotPassword = () => {
         ) : (
           <form onSubmit={handleResetPassword} className="space-y-6 animate-fadeIn">
             <div className="bg-blue-50/50 p-4 rounded-sm border border-blue-100 italic">
-              <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest text-center leading-relaxed">
-                Protocol: Secure Code sent to <br />
-                <span className="lowercase font-bold">{email}</span>
+              <p className="text-[10px] text-blue-600 font-black uppercase tracking-widest text-center">
+                Protocol: Secure Code sent to {email}
               </p>
             </div>
             
@@ -169,7 +166,6 @@ const ForgotPassword = () => {
               type="text" 
               placeholder="6-DIGIT OTP" 
               required 
-              value={details.otp}
               maxLength="6"
               className="w-full border-b-2 p-3 outline-none focus:border-[#2874f0] text-center text-2xl font-black tracking-[12px] placeholder:tracking-normal placeholder:text-gray-200 placeholder:text-sm"
               onChange={(e) => setDetails({...details, otp: e.target.value})}
@@ -219,7 +215,7 @@ const ForgotPassword = () => {
               type="button" 
               disabled={loading}
               onClick={() => setStep(1)}
-              className="w-full text-[9px] text-gray-300 font-black uppercase tracking-[3px] hover:text-gray-600 transition-colors"
+              className="w-full text-[9px] text-gray-300 font-black uppercase tracking-[3px] hover:text-gray-600"
             >
               ← Back to Email Input
             </button>
