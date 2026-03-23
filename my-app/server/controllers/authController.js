@@ -2,6 +2,9 @@ import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
+import { OAuth2Client } from 'google-auth-library';
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // --- SHARED EMAIL PROTOCOL ---
 const sendEmail = async ({ email, subject, message }) => {
@@ -137,6 +140,58 @@ export const resetPassword = async (req, res) => {
   }
 };
 
+// --- GOOGLE AUTH PROTOCOL ---
+
+export const googleLogin = async (req, res) => {
+  const { token: googleToken } = req.body;
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: googleToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const { name, email, picture } = ticket.getPayload();
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Create user if they don't exist via Google
+      user = await User.create({
+        name,
+        email,
+        password: await bcrypt.hash(Math.random().toString(36).slice(-10), 10),
+        isVerified: true, // Social accounts are trusted
+        image: picture,
+      });
+    }
+
+    const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    res.json({ token, user: { _id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin } });
+  } catch (error) {
+    res.status(400).json({ message: "Google authentication failed" });
+  }
+};
+
+export const resendOtp = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const user = await User.findOneAndUpdate(
+      { email: email.trim().toLowerCase() },
+      { otp, otpExpire: new Date(Date.now() + 600000) }
+    );
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    await sendEmail({
+      email: user.email,
+      subject: 'New Verification OTP',
+      message: `<h1>Your new OTP is: ${otp}</h1>`,
+    });
+    res.json({ message: 'New OTP dispatched' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // --- PROFILE & INVENTORY CONTROLLERS ---
 
 export const getUserProfile = async (req, res) => {
@@ -198,6 +253,3 @@ export const removeFromWishlist = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
-export const googleLogin = async (req, res) => res.status(501).json({ message: "Not implemented" });
-export const resendOtp = async (req, res) => res.status(501).json({ message: "Not implemented" });
