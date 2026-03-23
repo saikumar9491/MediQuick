@@ -8,41 +8,38 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 /**
  * --- SHARED EMAIL PROTOCOL ---
- * Dispatches OTPs via Gmail using Secure App Passwords.
+ * Dispatches OTPs via Brevo SMTP Relay for high reliability on Render.
  */
 const sendEmail = async ({ email, subject, message }) => {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     throw new Error('EMAIL_USER or EMAIL_PASS is missing in environment variables');
   }
 
+  // 📡 Brevo Relay Configuration (Replaces Gmail to prevent timeouts)
   const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // Use SSL
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  // 🛰️ THE CRITICAL FIX:
-  family: 4, // Forces Node.js to use IPv4 instead of IPv6
-  connectionTimeout: 20000, // Increased to 20s for cloud stability
-  greetingTimeout: 20000,
-  socketTimeout: 20000,
-});
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    secure: false, // TLS required for port 587
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS, // Your xsmtpsib- key
+    },
+    connectionTimeout: 20000,
+    socketTimeout: 20000,
+  });
 
   try {
-    await transporter.verify();
     const info = await transporter.sendMail({
       from: `"MediQuick+ Hub" <${process.env.EMAIL_USER}>`,
       to: email.trim().toLowerCase(),
       subject,
       html: message,
     });
-    console.log('📡 Hub Dispatch Success:', info.response);
+    console.log('🚀 Hub Dispatch Success (via Brevo):', info.response);
     return info;
   } catch (err) {
     console.error("❌ Mailer Protocol Failed:", err.message);
-    throw new Error("Email dispatch failed. Please check Hub logs.");
+    throw new Error("Email dispatch failed. Please check Brevo API keys.");
   }
 };
 
@@ -132,7 +129,7 @@ export const forgotPassword = async (req, res) => {
     const user = await User.findOneAndUpdate(
       { email: email.trim().toLowerCase() },
       { otp, otpExpire: new Date(Date.now() + 600000) },
-      { returnDocument: 'after' } // ✅ Fixed Deprecation Warning
+      { returnDocument: 'after' } 
     );
     if (!user) return res.status(404).json({ message: 'User not found' });
 
@@ -166,8 +163,6 @@ export const resetPassword = async (req, res) => {
     res.status(500).json({ message: 'Password reset failed' });
   }
 };
-
-// --- GOOGLE AUTH PROTOCOL ---
 
 export const googleLogin = async (req, res) => {
   const { token: googleToken } = req.body;
@@ -213,7 +208,7 @@ export const resendOtp = async (req, res) => {
     const user = await User.findOneAndUpdate(
       { email: email.trim().toLowerCase() },
       { otp, otpExpire: new Date(Date.now() + 600000) },
-      { returnDocument: 'after' } // ✅ Fixed Deprecation Warning
+      { returnDocument: 'after' }
     );
     if (!user) return res.status(404).json({ message: 'User not found' });
 
