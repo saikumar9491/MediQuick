@@ -283,10 +283,10 @@ const Navbar = ({ medicines = [] }) => {
                       </Link>
                     )}
 
-                    <Link to="/profile" className="flex items-center gap-3 border-b border-gray-50 px-5 py-3.5 text-[10px] font-black uppercase text-gray-600 transition-all hover:bg-blue-50 hover:text-blue-600">👤 User Profile</Link>
-                    <Link to="/my-orders" className="flex items-center gap-3 border-b border-gray-50 px-5 py-3.5 text-[10px] font-black uppercase text-gray-600 transition-all hover:bg-blue-50 hover:text-blue-600">📦 My Logistics</Link>
-                    <Link to="/wishlist" className="flex items-center gap-3 border-b border-gray-50 px-5 py-3.5 text-[10px] font-black uppercase text-gray-600 transition-all hover:bg-blue-50 hover:text-blue-600">❤️ Wishlist</Link>
-                    <button onClick={handleLogoutAction} className="flex w-full items-center gap-3 px-5 py-3.5 text-[10px] font-black uppercase text-red-500 transition-all hover:bg-red-50">🔌 Secure Logout</button>
+                    <Link to="/profile" className="flex items-center gap-3 border-b border-gray-50 px-5 py-3.5 text-[10px] font-black  text-gray-600 transition-all hover:bg-blue-50 hover:text-blue-600">👤 User Profile</Link>
+                    <Link to="/my-orders" className="flex items-center gap-3 border-b border-gray-50 px-5 py-3.5 text-[10px] font-black  text-gray-600 transition-all hover:bg-blue-50 hover:text-blue-600">📦 MyOrders</Link>
+                    <Link to="/wishlist" className="flex items-center gap-3 border-b border-gray-50 px-5 py-3.5 text-[10px] font-black  text-gray-600 transition-all hover:bg-blue-50 hover:text-blue-600">❤️ Wishlist</Link>
+                    <button onClick={handleLogoutAction} className="flex w-full items-center gap-3 px-5 py-3.5 text-[10px] font-black  text-red-500 transition-all hover:bg-red-50">🔌 Secure Logout</button>
                   </div>
                 )}
               </div>
@@ -414,7 +414,7 @@ const Navbar = ({ medicines = [] }) => {
                       <Link
                         to="/profile"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="rounded-2xl bg-blue-50 px-4 py-4 text-sm font-black uppercase text-blue-700"
+                        className="rounded-2xl bg-blue-50 px-4 py-4 text-sm font-black  text-blue-700"
                       >
                         👤 Profile
                       </Link>
@@ -422,22 +422,22 @@ const Navbar = ({ medicines = [] }) => {
                       <Link
                         to="/my-orders"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="rounded-2xl px-4 py-4 text-sm font-black uppercase text-gray-700 hover:bg-gray-50"
+                        className="rounded-2xl px-4 py-4 text-sm font-black  text-gray-700 hover:bg-gray-50"
                       >
-                        📦 Tracking
+                        📦 MyOrders
                       </Link>
 
                       <Link
                         to="/wishlist"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="rounded-2xl px-4 py-4 text-sm font-black uppercase text-gray-700 hover:bg-gray-50"
+                        className="rounded-2xl px-4 py-4 text-sm font-black  text-gray-700 hover:bg-gray-50"
                       >
                         ❤️ Wishlist
                       </Link>
 
                       <button
                         onClick={handleLogoutAction}
-                        className="rounded-2xl px-4 py-4 text-left text-sm font-black uppercase text-red-500 hover:bg-red-50"
+                        className="rounded-2xl px-4 py-4 text-left text-sm font-black  text-red-500 hover:bg-red-50"
                       >
                         🔌 Logout
                       </button>

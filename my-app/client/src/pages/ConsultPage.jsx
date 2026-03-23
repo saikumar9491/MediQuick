@@ -13,7 +13,7 @@ const ConsultPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50/50 px-4 pb-12 pt-20 sm:pt-24 sm:pb-14">
+    <div className="min-h-screen bg-slate-50/50 px-4 pb-12  sm:pt-24 sm:pb-14">
       <div className="mx-auto max-w-7xl">
         {/* Hero Section */}
         <div className="relative mb-10 sm:mb-12 overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] md:rounded-[3rem] bg-gradient-to-br from-teal-500 to-teal-700 p-6 sm:p-10 md:p-16 text-white shadow-xl shadow-teal-100">

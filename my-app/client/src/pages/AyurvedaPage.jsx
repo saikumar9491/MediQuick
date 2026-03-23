@@ -39,7 +39,7 @@ const AyurvedaPage = () => {
         );
 
   return (
-    <div className="min-h-screen bg-[#fcfdfa] px-4 pb-12 pt-20 sm:pt-24 sm:pb-14 font-serif text-[#2d4d3a]">
+    <div className="min-h-screen bg-[#fcfdfa] px-4 pb-12  sm:pt-24 sm:pb-14 font-serif text-[#2d4d3a]">
       <div className="mx-auto max-w-7xl">
         {/* Hero */}
         <div className="relative mb-10 overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] md:rounded-[3rem] bg-[#2d4d3a] p-5 sm:p-8 md:p-12 lg:p-14 text-white shadow-xl">

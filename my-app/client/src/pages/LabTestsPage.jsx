@@ -85,7 +85,7 @@ const LabTestsPage = () => {
       : packages.filter((pkg) => pkg.category === activeFilter);
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 pt-20 pb-14 font-sans text-slate-900 sm:pt-24 sm:pb-20">
+    <div className="min-h-screen bg-slate-50 px-4  pb-14 font-sans text-slate-900 sm:pt-24 sm:pb-20">
       <div className="mx-auto max-w-7xl">
         {/* 1. UNIQUE SMART-SLIDE BANNER */}
         <div className="group relative mb-10 sm:mb-12 md:mb-16">

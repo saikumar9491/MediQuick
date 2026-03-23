@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 const WhatsAppSupport = () => {
-  const phoneNumber = "919876543210";
+  const phoneNumber = "7997696717";
   const message = encodeURIComponent("Hello MediQuick! I need help with my order.");
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
 

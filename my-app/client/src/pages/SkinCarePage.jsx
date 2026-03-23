@@ -47,7 +47,7 @@ const SkinCarePage = () => {
   const spotlight = products[0];
 
   return (
-    <div className="min-h-screen bg-[#FFF5F6] pt-20 sm:pt-24 pb-10 sm:pb-12 px-4 font-sans text-slate-900 overflow-x-hidden">
+    <div className="min-h-screen bg-[#FFF5F6]  sm:pt-20 md:pt-24 pb-10 sm:pb-12 px-4 font-sans text-slate-900 overflow-x-hidden">
       <div className="max-w-7xl mx-auto">
         {/* HEADER */}
         <div className="mb-10 sm:mb-12 lg:mb-16">

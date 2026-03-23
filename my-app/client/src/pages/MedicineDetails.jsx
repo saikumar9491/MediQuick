@@ -24,7 +24,7 @@ const MedicineDetails = () => {
         window.scrollTo(0, 0);
 
         const res = await fetch(`${API_BASE}/api/medicines/${id}`);
-        if (!res.ok) throw new Error("Medicine not found");
+        if (!res.ok) throw new Error('Medicine not found');
         const data = await res.json();
         setMedicine(data);
 
@@ -43,7 +43,7 @@ const MedicineDetails = () => {
           setRelated(Array.isArray(relData) ? relData : []);
         }
       } catch (err) {
-        console.error("Hub data sync failed:", err);
+        console.error('Hub data sync failed:', err);
       } finally {
         setLoading(false);
       }
@@ -54,7 +54,8 @@ const MedicineDetails = () => {
 
   const toggleWishlist = async () => {
     if (!user) {
-      if (showNotification) showNotification("Please Login First!", "error");
+      if (showNotification) showNotification('Please Login First!', 'error');
+      navigate('/login');
       return;
     }
 
@@ -88,11 +89,28 @@ const MedicineDetails = () => {
         setUser({ ...user, wishlist: updatedWishlist });
       }
     } catch (err) {
-      console.error("Wishlist sync error:", err);
+      console.error('Wishlist sync error:', err);
+    }
+  };
+
+  const handleAddToCartClick = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
+    addToCart(medicine);
+    if (showNotification) {
+      showNotification('Added to cart!');
     }
   };
 
   const handleBuyNow = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
     if (medicine) {
       navigate('/checkout', {
         state: { isDirectBuy: true, directItem: { ...medicine, quantity: 1 } },
@@ -103,10 +121,7 @@ const MedicineDetails = () => {
   const ActionButtons = () => (
     <div className="flex flex-col sm:flex-row gap-3 w-full">
       <button
-        onClick={() => {
-          addToCart(medicine);
-          alert("Added to cart!");
-        }}
+        onClick={handleAddToCartClick}
         className="flex-1 bg-[#ff9f00] text-white py-3.5 sm:py-4 font-black uppercase text-xs sm:text-sm shadow-lg hover:bg-[#f39700] transition-colors flex items-center justify-center gap-2 rounded-lg"
       >
         🛒 Add to Cart
@@ -150,7 +165,6 @@ const MedicineDetails = () => {
     <div className="min-h-screen bg-[#f1f3f6] pb-12 sm:pb-16 lg:pb-20">
       <div className="max-w-7xl mx-auto px-3 py-4 sm:px-4 md:px-6 lg:px-8 lg:py-10">
         <div className="bg-white shadow-sm rounded-xl md:rounded-sm flex flex-col lg:flex-row gap-6 lg:gap-8 p-4 sm:p-5 md:p-8 lg:p-10 overflow-hidden">
-          
           <div className="w-full lg:w-[45%] flex flex-col gap-4 lg:sticky lg:top-24 lg:h-fit">
             <div className="relative overflow-hidden border border-gray-100 bg-[#fdfdfd] flex items-center justify-center p-6 sm:p-8 md:p-10 h-[280px] sm:h-[360px] md:h-[450px] lg:h-[550px] group rounded-xl md:rounded-sm">
               <img
@@ -175,7 +189,6 @@ const MedicineDetails = () => {
               </div>
             </div>
 
-            {/* Desktop only buttons */}
             <div className="hidden lg:flex">
               <ActionButtons />
             </div>
@@ -251,11 +264,10 @@ const MedicineDetails = () => {
               </h3>
               <p className="text-gray-700 text-sm sm:text-[15px] italic font-medium leading-relaxed">
                 {medicine.description ||
-                  "Source: Verified Amritsar Hub. Guaranteed quality and strictly monitored temperature-controlled storage."}
+                  'Source: Verified Amritsar Hub. Guaranteed quality and strictly monitored temperature-controlled storage.'}
               </p>
             </div>
 
-            {/* Mobile + tablet buttons below details */}
             <div className="mt-6 lg:hidden">
               <ActionButtons />
             </div>

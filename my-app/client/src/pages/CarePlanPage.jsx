@@ -20,7 +20,7 @@ const CarePlanPage = () => {
   ];
 
   return (
-    <div className="min-h-screen overflow-hidden bg-white pb-12 pt-20 sm:pt-24 sm:pb-14">
+    <div className="min-h-screen overflow-hidden bg-white pb-12  sm:pt-24 sm:pb-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         {/* Hero */}
         <div className="relative mb-10 sm:mb-12 overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] md:rounded-[3rem] bg-slate-900 p-5 sm:p-8 md:p-12 text-white shadow-2xl">

@@ -70,7 +70,7 @@ const MedicinesPage = () => {
       : medicines.filter((m) => m.category === filter);
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pt-20 sm:pt-24 pb-10 sm:pb-12">
+    <div className="min-h-screen bg-slate-50/50  sm:pt-20 pb-10 sm:pb-12">
       <div className="max-w-7xl mx-auto px-4">
         {/* 1. AUTO-ROTATING CATEGORY BANNER */}
         <div

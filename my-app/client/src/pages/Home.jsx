@@ -10,6 +10,9 @@ const Home = () => {
   const { token, user } = useAuth();
   const fileInputRef = useRef(null);
 
+  const servicesScrollRef = useRef(null);
+  const brandsScrollRef = useRef(null);
+
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [scanResult, setScanResult] = useState(null);
@@ -24,19 +27,16 @@ const Home = () => {
         title: '2-Hour Express Delivery',
         desc: 'Fastest pharmacy delivery in Amritsar.',
         bg: 'bg-[#2874f0]',
-        code: 'QUICK20',
       },
       {
         title: 'Flat 25% Off on Wellness',
         desc: 'Vitamins and protein supplements at best prices.',
         bg: 'bg-green-600',
-        code: 'HEALTHY25',
       },
       {
         title: 'Baby Care Bonanza',
         desc: 'Top brands like Cetaphil & Himalaya available.',
         bg: 'bg-red-600',
-        code: 'BABYCARE',
       },
     ],
     []
@@ -115,6 +115,15 @@ const Home = () => {
     return () => clearInterval(timer);
   }, [banners.length]);
 
+  const scrollHorizontally = (ref, direction) => {
+    if (ref.current) {
+      ref.current.scrollBy({
+        left: direction === 'left' ? -220 : 220,
+        behavior: 'smooth',
+      });
+    }
+  };
+
   const handleUploadPrescription = async () => {
     if (!user) return alert('Please Login First to upload prescriptions!');
     if (!selectedFile) return alert('Please select a file first!');
@@ -173,35 +182,50 @@ const Home = () => {
         </section>
 
         {/* SERVICES */}
-        <section className="w-full px-3 sm:px-4 lg:px-6 pt-2 pb-1 sm:pt-3 sm:pb-2">
-          <div className="mx-auto w-full max-w-7xl border-b border-gray-100 pb-3">
-            <div className="sm:hidden relative">
-              <div className="pointer-events-none absolute right-0 top-1/2 z-10 -translate-y-1/2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-100 bg-white/95 text-gray-500 shadow-md">
-                  <span className="text-lg font-bold">›</span>
-                </div>
+        <section className="w-full px-3 sm:px-4 lg:px-6 pt-2 pb-2 sm:pt-3 sm:pb-3">
+          <div className="mx-auto w-full max-w-7xl rounded-2xl bg-[#f6faff] border border-[#dbeafe] p-3 sm:p-5">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-base sm:text-lg md:text-xl font-black uppercase tracking-tight text-slate-800">
+                Quick Services
+              </h2>
+              <div className="sm:hidden flex items-center gap-2">
+                <button
+                  onClick={() => scrollHorizontally(servicesScrollRef, 'left')}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white border border-gray-200 shadow-md text-xl font-black text-gray-600"
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={() => scrollHorizontally(servicesScrollRef, 'right')}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white border border-gray-200 shadow-md text-xl font-black text-gray-600"
+                >
+                  ›
+                </button>
               </div>
+            </div>
 
-              <div className="overflow-x-auto no-scrollbar pr-10">
-                <div className="flex gap-3 w-max pr-3">
-                  {services.map((service, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => navigate(service.path)}
-                      className="w-[31vw] min-w-[31vw] max-w-[140px] group flex cursor-pointer flex-col items-center rounded-xl bg-white p-3 text-center transition-all active:scale-95"
-                    >
-                      <div className="mb-2 text-3xl transition-transform group-hover:scale-110">
-                        {service.img}
-                      </div>
-                      <span className="text-[10px] font-black uppercase tracking-tight leading-tight">
-                        {service.title}
-                      </span>
-                      <span className={`text-[8px] font-bold ${service.color}`}>
-                        {service.desc}
-                      </span>
+            <div
+              ref={servicesScrollRef}
+              className="sm:hidden overflow-x-auto no-scrollbar"
+            >
+              <div className="flex gap-3 w-max pr-3">
+                {services.map((service, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => navigate(service.path)}
+                    className="w-[31vw] min-w-[31vw] max-w-[140px] group flex cursor-pointer flex-col items-center rounded-2xl bg-white p-3 text-center border border-white shadow-sm transition-all active:scale-95"
+                  >
+                    <div className="mb-2 text-3xl transition-transform group-hover:scale-110">
+                      {service.img}
                     </div>
-                  ))}
-                </div>
+                    <span className="text-[10px] font-black uppercase tracking-tight leading-tight">
+                      {service.title}
+                    </span>
+                    <span className={`text-[8px] font-bold ${service.color}`}>
+                      {service.desc}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -210,7 +234,7 @@ const Home = () => {
                 <div
                   key={idx}
                   onClick={() => navigate(service.path)}
-                  className="group flex cursor-pointer flex-col items-center rounded-xl p-3 sm:p-4 text-center transition-all hover:shadow-md"
+                  className="group flex cursor-pointer flex-col items-center rounded-2xl bg-white border border-white p-3 sm:p-4 text-center shadow-sm transition-all hover:shadow-md"
                 >
                   <div className="mb-2 text-3xl sm:text-4xl transition-transform group-hover:scale-110">
                     {service.img}
@@ -442,48 +466,53 @@ const Home = () => {
         </section>
 
         {/* BRANDS */}
-        <section className="w-full bg-gray-50/50 px-3 sm:px-4 lg:px-6 py-6 sm:py-12">
-          <div className="mx-auto w-full max-w-7xl">
-            <div className="mb-5 sm:mb-6 flex items-center justify-between gap-3 border-b border-gray-200 pb-2">
-              <h2 className="text-lg sm:text-xl font-bold text-[#212121]">Featured brands</h2>
-              <button
-                onClick={() => navigate('/medicines')}
-                className="rounded border border-[#ff6f61] px-3 py-1 text-[10px] sm:text-xs font-bold uppercase text-[#ff6f61]"
-              >
-                See All
-              </button>
+        <section className="w-full px-3 sm:px-4 lg:px-6 py-6 sm:py-12">
+          <div className="mx-auto w-full max-w-7xl rounded-2xl bg-[#fff7f7] border border-[#ffe4e6] p-3 sm:p-5">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-base sm:text-lg md:text-xl font-black text-[#212121]">
+                Featured Brands
+              </h2>
+              <div className="sm:hidden flex items-center gap-2">
+                <button
+                  onClick={() => scrollHorizontally(brandsScrollRef, 'left')}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white border border-gray-200 shadow-md text-xl font-black text-gray-600"
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={() => scrollHorizontally(brandsScrollRef, 'right')}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white border border-gray-200 shadow-md text-xl font-black text-gray-600"
+                >
+                  ›
+                </button>
+              </div>
             </div>
 
-            <div className="sm:hidden relative">
-              <div className="pointer-events-none absolute right-0 top-1/2 z-10 -translate-y-1/2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-100 bg-white/95 text-gray-500 shadow-md">
-                  <span className="text-lg font-bold">›</span>
-                </div>
-              </div>
-
-              <div className="overflow-x-auto no-scrollbar pr-10">
-                <div className="flex gap-3 w-max pr-3">
-                  {brandLogos.map((brand, idx) => (
-                    <div
-                      key={idx}
-                      onClick={() => navigate(`/brand/${brand.name}`)}
-                      className="w-[31vw] min-w-[31vw] max-w-[130px] group flex cursor-pointer flex-col items-center"
-                    >
-                      <div className="flex aspect-square w-full items-center justify-center rounded-lg border border-gray-100 bg-white p-2 shadow-sm transition-shadow group-hover:shadow-md">
-                        <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-white shadow-inner">
-                          <img
-                            src={brand.img}
-                            alt={brand.name}
-                            className="h-[85%] w-[85%] object-contain transition-transform duration-300 group-hover:scale-110"
-                          />
-                        </div>
+            <div
+              ref={brandsScrollRef}
+              className="sm:hidden overflow-x-auto no-scrollbar"
+            >
+              <div className="flex gap-3 w-max pr-3">
+                {brandLogos.map((brand, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => navigate(`/brand/${brand.name}`)}
+                    className="w-[31vw] min-w-[31vw] max-w-[130px] group flex cursor-pointer flex-col items-center"
+                  >
+                    <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-white bg-white p-2 shadow-sm transition-shadow group-hover:shadow-md">
+                      <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-white shadow-inner">
+                        <img
+                          src={brand.img}
+                          alt={brand.name}
+                          className="h-[85%] w-[85%] object-contain transition-transform duration-300 group-hover:scale-110"
+                        />
                       </div>
-                      <span className="mt-2 text-center text-[8px] font-bold uppercase text-gray-500 break-words leading-tight">
-                        {brand.name}
-                      </span>
                     </div>
-                  ))}
-                </div>
+                    <span className="mt-2 text-center text-[8px] font-bold uppercase text-gray-500 break-words leading-tight">
+                      {brand.name}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -494,7 +523,7 @@ const Home = () => {
                   onClick={() => navigate(`/brand/${brand.name}`)}
                   className="group flex cursor-pointer flex-col items-center min-w-0"
                 >
-                  <div className="flex aspect-square w-full items-center justify-center rounded-lg border border-gray-100 bg-white p-2 shadow-sm transition-shadow group-hover:shadow-md">
+                  <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-white bg-white p-2 shadow-sm transition-shadow group-hover:shadow-md">
                     <div className="flex h-full w-full items-center justify-center overflow-hidden rounded-full bg-white shadow-inner">
                       <img
                         src={brand.img}
@@ -513,38 +542,39 @@ const Home = () => {
         </section>
 
         {/* BESTSELLERS */}
-        <section className="w-full px-3 sm:px-4 lg:px-6 py-8 sm:py-12">
-          <div className="mx-auto w-full max-w-7xl">
-            <div className="mb-6 sm:mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <h3 className="text-xl sm:text-2xl font-black uppercase italic tracking-tighter leading-none">
-                Bestsellers in Amritsar Hub
-              </h3>
-              <button
-                onClick={() => navigate('/medicines')}
-                className="self-start text-[10px] sm:text-xs font-black uppercase text-[#ff6f61] underline"
-              >
-                View All Categories
-              </button>
-            </div>
+       {/* BESTSELLERS */}
+<section className="w-full px-3 sm:px-4 lg:px-6 py-8 sm:py-12">
+  <div className="mx-auto w-full max-w-7xl rounded-2xl border border-[#e9e5ff] bg-[#f8f7ff] p-4 sm:p-6">
+    <div className="mb-6 sm:mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <h3 className="text-xl sm:text-2xl font-black uppercase italic tracking-tighter leading-none">
+        Bestsellers in Amritsar Hub
+      </h3>
+      <button
+        onClick={() => navigate('/medicines')}
+        className="self-start text-[10px] sm:text-xs font-black uppercase text-[#ff6f61] underline"
+      >
+        View All Categories
+      </button>
+    </div>
 
-            <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-              {medicines.slice(0, 10).map((med) => (
-                <div key={med._id} className="group flex min-w-0 flex-col">
-                  <MedicineCard {...med} />
-                  <div
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/medicines?category=${med.category || 'All'}`);
-                    }}
-                    className="mt-2 cursor-pointer text-center text-[8px] sm:text-[9px] font-black uppercase text-blue-500 opacity-100 sm:opacity-0 transition-opacity hover:underline sm:group-hover:opacity-100"
-                  >
-                    View similar in {med.category} →
-                  </div>
-                </div>
-              ))}
-            </div>
+    <div className="grid grid-cols-2 gap-4 sm:gap-5 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      {medicines.slice(0, 10).map((med) => (
+        <div key={med._id} className="group flex min-w-0 flex-col">
+          <MedicineCard {...med} />
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(`/medicines?category=${med.category || 'All'}`);
+            }}
+            className="mt-2 cursor-pointer text-center text-[8px] sm:text-[9px] font-black uppercase text-blue-500 opacity-100 sm:opacity-0 transition-opacity hover:underline sm:group-hover:opacity-100"
+          >
+            View similar in {med.category} →
           </div>
-        </section>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
       </div>
 
       <style>{`

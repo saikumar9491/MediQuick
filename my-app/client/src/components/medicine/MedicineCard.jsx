@@ -155,7 +155,7 @@ const MedicineCard = ({ _id, name, price, brand, needsPrescription, category, im
 
         <button
           onClick={handleAddToCart}
-          className="mt-5 sm:mt-6 w-full rounded-xl bg-slate-900 py-3 sm:py-3.5 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.18em] sm:tracking-widest text-white transition-all hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-200 active:scale-[0.98]"
+          className="hidden sm:block mt-5 sm:mt-6 w-full rounded-xl bg-slate-900 py-3 sm:py-3.5 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.18em] sm:tracking-widest text-white transition-all hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-200 active:scale-[0.98]"
         >
           Add to Bag — ₹{safePrice}
         </button>

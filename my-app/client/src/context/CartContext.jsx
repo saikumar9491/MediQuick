@@ -16,6 +16,7 @@ export const CartProvider = ({ children }) => {
     return url.endsWith('/') ? url.slice(0, -1) : url;
   };
 
+  // --- HUB SYNC: Fetch Cart on Login ---
   useEffect(() => {
     const fetchUserData = async () => {
       if (!user?._id || !token) {
@@ -38,6 +39,7 @@ export const CartProvider = ({ children }) => {
           const data = await res.json();
 
           if (data?.cart) {
+            // Reconstruct cart items with product details from the populated productId
             const formattedCart = data.cart
               .filter((item) => item.productId)
               .map((item) => ({
@@ -56,6 +58,8 @@ export const CartProvider = ({ children }) => {
         console.error('Cart Sync error:', err);
         setCart([]);
       } finally {
+        // Allow saving once the initial hub data is loaded
+        // Using a micro-task delay to ensure state updates finish
         setTimeout(() => {
           blockSave.current = false;
           setIsLoaded(true);
@@ -66,7 +70,9 @@ export const CartProvider = ({ children }) => {
     fetchUserData();
   }, [user?._id, token]);
 
+  // --- AUTO-SAVE: Sync Local State to MongoDB ---
   useEffect(() => {
+    // blockSave prevents overwriting DB with an empty array during initial load
     if (blockSave.current || !user?._id || !token || !isLoaded) return;
 
     const syncCartWithDB = async () => {
@@ -91,7 +97,7 @@ export const CartProvider = ({ children }) => {
           setSaveStatus('saved');
           setTimeout(() => setSaveStatus('idle'), 2000);
         } else {
-          console.error(`Server error: ${res.status}`);
+          console.error(`Hub Sync Error: ${res.status}`);
           setSaveStatus('idle');
         }
       } catch (err) {
@@ -100,18 +106,19 @@ export const CartProvider = ({ children }) => {
       }
     };
 
+    // Debounce: Wait 800ms after the last change before hitting the API
     const timeoutId = setTimeout(syncCartWithDB, 800);
     return () => clearTimeout(timeoutId);
   }, [cart, user?._id, token, isLoaded]);
 
-  const addToCart = (product) => {
-    if (!user) return alert('Please Login First!');
+  // --- ACTIONS ---
 
+  const addToCart = (product) => {
+    if (!user) return; // Note: MedicineDetails should handle the alert/redirect
     blockSave.current = false;
 
     setCart((prev) => {
       const exists = prev.find((item) => item._id === product._id);
-
       if (exists) {
         return prev.map((item) =>
           item._id === product._id
@@ -119,7 +126,6 @@ export const CartProvider = ({ children }) => {
             : item
         );
       }
-
       return [...prev, { ...product, quantity: 1 }];
     });
   };
@@ -131,7 +137,6 @@ export const CartProvider = ({ children }) => {
 
   const updateQuantity = (productId, newQuantity) => {
     if (newQuantity < 1) return;
-
     blockSave.current = false;
 
     setCart((prev) =>
@@ -141,6 +146,16 @@ export const CartProvider = ({ children }) => {
           : item
       )
     );
+  };
+
+  /**
+   * PROTOCOL: CLEAR HUB INVENTORY
+   * Used after successful checkout. 
+   * blockSave.current = false ensures the empty array is pushed to the DB.
+   */
+  const clearCart = () => {
+    blockSave.current = false; 
+    setCart([]);
   };
 
   const getCartTotal = () => {
@@ -154,6 +169,7 @@ export const CartProvider = ({ children }) => {
         addToCart,
         removeFromCart,
         updateQuantity,
+        clearCart,
         getCartTotal,
         setCart,
         saveStatus,
