@@ -18,14 +18,14 @@ const sendEmail = async ({ email, subject, message }) => {
   // 📡 Brevo Relay Configuration (Replaces Gmail to prevent timeouts)
   const transporter = nodemailer.createTransport({
     host: "smtp-relay.brevo.com",
-    port: 587,
+    port: 2525,
     secure: false, // TLS required for port 587
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS, // Your xsmtpsib- key
     },
-    connectionTimeout: 20000,
-    socketTimeout: 20000,
+    connectionTimeout: 30000,
+    socketTimeout: 30000,
   });
 
   try {
