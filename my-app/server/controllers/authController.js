@@ -16,18 +16,19 @@ const sendEmail = async ({ email, subject, message }) => {
   }
 
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-    connectionTimeout: 10000, // 10 seconds
-  greetingTimeout: 10000,
-  socketTimeout: 15000,
-  dnsTimeout: 5000,
-  debug: true, // This will show detailed logs if it fails again
-  logger: true
-  });
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, // Use SSL
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+  // 🛰️ THE CRITICAL FIX:
+  family: 4, // Forces Node.js to use IPv4 instead of IPv6
+  connectionTimeout: 20000, // Increased to 20s for cloud stability
+  greetingTimeout: 20000,
+  socketTimeout: 20000,
+});
 
   try {
     await transporter.verify();
