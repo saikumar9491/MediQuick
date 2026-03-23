@@ -16,7 +16,7 @@ const sendEmail = async ({ email, subject, message }) => {
   }
 
   const transporter = nodemailer.createTransport({
-    service: 'gmail', // Most stable for Render-to-Gmail communication
+    service: 'gmail',
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
@@ -125,7 +125,7 @@ export const forgotPassword = async (req, res) => {
     const user = await User.findOneAndUpdate(
       { email: email.trim().toLowerCase() },
       { otp, otpExpire: new Date(Date.now() + 600000) },
-      { new: true }
+      { returnDocument: 'after' } // ✅ Fixed Deprecation Warning
     );
     if (!user) return res.status(404).json({ message: 'User not found' });
 
@@ -174,7 +174,6 @@ export const googleLogin = async (req, res) => {
     let user = await User.findOne({ email });
 
     if (!user) {
-      // Create user if they don't exist via Google
       user = await User.create({
         name,
         email,
@@ -206,7 +205,8 @@ export const resendOtp = async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const user = await User.findOneAndUpdate(
       { email: email.trim().toLowerCase() },
-      { otp, otpExpire: new Date(Date.now() + 600000) }
+      { otp, otpExpire: new Date(Date.now() + 600000) },
+      { returnDocument: 'after' } // ✅ Fixed Deprecation Warning
     );
     if (!user) return res.status(404).json({ message: 'User not found' });
 
