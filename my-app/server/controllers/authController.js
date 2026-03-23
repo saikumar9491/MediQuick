@@ -21,10 +21,12 @@ const sendEmail = async ({ email, subject, message }) => {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
     },
-    connectionTimeout: 10000, // Wait 10 seconds before giving up
-    greetingTimeout: 5000,
-    socketTimeout: 10000,
-    pool: true
+    connectionTimeout: 10000, // 10 seconds
+  greetingTimeout: 10000,
+  socketTimeout: 15000,
+  dnsTimeout: 5000,
+  debug: true, // This will show detailed logs if it fails again
+  logger: true
   });
 
   try {
