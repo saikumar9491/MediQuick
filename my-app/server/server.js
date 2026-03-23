@@ -3,13 +3,15 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import axios from 'axios';
 import connectDB from './config/db.js';
+
+// Route Imports
 import userRoutes from './routes/userRoutes.js'; 
 import medicineRoutes from './routes/medicineRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import prescriptionRoutes from './routes/prescriptionRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 
-// Load Env & Connect Database
+// ⚙️ INITIALIZATION
 dotenv.config();
 connectDB();
 
@@ -17,7 +19,7 @@ const app = express();
 
 /**
  * 1. DYNAMIC CORS PROTOCOL
- * Includes all possible local development ports and Render production URLs.
+ * Includes local development ports and production URLs.
  */
 const allowedOrigins = [
   'http://localhost:5173', 
@@ -30,13 +32,12 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // 1. Allow internal server pings, Postman, or mobile apps (where origin is undefined)
+    // Allow requests with no origin (like Postman or mobile apps)
     if (!origin) return callback(null, true);
     
     const isWhitelisted = allowedOrigins.includes(origin);
     const isDevelopment = process.env.NODE_ENV !== 'production';
 
-    // 2. Logic: Allow if whitelisted OR if we are in local development mode
     if (isWhitelisted || isDevelopment) {
       callback(null, true);
     } else {
@@ -49,16 +50,17 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'] 
 }));
 
-// 2. MIDDLEWARE FOR DATA PARSING
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+/**
+ * 2. CORE MIDDLEWARE
+ */
+app.use(express.json({ limit: '10mb' })); // Increased limit for prescription uploads
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// 3. STATIC STORAGE PROTOCOL (For medicine and prescription images)
+// Static folder for Image storage
 app.use('/uploads', express.static('uploads'));
 
 /**
- * 4. MASTER HUB ROUTES
- * Ensure these match your actual folder structure in the 'routes' directory.
+ * 3. MASTER HUB ROUTES
  */
 app.use('/api/users', userRoutes); 
 app.use('/api/medicines', medicineRoutes);
@@ -66,7 +68,9 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/cart', cartRoutes);
 
-// 5. CLOUD HEALTH MONITOR
+/**
+ * 4. CLOUD HEALTH MONITOR
+ */
 app.get('/', (req, res) => {
   res.status(200).json({
     status: "Active",
@@ -77,14 +81,16 @@ app.get('/', (req, res) => {
 });
 
 /**
- * KEEP-ALIVE PROTOCOL
- * Prevents Render's free tier from putting the server to sleep.
+ * 5. KEEP-ALIVE PROTOCOL
+ * Pings the server every 14 minutes to prevent Render sleep mode.
  */
 const keepAlive = () => {
-  const url = `https://mediquick-53b1.onrender.com/`; 
+  // Use Render's default env variable if available, otherwise fallback
+  const url = process.env.RENDER_EXTERNAL_URL || `https://mediquick-53b1.onrender.com/`; 
+  
   setInterval(async () => {
     try {
-      const response = await axios.get(url);
+      const response = await axios.get(url, { timeout: 5000 });
       console.log(`📡 Heartbeat: Pulse Received [Status: ${response.status}]`);
     } catch (err) {
       console.error('❌ Heartbeat Interrupted:', err.message);
@@ -92,26 +98,29 @@ const keepAlive = () => {
   }, 840000); // 14 minutes
 };
 
-// 6. GLOBAL ERROR SHIELD
+/**
+ * 6. GLOBAL ERROR SHIELD
+ */
 app.use((err, req, res, next) => {
-  // If the error was a CORS error, status might already be set
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   res.status(statusCode).json({
-    message: err.message,
+    message: err.message || "Internal Server Error",
     protocol: "Error-Log-Sync",
-    // Hide stack trace in production for security
     stack: process.env.NODE_ENV === 'production' ? "🔒 Hidden" : err.stack,
   });
 });
 
-// 7. SERVER INITIALIZATION
+/**
+ * 7. SERVER STARTUP
+ */
 const PORT = process.env.PORT || 5000; 
 
+// Bind to 0.0.0.0 for Render compatibility
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`--- PROTOCOL START ---`);
-  console.log(`🚀 Node Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`📡 Server Port: ${PORT}`);
-  console.log(`🛡️  CORS Mode: ${process.env.NODE_ENV !== 'production' ? 'Open (Dev)' : 'Restricted (Prod)'}`);
+  console.log(`🚀 Hub Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`📡 Satellite Port: ${PORT}`);
+  console.log(`🛡️  Security Mode: ${process.env.NODE_ENV !== 'production' ? 'Open (Dev)' : 'Shielded (Prod)'}`);
   console.log(`----------------------`);
   
   if (process.env.NODE_ENV === 'production') {
