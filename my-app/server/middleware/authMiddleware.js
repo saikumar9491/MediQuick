@@ -1,28 +1,49 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 
-// Verify if the user is logged in
+/**
+ * --- VERIFY TOKEN PROTOCOL ---
+ * Checks if the Bearer token is valid and the user exists in the Hub.
+ */
 export const verifyToken = async (req, res, next) => {
-  const token = req.headers.authorization?.split(" ")[1]; // Format: "Bearer <token>"
+  // 1. Extract Token (Handles both "Bearer <token>" and raw token)
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : authHeader;
 
   if (!token) {
-    return res.status(401).json({ message: "Access Denied: No Token Provided" });
+    return res.status(401).json({ message: "Access Denied: No Hub Token Provided" });
   }
 
   try {
+    // 2. Decode the Token
     const verified = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = verified; // Contains user ID and isAdmin status
+    
+    // 3. Optional but Recommended: Database Double-Check
+    // This prevents "Ghost Users" (deleted users with active tokens) from accessing routes.
+    const userExists = await User.findById(verified.id).select("-password");
+    if (!userExists) {
+      return res.status(401).json({ message: "User no longer exists in Hub" });
+    }
+
+    req.user = verified; // Attach payload { id, isAdmin } to req
     next();
   } catch (error) {
-    res.status(403).json({ message: "Invalid or Expired Token" });
+    // Distinguish between expired and malformed tokens for better frontend debugging
+    const errorMessage = error.name === "TokenExpiredError" 
+      ? "Session Expired. Please Login Again." 
+      : "Invalid Security Token";
+      
+    res.status(403).json({ message: errorMessage });
   }
 };
 
-// Verify if the user is an Admin
+/**
+ * --- ADMIN PRIVILEGE CHECK ---
+ */
 export const isAdmin = (req, res, next) => {
   if (req.user && req.user.isAdmin) {
     next();
   } else {
-    res.status(403).json({ message: "Access Denied: Admin Privileges Required" });
+    res.status(403).json({ message: "Access Denied: Admin Clearance Required" });
   }
 };

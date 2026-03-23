@@ -16,6 +16,7 @@ import Checkout from './pages/Checkout';
 import MyOrders from './pages/MyOrders';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import VerifyOtp from './pages/Auth/VerifyOtp'; // 🛰️ IMPORTED VERIFY OTP
 import ForgotPassword from './pages/ForgotPassword';
 import Wishlist from './pages/Wishlist';
 import Profile from './pages/Profile';
@@ -36,47 +37,34 @@ import Navbar from './components/common/Navbar';
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white px-4">
-        <div className="flex flex-col items-center text-center">
-          <div className="animate-spin text-4xl sm:text-5xl">💊</div>
-          <p className="mt-4 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-gray-400">
-            Loading Secure Access...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
+  if (loading) return <LoadingScreen message="Loading Secure Access..." icon="💊" />;
   return user ? <Outlet /> : <Navigate to="/login" replace />;
 };
 
 const AdminRoute = () => {
   const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white px-4">
-        <div className="flex flex-col items-center text-center">
-          <div className="animate-spin text-4xl sm:text-5xl">⚙️</div>
-          <p className="mt-4 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-gray-400">
-            Checking Admin Access...
-          </p>
-        </div>
-      </div>
-    );
-  }
-
+  if (loading) return <LoadingScreen message="Checking Admin Access..." icon="⚙️" />;
   return user && user.isAdmin ? <Outlet /> : <Navigate to="/" replace />;
 };
+
+// Reusable Loading Component for Routes
+const LoadingScreen = ({ message, icon }) => (
+  <div className="min-h-screen flex items-center justify-center bg-white px-4">
+    <div className="flex flex-col items-center text-center">
+      <div className="animate-spin text-4xl sm:text-5xl">{icon}</div>
+      <p className="mt-4 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] text-gray-400">
+        {message}
+      </p>
+    </div>
+  </div>
+);
 
 function AppLayout({ medicines }) {
   const location = useLocation();
 
-  const hideNavbarRoutes = ['/login', '/signup', '/forgot-password'];
-  const hideWhatsAppRoutes = ['/login', '/signup', '/forgot-password', '/admin-dashboard'];
+  // 🛡️ Added /verify-otp to hidden routes to maintain focus
+  const hideNavbarRoutes = ['/login', '/signup', '/forgot-password', '/verify-otp'];
+  const hideWhatsAppRoutes = ['/login', '/signup', '/forgot-password', '/admin-dashboard', '/verify-otp'];
 
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
   const shouldHideWhatsApp =
@@ -89,10 +77,7 @@ function AppLayout({ medicines }) {
         position="top-center"
         reverseOrder={false}
         toastOptions={{
-          style: {
-            fontSize: '12px',
-            fontWeight: '700',
-          },
+          style: { fontSize: '12px', fontWeight: '700' },
         }}
       />
 
@@ -102,6 +87,7 @@ function AppLayout({ medicines }) {
         <Route path="/" element={<Home medicines={medicines} />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/verify-otp" element={<VerifyOtp />} /> {/* 🛰️ NEW ROUTE ADDED */}
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/brand/:brandName" element={<BrandPage />} />
 
@@ -169,11 +155,8 @@ function App() {
       <div className="min-h-screen w-full flex flex-col items-center justify-center bg-white px-4 text-center">
         <div className="relative">
           <div className="w-14 h-14 sm:w-16 sm:h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
-          <div className="absolute inset-0 flex items-center justify-center text-lg sm:text-xl">
-            🏥
-          </div>
+          <div className="absolute inset-0 flex items-center justify-center text-lg sm:text-xl">🏥</div>
         </div>
-
         <p className="mt-5 sm:mt-6 font-black uppercase italic text-[9px] sm:text-[10px] tracking-[0.25em] sm:tracking-[0.35em] text-gray-400 animate-pulse">
           Securing Medical Hub Connection...
         </p>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Navbar from '../components/common/Navbar';
 import AddMedicineModal from '../components/admin/AddMedicineModal';
 import { useAuth } from '../context/AuthContext';
@@ -13,21 +13,27 @@ const AdminDashboard = () => {
   const { user, token, setUser } = useAuth();
   const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-  const fetchInventory = async () => {
+  /**
+   * --- HUB PROTOCOL: Fetch Inventory ---
+   * Wrapped in useCallback to prevent unnecessary re-renders
+   */
+  const fetchInventory = useCallback(async () => {
     try {
       const response = await fetch(`${API_BASE}/api/medicines`);
+      if (!response.ok) throw new Error("Could not reach Hub");
       const data = await response.json();
-      setInventory(data);
+      setInventory(Array.isArray(data) ? data : []);
     } catch (err) {
+      console.error(err);
       toast.error('Failed to sync with Amritsar Hub inventory');
     } finally {
       setLoading(false);
     }
-  };
+  }, [API_BASE]);
 
   useEffect(() => {
     fetchInventory();
-  }, []);
+  }, [fetchInventory]);
 
   const handleAddNew = () => {
     setEditingProduct(null);
@@ -39,6 +45,9 @@ const AdminDashboard = () => {
     setIsModalOpen(true);
   };
 
+  /**
+   * --- OPERATION: Save/Update Unit ---
+   */
   const handleSaveProduct = async (productData) => {
     const isEdit = !!editingProduct;
     const url = isEdit
@@ -68,14 +77,18 @@ const AdminDashboard = () => {
 
     try {
       await savePromise;
-      fetchInventory();
+      fetchInventory(); // Refresh list after save
       setIsModalOpen(false);
     } catch (err) {
-      console.error(err);
+      console.error("Save failed:", err);
     }
   };
 
+  /**
+   * --- OPERATION: Purge Unit ---
+   */
   const handleDelete = async (id) => {
+    // Permanent purge confirmation
     if (!window.confirm('Remove this medicine from Amritsar Hub permanently?')) return;
 
     try {
@@ -86,9 +99,11 @@ const AdminDashboard = () => {
 
       if (res.ok) {
         toast.success('Unit purged from inventory');
-        setInventory(inventory.filter((m) => m._id !== id));
+        // Filter locally for immediate UI feedback
+        setInventory((prev) => prev.filter((m) => m._id !== id));
       } else {
-        toast.error('Delete failed. Check permissions.');
+        const data = await res.json();
+        toast.error(data.message || 'Purge failed. Check permissions.');
       }
     } catch (err) {
       toast.error('Hub connection error');
@@ -113,7 +128,7 @@ const AdminDashboard = () => {
       <Navbar user={user} setUser={setUser} />
 
       <main className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 sm:py-8">
-        {/* Header */}
+        {/* Header Section */}
         <div className="mb-6 flex flex-col gap-4 sm:mb-8 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-xl sm:text-2xl font-black uppercase italic leading-tight text-gray-800">
@@ -132,7 +147,7 @@ const AdminDashboard = () => {
           </button>
         </div>
 
-        {/* Stats Section */}
+        {/* System Stats Section */}
         <div className="mb-6 grid grid-cols-1 gap-4 sm:mb-8 md:grid-cols-3 md:gap-6">
           <div className="rounded-md border-l-4 border-blue-500 bg-white p-5 shadow-sm sm:p-6">
             <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">
@@ -158,7 +173,7 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Desktop Table / Mobile Scroll */}
+        {/* Inventory Data Table */}
         <div className="overflow-hidden rounded-md border border-gray-100 bg-white shadow-2xl">
           <div className="overflow-x-auto">
             <table className="min-w-[760px] w-full text-left">
@@ -172,13 +187,13 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-100 text-gray-700">
                 {inventory.map((med) => (
                   <tr key={med._id} className="group transition-colors hover:bg-blue-50/50">
                     <td className="p-4">
                       <div className="flex items-center gap-3 sm:gap-4">
                         <img
-                          src={med.image}
+                          src={med.image || 'https://placehold.co/100x100?text=Medicine'}
                           alt={med.name}
                           className="h-12 w-12 rounded-sm border bg-white p-1 object-contain"
                         />
@@ -232,7 +247,7 @@ const AdminDashboard = () => {
                       colSpan="5"
                       className="px-4 py-10 text-center text-xs font-black uppercase tracking-[2px] text-gray-400"
                     >
-                      No inventory units found
+                      No inventory units found in Hub
                     </td>
                   </tr>
                 )}
