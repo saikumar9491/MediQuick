@@ -21,7 +21,7 @@ const createTransporter = () => {
 
   if (!user || !pass) {
     throw new Error(
-      'SMTP credentials missing. Set BREVO_SMTP_USER/BREVO_SMTP_PASS or EMAIL_USER/EMAIL_PASS in Render.'
+      'SMTP credentials missing. Set EMAIL_USER/EMAIL_PASS in Render.'
     );
   }
 
@@ -33,9 +33,13 @@ const createTransporter = () => {
       user,
       pass,
     },
-    connectionTimeout: 20000,
-    greetingTimeout: 20000,
-    socketTimeout: 20000,
+    // 🛡️ TLS Bypass: This prevents the "Connection Timeout" on Render's network
+    tls: {
+      rejectUnauthorized: false 
+    },
+    connectionTimeout: 25000,
+    greetingTimeout: 25000,
+    socketTimeout: 25000,
   });
 };
 
@@ -59,10 +63,10 @@ const sendEmail = async ({ email, subject, message }) => {
       html: message,
     });
 
-    console.log('✅ Email sent:', info.response);
+    console.log('✅ Hub Dispatch Success:', info.response);
     return info;
   } catch (err) {
-    console.error('❌ Email sending failed:', err);
+    console.error('❌ Email sending failed:', err.message);
     throw new Error(err?.message || 'Email dispatch failed. Check SMTP settings in Render.');
   }
 };
@@ -70,6 +74,7 @@ const sendEmail = async ({ email, subject, message }) => {
 // -----------------------------
 // AUTH CONTROLLERS
 // -----------------------------
+
 export const signup = async (req, res) => {
   const { name, phone, email, password } = req.body;
 
@@ -102,10 +107,12 @@ export const signup = async (req, res) => {
       email: normalizedEmail,
       subject: 'MediQuick Account Verification OTP',
       message: `
-        <h2>Welcome to MediQuick</h2>
-        <p>Your verification OTP is:</p>
-        <h1>${otp}</h1>
-        <p>This OTP is valid for 10 minutes.</p>
+        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee;">
+          <h2>Welcome to MediQuick+</h2>
+          <p>Your verification OTP is:</p>
+          <h1 style="color: #2ecc71;">${otp}</h1>
+          <p>This OTP is valid for 10 minutes. Do not share this with anyone.</p>
+        </div>
       `,
     });
 
@@ -143,7 +150,6 @@ export const verifyOTP = async (req, res) => {
 
     return res.status(200).json({ message: 'Verified successfully' });
   } catch (error) {
-    console.error('❌ OTP verification error:', error);
     return res.status(500).json({ message: 'Verification failed' });
   }
 };
@@ -159,22 +165,12 @@ export const login = async (req, res) => {
     const normalizedEmail = email.trim().toLowerCase();
     const user = await User.findOne({ email: normalizedEmail });
 
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    if (!isMatch) {
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     if (!user.isVerified) {
       return res.status(403).json({ message: 'Please verify your email first' });
-    }
-
-    if (!process.env.JWT_SECRET) {
-      return res.status(500).json({ message: 'JWT_SECRET is missing in Render' });
     }
 
     const token = jwt.sign(
@@ -185,15 +181,9 @@ export const login = async (req, res) => {
 
     return res.json({
       token,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        isAdmin: user.isAdmin,
-      },
+      user: { _id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin },
     });
   } catch (error) {
-    console.error('❌ Login error:', error);
     return res.status(500).json({ message: 'Login failed' });
   }
 };
@@ -221,17 +211,11 @@ export const forgotPassword = async (req, res) => {
     await sendEmail({
       email: user.email,
       subject: 'MediQuick Password Reset OTP',
-      message: `
-        <h2>Password Reset</h2>
-        <p>Your password reset OTP is:</p>
-        <h1>${otp}</h1>
-        <p>This OTP is valid for 10 minutes.</p>
-      `,
+      message: `<h1>Reset OTP: ${otp}</h1><p>Valid for 10 minutes.</p>`,
     });
 
     return res.status(200).json({ message: 'Reset code sent' });
   } catch (error) {
-    console.error('❌ Forgot password error:', error);
     return res.status(500).json({ message: error.message || 'Forgot password failed' });
   }
 };
@@ -240,12 +224,7 @@ export const resetPassword = async (req, res) => {
   const { email, otp, newPassword } = req.body;
 
   try {
-    if (!email || !otp || !newPassword) {
-      return res.status(400).json({ message: 'Email, OTP and new password are required' });
-    }
-
     const normalizedEmail = email.trim().toLowerCase();
-
     const user = await User.findOne({
       email: normalizedEmail,
       otp,
@@ -263,7 +242,6 @@ export const resetPassword = async (req, res) => {
 
     return res.status(200).json({ message: 'Password updated successfully' });
   } catch (error) {
-    console.error('❌ Reset password error:', error);
     return res.status(500).json({ message: 'Password reset failed' });
   }
 };
@@ -272,18 +250,12 @@ export const googleLogin = async (req, res) => {
   const { token: googleToken } = req.body;
 
   try {
-    if (!googleToken) {
-      return res.status(400).json({ message: 'Google token is required' });
-    }
-
     const ticket = await client.verifyIdToken({
       idToken: googleToken,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
 
-    const payload = ticket.getPayload();
-    const { name, email, picture } = payload;
-
+    const { name, email, picture } = ticket.getPayload();
     let user = await User.findOne({ email });
 
     if (!user) {
@@ -297,10 +269,6 @@ export const googleLogin = async (req, res) => {
       });
     }
 
-    if (!process.env.JWT_SECRET) {
-      return res.status(500).json({ message: 'JWT_SECRET is missing in Render' });
-    }
-
     const token = jwt.sign(
       { id: user._id, isAdmin: user.isAdmin },
       process.env.JWT_SECRET,
@@ -309,33 +277,20 @@ export const googleLogin = async (req, res) => {
 
     return res.json({
       token,
-      user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        isAdmin: user.isAdmin,
-      },
+      user: { _id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin },
     });
   } catch (error) {
-    console.error('❌ Google Auth Error:', error);
     return res.status(400).json({ message: 'Google authentication failed' });
   }
 };
 
 export const resendOtp = async (req, res) => {
   const { email } = req.body;
-
   try {
-    if (!email) {
-      return res.status(400).json({ message: 'Email is required' });
-    }
-
     const normalizedEmail = email.trim().toLowerCase();
     const user = await User.findOne({ email: normalizedEmail });
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     user.otp = otp;
@@ -344,18 +299,12 @@ export const resendOtp = async (req, res) => {
 
     await sendEmail({
       email: user.email,
-      subject: 'MediQuick New Verification OTP',
-      message: `
-        <h2>Email Verification</h2>
-        <p>Your new OTP is:</p>
-        <h1>${otp}</h1>
-        <p>This OTP is valid for 10 minutes.</p>
-      `,
+      subject: 'New Verification OTP',
+      message: `<h1>Your new OTP: ${otp}</h1>`,
     });
 
     return res.status(200).json({ message: 'New OTP sent' });
   } catch (error) {
-    console.error('❌ Resend OTP error:', error);
     return res.status(500).json({ message: error.message || 'Resend OTP failed' });
   }
 };
@@ -365,14 +314,9 @@ export const resendOtp = async (req, res) => {
 // -----------------------------
 export const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id)
-      .select('-password')
-      .populate('cart.productId')
-      .populate('wishlist');
-
+    const user = await User.findById(req.user.id).select('-password').populate('cart.productId').populate('wishlist');
     return res.json(user);
   } catch (error) {
-    console.error('❌ Get profile error:', error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -380,26 +324,14 @@ export const getUserProfile = async (req, res) => {
 export const updateUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
     user.name = req.body.name || user.name;
     user.phone = req.body.phone || user.phone;
-
     const updatedUser = await user.save();
 
-    return res.json({
-      _id: updatedUser._id,
-      name: updatedUser.name,
-      email: updatedUser.email,
-      phone: updatedUser.phone,
-      isAdmin: updatedUser.isAdmin,
-      image: updatedUser.image,
-    });
+    return res.json({ _id: updatedUser._id, name: updatedUser.name, email: updatedUser.email, phone: updatedUser.phone, isAdmin: updatedUser.isAdmin, image: updatedUser.image });
   } catch (error) {
-    console.error('❌ Update profile error:', error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -407,17 +339,12 @@ export const updateUserProfile = async (req, res) => {
 export const updateCart = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
     user.cart = req.body.cart || [];
     await user.save();
-
     return res.status(200).json({ message: 'Cart synced' });
   } catch (error) {
-    console.error('❌ Update cart error:', error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -425,28 +352,15 @@ export const updateCart = async (req, res) => {
 export const addToWishlist = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
     const productId = req.body.productId;
-    if (!productId) {
-      return res.status(400).json({ message: 'productId is required' });
-    }
-
-    const alreadyExists = user.wishlist.some(
-      (id) => id.toString() === productId.toString()
-    );
-
-    if (!alreadyExists) {
+    if (!user.wishlist.some((id) => id.toString() === productId.toString())) {
       user.wishlist.push(productId);
       await user.save();
     }
-
     return res.status(200).json({ message: 'Added to wishlist' });
   } catch (error) {
-    console.error('❌ Add wishlist error:', error);
     return res.status(500).json({ message: error.message });
   }
 };
@@ -454,25 +368,12 @@ export const addToWishlist = async (req, res) => {
 export const removeFromWishlist = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    const productId = req.body.productId;
-    if (!productId) {
-      return res.status(400).json({ message: 'productId is required' });
-    }
-
-    user.wishlist = user.wishlist.filter(
-      (id) => id.toString() !== productId.toString()
-    );
-
+    user.wishlist = user.wishlist.filter((id) => id.toString() !== req.body.productId.toString());
     await user.save();
-
     return res.status(200).json({ message: 'Removed from wishlist' });
   } catch (error) {
-    console.error('❌ Remove wishlist error:', error);
     return res.status(500).json({ message: error.message });
   }
 };
