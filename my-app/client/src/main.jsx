@@ -4,12 +4,15 @@ import App from './App.jsx'
 import './index.css'
 import { CartProvider } from './context/CartContext'
 import { AuthProvider } from './context/AuthContext' 
-import { GoogleOAuthProvider } from '@react-oauth/google'; // 1. Import Provider
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
+// 🚀 YOUR HUB'S UNIQUE IDENTITY
+const CLIENT_ID = "192919291714-mgdn6nq4f8q5rj2m34243k4qffulr7vv.apps.googleusercontent.com";
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    {/* 2. Wrap everything with the Google Provider */}
-    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com">
+    {/* 🛡️ This Provider allows the entire Hub to use Google Social Login */}
+    <GoogleOAuthProvider clientId={CLIENT_ID}>
       <AuthProvider>
         <CartProvider>
           <App />
