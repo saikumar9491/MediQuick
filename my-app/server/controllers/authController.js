@@ -11,11 +11,9 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 // EMAIL CONFIG (FIXED FOR RENDER & BREVO)
 // -----------------------------
 const createTransporter = () => {
-  // 🚀 Port 2525 is the secret to bypassing Render's SMTP blocks
   const host = 'smtp-relay.brevo.com';
-  const port = 2525; 
+  const port = 2525; // 🚀 Port 2525 bypasses Render's standard SMTP blocks
 
-  // Must match Brevo Login: a59a01001@smtp-brevo.com
   const user = process.env.EMAIL_USER; 
   const pass = process.env.EMAIL_PASS;
 
@@ -29,11 +27,9 @@ const createTransporter = () => {
     secure: false, 
     auth: { user, pass },
     tls: {
-      // 🛡️ Essential for stable handshakes on shared cloud networks
       rejectUnauthorized: false,
       minVersion: 'TLSv1.2'
     },
-    // ⏱️ High-patience timeouts for cloud relays
     connectionTimeout: 40000, 
     greetingTimeout: 40000,
     socketTimeout: 40000,
@@ -43,20 +39,17 @@ const createTransporter = () => {
 const sendEmail = async ({ email, subject, message }) => {
   try {
     const transporter = createTransporter();
-
     const info = await transporter.sendMail({
-      // 🛰️ Match your verified Brevo sender exactly
       from: `"MediQuick Hub" <balisaikumar9491@gmail.com>`, 
       to: email.trim().toLowerCase(),
       subject,
       html: message,
     });
-
     console.log('✅ Hub Dispatch Success:', info.response);
     return info;
   } catch (err) {
     console.error('❌ Email sending failed:', err.message);
-    throw new Error(err?.message || 'Email dispatch failed. Check SMTP settings.');
+    throw new Error(err?.message || 'Email dispatch failed.');
   }
 };
 
@@ -78,8 +71,7 @@ export const signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // 🚀 STEP 1: Send Email FIRST. 
-    // This prevents "Ghost Users" (users in DB who never got an OTP)
+    // 🚀 STEP 1: Send Email FIRST
     await sendEmail({
       email: normalizedEmail,
       subject: 'MediQuick Account Verification OTP',
@@ -88,25 +80,24 @@ export const signup = async (req, res) => {
           <h2 style="color: #2ecc71;">Welcome to MediQuick+</h2>
           <p>Your verification OTP is:</p>
           <h1 style="letter-spacing: 5px; background: #f4f4f4; padding: 10px; display: inline-block;">${otp}</h1>
-          <p>Valid for 10 minutes. Do not share this code.</p>
+          <p>Valid for 20 minutes. Do not share this code.</p>
         </div>
       `,
     });
 
-    // 🚀 STEP 2: Save to Database ONLY if email succeeded
+    // 🚀 STEP 2: Save to DB with 20-minute window
     await User.create({
       name,
       phone,
       email: normalizedEmail,
       password: hashedPassword,
       otp,
-      otpExpire: new Date(Date.now() + 10 * 60 * 1000),
+      otpExpire: new Date(Date.now() + 20 * 60 * 1000),
       isVerified: false,
     });
 
     return res.status(201).json({ message: 'OTP sent to email' });
   } catch (error) {
-    console.error('❌ Signup failed:', error.message);
     return res.status(500).json({ message: error.message || 'Signup failed' });
   }
 };
@@ -114,10 +105,15 @@ export const signup = async (req, res) => {
 export const verifyOTP = async (req, res) => {
   const { email, otp } = req.body;
   try {
+    const normalizedEmail = email.trim().toLowerCase();
+    
+    // 🛡️ Grace Period: Offset current time by 5 seconds to prevent "Instant Expiry"
+    const checkTime = new Date(Date.now() - 5000);
+
     const user = await User.findOne({
-      email: email.trim().toLowerCase(),
+      email: normalizedEmail,
       otp,
-      otpExpire: { $gt: Date.now() },
+      otpExpire: { $gt: checkTime },
     });
 
     if (!user) return res.status(400).json({ message: 'Invalid or expired OTP' });
@@ -140,19 +136,10 @@ export const login = async (req, res) => {
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
-
     if (!user.isVerified) return res.status(403).json({ message: 'Please verify your email first' });
 
-    const token = jwt.sign(
-      { id: user._id, isAdmin: user.isAdmin },
-      process.env.JWT_SECRET,
-      { expiresIn: '1d' }
-    );
-
-    return res.json({
-      token,
-      user: { _id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin },
-    });
+    const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    return res.json({ token, user: { _id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin } });
   } catch (error) {
     return res.status(500).json({ message: 'Login failed' });
   }
@@ -166,7 +153,7 @@ export const forgotPassword = async (req, res) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     user.otp = otp;
-    user.otpExpire = new Date(Date.now() + 10 * 60 * 1000);
+    user.otpExpire = new Date(Date.now() + 20 * 60 * 1000); // 🚀 20 Min
     await user.save();
 
     await sendEmail({
@@ -174,7 +161,6 @@ export const forgotPassword = async (req, res) => {
       subject: 'MediQuick Password Reset OTP',
       message: `<h1>Reset OTP: ${otp}</h1>`,
     });
-
     return res.status(200).json({ message: 'Reset code sent' });
   } catch (error) {
     return res.status(500).json({ message: error.message || 'Forgot password failed' });
@@ -184,10 +170,11 @@ export const forgotPassword = async (req, res) => {
 export const resetPassword = async (req, res) => {
   const { email, otp, newPassword } = req.body;
   try {
+    const checkTime = new Date(Date.now() - 5000);
     const user = await User.findOne({
       email: email.trim().toLowerCase(),
       otp,
-      otpExpire: { $gt: Date.now() },
+      otpExpire: { $gt: checkTime },
     });
 
     if (!user) return res.status(400).json({ message: 'Invalid code or request expired' });
@@ -219,8 +206,7 @@ export const googleLogin = async (req, res) => {
         email: payload.email, 
         phone: 'N/A',
         password: await bcrypt.hash(Math.random().toString(36).slice(-10), 10),
-        isVerified: true, 
-        image: payload.picture,
+        isVerified: true, image: payload.picture,
       });
     }
     const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '1d' });
@@ -233,12 +219,13 @@ export const googleLogin = async (req, res) => {
 export const resendOtp = async (req, res) => {
   const { email } = req.body;
   try {
-    const user = await User.findOne({ email: email.trim().toLowerCase() });
+    const normalizedEmail = email.trim().toLowerCase();
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) return res.status(404).json({ message: 'User not found' });
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     user.otp = otp;
-    user.otpExpire = new Date(Date.now() + 10 * 60 * 1000);
+    user.otpExpire = new Date(Date.now() + 20 * 60 * 1000); // 🚀 20 Min
     await user.save();
 
     await sendEmail({
