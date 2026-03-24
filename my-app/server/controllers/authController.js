@@ -1,40 +1,47 @@
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
 import { OAuth2Client } from 'google-auth-library';
-import { Resend } from 'resend';
 
-// Initialize Clients
+// Initialize Google OAuth Client
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 /**
- * --- SHARED EMAIL PROTOCOL ---
- * Dispatches OTPs via Resend SDK. 
- * This uses HTTPS (Port 443) to avoid Render's SMTP connection timeouts.
+ * --- SHARED EMAIL PROTOCOL (UNIVERSAL) ---
+ * Dispatches OTPs via Brevo Relay. 
+ * Port 2525 is used to bypass Render's SMTP port blocking.
+ * This configuration allows signups from ANY email address.
  */
 const sendEmail = async ({ email, subject, message }) => {
-  if (!process.env.RESEND_API_KEY) {
-    throw new Error('RESEND_API_KEY is missing in environment variables');
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    throw new Error('Critical Error: SMTP credentials missing in Render Environment');
   }
 
+  const transporter = nodemailer.createTransport({
+    host: "smtp-relay.brevo.com",
+    port: 2525, // 🚀 Universal Port for Cloud Servers
+    secure: false, 
+    auth: {
+      user: process.env.EMAIL_USER, // Your Brevo Login Email
+      pass: process.env.EMAIL_PASS, // Your xsmtpsib- key
+    },
+    connectionTimeout: 20000,
+    socketTimeout: 20000,
+  });
+
   try {
-    const { data, error } = await resend.emails.send({
-      from: 'MediQuick+ <onboarding@resend.dev>', // Update this to your verified domain later
-      to: [email.trim().toLowerCase()],
-      subject: subject,
+    const info = await transporter.sendMail({
+      from: `"MediQuick+ Hub" <${process.env.EMAIL_USER}>`,
+      to: email.trim().toLowerCase(),
+      subject,
       html: message,
     });
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    console.log('🚀 Hub Dispatch Success (via Resend):', data.id);
-    return data;
+    console.log('🚀 Hub Dispatch Success (Universal):', info.response);
+    return info;
   } catch (err) {
-    console.error("❌ Resend Protocol Failed:", err.message);
-    throw new Error("Email dispatch failed. Check Resend API settings.");
+    console.error("❌ Mailer Protocol Failed:", err.message);
+    throw new Error("Email dispatch failed. Verify Brevo keys in Render.");
   }
 };
 
@@ -63,7 +70,7 @@ export const signup = async (req, res) => {
     await sendEmail({
       email: normalizedEmail,
       subject: 'MediQuick Account Verification',
-      message: `<strong>Your Verification OTP is: ${otp}</strong><p>Valid for 10 minutes.</p>`,
+      message: `<h1>Welcome to the Hub</h1><p>Your Verification OTP is: <strong>${otp}</strong></p><p>Valid for 10 minutes.</p>`,
     });
 
     res.status(201).json({ message: 'OTP sent to email' });
@@ -131,7 +138,7 @@ export const forgotPassword = async (req, res) => {
     await sendEmail({
       email: user.email,
       subject: 'Password Reset OTP',
-      message: `<strong>Your Reset Code is: ${otp}</strong>`,
+      message: `<h1>Reset Code: ${otp}</h1>`,
     });
     res.json({ message: 'Reset code sent' });
   } catch (error) {
@@ -180,16 +187,8 @@ export const googleLogin = async (req, res) => {
       });
     }
 
-    const token = jwt.sign(
-      { id: user._id, isAdmin: user.isAdmin }, 
-      process.env.JWT_SECRET, 
-      { expiresIn: '1d' }
-    );
-    
-    res.json({ 
-      token, 
-      user: { _id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin } 
-    });
+    const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    res.json({ token, user: { _id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin } });
   } catch (error) {
     console.error("❌ Google Auth Error:", error);
     res.status(400).json({ message: "Google authentication failed" });
@@ -210,9 +209,9 @@ export const resendOtp = async (req, res) => {
     await sendEmail({
       email: user.email,
       subject: 'New Verification OTP',
-      message: `<strong>Your new OTP is: ${otp}</strong>`,
+      message: `<h1>Your new OTP is: ${otp}</h1>`,
     });
-    res.json({ message: 'New OTP dispatched to email' });
+    res.json({ message: 'New OTP dispatched' });
   } catch (error) {
     res.status(500).json({ message: 'Resend OTP protocol failed' });
   }
