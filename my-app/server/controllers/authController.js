@@ -1,45 +1,40 @@
 import User from '../models/User.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import nodemailer from 'nodemailer';
 import { OAuth2Client } from 'google-auth-library';
+import { Resend } from 'resend';
 
+// Initialize Clients
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 /**
  * --- SHARED EMAIL PROTOCOL ---
- * Dispatches OTPs via Brevo SMTP Relay for high reliability on Render.
+ * Dispatches OTPs via Resend SDK. 
+ * This uses HTTPS (Port 443) to avoid Render's SMTP connection timeouts.
  */
 const sendEmail = async ({ email, subject, message }) => {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    throw new Error('EMAIL_USER or EMAIL_PASS is missing in environment variables');
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error('RESEND_API_KEY is missing in environment variables');
   }
 
-  // 📡 Brevo Relay Configuration (Replaces Gmail to prevent timeouts)
-  const transporter = nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",
-    port: 2525,
-    secure: false, // TLS required for port 587
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS, // Your xsmtpsib- key
-    },
-    connectionTimeout: 30000,
-    socketTimeout: 30000,
-  });
-
   try {
-    const info = await transporter.sendMail({
-      from: `"MediQuick+ Hub" <${process.env.EMAIL_USER}>`,
-      to: email.trim().toLowerCase(),
-      subject,
+    const { data, error } = await resend.emails.send({
+      from: 'MediQuick+ <onboarding@resend.dev>', // Update this to your verified domain later
+      to: [email.trim().toLowerCase()],
+      subject: subject,
       html: message,
     });
-    console.log('🚀 Hub Dispatch Success (via Brevo):', info.response);
-    return info;
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    console.log('🚀 Hub Dispatch Success (via Resend):', data.id);
+    return data;
   } catch (err) {
-    console.error("❌ Mailer Protocol Failed:", err.message);
-    throw new Error("Email dispatch failed. Please check Brevo API keys.");
+    console.error("❌ Resend Protocol Failed:", err.message);
+    throw new Error("Email dispatch failed. Check Resend API settings.");
   }
 };
 
@@ -68,7 +63,7 @@ export const signup = async (req, res) => {
     await sendEmail({
       email: normalizedEmail,
       subject: 'MediQuick Account Verification',
-      message: `<h1>Your Verification OTP is: ${otp}</h1><p>Valid for 10 minutes.</p>`,
+      message: `<strong>Your Verification OTP is: ${otp}</strong><p>Valid for 10 minutes.</p>`,
     });
 
     res.status(201).json({ message: 'OTP sent to email' });
@@ -136,7 +131,7 @@ export const forgotPassword = async (req, res) => {
     await sendEmail({
       email: user.email,
       subject: 'Password Reset OTP',
-      message: `<h1>Your Reset Code is: ${otp}</h1>`,
+      message: `<strong>Your Reset Code is: ${otp}</strong>`,
     });
     res.json({ message: 'Reset code sent' });
   } catch (error) {
@@ -215,7 +210,7 @@ export const resendOtp = async (req, res) => {
     await sendEmail({
       email: user.email,
       subject: 'New Verification OTP',
-      message: `<h1>Your new OTP is: ${otp}</h1>`,
+      message: `<strong>Your new OTP is: ${otp}</strong>`,
     });
     res.json({ message: 'New OTP dispatched to email' });
   } catch (error) {
