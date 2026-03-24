@@ -4,16 +4,18 @@ import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import { OAuth2Client } from 'google-auth-library';
 
-// Google OAuth client
+// Google OAuth client using environment variable
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // -----------------------------
 // EMAIL CONFIG (FIXED FOR RENDER & BREVO)
 // -----------------------------
 const createTransporter = () => {
+  // 🚀 Port 2525 is the industry secret for bypassing Render's SMTP blocks
   const host = 'smtp-relay.brevo.com';
-  const port = 2525; // 🚀 Port 2525 bypasses Render's standard SMTP blocks
+  const port = 2525; 
 
+  // Must match Brevo Login (e.g., a59a01001@smtp-brevo.com) and your Master Key
   const user = process.env.EMAIL_USER; 
   const pass = process.env.EMAIL_PASS;
 
@@ -27,9 +29,11 @@ const createTransporter = () => {
     secure: false, 
     auth: { user, pass },
     tls: {
+      // 🛡️ Critical for stable handshakes on shared cloud networks
       rejectUnauthorized: false,
       minVersion: 'TLSv1.2'
     },
+    // ⏱️ Extended timeouts to ensure the connection doesn't drop
     connectionTimeout: 40000, 
     greetingTimeout: 40000,
     socketTimeout: 40000,
@@ -40,6 +44,7 @@ const sendEmail = async ({ email, subject, message }) => {
   try {
     const transporter = createTransporter();
     const info = await transporter.sendMail({
+      // 🛰️ Match your verified Brevo sender exactly
       from: `"MediQuick Hub" <balisaikumar9491@gmail.com>`, 
       to: email.trim().toLowerCase(),
       subject,
@@ -71,7 +76,7 @@ export const signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // 🚀 STEP 1: Send Email FIRST
+    // 🚀 STEP 1: Send Email FIRST (Prevents ghost users in DB)
     await sendEmail({
       email: normalizedEmail,
       subject: 'MediQuick Account Verification OTP',
@@ -80,12 +85,12 @@ export const signup = async (req, res) => {
           <h2 style="color: #2ecc71;">Welcome to MediQuick+</h2>
           <p>Your verification OTP is:</p>
           <h1 style="letter-spacing: 5px; background: #f4f4f4; padding: 10px; display: inline-block;">${otp}</h1>
-          <p>Valid for 20 minutes. Do not share this code.</p>
+          <p style="color: #e74c3c;"><strong>Valid for 20 minutes.</strong> Do not share this code.</p>
         </div>
       `,
     });
 
-    // 🚀 STEP 2: Save to DB with 20-minute window
+    // 🚀 STEP 2: Save to DB with a 20-minute window
     await User.create({
       name,
       phone,
@@ -98,6 +103,7 @@ export const signup = async (req, res) => {
 
     return res.status(201).json({ message: 'OTP sent to email' });
   } catch (error) {
+    console.error('❌ Signup failed:', error.message);
     return res.status(500).json({ message: error.message || 'Signup failed' });
   }
 };
@@ -107,7 +113,7 @@ export const verifyOTP = async (req, res) => {
   try {
     const normalizedEmail = email.trim().toLowerCase();
     
-    // 🛡️ Grace Period: Offset current time by 5 seconds to prevent "Instant Expiry"
+    // 🛡️ Grace Period: Offset current time by 5 seconds to handle server clock drift
     const checkTime = new Date(Date.now() - 5000);
 
     const user = await User.findOne({
@@ -159,7 +165,7 @@ export const forgotPassword = async (req, res) => {
     await sendEmail({
       email: user.email,
       subject: 'MediQuick Password Reset OTP',
-      message: `<h1>Reset OTP: ${otp}</h1>`,
+      message: `<h1>Reset OTP: ${otp}</h1><p>Valid for 20 minutes.</p>`,
     });
     return res.status(200).json({ message: 'Reset code sent' });
   } catch (error) {
@@ -206,12 +212,14 @@ export const googleLogin = async (req, res) => {
         email: payload.email, 
         phone: 'N/A',
         password: await bcrypt.hash(Math.random().toString(36).slice(-10), 10),
-        isVerified: true, image: payload.picture,
+        isVerified: true, 
+        image: payload.picture,
       });
     }
     const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '1d' });
     return res.json({ token, user: { _id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin } });
   } catch (error) {
+    console.error("❌ Google Auth Failure:", error.message);
     return res.status(400).json({ message: 'Google authentication failed' });
   }
 };
@@ -231,7 +239,7 @@ export const resendOtp = async (req, res) => {
     await sendEmail({
       email: user.email,
       subject: 'New Verification OTP',
-      message: `<h1>OTP: ${otp}</h1>`,
+      message: `<h1>New OTP: ${otp}</h1>`,
     });
     return res.status(200).json({ message: 'New OTP sent' });
   } catch (error) {
@@ -258,7 +266,14 @@ export const updateUserProfile = async (req, res) => {
     user.name = req.body.name || user.name;
     user.phone = req.body.phone || user.phone;
     const updatedUser = await user.save();
-    return res.json({ _id: updatedUser._id, name: updatedUser.name, email: updatedUser.email, phone: updatedUser.phone, isAdmin: updatedUser.isAdmin, image: updatedUser.image });
+    return res.json({ 
+      _id: updatedUser._id, 
+      name: updatedUser.name, 
+      email: updatedUser.email, 
+      phone: updatedUser.phone, 
+      isAdmin: updatedUser.isAdmin, 
+      image: updatedUser.image 
+    });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
