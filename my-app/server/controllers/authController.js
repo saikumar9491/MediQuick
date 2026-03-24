@@ -8,15 +8,16 @@ import { OAuth2Client } from 'google-auth-library';
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // -----------------------------
-// EMAIL CONFIG
+// EMAIL CONFIG (FIXED FOR RENDER & BREVO)
 // -----------------------------
 const createTransporter = () => {
-  const host = process.env.BREVO_SMTP_HOST || 'smtp-relay.brevo.com';
-  const port = Number(process.env.BREVO_SMTP_PORT || 587);
-  const secure = String(process.env.BREVO_SMTP_SECURE || 'false') === 'true';
+  // 🚀 Port 2525 is the secret to bypassing Render's SMTP blocks
+  const host = 'smtp-relay.brevo.com';
+  const port = 2525; 
 
-  const user = process.env.BREVO_SMTP_USER || process.env.EMAIL_USER;
-  const pass = process.env.BREVO_SMTP_PASS || process.env.EMAIL_PASS;
+  // Must match Brevo Login: a59a01001@smtp-brevo.com
+  const user = process.env.EMAIL_USER; 
+  const pass = process.env.EMAIL_PASS;
 
   if (!user || !pass) {
     throw new Error('SMTP credentials missing. Set EMAIL_USER/EMAIL_PASS in Render.');
@@ -25,15 +26,17 @@ const createTransporter = () => {
   return nodemailer.createTransport({
     host,
     port,
-    secure,
+    secure: false, 
     auth: { user, pass },
     tls: {
-      // 🛡️ Bypasses Render's strict network handshake rules
-      rejectUnauthorized: false 
+      // 🛡️ Essential for stable handshakes on shared cloud networks
+      rejectUnauthorized: false,
+      minVersion: 'TLSv1.2'
     },
-    connectionTimeout: 25000,
-    greetingTimeout: 25000,
-    socketTimeout: 25000,
+    // ⏱️ High-patience timeouts for cloud relays
+    connectionTimeout: 40000, 
+    greetingTimeout: 40000,
+    socketTimeout: 40000,
   });
 };
 
@@ -41,9 +44,8 @@ const sendEmail = async ({ email, subject, message }) => {
   try {
     const transporter = createTransporter();
 
-    // 🚀 HARDCODED FIX: Uses your verified email but masks it as MediQuick Hub
-    // This prevents conflicts with your "Agri" project settings in Brevo
     const info = await transporter.sendMail({
+      // 🛰️ Match your verified Brevo sender exactly
       from: `"MediQuick Hub" <balisaikumar9491@gmail.com>`, 
       to: email.trim().toLowerCase(),
       subject,
@@ -71,22 +73,13 @@ export const signup = async (req, res) => {
 
     const normalizedEmail = email.trim().toLowerCase();
     const existingUser = await User.findOne({ email: normalizedEmail });
-
     if (existingUser) return res.status(400).json({ message: 'User already exists' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    await User.create({
-      name,
-      phone,
-      email: normalizedEmail,
-      password: hashedPassword,
-      otp,
-      otpExpire: new Date(Date.now() + 10 * 60 * 1000),
-      isVerified: false,
-    });
-
+    // 🚀 STEP 1: Send Email FIRST. 
+    // This prevents "Ghost Users" (users in DB who never got an OTP)
     await sendEmail({
       email: normalizedEmail,
       subject: 'MediQuick Account Verification OTP',
@@ -100,8 +93,20 @@ export const signup = async (req, res) => {
       `,
     });
 
+    // 🚀 STEP 2: Save to Database ONLY if email succeeded
+    await User.create({
+      name,
+      phone,
+      email: normalizedEmail,
+      password: hashedPassword,
+      otp,
+      otpExpire: new Date(Date.now() + 10 * 60 * 1000),
+      isVerified: false,
+    });
+
     return res.status(201).json({ message: 'OTP sent to email' });
   } catch (error) {
+    console.error('❌ Signup failed:', error.message);
     return res.status(500).json({ message: error.message || 'Signup failed' });
   }
 };
@@ -167,7 +172,7 @@ export const forgotPassword = async (req, res) => {
     await sendEmail({
       email: user.email,
       subject: 'MediQuick Password Reset OTP',
-      message: `<h1>Reset OTP: ${otp}</h1><p>Valid for 10 minutes.</p>`,
+      message: `<h1>Reset OTP: ${otp}</h1>`,
     });
 
     return res.status(200).json({ message: 'Reset code sent' });
@@ -205,21 +210,19 @@ export const googleLogin = async (req, res) => {
       idToken: googleToken,
       audience: process.env.GOOGLE_CLIENT_ID,
     });
-
-    const { name, email, picture } = ticket.getPayload();
-    let user = await User.findOne({ email });
+    const payload = ticket.getPayload();
+    let user = await User.findOne({ email: payload.email });
 
     if (!user) {
       user = await User.create({
-        name,
-        email,
+        name: payload.name, 
+        email: payload.email, 
         phone: 'N/A',
         password: await bcrypt.hash(Math.random().toString(36).slice(-10), 10),
-        isVerified: true,
-        image: picture,
+        isVerified: true, 
+        image: payload.picture,
       });
     }
-
     const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '1d' });
     return res.json({ token, user: { _id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin } });
   } catch (error) {
@@ -241,9 +244,8 @@ export const resendOtp = async (req, res) => {
     await sendEmail({
       email: user.email,
       subject: 'New Verification OTP',
-      message: `<h1>Your new OTP: ${otp}</h1>`,
+      message: `<h1>OTP: ${otp}</h1>`,
     });
-
     return res.status(200).json({ message: 'New OTP sent' });
   } catch (error) {
     return res.status(500).json({ message: error.message || 'Resend OTP failed' });
@@ -266,11 +268,9 @@ export const updateUserProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
-
     user.name = req.body.name || user.name;
     user.phone = req.body.phone || user.phone;
     const updatedUser = await user.save();
-
     return res.json({ _id: updatedUser._id, name: updatedUser.name, email: updatedUser.email, phone: updatedUser.phone, isAdmin: updatedUser.isAdmin, image: updatedUser.image });
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -281,7 +281,6 @@ export const updateCart = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
-
     user.cart = req.body.cart || [];
     await user.save();
     return res.status(200).json({ message: 'Cart synced' });
@@ -294,7 +293,6 @@ export const addToWishlist = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
-
     const productId = req.body.productId;
     if (!user.wishlist.some((id) => id.toString() === productId.toString())) {
       user.wishlist.push(productId);
@@ -310,7 +308,6 @@ export const removeFromWishlist = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
-
     user.wishlist = user.wishlist.filter((id) => id.toString() !== req.body.productId.toString());
     await user.save();
     return res.status(200).json({ message: 'Removed from wishlist' });
