@@ -27,7 +27,9 @@ const allowedOrigins = [
   'http://localhost:5175', 
   'http://localhost:3000',
   'https://mediquick-53b1.onrender.com', 
-  'https://mediquick-1.onrender.com'      
+  'https://mediquick-1.onrender.com',
+  'https://server-wheat-nine-72.vercel.app',
+  'https://mediquick-1.onrender.com',
 ];
 
 app.use(cors({
@@ -57,6 +59,9 @@ app.use(express.json({ limit: '10mb' })); // Increased limit for prescription up
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Static folder for Image storage
+// NOTE: On Vercel (serverless), the filesystem is read-only.
+// Uploaded files via multer will NOT persist between requests.
+// For production file storage, use Cloudinary or AWS S3.
 app.use('/uploads', express.static('uploads'));
 
 /**
@@ -83,9 +88,9 @@ app.get('/', (req, res) => {
 /**
  * 5. KEEP-ALIVE PROTOCOL
  * Pings the server every 14 minutes to prevent Render sleep mode.
+ * Only runs in a persistent server environment (not Vercel serverless).
  */
 const keepAlive = () => {
-  // Use Render's default env variable if available, otherwise fallback
   const url = process.env.RENDER_EXTERNAL_URL || `https://mediquick-53b1.onrender.com/`; 
   
   setInterval(async () => {
@@ -112,18 +117,25 @@ app.use((err, req, res, next) => {
 
 /**
  * 7. SERVER STARTUP
+ * When running locally (not on Vercel), start a persistent HTTP server.
+ * On Vercel, the app is exported and used as a serverless handler.
  */
-const PORT = process.env.PORT || 5000; 
+const isVercel = process.env.VERCEL === '1';
 
-// Bind to 0.0.0.0 for Render compatibility
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`--- PROTOCOL START ---`);
-  console.log(`🚀 Hub Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`📡 Satellite Port: ${PORT}`);
-  console.log(`🛡️  Security Mode: ${process.env.NODE_ENV !== 'production' ? 'Open (Dev)' : 'Shielded (Prod)'}`);
-  console.log(`----------------------`);
-  
-  if (process.env.NODE_ENV === 'production') {
-    keepAlive();
-  }
-});
+if (!isVercel) {
+  const PORT = process.env.PORT || 5000; 
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`--- PROTOCOL START ---`);
+    console.log(`🚀 Hub Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`📡 Satellite Port: ${PORT}`);
+    console.log(`🛡️  Security Mode: ${process.env.NODE_ENV !== 'production' ? 'Open (Dev)' : 'Shielded (Prod)'}`);
+    console.log(`----------------------`);
+    
+    if (process.env.NODE_ENV === 'production') {
+      keepAlive();
+    }
+  });
+}
+
+// Export the app for Vercel serverless usage
+export default app;
