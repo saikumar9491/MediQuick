@@ -35,9 +35,23 @@ const connectDB = async () => {
       console.log("👉 Protocol Tip: Verify your MongoDB Atlas Network Access (Allow Access from Anywhere).");
     }
     
-    // Exit process with failure
-    process.exit(1);
+    // Exit process with failure (removed for Vercel/serverless stability)
+    // process.exit(1);
   }
 };
+
+// Add a helper to get the last error
+export let lastDbError = null;
+const originalConnectDB = connectDB;
+const connectDBWithLogging = async () => {
+  try {
+    await originalConnectDB();
+    lastDbError = null;
+  } catch (err) {
+    lastDbError = err.message;
+    throw err;
+  }
+};
+
 
 export default connectDB;

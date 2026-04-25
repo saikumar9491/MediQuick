@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import axios from 'axios';
 import connectDB from './config/db.js';
+import mongoose from 'mongoose';
 
 // Route Imports
 import userRoutes from './routes/userRoutes.js'; 
@@ -13,7 +14,7 @@ import cartRoutes from './routes/cartRoutes.js';
 
 // ⚙️ INITIALIZATION
 dotenv.config();
-connectDB();
+await connectDB(); // 🛰️ FORCING HUB CONNECTION
 
 const app = express();
 
@@ -81,6 +82,19 @@ app.get('/', (req, res) => {
     hub: "Amritsar Hub-01",
     message: "🚀 MediQuick+ Satellite Link Established",
     timestamp: new Date().toISOString()
+  });
+});
+
+/**
+ * 4.5. SYSTEM DEBUG PROTOCOL
+ */
+app.get('/debug', (req, res) => {
+  res.status(200).json({
+    dbState: mongoose.connection.readyState,
+    status: mongoose.connection.readyState === 1 ? "Connected" : "Disconnected",
+    env: process.env.NODE_ENV,
+    hasMongoUri: !!(process.env.MONGODB_URI || process.env.MONGO_URI),
+    uriStart: (process.env.MONGODB_URI || process.env.MONGO_URI || "").substring(0, 20) + "..."
   });
 });
 
