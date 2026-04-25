@@ -29,7 +29,6 @@ const allowedOrigins = [
   'https://mediquick-53b1.onrender.com', 
   'https://mediquick-1.onrender.com',
   'https://server-wheat-nine-72.vercel.app',
-  'https://mediquick-1.onrender.com',
 ];
 
 app.use(cors({
