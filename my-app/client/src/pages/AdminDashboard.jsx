@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import Navbar from '../components/common/Navbar';
 import AddMedicineModal from '../components/admin/AddMedicineModal';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -125,9 +124,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#f1f3f6] pb-16 sm:pb-20">
-      <Navbar user={user} setUser={setUser} />
-
-      <main className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 sm:py-8">
+      <main className="mx-auto max-w-[1400px] px-4 pt-24 py-6 sm:px-6 sm:py-8 sm:pt-28">
         {/* Header Section */}
         <div className="mb-6 flex flex-col gap-4 sm:mb-8 md:flex-row md:items-center md:justify-between">
           <div>
