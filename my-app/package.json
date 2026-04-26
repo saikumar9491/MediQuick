@@ -1,0 +1,8 @@
+{
+  "name": "mediquick-vercel-root",
+  "version": "1.0.0",
+  "description": "Dummy package.json to fix Vercel Root Directory issue",
+  "scripts": {
+    "build": "cd server && npm install"
+  }
+}
