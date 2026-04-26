@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 
-const MedicineCard = ({ _id, name, price, brand, needsPrescription, category, image }) => {
+const MedicineCard = ({ _id, name, price, brand, needsPrescription, category, image, isFlashDeal, discountPrice }) => {
   const navigate = useNavigate();
   const { addToCart, showNotification } = useCart();
   const { user, token, setUser } = useAuth();
@@ -20,9 +20,12 @@ const MedicineCard = ({ _id, name, price, brand, needsPrescription, category, im
     }
   }, [user?.wishlist, _id]);
 
+  const activePrice = isFlashDeal && discountPrice ? discountPrice : (price || 0);
   const safePrice = price || 0;
   const mrp = Math.round(safePrice * 1.33);
-  const discount = mrp > 0 ? Math.round(((mrp - safePrice) / mrp) * 100) : 0;
+  const discount = isFlashDeal && discountPrice 
+    ? Math.round(((safePrice - discountPrice) / safePrice) * 100)
+    : (mrp > 0 ? Math.round(((mrp - safePrice) / mrp) * 100) : 0);
 
   const toggleWishlist = async (e) => {
     e.stopPropagation();
@@ -76,7 +79,7 @@ const MedicineCard = ({ _id, name, price, brand, needsPrescription, category, im
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
-    addToCart({ _id, name, price: safePrice, brand, category, image });
+    addToCart({ _id, name, price: activePrice, brand, category, image });
   };
 
   return (
@@ -86,8 +89,8 @@ const MedicineCard = ({ _id, name, price, brand, needsPrescription, category, im
     >
       <div className="absolute left-2 top-2 sm:left-3 sm:top-3 z-10 flex flex-col gap-1.5 sm:gap-2">
         {discount > 0 && (
-          <span className="rounded-lg bg-blue-600 px-2 py-1 text-[9px] sm:text-[10px] font-black text-white shadow-lg rotate-[-2deg]">
-            {discount}% OFF
+          <span className={`rounded-lg px-2 py-1 text-[9px] sm:text-[10px] font-black text-white shadow-lg rotate-[-2deg] ${isFlashDeal ? 'bg-orange-500' : 'bg-blue-600'}`}>
+            {isFlashDeal ? '⚡ FLASH ' : ''}{discount}% OFF
           </span>
         )}
 
@@ -139,11 +142,11 @@ const MedicineCard = ({ _id, name, price, brand, needsPrescription, category, im
         <div className="mt-4 sm:mt-5 flex flex-col">
           <div className="flex items-baseline gap-2">
             <span className="text-xl sm:text-2xl font-black tracking-tighter text-slate-900">
-              ₹{safePrice}
+              ₹{activePrice}
             </span>
-            {mrp > safePrice && (
+            {(isFlashDeal || mrp > activePrice) && (
               <span className="text-xs sm:text-sm font-bold text-slate-300 line-through">
-                ₹{mrp}
+                ₹{isFlashDeal ? safePrice : mrp}
               </span>
             )}
           </div>
@@ -157,7 +160,7 @@ const MedicineCard = ({ _id, name, price, brand, needsPrescription, category, im
           onClick={handleAddToCart}
           className="hidden sm:block mt-5 sm:mt-6 w-full rounded-xl bg-slate-900 py-3 sm:py-3.5 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.18em] sm:tracking-widest text-white transition-all hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-200 active:scale-[0.98]"
         >
-          Add to Bag — ₹{safePrice}
+          Add to Bag — ₹{activePrice}
         </button>
       </div>
     </div>

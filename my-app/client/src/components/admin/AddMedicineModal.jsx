@@ -10,6 +10,8 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
     category: 'Wellness',
     image: '',
     needsRx: false,
+    isFlashDeal: false,
+    discountPrice: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -28,6 +30,8 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
         category: 'Wellness',
         image: '',
         needsRx: false,
+        isFlashDeal: false,
+        discountPrice: '',
       });
     }
   }, [initialData, isOpen]);
@@ -174,6 +178,35 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
               Requires Rx Protocol (Amritsar Hub Safety)
             </span>
           </label>
+
+          <div className="rounded-md border border-blue-100 bg-blue-50/50 p-4 space-y-3">
+            <label className="flex cursor-pointer items-center gap-3">
+              <input
+                type="checkbox"
+                checked={formData.isFlashDeal}
+                className="h-4 w-4 accent-blue-600"
+                onChange={(e) => setFormData({ ...formData, isFlashDeal: e.target.checked })}
+              />
+              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-blue-600">
+                Mark as Daily Flash Deal
+              </span>
+            </label>
+
+            {formData.isFlashDeal && (
+              <div className="space-y-1 animate-fadeIn">
+                <label className="ml-1 text-[9px] font-black uppercase tracking-widest text-blue-400">
+                  Flash Sale Price (₹)
+                </label>
+                <input
+                  type="number"
+                  value={formData.discountPrice}
+                  placeholder="Lower than regular price"
+                  className="w-full rounded-md border border-blue-200 p-2.5 text-sm font-bold outline-none transition focus:border-blue-500"
+                  onChange={(e) => setFormData({ ...formData, discountPrice: e.target.value })}
+                />
+              </div>
+            )}
+          </div>
 
           <button
             type="submit"

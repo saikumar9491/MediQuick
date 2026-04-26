@@ -42,23 +42,35 @@ export const getRelatedMedicines = async (req, res) => {
   }
 };
 
-// @desc    Get Top Rated Medicines for Home Screen
+// @desc    Get Top Rated Medicines for Home Screen (Prioritizes Flash Deals)
 // @route   GET /api/medicines/top
 export const getTopMedicines = async (req, res) => {
   try {
-    // Try to find high-rated medicines first
-    let medicines = await Medicine.find({ rating: { $gte: 4 } })
-      .sort({ rating: -1, createdAt: -1 })
+    // 1. Fetch Explicit Flash Deals first
+    let flashDeals = await Medicine.find({ isFlashDeal: true })
+      .sort({ createdAt: -1 })
       .limit(8);
 
-    // Fallback: if no high-rated medicines exist, return latest 8 medicines
-    if (!medicines || medicines.length === 0) {
-      medicines = await Medicine.find({})
+    // 2. If fewer than 8 flash deals, supplement with top-rated medicines
+    let supplementaryMedicines = [];
+    if (flashDeals.length < 8) {
+      supplementaryMedicines = await Medicine.find({ 
+        isFlashDeal: false, 
+        rating: { $gte: 4 } 
+      })
+        .sort({ rating: -1, createdAt: -1 })
+        .limit(8 - flashDeals.length);
+    }
+
+    // 3. Final Fallback: Latest medicines if still empty
+    let finalMedicines = [...flashDeals, ...supplementaryMedicines];
+    if (finalMedicines.length === 0) {
+      finalMedicines = await Medicine.find({})
         .sort({ createdAt: -1 })
         .limit(8);
     }
 
-    res.status(200).json(medicines || []);
+    res.status(200).json(finalMedicines || []);
   } catch (error) {
     console.error('getTopMedicines error:', error);
     res.status(200).json([]);
@@ -131,6 +143,29 @@ export const deleteMedicine = async (req, res) => {
     res.status(200).json({ message: 'Unit successfully purged from Hub' });
   } catch (error) {
     res.status(500).json({ message: 'Delete operation failed' });
+  }
+};
+
+// @desc    Toggle Flash Deal status
+// @route   PATCH /api/medicines/:id/flash-deal
+export const toggleFlashDeal = async (req, res) => {
+  try {
+    const { isFlashDeal, discountPrice } = req.body;
+    const medicine = await Medicine.findById(req.params.id);
+
+    if (!medicine) {
+      return res.status(404).json({ message: 'Medicine not found' });
+    }
+
+    medicine.isFlashDeal = isFlashDeal !== undefined ? isFlashDeal : !medicine.isFlashDeal;
+    if (discountPrice !== undefined) {
+      medicine.discountPrice = discountPrice;
+    }
+
+    const updatedMedicine = await medicine.save();
+    res.status(200).json(updatedMedicine);
+  } catch (error) {
+    res.status(400).json({ message: 'Failed to update flash deal status', error: error.message });
   }
 };
 

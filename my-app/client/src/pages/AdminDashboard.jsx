@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import AddMedicineModal from '../components/admin/AddMedicineModal';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -136,12 +137,20 @@ const AdminDashboard = () => {
             </p>
           </div>
 
-          <button
-            onClick={handleAddNew}
-            className="w-full rounded-md bg-[#2874f0] px-5 py-3 text-[10px] sm:w-auto sm:px-8 sm:py-4 sm:text-xs font-black italic tracking-[2px] sm:tracking-widest text-white shadow-xl transition-all hover:bg-blue-700 active:scale-95"
-          >
-            + REGISTER NEW MEDICINE
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Link
+              to="/admin/flash-deals"
+              className="w-full rounded-md bg-orange-500 px-5 py-3 text-[10px] sm:w-auto sm:px-8 sm:py-4 sm:text-xs font-black italic tracking-[2px] sm:tracking-widest text-white shadow-xl transition-all hover:bg-orange-600 active:scale-95 flex items-center justify-center gap-2"
+            >
+              <span>⚡</span> FLASH DEALS MANAGER
+            </Link>
+            <button
+              onClick={handleAddNew}
+              className="w-full rounded-md bg-[#2874f0] px-5 py-3 text-[10px] sm:w-auto sm:px-8 sm:py-4 sm:text-xs font-black italic tracking-[2px] sm:tracking-widest text-white shadow-xl transition-all hover:bg-blue-700 active:scale-95"
+            >
+              + REGISTER NEW MEDICINE
+            </button>
+          </div>
         </div>
 
         {/* System Stats Section */}
@@ -179,6 +188,7 @@ const AdminDashboard = () => {
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest">Unit Details</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest">Classification</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest">Brand</th>
+                  <th className="p-4 text-[10px] font-black uppercase tracking-widest">Status</th>
                   <th className="p-4 text-[10px] font-black uppercase tracking-widest">Valuation</th>
                   <th className="p-4 text-center text-[10px] font-black uppercase tracking-widest">Operations</th>
                 </tr>
@@ -213,6 +223,19 @@ const AdminDashboard = () => {
 
                     <td className="p-4 text-[10px] font-black uppercase text-gray-400">
                       {med.brand}
+                    </td>
+
+                    <td className="p-4">
+                      {med.isFlashDeal ? (
+                        <div className="flex flex-col">
+                          <span className="inline-block rounded-full bg-blue-100 px-2 py-0.5 text-[8px] font-black uppercase text-blue-600">
+                            ⚡ Flash Deal
+                          </span>
+                          <span className="mt-1 text-[9px] font-bold text-blue-400">₹{med.discountPrice}</span>
+                        </div>
+                      ) : (
+                        <span className="text-[9px] font-bold text-gray-300">Standard</span>
+                      )}
                     </td>
 
                     <td className="p-4 text-sm font-black text-blue-600">

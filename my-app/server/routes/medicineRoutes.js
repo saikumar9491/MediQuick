@@ -1,13 +1,14 @@
 import express from 'express';
-import { 
-  getMedicines, 
+import {
+  getMedicines,
   getTopMedicines,
-  getMedicineById, 
-  addMedicine, 
-  updateMedicine, 
+  getMedicineById,
+  addMedicine,
+  updateMedicine,
   deleteMedicine,
   createMedicineReview,
-  getRelatedMedicines
+  getRelatedMedicines,
+  toggleFlashDeal
 } from '../controllers/medicineController.js';
 import { verifyToken, isAdmin } from '../middleware/authMiddleware.js';
 
@@ -56,5 +57,8 @@ router.put('/:id', verifyToken, isAdmin, updateMedicine);
 
 // Remove a product from the database
 router.delete('/:id', verifyToken, isAdmin, deleteMedicine);
+
+// Toggle Flash Deal status (Daily Flash Deals management)
+router.patch('/:id/flash-deal', verifyToken, isAdmin, toggleFlashDeal);
 
 export default router;

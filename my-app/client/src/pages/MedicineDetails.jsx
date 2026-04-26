@@ -184,9 +184,16 @@ const MedicineDetails = () => {
                 </span>
               </button>
 
-              <div className="absolute top-3 left-3 sm:top-4 sm:left-4 rounded-full bg-green-600 px-2.5 sm:px-3 py-1 text-[9px] sm:text-[10px] font-black uppercase text-white shadow-md animate-pulse">
-                25% Off
-              </div>
+              {medicine.isFlashDeal && (
+                <div className="absolute top-3 left-3 sm:top-4 sm:left-4 rounded-full bg-orange-500 px-2.5 sm:px-3 py-1 text-[9px] sm:text-[10px] font-black uppercase text-white shadow-md animate-pulse">
+                  ⚡ Flash Deal
+                </div>
+              )}
+              {!medicine.isFlashDeal && (
+                <div className="absolute top-3 left-3 sm:top-4 sm:left-4 rounded-full bg-green-600 px-2.5 sm:px-3 py-1 text-[9px] sm:text-[10px] font-black uppercase text-white shadow-md">
+                  25% Off
+                </div>
+              )}
             </div>
 
             <div className="hidden lg:flex">
@@ -217,13 +224,13 @@ const MedicineDetails = () => {
 
             <div className="flex flex-wrap items-end gap-2 sm:gap-4 mb-2">
               <span className="text-3xl sm:text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
-                ₹{medicine.price}
+                ₹{medicine.isFlashDeal && medicine.discountPrice ? medicine.discountPrice : medicine.price}
               </span>
               <span className="text-gray-400 line-through text-base sm:text-lg">
-                ₹{Math.round(medicine.price * 1.33)}
+                ₹{medicine.isFlashDeal ? medicine.price : Math.round(medicine.price * 1.33)}
               </span>
               <span className="text-green-600 font-black text-[10px] sm:text-xs md:text-sm uppercase italic tracking-wide sm:tracking-widest">
-                Special Offer Applied
+                {medicine.isFlashDeal ? '⚡ LIMITED TIME FLASH PRICE' : 'Special Offer Applied'}
               </span>
             </div>
 

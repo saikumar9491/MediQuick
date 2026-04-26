@@ -18,6 +18,8 @@ const medicineSchema = mongoose.Schema({
   rating: { type: Number, default: 0 },
   numReviews: { type: Number, default: 0 },
   needsPrescription: { type: Boolean, default: false },
+  isFlashDeal: { type: Boolean, default: false },
+  discountPrice: { type: Number },
 }, { timestamps: true });
 
 export default mongoose.model('Medicine', medicineSchema);

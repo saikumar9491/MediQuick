@@ -14,9 +14,22 @@ import cartRoutes from './routes/cartRoutes.js';
 
 // ⚙️ INITIALIZATION
 dotenv.config();
-await connectDB(); // 🛰️ FORCING HUB CONNECTION
 
 const app = express();
+
+// --- Serverless Database Connection Middleware ---
+app.use(async (req, res, next) => {
+  try {
+    // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
+    if (mongoose.connection.readyState !== 1 && mongoose.connection.readyState !== 2) {
+      await connectDB();
+    }
+    next();
+  } catch (error) {
+    console.error("Critical DB Middleware Error:", error);
+    res.status(500).json({ status: "Error", message: "Database connection failed" });
+  }
+});
 
 /**
  * 1. DYNAMIC CORS PROTOCOL
@@ -117,7 +130,19 @@ const keepAlive = () => {
 };
 
 /**
- * 6. GLOBAL ERROR SHIELD
+ * 6. FALLBACK ROUTE (404)
+ * Catch-all for undefined routes to provide better diagnostic feedback.
+ */
+app.use((req, res, next) => {
+  res.status(404).json({
+    status: "Error",
+    message: `🛰️ Route Not Found: [${req.method}] ${req.originalUrl}`,
+    suggestion: "Check API documentation or verify the endpoint path."
+  });
+});
+
+/**
+ * 7. GLOBAL ERROR SHIELD
  */
 app.use((err, req, res, next) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;

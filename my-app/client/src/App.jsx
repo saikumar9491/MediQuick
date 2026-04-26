@@ -30,6 +30,7 @@ import AyurvedaPage from './pages/AyurvedaPage';
 import CarePlanPage from './pages/CarePlanPage';
 import SkinCarePage from './pages/SkinCarePage';
 import AdminDashboard from './pages/AdminDashboard';
+import AdminFlashDeals from './pages/AdminFlashDeals';
 
 // Global Components
 import WhatsAppSupport from './components/common/WhatsAppSupport';
@@ -113,6 +114,10 @@ function AppLayout({ medicines }) {
           <Route
             path="/admin-dashboard"
             element={<AdminDashboard medicines={medicines} />}
+          />
+          <Route
+            path="/admin/flash-deals"
+            element={<AdminFlashDeals />}
           />
         </Route>
 
