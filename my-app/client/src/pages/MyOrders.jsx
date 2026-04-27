@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+import { API_BASE } from '../utils/apiConfig';
+
 const MyOrders = () => {
   const { user, token } = useAuth();
   const navigate = useNavigate();
@@ -16,7 +18,6 @@ const MyOrders = () => {
       }
 
       try {
-        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
         const res = await fetch(`${API_BASE}/api/orders/user/${user._id}`, {
           headers: {

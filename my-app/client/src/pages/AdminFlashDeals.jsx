@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { API_BASE } from '../utils/apiConfig';
 
 const AdminFlashDeals = () => {
   const [medicines, setMedicines] = useState([]);
@@ -14,7 +15,6 @@ const AdminFlashDeals = () => {
   const [discountPrice, setDiscountPrice] = useState('');
 
   const { token } = useAuth();
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   const fetchMedicines = useCallback(async () => {
     try {
@@ -28,7 +28,7 @@ const AdminFlashDeals = () => {
     } finally {
       setLoading(false);
     }
-  }, [API_BASE]);
+  }, []);
 
   useEffect(() => {
     fetchMedicines();

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 
+import { API_BASE } from '../utils/apiConfig';
+
 const Wishlist = () => {
   const { user, token, setUser, loading } = useAuth();
   const { addToCart, showNotification } = useCart();
@@ -12,7 +14,6 @@ const Wishlist = () => {
 
   const removeFromWishlist = async (id) => {
     try {
-      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       const res = await fetch(`${API_BASE}/api/users/wishlist/remove`, {
         method: 'POST',
         headers: {

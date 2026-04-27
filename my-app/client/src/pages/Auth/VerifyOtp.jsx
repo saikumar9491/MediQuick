@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { API_BASE } from '../../utils/apiConfig';
 
 const VerifyOtp = () => {
   const [otp, setOtp] = useState('');
@@ -14,7 +15,6 @@ const VerifyOtp = () => {
 
   // Get email from previous signup step (passed via state)
   const email = location.state?.email || "";
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   // 1. Timer Logic
   useEffect(() => {

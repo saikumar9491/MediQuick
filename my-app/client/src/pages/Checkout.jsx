@@ -3,6 +3,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { API_BASE } from '../utils/apiConfig';
 
 const Checkout = () => {
   const { cartItems, clearCart } = useCart();
@@ -90,8 +91,6 @@ const Checkout = () => {
         paymentMethod,
         status: 'Confirmed',
       };
-
-      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
       const response = await fetch(`${API_BASE}/api/orders`, {
         method: 'POST',

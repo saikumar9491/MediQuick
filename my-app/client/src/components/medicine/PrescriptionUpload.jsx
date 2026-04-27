@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Upload, FileText, Loader2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { API_BASE } from '../../utils/apiConfig';
 
 const PrescriptionUpload = () => {
   const [file, setFile] = useState(null);
@@ -31,8 +32,6 @@ const PrescriptionUpload = () => {
     formData.append('prescription', file);
 
     try {
-      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
       const response = await fetch(`${API_BASE}/api/prescriptions/scan-and-check`, {
         method: 'POST',
         headers: {

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
+import { API_BASE } from '../utils/apiConfig';
+
 const ForgotPassword = () => {
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
@@ -16,13 +18,10 @@ const ForgotPassword = () => {
 
   const navigate = useNavigate();
 
-  // 📡 Hub Satellite Link Connection
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
   // Wake up protocol
   useEffect(() => {
     fetch(`${API_BASE}/`).catch(() => console.log('📡 Hub initializing...'));
-  }, [API_BASE]);
+  }, []);
 
   // Security Timer Protocol
   useEffect(() => {

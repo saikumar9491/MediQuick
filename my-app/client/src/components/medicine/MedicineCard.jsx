@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 
+import { API_BASE } from '../../utils/apiConfig';
+
 const MedicineCard = ({ _id, name, price, brand, needsPrescription, category, image, isFlashDeal, discountPrice }) => {
   const navigate = useNavigate();
   const { addToCart, showNotification } = useCart();
@@ -35,7 +37,6 @@ const MedicineCard = ({ _id, name, price, brand, needsPrescription, category, im
       return;
     }
 
-    const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     const isRemoving = isWishlisted;
 
     setIsWishlisted(!isRemoving);

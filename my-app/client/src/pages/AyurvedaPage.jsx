@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import MedicineCard from '../components/medicine/MedicineCard';
 
+import { API_BASE } from '../utils/apiConfig';
+
 const AyurvedaPage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +18,6 @@ const AyurvedaPage = () => {
   useEffect(() => {
     const fetchAyurveda = async () => {
       try {
-        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         const res = await fetch(`${API_BASE}/api/medicines`);
         const data = await res.json();
         const ayurvedaData = data.filter((item) => item.category === 'Ayurveda');

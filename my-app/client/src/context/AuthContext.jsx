@@ -1,9 +1,10 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 
+import { API_BASE } from '../utils/apiConfig';
+
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem('userToken') || null);

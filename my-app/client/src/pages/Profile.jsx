@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
+import { API_BASE } from '../utils/apiConfig';
+
 const Profile = () => {
   const { user, token, logout, setUser, loading } = useAuth();
   const navigate = useNavigate();
@@ -32,8 +34,6 @@ const Profile = () => {
 
   const handleSave = async () => {
     try {
-      const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
       const res = await fetch(`${API_BASE}/api/users/profile/update`, {
         method: 'PUT',
         headers: {

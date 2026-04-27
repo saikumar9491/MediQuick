@@ -60,7 +60,9 @@ const LoadingScreen = ({ message, icon }) => (
   </div>
 );
 
-function AppLayout({ medicines }) {
+import { API_BASE } from './utils/apiConfig';
+
+function AppLayout({ medicines, featured, loading }) {
   const location = useLocation();
 
   // 🛡️ Added /verify-otp to hidden routes to maintain focus
@@ -85,7 +87,7 @@ function AppLayout({ medicines }) {
       {!shouldHideNavbar && <Navbar medicines={medicines} />}
 
       <Routes>
-        <Route path="/" element={<Home medicines={medicines} />} />
+        <Route path="/" element={<Home medicines={medicines} featured={featured} loading={loading} />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/verify-otp" element={<VerifyOtp />} /> {/* 🛰️ NEW ROUTE ADDED */}
@@ -132,32 +134,46 @@ function AppLayout({ medicines }) {
 function App() {
   const { loading: authLoading } = useAuth();
   const [medicines, setMedicines] = useState([]);
+  const [featured, setFeatured] = useState([]);
+  const [medicinesLoading, setMedicinesLoading] = useState(true);
 
   useEffect(() => {
-    const API_BASE =
-      import.meta.env.VITE_API_URL || 'https://mediquick-53b1.onrender.com';
-
+    // Ping to wake up server
     fetch(`${API_BASE}/`)
       .then(() => console.log('📡 Amritsar Hub Satellite Linked'))
       .catch(() => console.log('🛰️ Hub Initializing...'));
 
-    const fetchMedicines = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/medicines`);
-        const data = await res.json();
-        setMedicines(Array.isArray(data) ? data : []);
+        const [medRes, topRes] = await Promise.all([
+          fetch(`${API_BASE}/api/medicines`),
+          fetch(`${API_BASE}/api/medicines/top`)
+        ]);
+        
+        const medData = await medRes.json();
+        const topData = await topRes.json();
+
+        setMedicines(Array.isArray(medData) ? medData : []);
+        setFeatured(Array.isArray(topData) ? topData : []);
       } catch (err) {
         console.error('Search sync error:', err);
         setMedicines([]);
+        setFeatured([]);
+      } finally {
+        setMedicinesLoading(false);
       }
     };
 
-    fetchMedicines();
+    fetchData();
   }, []);
 
   return (
     <Router>
-      <AppLayout medicines={medicines} />
+      <AppLayout 
+        medicines={medicines} 
+        featured={featured} 
+        loading={medicinesLoading} 
+      />
     </Router>
   );
 }

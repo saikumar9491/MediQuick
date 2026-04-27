@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import MedicineCard from '../components/medicine/MedicineCard';
 
+import { API_BASE } from '../utils/apiConfig';
+
 /**
  * @description Advanced Dermatology Center Page
  * Responsive + mobile-friendly version
@@ -21,7 +23,6 @@ const SkinCarePage = () => {
   useEffect(() => {
     const fetchSkinCare = async () => {
       try {
-        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         const res = await fetch(`${API_BASE}/api/medicines`);
         const data = await res.json();
 

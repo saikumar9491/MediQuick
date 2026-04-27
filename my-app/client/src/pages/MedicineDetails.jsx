@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import MedicineCard from '../components/medicine/MedicineCard';
 
+import { API_BASE } from '../utils/apiConfig';
+
 const MedicineDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -14,8 +16,6 @@ const MedicineDetails = () => {
   const [related, setRelated] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isWishlisted, setIsWishlisted] = useState(false);
-
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     const fetchProductData = async () => {

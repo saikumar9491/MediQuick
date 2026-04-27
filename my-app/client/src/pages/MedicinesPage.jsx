@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import MedicineCard from '../components/medicine/MedicineCard';
+import { API_BASE } from '../utils/apiConfig';
 
 const MedicinesPage = () => {
   const [medicines, setMedicines] = useState([]);
@@ -34,7 +35,6 @@ const MedicinesPage = () => {
   useEffect(() => {
     const fetchMedicines = async () => {
       try {
-        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         const res = await fetch(`${API_BASE}/api/medicines`);
         const data = await res.json();
         setMedicines(data);

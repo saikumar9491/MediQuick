@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import MedicineCard from '../components/medicine/MedicineCard';
 
+import { API_BASE } from '../utils/apiConfig';
+
 const BrandPage = () => {
   const { brandName } = useParams();
   const [products, setProducts] = useState([]);
@@ -12,7 +14,6 @@ const BrandPage = () => {
       setLoading(true);
 
       try {
-        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
         const res = await fetch(`${API_BASE}/api/medicines`);
         const data = await res.json();
 

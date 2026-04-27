@@ -4,7 +4,9 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import MedicineCard from '../components/medicine/MedicineCard';
 
-const Home = () => {
+import { API_BASE } from '../utils/apiConfig';
+
+const Home = ({ medicines = [], featured = [], loading = true }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { token, user } = useAuth();
@@ -16,9 +18,6 @@ const Home = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [scanResult, setScanResult] = useState(null);
-  const [medicines, setMedicines] = useState([]);
-  const [featured, setFeatured] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [currentBanner, setCurrentBanner] = useState(0);
 
   const banners = useMemo(
@@ -41,6 +40,14 @@ const Home = () => {
     ],
     []
   );
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentBanner((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [banners.length]);
 
   const brandLogos = [
     {
@@ -85,35 +92,6 @@ const Home = () => {
     { title: 'Care Plan', img: '💳', desc: 'Extra Savings', color: 'text-red-600', path: '/care-plan' },
     { title: 'Skin Care', img: '✨', desc: 'Derm Approved', color: 'text-pink-600', path: '/skin-care' },
   ];
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        const [allRes, topRes] = await Promise.all([
-          fetch(`${API_BASE}/api/medicines`),
-          fetch(`${API_BASE}/api/medicines/top`),
-        ]);
-        const allData = await allRes.json();
-        const topData = await topRes.json();
-
-        setMedicines(Array.isArray(allData) ? allData : []);
-        setFeatured(Array.isArray(topData) ? topData : []);
-      } catch (err) {
-        console.error('Hub data sync failed:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-
-    const timer = setInterval(() => {
-      setCurrentBanner((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
-    }, 5000);
-
-    return () => clearInterval(timer);
-  }, [banners.length]);
 
   const scrollHorizontally = (ref, direction) => {
     if (ref.current) {

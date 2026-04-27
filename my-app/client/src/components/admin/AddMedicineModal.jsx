@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
+import { API_BASE } from '../../utils/apiConfig';
 
 const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
   const [formData, setFormData] = useState({
@@ -17,7 +18,6 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
   const [loading, setLoading] = useState(false);
 
   const { token } = useAuth();
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     if (initialData) {

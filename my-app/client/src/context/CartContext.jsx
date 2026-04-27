@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { useAuth } from './AuthContext';
+import { API_BASE } from '../utils/apiConfig';
 
 const CartContext = createContext();
 
@@ -10,11 +11,6 @@ export const CartProvider = ({ children }) => {
   const [saveStatus, setSaveStatus] = useState('idle'); // idle | saving | saved
 
   const blockSave = useRef(true);
-
-  const getBaseUrl = () => {
-    const url = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-    return url.endsWith('/') ? url.slice(0, -1) : url;
-  };
 
   // --- HUB SYNC: Fetch Cart on Login ---
   useEffect(() => {
@@ -27,7 +23,7 @@ export const CartProvider = ({ children }) => {
       }
 
       try {
-        const res = await fetch(`${getBaseUrl()}/api/users/profile`, {
+        const res = await fetch(`${API_BASE}/api/users/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -84,7 +80,7 @@ export const CartProvider = ({ children }) => {
       }));
 
       try {
-        const res = await fetch(`${getBaseUrl()}/api/users/cart/update`, {
+        const res = await fetch(`${API_BASE}/api/users/cart/update`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
