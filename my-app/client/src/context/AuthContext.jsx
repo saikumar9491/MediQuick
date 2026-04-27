@@ -24,6 +24,11 @@ export const AuthProvider = ({ children }) => {
         const parsedUser = JSON.parse(savedUser);
         setUser(parsedUser);
         setToken(savedToken);
+        
+        // 🚀 CRITICAL OPTIMIZATION:
+        // Set loading to false immediately so the user can see the products
+        // while we refresh the profile in the background.
+        setLoading(false);
 
         const res = await fetch(`${API_BASE}/api/users/profile`, {
           headers: {
@@ -35,20 +40,16 @@ export const AuthProvider = ({ children }) => {
           const freshData = await res.json();
           setUser(freshData);
           localStorage.setItem('mediQuickUser', JSON.stringify(freshData));
-        } else {
+        } else if (res.status === 401) {
+          // Token expired, clean up
           setUser(null);
           setToken(null);
           localStorage.removeItem('mediQuickUser');
           localStorage.removeItem('userToken');
         }
       } catch (err) {
-        console.error('Profile Sync Failed:', err);
-        setUser(null);
-        setToken(null);
-        localStorage.removeItem('mediQuickUser');
-        localStorage.removeItem('userToken');
-      } finally {
-        setLoading(false);
+        console.error('Profile Sync Failed (Background):', err);
+        // We keep the cached user for now to avoid a jarring UI jump
       }
     };
 

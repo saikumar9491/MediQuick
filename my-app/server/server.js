@@ -93,6 +93,7 @@ app.get('/', (req, res) => {
   res.status(200).json({
     status: "Active",
     hub: "Amritsar Hub-01",
+    platform: process.env.VERCEL ? "Vercel Serverless" : "Persistent Server",
     message: "🚀 MediQuick+ Satellite Link Established",
     timestamp: new Date().toISOString()
   });

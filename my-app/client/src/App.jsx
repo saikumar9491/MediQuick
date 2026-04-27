@@ -133,9 +133,15 @@ function AppLayout({ medicines, featured, loading }) {
 
 function App() {
   const { loading: authLoading } = useAuth();
-  const [medicines, setMedicines] = useState([]);
-  const [featured, setFeatured] = useState([]);
-  const [medicinesLoading, setMedicinesLoading] = useState(true);
+  const [medicines, setMedicines] = useState(() => {
+    const cached = localStorage.getItem('mq_medicines');
+    return cached ? JSON.parse(cached) : [];
+  });
+  const [featured, setFeatured] = useState(() => {
+    const cached = localStorage.getItem('mq_featured');
+    return cached ? JSON.parse(cached) : [];
+  });
+  const [medicinesLoading, setMedicinesLoading] = useState(!medicines.length);
 
   useEffect(() => {
     // Ping to wake up server
@@ -153,12 +159,18 @@ function App() {
         const medData = await medRes.json();
         const topData = await topRes.json();
 
-        setMedicines(Array.isArray(medData) ? medData : []);
-        setFeatured(Array.isArray(topData) ? topData : []);
+        const medArray = Array.isArray(medData) ? medData : [];
+        const topArray = Array.isArray(topData) ? topData : [];
+
+        setMedicines(medArray);
+        setFeatured(topArray);
+
+        // Cache for next time
+        localStorage.setItem('mq_medicines', JSON.stringify(medArray));
+        localStorage.setItem('mq_featured', JSON.stringify(topArray));
       } catch (err) {
         console.error('Search sync error:', err);
-        setMedicines([]);
-        setFeatured([]);
+        // Fallback to cache is already handled by initial state
       } finally {
         setMedicinesLoading(false);
       }
