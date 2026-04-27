@@ -1,9 +1,27 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Package, 
+  Users, 
+  Image as ImageIcon, 
+  Award, 
+  Activity, 
+  TrendingUp, 
+  Plus, 
+  Zap,
+  Mail,
+  ShieldAlert,
+  Trash2,
+  Edit3,
+  ExternalLink,
+  ChevronRight
+} from 'lucide-react';
 import AddMedicineModal from '../components/admin/AddMedicineModal';
 import AddBannerModal from '../components/admin/AddBannerModal';
 import AddBrandModal from '../components/admin/AddBrandModal';
 import EmailUserModal from '../components/admin/EmailUserModal';
+import AdminSidebar from '../components/admin/AdminSidebar';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { API_BASE } from '../utils/apiConfig';
@@ -24,15 +42,11 @@ const AdminDashboard = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const { user, token, setUser } = useAuth();
+  const { user, token } = useAuth();
 
-  /**
-   * --- HUB PROTOCOL: Fetch Data ---
-   */
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      // Parallel fetching for performance
       const [invRes, userRes, bannerRes, brandRes] = await Promise.all([
         fetch(`${API_BASE}/api/medicines`),
         fetch(`${API_BASE}/api/users`, { headers: { Authorization: `Bearer ${token}` } }),
@@ -41,10 +55,7 @@ const AdminDashboard = () => {
       ]);
 
       const [invData, userData, bannerData, brandData] = await Promise.all([
-        invRes.json(),
-        userRes.json(),
-        bannerRes.json(),
-        brandRes.json()
+        invRes.json(), userRes.json(), bannerRes.json(), brandRes.json()
       ]);
 
       setInventory(Array.isArray(invData) ? invData : []);
@@ -52,44 +63,25 @@ const AdminDashboard = () => {
       setBanners(Array.isArray(bannerData) ? bannerData : []);
       setBrands(Array.isArray(brandData) ? brandData : []);
     } catch (err) {
-      console.error(err);
-      toast.error('Failed to sync with Hub database');
+      toast.error('Hub sync failed');
     } finally {
       setLoading(false);
     }
   }, [API_BASE, token]);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
-  const handleAddNew = () => {
-    setEditingProduct(null);
-    setIsModalOpen(true);
-  };
+  const handleAddNew = () => { setEditingProduct(null); setIsModalOpen(true); };
+  const handleEdit = (product) => { setEditingProduct(product); setIsModalOpen(true); };
 
-  const handleEdit = (product) => {
-    setEditingProduct(product);
-    setIsModalOpen(true);
-  };
-
-  /**
-   * --- OPERATION: Save/Update Unit ---
-   */
   const handleSaveProduct = async (productData) => {
     const isEdit = !!editingProduct;
-    const url = isEdit
-      ? `${API_BASE}/api/medicines/${editingProduct._id}`
-      : `${API_BASE}/api/medicines`;
-
+    const url = isEdit ? `${API_BASE}/api/medicines/${editingProduct._id}` : `${API_BASE}/api/medicines`;
     const method = isEdit ? 'PUT' : 'POST';
 
     const savePromise = fetch(url, {
       method,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify(productData),
     }).then(async (res) => {
       const data = await res.json();
@@ -99,41 +91,27 @@ const AdminDashboard = () => {
 
     toast.promise(savePromise, {
       loading: isEdit ? 'Updating Unit...' : 'Uploading to Hub...',
-      success: isEdit ? 'Unit Updated!' : 'New Unit Added!',
+      success: 'Database Synced!',
       error: (err) => `❌ ${err.message}`,
     });
 
-    try {
-      await savePromise;
-      fetchData(); // Refresh list after save
-      setIsModalOpen(false);
-    } catch (err) {
-      console.error("Save failed:", err);
-    }
+    try { await savePromise; fetchData(); setIsModalOpen(false); } catch (err) { console.error(err); }
   };
 
-  /**
-   * --- OPERATION: Purge Unit ---
-   */
   const handleDelete = async (id) => {
-    if (!window.confirm('Remove this medicine from Amritsar Hub permanently?')) return;
+    if (!window.confirm('Purge this unit?')) return;
     try {
       const res = await fetch(`${API_BASE}/api/medicines/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
-        toast.success('Unit purged from inventory');
-        setInventory((prev) => prev.filter((m) => m._id !== id));
+        toast.success('Unit Purged');
+        setInventory(prev => prev.filter(m => m._id !== id));
       }
-    } catch (err) {
-      toast.error('Hub connection error');
-    }
+    } catch (err) { toast.error('Connection failed'); }
   };
 
-  /**
-   * --- OPERATION: User Management ---
-   */
   const handleBlockUser = async (userId) => {
     try {
       const res = await fetch(`${API_BASE}/api/users/${userId}/block`, {
@@ -145,320 +123,303 @@ const AdminDashboard = () => {
         toast.success(data.message);
         setUsers(users.map(u => u._id === userId ? { ...u, isBlocked: data.isBlocked } : u));
       }
-    } catch (err) {
-      toast.error('Block operation failed');
-    }
+    } catch (err) { toast.error('Operation failed'); }
   };
 
   const handleDeleteUser = async (userId) => {
-    if (!window.confirm('Permanently delete this user? This cannot be undone.')) return;
+    if (!window.confirm('Purge user?')) return;
     try {
       const res = await fetch(`${API_BASE}/api/users/${userId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
-        toast.success('User deleted');
+        toast.success('User Deleted');
         setUsers(users.filter(u => u._id !== userId));
       }
-    } catch (err) {
-      toast.error('Delete operation failed');
-    }
+    } catch (err) { toast.error('Purge failed'); }
   };
 
-  /**
-   * --- OPERATION: Banner/Brand Management ---
-   */
-  const handleDeleteBanner = async (id) => {
-    if (!window.confirm('Delete this banner?')) return;
-    try {
-      const res = await fetch(`${API_BASE}/api/banners/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        toast.success('Banner deleted');
-        setBanners(prev => prev.filter(b => b._id !== id));
-      }
-    } catch (err) {
-      toast.error('Delete failed');
-    }
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, staggerChildren: 0.1 } }
   };
 
-  const handleDeleteBrand = async (id) => {
-    if (!window.confirm('Delete this brand?')) return;
-    try {
-      const res = await fetch(`${API_BASE}/api/brands/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (res.ok) {
-        toast.success('Brand deleted');
-        setBrands(prev => prev.filter(b => b._id !== id));
-      }
-    } catch (err) {
-      toast.error('Delete failed');
-    }
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { opacity: 1, scale: 1 }
   };
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f1f3f6] px-4">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-blue-100 border-t-[#2874f0]"></div>
-          <p className="text-sm font-black uppercase italic tracking-wide text-gray-700">
-            Establishing Satellite Link...
-          </p>
-        </div>
+      <div className="flex min-h-screen items-center justify-center bg-[#f8fafc]">
+        <motion.div 
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+          className="h-12 w-12 rounded-full border-4 border-blue-100 border-t-blue-600"
+        />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#f1f3f6] pb-16 sm:pb-20">
-      <main className="mx-auto max-w-[1400px] px-4 pt-24 py-6 sm:px-6 sm:py-8 sm:pt-28">
-        {/* Header Section */}
-        <div className="mb-6 flex flex-col gap-4 sm:mb-8 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-black uppercase italic leading-tight text-gray-800">
-              Admin Control Center
-            </h1>
-            <p className="mt-2 text-[9px] sm:text-[10px] font-bold uppercase tracking-[3px] sm:tracking-[4px] text-gray-400">
-              System Management Protocol
-            </p>
-          </div>
+    <div className="min-h-screen bg-[#f8fafc]">
+      <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-          <div className="flex flex-col sm:flex-row gap-3">
-            {activeTab === 'inventory' && (
-              <Link
-                to="/admin/flash-deals"
-                className="w-full rounded-md bg-orange-500 px-5 py-3 text-[10px] sm:w-auto sm:px-8 sm:py-4 sm:text-xs font-black italic tracking-[2px] sm:tracking-widest text-white shadow-xl transition-all hover:bg-orange-600 active:scale-95 flex items-center justify-center gap-2"
+      <main className="sm:ml-20 transition-all duration-300 min-h-screen p-4 sm:p-8 lg:p-12">
+        <motion.div 
+          initial="hidden"
+          animate="visible"
+          variants={containerVariants}
+          className="mx-auto max-w-7xl"
+        >
+          {/* Header */}
+          <div className="mb-12 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <motion.h1 
+                className="text-3xl font-black uppercase italic tracking-tighter text-gray-900 sm:text-4xl"
               >
-                <span>⚡</span> FLASH DEALS MANAGER
-              </Link>
-            )}
-            <button
-              onClick={() => {
-                if (activeTab === 'inventory') handleAddNew();
-                if (activeTab === 'banners') setIsBannerModalOpen(true);
-                if (activeTab === 'brands') setIsBrandModalOpen(true);
-              }}
-              className="w-full rounded-md bg-[#2874f0] px-5 py-3 text-[10px] sm:w-auto sm:px-8 sm:py-4 sm:text-xs font-black italic tracking-[2px] sm:tracking-widest text-white shadow-xl transition-all hover:bg-blue-700 active:scale-95"
+                Operational <span className="text-blue-600">Hub</span>
+              </motion.h1>
+              <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">
+                Command & Control Interface v2.0
+              </p>
+            </div>
+
+            <div className="flex items-center gap-4">
+              {activeTab === 'inventory' && (
+                <Link
+                  to="/admin/flash-deals"
+                  className="group relative flex items-center gap-2 overflow-hidden rounded-xl bg-orange-500 px-6 py-4 text-xs font-black uppercase italic tracking-widest text-white transition-all hover:bg-orange-600 active:scale-95 shadow-lg shadow-orange-500/20"
+                >
+                  <Zap className="h-4 w-4" />
+                  <span>Flash Deals</span>
+                </Link>
+              )}
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => {
+                  if (activeTab === 'inventory') handleAddNew();
+                  if (activeTab === 'banners') setIsBannerModalOpen(true);
+                  if (activeTab === 'brands') setIsBrandModalOpen(true);
+                }}
+                className="flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-4 text-xs font-black uppercase italic tracking-widest text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-700"
+              >
+                <Plus className="h-4 w-4" />
+                {activeTab === 'inventory' ? 'Add Unit' : activeTab === 'banners' ? 'Add Banner' : activeTab === 'brands' ? 'Add Brand' : 'Admin Status'}
+              </motion.button>
+            </div>
+          </div>
+
+          {/* Quick Stats Grid */}
+          <div className="mb-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { label: 'Inventory', value: inventory.length, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
+              { label: 'Total Users', value: users.length, icon: Users, color: 'text-purple-600', bg: 'bg-purple-50' },
+              { label: 'Active Banners', value: banners.length, icon: ImageIcon, color: 'text-green-600', bg: 'bg-green-50' },
+              { label: 'Market Reach', value: 'Live', icon: Activity, color: 'text-orange-600', bg: 'bg-orange-50' },
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                variants={cardVariants}
+                className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:shadow-xl hover:shadow-gray-200/50"
+              >
+                <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${stat.bg} ${stat.color} transition-transform group-hover:scale-110`}>
+                  <stat.icon className="h-6 w-6" />
+                </div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{stat.label}</p>
+                <p className="mt-1 text-2xl font-black italic text-gray-900">{stat.value}</p>
+                <div className="absolute -bottom-2 -right-2 text-6xl opacity-[0.03]">
+                  <stat.icon />
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Dynamic Content Table */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-2xl"
             >
-              + {activeTab === 'inventory' ? 'REGISTER NEW MEDICINE' : activeTab === 'banners' ? 'UPLOAD NEW BANNER' : activeTab === 'brands' ? 'ADD FEATURED BRAND' : 'MANAGE USERS'}
-            </button>
-          </div>
-        </div>
+              <div className="overflow-x-auto custom-scrollbar">
+                {activeTab === 'inventory' && (
+                  <table className="w-full text-left">
+                    <thead className="bg-gray-50/50 border-b border-gray-100">
+                      <tr>
+                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Inventory Unit</th>
+                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Classification</th>
+                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Status</th>
+                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Valuation</th>
+                        <th className="p-6 text-center text-[10px] font-black uppercase tracking-widest text-gray-400">Operations</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {inventory.map((med) => (
+                        <tr key={med._id} className="group hover:bg-gray-50/50 transition-colors">
+                          <td className="p-6">
+                            <div className="flex items-center gap-4">
+                              <div className="h-14 w-14 rounded-xl border border-gray-100 bg-white p-2 shadow-sm">
+                                <img src={med.image} alt="" className="h-full w-full object-contain" />
+                              </div>
+                              <div>
+                                <span className="block text-sm font-black uppercase italic text-gray-900">{med.name}</span>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{med.brand}</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-6">
+                            <span className="inline-flex items-center rounded-lg bg-gray-100 px-3 py-1 text-[10px] font-black uppercase text-gray-600">
+                              {med.category}
+                            </span>
+                          </td>
+                          <td className="p-6">
+                            {med.isFlashDeal ? (
+                              <span className="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-3 py-1 text-[10px] font-black uppercase text-blue-600">
+                                <Zap className="h-3 w-3" /> Deal
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-black uppercase text-gray-300 tracking-widest">Normal</span>
+                            )}
+                          </td>
+                          <td className="p-6">
+                            <span className="text-sm font-black text-blue-600">₹{med.price}</span>
+                          </td>
+                          <td className="p-6">
+                            <div className="flex justify-center gap-4">
+                              <button onClick={() => handleEdit(med)} className="rounded-lg p-2 text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-all"><Edit3 className="h-4 w-4" /></button>
+                              <button onClick={() => handleDelete(med._id)} className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all"><Trash2 className="h-4 w-4" /></button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
 
-        {/* Navigation Tabs */}
-        <div className="mb-6 flex gap-2 overflow-x-auto pb-2 sm:mb-8 border-b border-gray-200">
-          {['inventory', 'users', 'banners', 'brands'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
-                activeTab === tab 
-                ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50/50' 
-                : 'text-gray-400 hover:text-gray-600'
-              }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
+                {activeTab === 'users' && (
+                  <table className="w-full text-left">
+                    <thead className="bg-gray-50/50 border-b border-gray-100">
+                      <tr>
+                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Personnel Profile</th>
+                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Communication</th>
+                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Security Clearance</th>
+                        <th className="p-6 text-center text-[10px] font-black uppercase tracking-widest text-gray-400">Protocols</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {users.map((u) => (
+                        <tr key={u._id} className="group hover:bg-gray-50/50 transition-colors">
+                          <td className="p-6">
+                            <div className="flex items-center gap-4">
+                              <div className="h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 font-black">
+                                {u.name[0]}
+                              </div>
+                              <div>
+                                <span className="block text-sm font-black uppercase italic text-gray-900">{u.name}</span>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase">Sector {u._id.slice(-4)}</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-6">
+                            <span className="block text-xs font-bold text-gray-600">{u.email}</span>
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{u.phone}</span>
+                          </td>
+                          <td className="p-6">
+                            {u.isAdmin ? (
+                              <span className="rounded-lg bg-purple-50 px-3 py-1 text-[10px] font-black uppercase text-purple-600">Master Level</span>
+                            ) : u.isBlocked ? (
+                              <span className="rounded-lg bg-red-600 px-3 py-1 text-[10px] font-black uppercase text-white shadow-lg shadow-red-500/20">Access Revoked</span>
+                            ) : (
+                              <span className="rounded-lg bg-green-50 px-3 py-1 text-[10px] font-black uppercase text-green-600">Verified</span>
+                            )}
+                          </td>
+                          <td className="p-6">
+                            <div className="flex justify-center gap-4">
+                              <button onClick={() => { setSelectedUser(u); setIsEmailModalOpen(true); }} className="rounded-lg p-2 text-gray-400 hover:bg-blue-50 hover:text-blue-600"><Mail className="h-4 w-4" /></button>
+                              {!u.isAdmin && (
+                                <>
+                                  <button onClick={() => handleBlockUser(u._id)} className={`rounded-lg p-2 transition-all ${u.isBlocked ? 'text-green-600 hover:bg-green-50' : 'text-orange-500 hover:bg-orange-50'}`}>
+                                    <ShieldAlert className="h-4 w-4" />
+                                  </button>
+                                  <button onClick={() => handleDeleteUser(u._id)} className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-500"><Trash2 className="h-4 w-4" /></button>
+                                </>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
 
-        {/* System Stats Section */}
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:mb-8 md:grid-cols-4 md:gap-6">
-          <div className="rounded-md border-l-4 border-blue-500 bg-white p-5 shadow-sm sm:p-6">
-            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Inventory Units</p>
-            <p className="text-2xl font-black italic text-gray-800">{inventory.length}</p>
-          </div>
-          <div className="rounded-md border-l-4 border-purple-500 bg-white p-5 shadow-sm sm:p-6">
-            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Total Users</p>
-            <p className="text-2xl font-black italic text-gray-800">{users.length}</p>
-          </div>
-          <div className="rounded-md border-l-4 border-green-500 bg-white p-5 shadow-sm sm:p-6">
-            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Featured Brands</p>
-            <p className="text-2xl font-black italic text-gray-800">{brands.length}</p>
-          </div>
-          <div className="rounded-md border-l-4 border-yellow-500 bg-white p-5 shadow-sm sm:p-6">
-            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">System Status</p>
-            <p className="text-lg font-black italic text-green-600 uppercase">Online</p>
-          </div>
-        </div>
+                {activeTab === 'banners' && (
+                  <table className="w-full text-left">
+                    <thead className="bg-gray-50/50 border-b border-gray-100">
+                      <tr>
+                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Visual Payload</th>
+                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Deployment Logic</th>
+                        <th className="p-6 text-center text-[10px] font-black uppercase tracking-widest text-gray-400">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {banners.map((b) => (
+                        <tr key={b._id}>
+                          <td className="p-6">
+                            <div className="relative group/img overflow-hidden rounded-2xl border border-gray-100 shadow-sm h-24 w-64 bg-gray-50">
+                              <img src={b.image} className="h-full w-full object-cover transition-transform group-hover/img:scale-110" alt="" />
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                                <ExternalLink className="text-white h-6 w-6" />
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-6">
+                            <span className="block text-xs font-black uppercase italic text-gray-900">{b.title}</span>
+                            <span className="text-[10px] font-bold text-blue-500 underline truncate block max-w-xs">{b.link}</span>
+                          </td>
+                          <td className="p-6 text-center">
+                            <button onClick={() => handleDeleteBanner(b._id)} className="rounded-xl bg-red-50 px-4 py-2 text-[10px] font-black uppercase text-red-500 transition-all hover:bg-red-500 hover:text-white">Decommission</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
 
-        {/* System Stats Section */}
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:mb-8 md:grid-cols-3 md:gap-6">
-          <div className="rounded-md border-l-4 border-blue-500 bg-white p-5 shadow-sm sm:p-6">
-            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">
-              Active Stock Units
-            </p>
-            <p className="text-2xl sm:text-3xl font-black italic text-gray-800">
-              {inventory.length}
-            </p>
-          </div>
-
-          <div className="rounded-md border-l-4 border-green-500 bg-white p-5 shadow-sm opacity-70 sm:p-6">
-            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">
-              Live Hub Orders
-            </p>
-            <p className="text-2xl sm:text-3xl font-black italic text-gray-800">12</p>
-          </div>
-
-          <div className="rounded-md border-l-4 border-yellow-500 bg-white p-5 shadow-sm opacity-70 sm:p-6">
-            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">
-              System Status
-            </p>
-            <p className="text-lg sm:text-xl font-black italic text-green-600">ONLINE</p>
-          </div>
-        </div>
-
-        {/* Dynamic Content Section */}
-        <div className="overflow-hidden rounded-md border border-gray-100 bg-white shadow-2xl">
-          <div className="overflow-x-auto">
-            {activeTab === 'inventory' && (
-              <table className="min-w-[760px] w-full text-left">
-                <thead className="bg-gray-800 text-white">
-                  <tr>
-                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Unit Details</th>
-                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Classification</th>
-                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Status</th>
-                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Valuation</th>
-                    <th className="p-4 text-center text-[10px] font-black uppercase tracking-widest">Operations</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 text-gray-700">
-                  {inventory.map((med) => (
-                    <tr key={med._id} className="group transition-colors hover:bg-blue-50/50">
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <img src={med.image} alt={med.name} className="h-12 w-12 rounded-sm border p-1 object-contain bg-white" />
-                          <div>
-                            <span className="block text-xs font-black uppercase italic text-gray-800">{med.name}</span>
-                            <span className="text-[9px] font-bold text-gray-400 uppercase">{med.brand}</span>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4 text-[10px] font-black uppercase italic text-gray-500">{med.category}</td>
-                      <td className="p-4">
-                        {med.isFlashDeal ? <span className="bg-blue-100 px-2 py-0.5 text-[8px] font-black uppercase text-blue-600 rounded-full">⚡ Flash Deal</span> : <span className="text-[9px] font-bold text-gray-300">Standard</span>}
-                      </td>
-                      <td className="p-4 text-sm font-black text-blue-600">₹{med.price}</td>
-                      <td className="p-4">
-                        <div className="flex justify-center gap-6">
-                          <button onClick={() => handleEdit(med)} className="text-[10px] font-black uppercase text-blue-600 hover:underline">Edit</button>
-                          <button onClick={() => handleDelete(med._id)} className="text-[10px] font-black uppercase text-red-500 hover:underline">Purge</button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-
-            {activeTab === 'users' && (
-              <table className="min-w-[760px] w-full text-left">
-                <thead className="bg-gray-800 text-white">
-                  <tr>
-                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">User Profile</th>
-                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Contact Info</th>
-                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Status</th>
-                    <th className="p-4 text-center text-[10px] font-black uppercase tracking-widest">Security Protocols</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100 text-gray-700">
-                  {users.map((u) => (
-                    <tr key={u._id} className="group transition-colors hover:bg-purple-50/50">
-                      <td className="p-4">
-                        <div>
-                          <span className="block text-xs font-black uppercase italic text-gray-800">{u.name}</span>
-                          <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">ID: {u._id.slice(-8)}</span>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <span className="block text-[10px] font-bold text-gray-600">{u.email}</span>
-                        <span className="text-[10px] font-bold text-gray-400">{u.phone}</span>
-                      </td>
-                      <td className="p-4">
-                        {u.isAdmin ? (
-                          <span className="bg-purple-100 px-2 py-0.5 text-[8px] font-black uppercase text-purple-600 rounded-sm">Master Admin</span>
-                        ) : u.isBlocked ? (
-                          <span className="bg-red-600 px-2 py-0.5 text-[8px] font-black uppercase text-white rounded-sm">Blocked</span>
-                        ) : (
-                          <span className="bg-green-100 px-2 py-0.5 text-[8px] font-black uppercase text-green-600 rounded-sm">Verified User</span>
-                        )}
-                      </td>
-                      <td className="p-4">
-                        <div className="flex justify-center gap-4">
-                          <button onClick={() => { setSelectedUser(u); setIsEmailModalOpen(true); }} className="text-[10px] font-black uppercase text-blue-600 hover:underline">Message</button>
-                          {!u.isAdmin && (
-                            <>
-                              <button onClick={() => handleBlockUser(u._id)} className={`text-[10px] font-black uppercase hover:underline ${u.isBlocked ? 'text-green-600' : 'text-orange-500'}`}>
-                                {u.isBlocked ? 'Unblock' : 'Block'}
-                              </button>
-                              <button onClick={() => handleDeleteUser(u._id)} className="text-[10px] font-black uppercase text-red-500 hover:underline">Delete</button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-
-            {activeTab === 'banners' && (
-              <table className="min-w-[760px] w-full text-left">
-                <thead className="bg-gray-800 text-white">
-                  <tr>
-                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Banner Preview</th>
-                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Title / Link</th>
-                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Status</th>
-                    <th className="p-4 text-center text-[10px] font-black uppercase tracking-widest">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {banners.map((b) => (
-                    <tr key={b._id}>
-                      <td className="p-4"><img src={b.image} className="h-12 w-32 object-cover rounded border" alt="banner" /></td>
-                      <td className="p-4">
-                        <span className="block text-[10px] font-black uppercase text-gray-800">{b.title}</span>
-                        <span className="text-[9px] text-blue-500 underline truncate block max-w-xs">{b.link}</span>
-                      </td>
-                      <td className="p-4"><span className="text-[10px] font-black text-green-600">ACTIVE</span></td>
-                      <td className="p-4 text-center">
-                        <button onClick={() => handleDeleteBanner(b._id)} className="text-[10px] font-black uppercase text-red-500 hover:underline">Remove</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-
-            {activeTab === 'brands' && (
-              <table className="min-w-[760px] w-full text-left">
-                <thead className="bg-gray-800 text-white">
-                  <tr>
-                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Brand Logo</th>
-                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Brand Name</th>
-                    <th className="p-4 text-center text-[10px] font-black uppercase tracking-widest">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {brands.map((brand) => (
-                    <tr key={brand._id}>
-                      <td className="p-4"><img src={brand.image} className="h-10 w-10 object-contain p-1 border rounded bg-white" alt="brand" /></td>
-                      <td className="p-4 text-xs font-black uppercase italic text-gray-800">{brand.name}</td>
-                      <td className="p-4 text-center">
-                        <button onClick={() => handleDeleteBrand(brand._id)} className="text-[10px] font-black uppercase text-red-500 hover:underline">Remove</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        </div>
+                {activeTab === 'brands' && (
+                  <table className="w-full text-left">
+                    <thead className="bg-gray-50/50 border-b border-gray-100">
+                      <tr>
+                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Brand Identity</th>
+                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Name</th>
+                        <th className="p-6 text-center text-[10px] font-black uppercase tracking-widest text-gray-400">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {brands.map((brand) => (
+                        <tr key={brand._id}>
+                          <td className="p-6">
+                            <div className="h-16 w-16 flex items-center justify-center rounded-xl border border-gray-100 bg-white p-2 shadow-sm">
+                              <img src={brand.image} className="h-full w-full object-contain" alt="" />
+                            </div>
+                          </td>
+                          <td className="p-6 text-xs font-black uppercase italic text-gray-900 tracking-tight">{brand.name}</td>
+                          <td className="p-6 text-center">
+                            <button onClick={() => handleDeleteBrand(brand._id)} className="text-[10px] font-black uppercase text-red-400 hover:text-red-600 hover:underline">Remove Associate</button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </motion.div>
       </main>
 
       <AddMedicineModal
@@ -488,6 +449,13 @@ const AdminDashboard = () => {
         user={selectedUser}
         token={token}
       />
+
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+      `}</style>
     </div>
   );
 };
