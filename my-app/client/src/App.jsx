@@ -155,20 +155,6 @@ function App() {
     fetchMedicines();
   }, []);
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-white px-4 text-center">
-        <div className="relative">
-          <div className="w-14 h-14 sm:w-16 sm:h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
-          <div className="absolute inset-0 flex items-center justify-center text-lg sm:text-xl">🏥</div>
-        </div>
-        <p className="mt-5 sm:mt-6 font-black uppercase italic text-[9px] sm:text-[10px] tracking-[0.25em] sm:tracking-[0.35em] text-gray-400 animate-pulse">
-          Securing Medical Hub Connection...
-        </p>
-      </div>
-    );
-  }
-
   return (
     <Router>
       <AppLayout medicines={medicines} />

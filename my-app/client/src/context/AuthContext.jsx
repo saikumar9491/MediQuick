@@ -88,6 +88,45 @@ export const AuthProvider = ({ children }) => {
     window.location.href = '/login';
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen w-full flex flex-col items-center justify-center bg-white px-4 text-center">
+        <div className="relative">
+          {/* Main Spinner */}
+          <div className="w-16 h-16 sm:w-20 sm:h-20 border-4 border-blue-50 border-t-blue-600 rounded-full animate-spin"></div>
+          
+          {/* Inner Pulsing Core */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-8 h-8 bg-blue-600/10 rounded-full animate-ping flex items-center justify-center">
+              <span className="text-xl sm:text-2xl">🏥</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 space-y-2">
+          <h2 className="text-sm font-black uppercase italic tracking-[0.3em] text-gray-800 animate-pulse">
+            MediQuick+ Hub
+          </h2>
+          <p className="font-black uppercase italic text-[9px] sm:text-[10px] tracking-[0.25em] sm:tracking-[0.35em] text-gray-400">
+            Establishing Secure Satellite Link...
+          </p>
+        </div>
+
+        {/* Progress Bar Mockup */}
+        <div className="mt-8 w-48 h-[2px] bg-gray-100 overflow-hidden relative mx-auto">
+          <div className="absolute top-0 left-0 h-full bg-blue-600 animate-[loading_2s_infinite]"></div>
+        </div>
+
+        <style>{`
+          @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -99,7 +138,7 @@ export const AuthProvider = ({ children }) => {
         setUser,
       }}
     >
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };
