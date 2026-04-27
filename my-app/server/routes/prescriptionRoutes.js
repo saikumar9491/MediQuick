@@ -8,12 +8,10 @@ const router = express.Router();
 
 // 1. IMPROVED STORAGE CONFIGURATION
 // diskStorage allows us to keep the original file extension
+// 🛡️ VERCEL COMPATIBILITY: Use /tmp for uploads as the rest of the filesystem is read-only
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const uploadDir = 'uploads/prescriptions/';
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
+        const uploadDir = '/tmp/'; 
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {

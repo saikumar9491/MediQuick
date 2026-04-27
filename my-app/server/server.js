@@ -21,13 +21,17 @@ const app = express();
 app.use(async (req, res, next) => {
   try {
     // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
-    if (mongoose.connection.readyState !== 1 && mongoose.connection.readyState !== 2) {
+    if (mongoose.connection.readyState !== 1) {
+      console.log('📡 Re-establishing Hub Link...');
       await connectDB();
     }
     next();
   } catch (error) {
-    console.error("Critical DB Middleware Error:", error);
-    res.status(500).json({ status: "Error", message: "Database connection failed" });
+    console.error('🛰️ Satellite Link Failure:', error);
+    res.status(503).json({ 
+      status: "Offline", 
+      message: "Amritsar Hub is temporarily unreachable. Please try again." 
+    });
   }
 });
 
