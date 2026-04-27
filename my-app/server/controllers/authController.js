@@ -317,3 +317,63 @@ export const removeFromWishlist = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+// -----------------------------
+// ADMIN CONTROLLERS
+// -----------------------------
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}).select('-password');
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const blockUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    
+    user.isBlocked = !user.isBlocked;
+    await user.save();
+    res.json({ message: `User ${user.isBlocked ? 'blocked' : 'unblocked'}`, isBlocked: user.isBlocked });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    
+    await user.deleteOne();
+    res.json({ message: 'User removed from Hub' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const sendAdminEmail = async (req, res) => {
+  const { email, subject, message } = req.body;
+  try {
+    await sendEmail({
+      email,
+      subject,
+      message: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee;">
+          <h2 style="color: #2874f0;">Message from MediQuick Admin</h2>
+          <div style="margin-top: 20px; color: #333; line-height: 1.6;">
+            ${message}
+          </div>
+          <hr style="margin-top: 30px; border: 0; border-top: 1px solid #eee;">
+          <p style="font-size: 12px; color: #999;">This is an automated message from MediQuick+ Amritsar Hub.</p>
+        </div>
+      `,
+    });
+    res.json({ message: 'Email dispatched successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

@@ -11,6 +11,8 @@ import medicineRoutes from './routes/medicineRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import prescriptionRoutes from './routes/prescriptionRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
+import bannerRoutes from './routes/bannerRoutes.js';
+import brandRoutes from './routes/brandRoutes.js';
 
 // ⚙️ INITIALIZATION
 dotenv.config();
@@ -89,6 +91,8 @@ app.use('/api/medicines', medicineRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/banners', bannerRoutes);
+app.use('/api/brands', brandRoutes);
 
 /**
  * 4. CLOUD HEALTH MONITOR

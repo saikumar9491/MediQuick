@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema(
 
     isAdmin: { type: Boolean, required: true, default: false },
     isVerified: { type: Boolean, default: false },
+    isBlocked: { type: Boolean, default: false },
 
     otp: { type: String, default: null },
     otpExpire: { type: Date, default: null },

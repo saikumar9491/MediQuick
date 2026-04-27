@@ -1,39 +1,67 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import AddMedicineModal from '../components/admin/AddMedicineModal';
+import AddBannerModal from '../components/admin/AddBannerModal';
+import AddBrandModal from '../components/admin/AddBrandModal';
+import EmailUserModal from '../components/admin/EmailUserModal';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { API_BASE } from '../utils/apiConfig';
 
 const AdminDashboard = () => {
+  const [activeTab, setActiveTab] = useState('inventory');
   const [inventory, setInventory] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [banners, setBanners] = useState([]);
+  const [brands, setBrands] = useState([]);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBannerModalOpen, setIsBannerModalOpen] = useState(false);
+  const [isBrandModalOpen, setIsBrandModalOpen] = useState(false);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  
   const [editingProduct, setEditingProduct] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const { user, token, setUser } = useAuth();
 
   /**
-   * --- HUB PROTOCOL: Fetch Inventory ---
-   * Wrapped in useCallback to prevent unnecessary re-renders
+   * --- HUB PROTOCOL: Fetch Data ---
    */
-  const fetchInventory = useCallback(async () => {
+  const fetchData = useCallback(async () => {
+    setLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/api/medicines`);
-      if (!response.ok) throw new Error("Could not reach Hub");
-      const data = await response.json();
-      setInventory(Array.isArray(data) ? data : []);
+      // Parallel fetching for performance
+      const [invRes, userRes, bannerRes, brandRes] = await Promise.all([
+        fetch(`${API_BASE}/api/medicines`),
+        fetch(`${API_BASE}/api/users`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API_BASE}/api/banners`),
+        fetch(`${API_BASE}/api/brands`)
+      ]);
+
+      const [invData, userData, bannerData, brandData] = await Promise.all([
+        invRes.json(),
+        userRes.json(),
+        bannerRes.json(),
+        brandRes.json()
+      ]);
+
+      setInventory(Array.isArray(invData) ? invData : []);
+      setUsers(Array.isArray(userData) ? userData : []);
+      setBanners(Array.isArray(bannerData) ? bannerData : []);
+      setBrands(Array.isArray(brandData) ? brandData : []);
     } catch (err) {
       console.error(err);
-      toast.error('Failed to sync with Amritsar Hub inventory');
+      toast.error('Failed to sync with Hub database');
     } finally {
       setLoading(false);
     }
-  }, [API_BASE]);
+  }, [API_BASE, token]);
 
   useEffect(() => {
-    fetchInventory();
-  }, [fetchInventory]);
+    fetchData();
+  }, [fetchData]);
 
   const handleAddNew = () => {
     setEditingProduct(null);
@@ -77,7 +105,7 @@ const AdminDashboard = () => {
 
     try {
       await savePromise;
-      fetchInventory(); // Refresh list after save
+      fetchData(); // Refresh list after save
       setIsModalOpen(false);
     } catch (err) {
       console.error("Save failed:", err);
@@ -88,25 +116,88 @@ const AdminDashboard = () => {
    * --- OPERATION: Purge Unit ---
    */
   const handleDelete = async (id) => {
-    // Permanent purge confirmation
     if (!window.confirm('Remove this medicine from Amritsar Hub permanently?')) return;
-
     try {
       const res = await fetch(`${API_BASE}/api/medicines/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-
       if (res.ok) {
         toast.success('Unit purged from inventory');
-        // Filter locally for immediate UI feedback
         setInventory((prev) => prev.filter((m) => m._id !== id));
-      } else {
-        const data = await res.json();
-        toast.error(data.message || 'Purge failed. Check permissions.');
       }
     } catch (err) {
       toast.error('Hub connection error');
+    }
+  };
+
+  /**
+   * --- OPERATION: User Management ---
+   */
+  const handleBlockUser = async (userId) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/users/${userId}/block`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(data.message);
+        setUsers(users.map(u => u._id === userId ? { ...u, isBlocked: data.isBlocked } : u));
+      }
+    } catch (err) {
+      toast.error('Block operation failed');
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm('Permanently delete this user? This cannot be undone.')) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/users/${userId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        toast.success('User deleted');
+        setUsers(users.filter(u => u._id !== userId));
+      }
+    } catch (err) {
+      toast.error('Delete operation failed');
+    }
+  };
+
+  /**
+   * --- OPERATION: Banner/Brand Management ---
+   */
+  const handleDeleteBanner = async (id) => {
+    if (!window.confirm('Delete this banner?')) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/banners/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        toast.success('Banner deleted');
+        setBanners(prev => prev.filter(b => b._id !== id));
+      }
+    } catch (err) {
+      toast.error('Delete failed');
+    }
+  };
+
+  const handleDeleteBrand = async (id) => {
+    if (!window.confirm('Delete this brand?')) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/brands/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        toast.success('Brand deleted');
+        setBrands(prev => prev.filter(b => b._id !== id));
+      }
+    } catch (err) {
+      toast.error('Delete failed');
     }
   };
 
@@ -133,23 +224,66 @@ const AdminDashboard = () => {
               Admin Control Center
             </h1>
             <p className="mt-2 text-[9px] sm:text-[10px] font-bold uppercase tracking-[3px] sm:tracking-[4px] text-gray-400">
-              Inventory Management Protocol
+              System Management Protocol
             </p>
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link
-              to="/admin/flash-deals"
-              className="w-full rounded-md bg-orange-500 px-5 py-3 text-[10px] sm:w-auto sm:px-8 sm:py-4 sm:text-xs font-black italic tracking-[2px] sm:tracking-widest text-white shadow-xl transition-all hover:bg-orange-600 active:scale-95 flex items-center justify-center gap-2"
-            >
-              <span>⚡</span> FLASH DEALS MANAGER
-            </Link>
+            {activeTab === 'inventory' && (
+              <Link
+                to="/admin/flash-deals"
+                className="w-full rounded-md bg-orange-500 px-5 py-3 text-[10px] sm:w-auto sm:px-8 sm:py-4 sm:text-xs font-black italic tracking-[2px] sm:tracking-widest text-white shadow-xl transition-all hover:bg-orange-600 active:scale-95 flex items-center justify-center gap-2"
+              >
+                <span>⚡</span> FLASH DEALS MANAGER
+              </Link>
+            )}
             <button
-              onClick={handleAddNew}
+              onClick={() => {
+                if (activeTab === 'inventory') handleAddNew();
+                if (activeTab === 'banners') setIsBannerModalOpen(true);
+                if (activeTab === 'brands') setIsBrandModalOpen(true);
+              }}
               className="w-full rounded-md bg-[#2874f0] px-5 py-3 text-[10px] sm:w-auto sm:px-8 sm:py-4 sm:text-xs font-black italic tracking-[2px] sm:tracking-widest text-white shadow-xl transition-all hover:bg-blue-700 active:scale-95"
             >
-              + REGISTER NEW MEDICINE
+              + {activeTab === 'inventory' ? 'REGISTER NEW MEDICINE' : activeTab === 'banners' ? 'UPLOAD NEW BANNER' : activeTab === 'brands' ? 'ADD FEATURED BRAND' : 'MANAGE USERS'}
             </button>
+          </div>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="mb-6 flex gap-2 overflow-x-auto pb-2 sm:mb-8 border-b border-gray-200">
+          {['inventory', 'users', 'banners', 'brands'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${
+                activeTab === tab 
+                ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50/50' 
+                : 'text-gray-400 hover:text-gray-600'
+              }`}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
+
+        {/* System Stats Section */}
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:mb-8 md:grid-cols-4 md:gap-6">
+          <div className="rounded-md border-l-4 border-blue-500 bg-white p-5 shadow-sm sm:p-6">
+            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Inventory Units</p>
+            <p className="text-2xl font-black italic text-gray-800">{inventory.length}</p>
+          </div>
+          <div className="rounded-md border-l-4 border-purple-500 bg-white p-5 shadow-sm sm:p-6">
+            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Total Users</p>
+            <p className="text-2xl font-black italic text-gray-800">{users.length}</p>
+          </div>
+          <div className="rounded-md border-l-4 border-green-500 bg-white p-5 shadow-sm sm:p-6">
+            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">Featured Brands</p>
+            <p className="text-2xl font-black italic text-gray-800">{brands.length}</p>
+          </div>
+          <div className="rounded-md border-l-4 border-yellow-500 bg-white p-5 shadow-sm sm:p-6">
+            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">System Status</p>
+            <p className="text-lg font-black italic text-green-600 uppercase">Online</p>
           </div>
         </div>
 
@@ -179,100 +313,150 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Inventory Data Table */}
+        {/* Dynamic Content Section */}
         <div className="overflow-hidden rounded-md border border-gray-100 bg-white shadow-2xl">
           <div className="overflow-x-auto">
-            <table className="min-w-[760px] w-full text-left">
-              <thead className="bg-gray-800 text-white">
-                <tr>
-                  <th className="p-4 text-[10px] font-black uppercase tracking-widest">Unit Details</th>
-                  <th className="p-4 text-[10px] font-black uppercase tracking-widest">Classification</th>
-                  <th className="p-4 text-[10px] font-black uppercase tracking-widest">Brand</th>
-                  <th className="p-4 text-[10px] font-black uppercase tracking-widest">Status</th>
-                  <th className="p-4 text-[10px] font-black uppercase tracking-widest">Valuation</th>
-                  <th className="p-4 text-center text-[10px] font-black uppercase tracking-widest">Operations</th>
-                </tr>
-              </thead>
+            {activeTab === 'inventory' && (
+              <table className="min-w-[760px] w-full text-left">
+                <thead className="bg-gray-800 text-white">
+                  <tr>
+                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Unit Details</th>
+                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Classification</th>
+                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Status</th>
+                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Valuation</th>
+                    <th className="p-4 text-center text-[10px] font-black uppercase tracking-widest">Operations</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 text-gray-700">
+                  {inventory.map((med) => (
+                    <tr key={med._id} className="group transition-colors hover:bg-blue-50/50">
+                      <td className="p-4">
+                        <div className="flex items-center gap-3">
+                          <img src={med.image} alt={med.name} className="h-12 w-12 rounded-sm border p-1 object-contain bg-white" />
+                          <div>
+                            <span className="block text-xs font-black uppercase italic text-gray-800">{med.name}</span>
+                            <span className="text-[9px] font-bold text-gray-400 uppercase">{med.brand}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="p-4 text-[10px] font-black uppercase italic text-gray-500">{med.category}</td>
+                      <td className="p-4">
+                        {med.isFlashDeal ? <span className="bg-blue-100 px-2 py-0.5 text-[8px] font-black uppercase text-blue-600 rounded-full">⚡ Flash Deal</span> : <span className="text-[9px] font-bold text-gray-300">Standard</span>}
+                      </td>
+                      <td className="p-4 text-sm font-black text-blue-600">₹{med.price}</td>
+                      <td className="p-4">
+                        <div className="flex justify-center gap-6">
+                          <button onClick={() => handleEdit(med)} className="text-[10px] font-black uppercase text-blue-600 hover:underline">Edit</button>
+                          <button onClick={() => handleDelete(med._id)} className="text-[10px] font-black uppercase text-red-500 hover:underline">Purge</button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
 
-              <tbody className="divide-y divide-gray-100 text-gray-700">
-                {inventory.map((med) => (
-                  <tr key={med._id} className="group transition-colors hover:bg-blue-50/50">
-                    <td className="p-4">
-                      <div className="flex items-center gap-3 sm:gap-4">
-                        <img
-                          src={med.image || 'https://placehold.co/100x100?text=Medicine'}
-                          alt={med.name}
-                          className="h-12 w-12 rounded-sm border bg-white p-1 object-contain"
-                        />
+            {activeTab === 'users' && (
+              <table className="min-w-[760px] w-full text-left">
+                <thead className="bg-gray-800 text-white">
+                  <tr>
+                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">User Profile</th>
+                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Contact Info</th>
+                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Status</th>
+                    <th className="p-4 text-center text-[10px] font-black uppercase tracking-widest">Security Protocols</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 text-gray-700">
+                  {users.map((u) => (
+                    <tr key={u._id} className="group transition-colors hover:bg-purple-50/50">
+                      <td className="p-4">
                         <div>
-                          <span className="block text-xs sm:text-sm font-black uppercase italic tracking-tight text-gray-800">
-                            {med.name}
-                          </span>
-                          {med.needsPrescription && (
-                            <span className="mt-1 inline-block bg-red-600 px-1.5 py-0.5 text-[8px] font-black uppercase text-white">
-                              Rx Protocol
-                            </span>
+                          <span className="block text-xs font-black uppercase italic text-gray-800">{u.name}</span>
+                          <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">ID: {u._id.slice(-8)}</span>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <span className="block text-[10px] font-bold text-gray-600">{u.email}</span>
+                        <span className="text-[10px] font-bold text-gray-400">{u.phone}</span>
+                      </td>
+                      <td className="p-4">
+                        {u.isAdmin ? (
+                          <span className="bg-purple-100 px-2 py-0.5 text-[8px] font-black uppercase text-purple-600 rounded-sm">Master Admin</span>
+                        ) : u.isBlocked ? (
+                          <span className="bg-red-600 px-2 py-0.5 text-[8px] font-black uppercase text-white rounded-sm">Blocked</span>
+                        ) : (
+                          <span className="bg-green-100 px-2 py-0.5 text-[8px] font-black uppercase text-green-600 rounded-sm">Verified User</span>
+                        )}
+                      </td>
+                      <td className="p-4">
+                        <div className="flex justify-center gap-4">
+                          <button onClick={() => { setSelectedUser(u); setIsEmailModalOpen(true); }} className="text-[10px] font-black uppercase text-blue-600 hover:underline">Message</button>
+                          {!u.isAdmin && (
+                            <>
+                              <button onClick={() => handleBlockUser(u._id)} className={`text-[10px] font-black uppercase hover:underline ${u.isBlocked ? 'text-green-600' : 'text-orange-500'}`}>
+                                {u.isBlocked ? 'Unblock' : 'Block'}
+                              </button>
+                              <button onClick={() => handleDeleteUser(u._id)} className="text-[10px] font-black uppercase text-red-500 hover:underline">Delete</button>
+                            </>
                           )}
                         </div>
-                      </div>
-                    </td>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
 
-                    <td className="p-4 text-[10px] font-black uppercase italic text-gray-500">
-                      {med.category}
-                    </td>
-
-                    <td className="p-4 text-[10px] font-black uppercase text-gray-400">
-                      {med.brand}
-                    </td>
-
-                    <td className="p-4">
-                      {med.isFlashDeal ? (
-                        <div className="flex flex-col">
-                          <span className="inline-block rounded-full bg-blue-100 px-2 py-0.5 text-[8px] font-black uppercase text-blue-600">
-                            ⚡ Flash Deal
-                          </span>
-                          <span className="mt-1 text-[9px] font-bold text-blue-400">₹{med.discountPrice}</span>
-                        </div>
-                      ) : (
-                        <span className="text-[9px] font-bold text-gray-300">Standard</span>
-                      )}
-                    </td>
-
-                    <td className="p-4 text-sm font-black text-blue-600">
-                      ₹{med.price}
-                    </td>
-
-                    <td className="p-4">
-                      <div className="flex justify-center gap-4 sm:gap-8">
-                        <button
-                          onClick={() => handleEdit(med)}
-                          className="text-[10px] font-black uppercase text-blue-600 hover:underline"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(med._id)}
-                          className="text-[10px] font-black uppercase text-red-500 hover:underline"
-                        >
-                          Purge
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-
-                {inventory.length === 0 && (
+            {activeTab === 'banners' && (
+              <table className="min-w-[760px] w-full text-left">
+                <thead className="bg-gray-800 text-white">
                   <tr>
-                    <td
-                      colSpan="5"
-                      className="px-4 py-10 text-center text-xs font-black uppercase tracking-[2px] text-gray-400"
-                    >
-                      No inventory units found in Hub
-                    </td>
+                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Banner Preview</th>
+                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Title / Link</th>
+                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Status</th>
+                    <th className="p-4 text-center text-[10px] font-black uppercase tracking-widest">Actions</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {banners.map((b) => (
+                    <tr key={b._id}>
+                      <td className="p-4"><img src={b.image} className="h-12 w-32 object-cover rounded border" alt="banner" /></td>
+                      <td className="p-4">
+                        <span className="block text-[10px] font-black uppercase text-gray-800">{b.title}</span>
+                        <span className="text-[9px] text-blue-500 underline truncate block max-w-xs">{b.link}</span>
+                      </td>
+                      <td className="p-4"><span className="text-[10px] font-black text-green-600">ACTIVE</span></td>
+                      <td className="p-4 text-center">
+                        <button onClick={() => handleDeleteBanner(b._id)} className="text-[10px] font-black uppercase text-red-500 hover:underline">Remove</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+
+            {activeTab === 'brands' && (
+              <table className="min-w-[760px] w-full text-left">
+                <thead className="bg-gray-800 text-white">
+                  <tr>
+                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Brand Logo</th>
+                    <th className="p-4 text-[10px] font-black uppercase tracking-widest">Brand Name</th>
+                    <th className="p-4 text-center text-[10px] font-black uppercase tracking-widest">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {brands.map((brand) => (
+                    <tr key={brand._id}>
+                      <td className="p-4"><img src={brand.image} className="h-10 w-10 object-contain p-1 border rounded bg-white" alt="brand" /></td>
+                      <td className="p-4 text-xs font-black uppercase italic text-gray-800">{brand.name}</td>
+                      <td className="p-4 text-center">
+                        <button onClick={() => handleDeleteBrand(brand._id)} className="text-[10px] font-black uppercase text-red-500 hover:underline">Remove</button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
           </div>
         </div>
       </main>
@@ -282,6 +466,27 @@ const AdminDashboard = () => {
         onClose={() => setIsModalOpen(false)}
         onAdd={handleSaveProduct}
         initialData={editingProduct}
+      />
+
+      <AddBannerModal
+        isOpen={isBannerModalOpen}
+        onClose={() => setIsBannerModalOpen(false)}
+        onAdd={(newBanner) => setBanners([...banners, newBanner])}
+        token={token}
+      />
+
+      <AddBrandModal
+        isOpen={isBrandModalOpen}
+        onClose={() => setIsBrandModalOpen(false)}
+        onAdd={(newBrand) => setBrands([...brands, newBrand])}
+        token={token}
+      />
+
+      <EmailUserModal
+        isOpen={isEmailModalOpen}
+        onClose={() => setIsEmailModalOpen(false)}
+        user={selectedUser}
+        token={token}
       />
     </div>
   );

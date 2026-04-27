@@ -19,70 +19,70 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [scanResult, setScanResult] = useState(null);
   const [currentBanner, setCurrentBanner] = useState(0);
+  
+  const [dbBanners, setDbBanners] = useState([]);
+  const [dbBrands, setDbBrands] = useState([]);
 
-  const banners = useMemo(
-    () => [
-      {
-        title: '2-Hour Express Delivery',
-        desc: 'Fastest pharmacy delivery in Amritsar.',
-        bg: 'bg-[#2874f0]',
-      },
-      {
-        title: 'Flat 25% Off on Wellness',
-        desc: 'Vitamins and protein supplements at best prices.',
-        bg: 'bg-green-600',
-      },
-      {
-        title: 'Baby Care Bonanza',
-        desc: 'Top brands like Cetaphil & Himalaya available.',
-        bg: 'bg-red-600',
-      },
-    ],
-    []
-  );
+  useEffect(() => {
+    const fetchHomeAssets = async () => {
+      try {
+        const [bRes, brRes] = await Promise.all([
+          fetch(`${API_BASE}/api/banners`),
+          fetch(`${API_BASE}/api/brands`)
+        ]);
+        const [bData, brData] = await Promise.all([bRes.json(), brRes.json()]);
+        setDbBanners(Array.isArray(bData) ? bData : []);
+        setDbBrands(Array.isArray(brData) ? brData : []);
+      } catch (err) {
+        console.error("Home sync failed:", err);
+      }
+    };
+    fetchHomeAssets();
+  }, []);
+
+  const fallbackBanners = [
+    {
+      title: '2-Hour Express Delivery',
+      desc: 'Fastest pharmacy delivery in Amritsar.',
+      bg: 'bg-[#2874f0]',
+      image: null
+    },
+    {
+      title: 'Flat 25% Off on Wellness',
+      desc: 'Vitamins and protein supplements at best prices.',
+      bg: 'bg-green-600',
+      image: null
+    },
+    {
+      title: 'Baby Care Bonanza',
+      desc: 'Top brands like Cetaphil & Himalaya available.',
+      bg: 'bg-red-600',
+      image: null
+    },
+  ];
+
+  const activeBanners = dbBanners.length > 0 ? dbBanners : fallbackBanners;
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentBanner((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
+      setCurrentBanner((prev) => (prev === activeBanners.length - 1 ? 0 : prev + 1));
     }, 5000);
 
     return () => clearInterval(timer);
-  }, [banners.length]);
+  }, [activeBanners.length]);
 
-  const brandLogos = [
-    {
-      name: 'himalaya',
-      img: 'https://www.watsons.com.sg/medias/04-Brand-Story-Banner-750x530px-01-IL-01.jpg?context=bWFzdGVyfHJvb3R8NjAxNjF8aW1hZ2UvanBlZ3xoZmMvaGU1LzkwNzMyOTQyNDU5MTguanBnfGQ5ZWI3NGQyMTJkOTU5MzA5YTkzNGNjOWM2NjVhZDBiMjFkZjdkZDQzNDNhNjBhNTUwYjBiZjk3OWQyZGEwMTI',
-    },
-    {
-      name: 'cetaphil',
-      img: 'https://mir-s3-cdn-cf.behance.net/projects/404/fd66d1160593807.Y3JvcCw2MjcsNDkwLDEzNiw5MQ.jpg',
-    },
-    {
-      name: 'Pilgrim',
-      img: 'https://images.yourstory.com/cs/images/companies/Pilgrim-1624019483873.jpg',
-    },
-    {
-      name: 'Accu-chek',
-      img: 'https://www.logosvgpng.com/wp-content/uploads/2018/09/accu-chek-logo-vector.png',
-    },
-    {
-      name: 'PentaSure',
-      img: 'https://th.bing.com/th/id/R.d4bebbe9a31ce35ca40a48b8229aa163?rik=aMVwFck4mff8aQ&riu=http%3a%2f%2fpentasurenutrition.com%2fcdn%2fshop%2ffiles%2fPentaSure-logo.png%3fv%3d1718862987&ehk=%2fm4SFCnatztjh5EbTsNKewqUJpAt5lwkB7Ogmjo0eUE%3d&risl=&pid=ImgRaw&r=0',
-    },
-    {
-      name: 'Optimum Nutrition',
-      img: 'https://tse4.mm.bing.net/th/id/OIP.Fz9_NbeoX05Pm7ZWHwlr4wHaEK?rs=1&pid=ImgDetMain&o=7&rm=3',
-    },
-    {
-      name: 'Prohance',
-      img: 'https://pbs.twimg.com/profile_images/654650890335334400/oxTrSWLY_400x400.png',
-    },
-    {
-      name: 'Tejasya',
-      img: 'https://aniportalimages.s3.amazonaws.com/media/details/Capture_2QlQdnb.jpg',
-    },
+  const fallbackBrands = [
+    { name: 'himalaya', img: 'https://www.watsons.com.sg/medias/04-Brand-Story-Banner-750x530px-01-IL-01.jpg?context=bWFzdGVyfHJvb3R8NjAxNjF8aW1hZ2UvanBlZ3xoZmMvaGU1LzkwNzMyOTQyNDU5MTguanBnfGQ5ZWI3NGQyMTJkOTU5MzA5YTkzNGNjOWM2NjVhZDBiMjFkZjdkZDQzNDNhNjBhNTUwYjBiZjk3OWQyZGEwMTI' },
+    { name: 'cetaphil', img: 'https://mir-s3-cdn-cf.behance.net/projects/404/fd66d1160593807.Y3JvcCw2MjcsNDkwLDEzNiw5MQ.jpg' },
+    { name: 'Pilgrim', img: 'https://images.yourstory.com/cs/images/companies/Pilgrim-1624019483873.jpg' },
+    { name: 'Accu-chek', img: 'https://www.logosvgpng.com/wp-content/uploads/2018/09/accu-chek-logo-vector.png' },
+    { name: 'PentaSure', img: 'https://th.bing.com/th/id/R.d4bebbe9a31ce35ca40a48b8229aa163?rik=aMVwFck4mff8aQ&riu=http%3a%2f%2fpentasurenutrition.com%2fcdn%2fshop%2ffiles%2fPentaSure-logo.png%3fv%3d1718862987&ehk=%2fm4SFCnatztjh5EbTsNKewqUJpAt5lwkB7Ogmjo0eUE%3d&risl=&pid=ImgRaw&r=0' },
+    { name: 'Optimum Nutrition', img: 'https://tse4.mm.bing.net/th/id/OIP.Fz9_NbeoX05Pm7ZWHwlr4wHaEK?rs=1&pid=ImgDetMain&o=7&rm=3' },
+    { name: 'Prohance', img: 'https://pbs.twimg.com/profile_images/654650890335334400/oxTrSWLY_400x400.png' },
+    { name: 'Tejasya', img: 'https://aniportalimages.s3.amazonaws.com/media/details/Capture_2QlQdnb.jpg' },
   ];
+
+  const activeBrands = dbBrands.length > 0 ? dbBrands.map(b => ({ name: b.name, img: b.image })) : fallbackBrands;
 
   const services = [
     { title: 'Medicines', img: '💊', desc: 'Flat 25% Off', color: 'text-orange-600', path: '/medicines' },
@@ -145,14 +145,18 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
         <section className="w-full px-3 sm:px-4 lg:px-6 py-1 sm:py-2">
           <div className="mx-auto w-full max-w-7xl">
             <div
-              className={`relative h-[120px] sm:h-[180px] md:h-[260px] lg:h-[300px] overflow-hidden rounded-2xl sm:rounded-3xl text-white shadow-xl transition-all duration-700 ${banners[currentBanner].bg}`}
+              onClick={() => activeBanners[currentBanner].link && navigate(activeBanners[currentBanner].link)}
+              className={`relative cursor-pointer h-[120px] sm:h-[180px] md:h-[260px] lg:h-[300px] overflow-hidden rounded-2xl sm:rounded-3xl text-white shadow-xl transition-all duration-700 ${activeBanners[currentBanner].bg || 'bg-slate-800'}`}
             >
+              {activeBanners[currentBanner].image && (
+                <img src={activeBanners[currentBanner].image} className="absolute inset-0 h-full w-full object-cover opacity-60" alt="banner" />
+              )}
               <div className="absolute inset-0 z-10 flex flex-col justify-center px-4 sm:px-8 md:px-12">
                 <h1 className="mb-2 max-w-[95%] text-lg sm:text-3xl md:text-5xl font-black uppercase italic tracking-tight leading-tight">
-                  {banners[currentBanner].title}
+                  {activeBanners[currentBanner].title}
                 </h1>
                 <p className="max-w-[95%] sm:max-w-md text-[10px] sm:text-base md:text-lg font-bold italic opacity-90 leading-snug">
-                  {banners[currentBanner].desc}
+                  {activeBanners[currentBanner].desc || activeBanners[currentBanner].title}
                 </p>
               </div>
             </div>
@@ -471,7 +475,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
               className="sm:hidden overflow-x-auto no-scrollbar"
             >
               <div className="flex gap-3 w-max pr-3">
-                {brandLogos.map((brand, idx) => (
+                {activeBrands.map((brand, idx) => (
                   <div
                     key={idx}
                     onClick={() => navigate(`/brand/${brand.name}`)}
@@ -495,7 +499,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
             </div>
 
             <div className="hidden sm:grid grid-cols-4 gap-4 md:grid-cols-6 lg:grid-cols-8">
-              {brandLogos.map((brand, idx) => (
+              {activeBrands.map((brand, idx) => (
                 <div
                   key={idx}
                   onClick={() => navigate(`/brand/${brand.name}`)}
