@@ -253,6 +253,7 @@ const AdminDashboard = () => {
               </motion.div>
             ))}
           </div>
+          )}
 
           {/* Dynamic Content Tables */}
           {activeTab !== 'overview' && (
