@@ -22,7 +22,7 @@ import {
   Bell
 } from 'lucide-react';
 import AddMedicineModal from '../components/admin/AddMedicineModal';
-import AddBannerModal from '../components/admin/AddBannerModal';
+import AdminBannerManager from '../components/admin/AdminBannerManager';
 import AddBrandModal from '../components/admin/AddBrandModal';
 import EmailUserModal from '../components/admin/EmailUserModal';
 import AdminSidebar from '../components/admin/AdminSidebar';
@@ -144,6 +144,20 @@ const AdminDashboard = () => {
     } catch (err) { toast.error('Purge failed'); }
   };
 
+  const handleDeleteBanner = async (id) => {
+    if (!window.confirm('Remove this banner?')) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/banners/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        toast.success('Banner removed');
+        setBanners(banners.filter(b => b._id !== id));
+      }
+    } catch (err) { toast.error('Error removing banner'); }
+  };
+
   const containerVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 20, staggerChildren: 0.05 } }
@@ -197,19 +211,18 @@ const AdminDashboard = () => {
                     <span>Flash Deals</span>
                   </Link>
                 )}
-                {['products', 'banners', 'brands'].includes(activeTab) && (
+                {['products', 'brands'].includes(activeTab) && (
                   <motion.button
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => {
                       if (activeTab === 'products') handleAddNew();
-                      if (activeTab === 'banners') setIsBannerModalOpen(true);
                       if (activeTab === 'brands') setIsBrandModalOpen(true);
                     }}
                     className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/30"
                   >
                     <Plus className="h-4 w-4" />
-                    {activeTab === 'products' ? 'Add Product' : activeTab === 'banners' ? 'Add Banner' : activeTab === 'brands' ? 'Add Brand' : 'Add New'}
+                    {activeTab === 'products' ? 'Add Product' : activeTab === 'brands' ? 'Add Brand' : 'Add New'}
                   </motion.button>
                 )}
               </div>
@@ -452,36 +465,15 @@ const AdminDashboard = () => {
                   )}
 
                   {activeTab === 'banners' && (
-                    <table className="w-full text-left">
-                      <thead className="bg-slate-50/50 border-b border-slate-100">
-                        <tr>
-                          <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Visual Payload</th>
-                          <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Deployment Logic</th>
-                          <th className="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 bg-white/50">
-                        {banners.map((b) => (
-                          <tr key={b._id} className="group hover:bg-slate-50 transition-colors">
-                            <td className="p-4 sm:px-6">
-                              <div className="relative group/img overflow-hidden rounded-xl border border-slate-100 shadow-sm h-24 w-64 bg-slate-50">
-                                <img src={b.image} className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-105" alt="" />
-                                <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                                  <ExternalLink className="text-white h-6 w-6" />
-                                </div>
-                              </div>
-                            </td>
-                            <td className="p-4 sm:px-6">
-                              <span className="block text-sm font-semibold text-slate-800">{b.title}</span>
-                              <span className="text-xs font-medium text-blue-500 hover:underline truncate block max-w-xs">{b.link}</span>
-                            </td>
-                            <td className="p-4 sm:px-6 text-center">
-                              <button onClick={() => handleDeleteBanner(b._id)} className="rounded-lg bg-red-50 px-4 py-2 text-xs font-semibold text-red-600 transition-all hover:bg-red-500 hover:text-white shadow-sm">Delete</button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                    <div className="p-1">
+                      <AdminBannerManager 
+                        banners={banners} 
+                        setBanners={setBanners} 
+                        token={token} 
+                        API_BASE={API_BASE} 
+                        handleDeleteBanner={handleDeleteBanner} 
+                      />
+                    </div>
                   )}
 
                   {activeTab === 'brands' && (
@@ -524,12 +516,7 @@ const AdminDashboard = () => {
         initialData={editingProduct}
       />
 
-      <AddBannerModal
-        isOpen={isBannerModalOpen}
-        onClose={() => setIsBannerModalOpen(false)}
-        onAdd={(newBanner) => setBanners([...banners, newBanner])}
-        token={token}
-      />
+
 
       <AddBrandModal
         isOpen={isBrandModalOpen}
