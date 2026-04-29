@@ -188,14 +188,14 @@ const AdminBannerManager = ({ banners, setBanners, token, API_BASE, handleDelete
       <div className="space-y-6">
         <h2 className="text-sm font-black uppercase tracking-widest text-slate-400">Live Deployments</h2>
         
-        {banners.length === 0 ? (
+        {banners.filter(b => b.category !== 'flash').length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-slate-50 py-20 text-slate-400">
             <ImageIcon className="h-12 w-12 mb-4 opacity-50" />
             <p className="text-sm font-bold">No active banners found.</p>
           </div>
         ) : (
           <div className="space-y-4">
-            {banners.map(banner => (
+            {banners.filter(b => b.category !== 'flash').map(banner => (
               <div key={banner._id} className={`group relative flex h-32 w-full overflow-hidden rounded-full shadow-md transition-transform hover:scale-[1.02] ${banner.bg || 'bg-slate-800'}`}>
                 {/* Left side text content */}
                 <div className="flex w-2/3 flex-col justify-center pl-8 pr-4 z-10">
