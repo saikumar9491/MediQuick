@@ -376,7 +376,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
                 <img 
                   src={flashBanner.image} 
                   alt={flashBanner.title || "Flash Deals"} 
-                  className="w-full h-[120px] sm:h-[180px] md:h-[240px] lg:h-[280px] object-cover" 
+                  className="w-full h-[120px] sm:h-[150px] md:h-[180px] lg:h-[200px] object-cover" 
                 />
               </div>
             )}
