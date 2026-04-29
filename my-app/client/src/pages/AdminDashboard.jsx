@@ -12,10 +12,14 @@ import {
   Zap,
   Mail,
   ShieldAlert,
+  ShieldCheck,
   Trash2,
   Edit3,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  Eye,
+  FileText,
+  Bell
 } from 'lucide-react';
 import AddMedicineModal from '../components/admin/AddMedicineModal';
 import AddBannerModal from '../components/admin/AddBannerModal';
@@ -163,37 +167,25 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50 text-slate-800 font-sans">
-      <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
-
-      <main className="sm:ml-20 transition-all duration-300 min-h-screen p-4 sm:p-8 lg:p-12">
+    <div className="min-h-screen bg-[#f8f9fa] text-slate-800 font-sans">
+      <main className="min-h-screen p-4 sm:p-6 lg:p-8">
         <motion.div 
           initial="hidden"
           animate="visible"
           variants={containerVariants}
-          className="mx-auto max-w-7xl"
+          className="mx-auto max-w-[1400px]"
         >
-          {/* Header */}
-          <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <motion.h1 
-                className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl"
-              >
-                {activeTab === 'overview' ? (
-                  <>Dashboard <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Overview</span></>
-                ) : activeTab === 'products' ? (
-                  <>Products <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Management</span></>
-                ) : activeTab === 'users' ? (
-                  <>User <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Base</span></>
-                ) : (
-                  <span className="capitalize">{activeTab} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Management</span></span>
-                )}
-              </motion.h1>
-              <p className="mt-2 text-sm font-medium text-slate-500">
-                {activeTab === 'overview' ? 'Manage your inventory, users, and platform settings.' : `Manage your ${activeTab} data and configurations.`}
-              </p>
-            </div>
+          {/* Admin Command Center Header */}
+          <div className="flex items-center gap-3 mb-1">
+            <ShieldCheck className="h-7 w-7 text-green-500" />
+            <h1 className="text-2xl font-black tracking-tight text-slate-900">Admin Command Center</h1>
+          </div>
+          <p className="text-sm font-medium text-slate-500 ml-10 mb-2">
+            Inventory management and system configuration
+          </p>
 
+          <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             {activeTab !== 'overview' && (
               <div className="flex items-center gap-4">
                 {activeTab === 'products' && (
@@ -224,35 +216,117 @@ const AdminDashboard = () => {
             )}
           </div>
 
-          {/* Quick Stats Grid */}
+          {/* NEW COMMAND CENTER GRID */}
           {activeTab === 'overview' && (
-            <div className="mb-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { label: 'Total Products', value: inventory.length, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
-              { label: 'Registered Users', value: users.length, icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50' },
-              { label: 'Active Banners', value: banners.length, icon: ImageIcon, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-              { label: 'System Status', value: 'Online', icon: Activity, color: 'text-teal-600', bg: 'bg-teal-50' },
-            ].map((stat, i) => (
-              <motion.div
-                key={i}
-                variants={cardVariants}
-                className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white/80 backdrop-blur-xl p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-200/50"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-slate-500">{stat.label}</p>
-                    <p className="mt-2 text-3xl font-bold text-slate-800">{stat.value}</p>
+            <div className="flex flex-col gap-6 mb-10">
+              
+              {/* TOP ROW: 3 Large Colored Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                {/* 1. Live Status (Purple) */}
+                <motion.div variants={cardVariants} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 p-6 text-white shadow-lg shadow-purple-500/20">
+                  <div className="relative z-10">
+                    <h3 className="text-xs font-black uppercase tracking-wider text-white/80">Live Status</h3>
+                    <div className="mt-4 flex items-center gap-3">
+                      <span className="text-5xl font-black">1</span>
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-bold backdrop-blur-sm">
+                        <span className="h-2 w-2 rounded-full bg-green-400 animate-pulse"></span>
+                        ONLINE
+                      </span>
+                    </div>
+                    <p className="mt-4 text-xs font-medium text-white/70">Active in last 5 minutes</p>
                   </div>
-                  <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${stat.bg} ${stat.color} transition-transform group-hover:scale-110 group-hover:rotate-3`}>
-                    <stat.icon className="h-7 w-7" />
+                  <Activity className="absolute -bottom-6 -right-6 h-40 w-40 opacity-10 text-white transition-transform duration-500 hover:scale-110 hover:-rotate-6" />
+                </motion.div>
+
+                {/* 2. User Growth (Green) */}
+                <motion.div variants={cardVariants} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 p-6 text-white shadow-lg shadow-emerald-500/20">
+                  <div className="relative z-10">
+                    <h3 className="text-xs font-black uppercase tracking-wider text-white/80">User Growth</h3>
+                    <div className="mt-4 flex items-center gap-3">
+                      <span className="text-5xl font-black">{users.length}</span>
+                    </div>
+                    <p className="mt-4 text-xs font-bold text-white/80 uppercase tracking-widest">Total Registered</p>
                   </div>
+                  <Users className="absolute -bottom-6 -right-6 h-40 w-40 opacity-10 text-white transition-transform duration-500 hover:scale-110 hover:-rotate-6" />
+                </motion.div>
+
+                {/* 3. Platform Traffic / Inventory (Orange) */}
+                <motion.div variants={cardVariants} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 p-6 text-white shadow-lg shadow-orange-500/20">
+                  <div className="relative z-10">
+                    <h3 className="text-xs font-black uppercase tracking-wider text-white/80">Total Inventory</h3>
+                    <div className="mt-4 flex items-center gap-3">
+                      <span className="text-5xl font-black">{inventory.length}</span>
+                    </div>
+                    <div className="mt-4 flex items-center gap-6 text-xs font-bold text-white/80 uppercase tracking-widest">
+                      <div>
+                        <span className="block text-white/60 text-[10px] mb-0.5">Flash Deals</span>
+                        <span>{inventory.filter(m => m.isFlashDeal).length} Active</span>
+                      </div>
+                      <div>
+                        <span className="block text-white/60 text-[10px] mb-0.5">Banners</span>
+                        <span>{banners.length} Live</span>
+                      </div>
+                    </div>
+                  </div>
+                  <Eye className="absolute -bottom-6 -right-6 h-40 w-40 opacity-10 text-white transition-transform duration-500 hover:scale-110 hover:-rotate-6" />
+                </motion.div>
+                
+              </div>
+
+              {/* BOTTOM ROW: 4 Small White Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                  { label: 'Total Users', value: users.length, icon: Users },
+                  { label: 'Products Listed', value: inventory.length, icon: Package },
+                  { label: 'Active Brands', value: brands.length, icon: Award },
+                  { label: 'Total Broadcasts', value: 0, icon: Bell },
+                ].map((stat, i) => (
+                  <motion.div
+                    key={i}
+                    variants={cardVariants}
+                    className="flex items-center gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
+                  >
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-50 text-slate-500 border border-slate-100">
+                      <stat.icon className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-black text-slate-800 leading-none">{stat.value}</p>
+                      <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-slate-500">{stat.label}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Recent User Activity Section */}
+              <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="flex items-center gap-3 mb-6">
+                  <Activity className="h-5 w-5 text-indigo-600" />
+                  <h2 className="text-lg font-black tracking-tight text-slate-900">Recent User Activity</h2>
                 </div>
-                <div className="absolute -bottom-4 -right-4 text-8xl opacity-[0.02] text-slate-900 transition-transform group-hover:scale-110">
-                  <stat.icon />
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                {users.length > 0 ? (
+                  <div className="space-y-4">
+                    {users.slice(0, 3).map(u => (
+                      <div key={u._id} className="flex items-center justify-between border-b border-slate-100 pb-4 last:border-0 last:pb-0">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 flex items-center justify-center rounded-full bg-indigo-50 text-indigo-600 font-bold border border-indigo-100">
+                            {u.name[0]}
+                          </div>
+                          <div>
+                            <p className="text-sm font-bold text-slate-800">{u.name}</p>
+                            <p className="text-xs text-slate-500">{u.email}</p>
+                          </div>
+                        </div>
+                        <span className="text-xs font-medium text-slate-400">Account verified</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="py-8 text-center text-sm font-medium text-slate-400">No recent activity detected.</div>
+                )}
+              </div>
+
+            </div>
           )}
 
           {/* Dynamic Content Tables */}
