@@ -4,11 +4,13 @@ import { Zap, Trash2, Edit3, Plus, Search } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { API_BASE } from '../../utils/apiConfig';
 
-const AdminFlashDealsSection = ({ inventory, setInventory, token }) => {
+const AdminFlashDealsSection = ({ inventory, setInventory, banners = [], setBanners, token }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMedicine, setSelectedMedicine] = useState(null);
   const [discountPrice, setDiscountPrice] = useState('');
+  const [bannerFile, setBannerFile] = useState(null);
+  const [bannerPreview, setBannerPreview] = useState('');
 
   const flashDeals = inventory.filter(m => m.isFlashDeal);
   const availableForFlash = inventory.filter(m => !m.isFlashDeal && m.name.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -43,6 +45,60 @@ const AdminFlashDealsSection = ({ inventory, setInventory, token }) => {
     setShowAddModal(true);
   };
 
+  const flashBanner = banners.find(b => b.category === 'flash');
+
+  const handleBannerUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setBannerFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setBannerPreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const saveFlashBanner = async () => {
+    if (!bannerPreview && !flashBanner) return toast.error('Please select an image');
+    const loadToast = toast.loading('Saving Banner...');
+    try {
+      const res = await fetch(`${API_BASE}/api/banners`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          title: 'Flash Sale Banner',
+          image: bannerPreview,
+          category: 'flash'
+        })
+      });
+      if (!res.ok) throw new Error('Failed to save banner');
+      const savedBanner = await res.json();
+      toast.success('Flash Deal Banner Updated', { id: loadToast });
+      setBannerFile(null);
+      setBannerPreview('');
+      if (setBanners) setBanners([...banners.filter(b => b.category !== 'flash'), savedBanner]);
+    } catch (err) {
+      toast.error(err.message, { id: loadToast });
+    }
+  };
+
+  const handleDeleteBanner = async () => {
+    if (!flashBanner || !window.confirm('Remove Flash Deal Banner?')) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/banners/${flashBanner._id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to remove banner');
+      toast.success('Banner removed');
+      if (setBanners) setBanners(banners.filter(b => b._id !== flashBanner._id));
+    } catch (err) {
+      toast.error(err.message);
+    }
+  };
+
   return (
     <div className="p-6 bg-white/50 backdrop-blur-md rounded-3xl border border-gray-100 shadow-xl animate-fadeIn">
       
@@ -66,6 +122,59 @@ const AdminFlashDealsSection = ({ inventory, setInventory, token }) => {
         >
           <Plus className="h-4 w-4" /> Add Flash Deal
         </button>
+      </div>
+
+      {/* Flash Banner Manager */}
+      <div className="mb-8 bg-white rounded-2xl shadow-sm border border-orange-100 overflow-hidden p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-black uppercase tracking-widest text-orange-600 flex items-center gap-2">
+            <span className="text-lg">🖼️</span> Daily Flash Deals Banner
+          </h2>
+        </div>
+        
+        <div className="flex flex-col md:flex-row gap-6 items-start">
+          {/* Current/Preview Banner Display */}
+          <div className="w-full md:w-2/3 h-[140px] sm:h-[180px] bg-slate-50 border-2 border-dashed border-gray-200 rounded-2xl flex items-center justify-center overflow-hidden relative">
+            {(bannerPreview || flashBanner) ? (
+              <img 
+                src={bannerPreview || flashBanner.image} 
+                alt="Flash Deal Banner" 
+                className="w-full h-full object-cover" 
+              />
+            ) : (
+              <div className="text-center text-gray-400">
+                <span className="block text-3xl mb-2">📸</span>
+                <span className="text-xs font-bold uppercase tracking-widest">No Banner Set</span>
+              </div>
+            )}
+          </div>
+
+          {/* Banner Controls */}
+          <div className="w-full md:w-1/3 flex flex-col gap-3">
+            <label className="cursor-pointer bg-blue-50 text-blue-600 text-xs font-black uppercase tracking-widest px-4 py-3 rounded-xl text-center hover:bg-blue-100 transition-colors">
+              {flashBanner ? 'Change Image' : 'Upload Image'}
+              <input type="file" className="hidden" accept="image/*" onChange={handleBannerUpload} />
+            </label>
+            
+            {bannerPreview && (
+              <button 
+                onClick={saveFlashBanner} 
+                className="bg-orange-500 text-white text-xs font-black uppercase tracking-widest px-4 py-3 rounded-xl text-center hover:bg-orange-600 transition-colors"
+              >
+                Save Banner
+              </button>
+            )}
+
+            {flashBanner && !bannerPreview && (
+              <button 
+                onClick={handleDeleteBanner} 
+                className="bg-red-50 text-red-600 text-xs font-black uppercase tracking-widest px-4 py-3 rounded-xl text-center hover:bg-red-100 transition-colors"
+              >
+                Delete Banner
+              </button>
+            )}
+          </div>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-50 overflow-hidden shadow-sm">

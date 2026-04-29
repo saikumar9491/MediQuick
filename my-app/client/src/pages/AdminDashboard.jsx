@@ -26,6 +26,7 @@ import AdminBannerManager from '../components/admin/AdminBannerManager';
 import AddBrandModal from '../components/admin/AddBrandModal';
 import EmailUserModal from '../components/admin/EmailUserModal';
 import AdminSidebar from '../components/admin/AdminSidebar';
+import AdminFlashDealsSection from '../components/admin/AdminFlashDealsSection';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { API_BASE } from '../utils/apiConfig';
@@ -472,6 +473,18 @@ const AdminDashboard = () => {
                         token={token} 
                         API_BASE={API_BASE} 
                         handleDeleteBanner={handleDeleteBanner} 
+                      />
+                    </div>
+                  )}
+
+                  {activeTab === 'flash' && (
+                    <div className="p-1">
+                      <AdminFlashDealsSection 
+                        inventory={inventory} 
+                        setInventory={setInventory} 
+                        banners={banners}
+                        setBanners={setBanners}
+                        token={token} 
                       />
                     </div>
                   )}
