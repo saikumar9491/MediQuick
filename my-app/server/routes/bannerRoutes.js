@@ -28,8 +28,8 @@ router.get('/', async (req, res) => {
 // @route   POST /api/banners
 router.post('/', verifyToken, isAdmin, async (req, res) => {
   try {
-    const { title, image, link } = req.body;
-    const banner = new Banner({ title, image, link });
+    const { title, image, link, desc, bg, category } = req.body;
+    const banner = new Banner({ title, image, link, desc, bg, category });
     const createdBanner = await banner.save();
     res.status(201).json(createdBanner);
   } catch (error) {

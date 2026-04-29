@@ -61,7 +61,10 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
     },
   ];
 
-  const activeBanners = dbBanners.length > 0 ? dbBanners : fallbackBanners;
+  const mainBannersFromDb = dbBanners.filter(b => b.category !== 'flash');
+  const flashBanner = dbBanners.find(b => b.category === 'flash');
+
+  const activeBanners = mainBannersFromDb.length > 0 ? mainBannersFromDb : fallbackBanners;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -368,17 +371,28 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
         {/* DAILY DEALS */}
         <section id="daily-deals" className="w-full px-3 sm:px-4 lg:px-6 py-5 sm:py-8">
           <div className="mx-auto w-full max-w-7xl">
-            <div className="sm:hidden mb-4 overflow-hidden rounded-2xl bg-gradient-to-r from-[#ff6f61] via-[#ff8a65] to-[#ffb74d] p-4 text-white shadow-lg">
-              <p className="text-[10px] font-black uppercase tracking-[0.25em] opacity-90">
-                Daily Deals
-              </p>
-              <h3 className="mt-1 text-xl font-black uppercase italic leading-tight">
-                Flash Sale
-              </h3>
-              <p className="mt-1 text-[11px] font-bold opacity-90">
-                Best offers on top medicines and wellness products
-              </p>
-            </div>
+            {flashBanner && (
+              <div className="mb-4 sm:mb-6 overflow-hidden rounded-2xl sm:rounded-3xl shadow-lg border border-gray-100">
+                <img 
+                  src={flashBanner.image} 
+                  alt={flashBanner.title || "Flash Deals"} 
+                  className="w-full h-[120px] sm:h-[180px] md:h-[240px] lg:h-[280px] object-cover" 
+                />
+              </div>
+            )}
+            {!flashBanner && (
+              <div className="sm:hidden mb-4 overflow-hidden rounded-2xl bg-gradient-to-r from-[#ff6f61] via-[#ff8a65] to-[#ffb74d] p-4 text-white shadow-lg">
+                <p className="text-[10px] font-black uppercase tracking-[0.25em] opacity-90">
+                  Daily Deals
+                </p>
+                <h3 className="mt-1 text-xl font-black uppercase italic leading-tight">
+                  Flash Sale
+                </h3>
+                <p className="mt-1 text-[11px] font-bold opacity-90">
+                  Best offers on top medicines and wellness products
+                </p>
+              </div>
+            )}
 
             <h3 className="hidden sm:block mb-5 sm:mb-6 text-lg sm:text-xl font-black uppercase italic tracking-tighter">
               Daily Flash Deals
