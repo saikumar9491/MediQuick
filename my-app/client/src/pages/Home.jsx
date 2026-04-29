@@ -149,7 +149,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
               className={`relative cursor-pointer h-[120px] sm:h-[180px] md:h-[260px] lg:h-[300px] overflow-hidden rounded-2xl sm:rounded-3xl text-white shadow-xl transition-all duration-700 ${activeBanners[currentBanner].bg || 'bg-slate-800'}`}
             >
               {activeBanners[currentBanner].image && (
-                <img src={activeBanners[currentBanner].image} className="absolute inset-0 h-full w-full object-cover opacity-60" alt="banner" />
+                <img src={activeBanners[currentBanner].image} className="absolute inset-0 h-full w-full object-cover" alt="banner" />
               )}
               <div className="absolute inset-0 z-10 flex flex-col justify-center px-4 sm:px-8 md:px-12">
                 <h1 className="mb-2 max-w-[95%] text-lg sm:text-3xl md:text-5xl font-black uppercase italic tracking-tight leading-tight">
