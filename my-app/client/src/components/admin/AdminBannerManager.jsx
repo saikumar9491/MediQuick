@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import toast from 'react-hot-toast';
-import { Trash2, Edit3, Image as ImageIcon, Upload, Link as LinkIcon, CheckCircle2 } from 'lucide-react';
+import { Trash2, Edit3, Image as ImageIcon, Upload, Link as LinkIcon, CheckCircle } from 'lucide-react';
 
 const THEME_COLORS = [
   'bg-gradient-to-r from-purple-500 to-purple-700',
@@ -156,7 +156,7 @@ const AdminBannerManager = ({ banners, setBanners, token, API_BASE, handleDelete
                     onClick={() => setFormData({ ...formData, bg: color })}
                     className={`h-10 w-10 cursor-pointer rounded-full ${color} shadow-sm transition-transform hover:scale-110 relative flex items-center justify-center`}
                   >
-                    {formData.bg === color && <CheckCircle2 className="h-5 w-5 text-white/90 drop-shadow-md" />}
+                    {formData.bg === color && <CheckCircle className="h-5 w-5 text-white/90 drop-shadow-md" />}
                   </div>
                 ))}
               </div>
