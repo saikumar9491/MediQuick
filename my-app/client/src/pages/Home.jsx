@@ -40,33 +40,11 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
     fetchHomeAssets();
   }, []);
 
-  const fallbackBanners = [
-    {
-      title: '2-Hour Express Delivery',
-      desc: 'Fastest pharmacy delivery in Amritsar.',
-      bg: 'bg-[#2874f0]',
-      image: null
-    },
-    {
-      title: 'Flat 25% Off on Wellness',
-      desc: 'Vitamins and protein supplements at best prices.',
-      bg: 'bg-green-600',
-      image: null
-    },
-    {
-      title: 'Baby Care Bonanza',
-      desc: 'Top brands like Cetaphil & Himalaya available.',
-      bg: 'bg-red-600',
-      image: null
-    },
-  ];
-
-  const mainBannersFromDb = dbBanners.filter(b => b.category !== 'flash');
+  const activeBanners = dbBanners.filter(b => b.category !== 'flash');
   const flashBanner = dbBanners.find(b => b.category === 'flash');
 
-  const activeBanners = mainBannersFromDb.length > 0 ? mainBannersFromDb : fallbackBanners;
-
   useEffect(() => {
+    if (activeBanners.length === 0) return;
     const timer = setInterval(() => {
       setCurrentBanner((prev) => (prev === activeBanners.length - 1 ? 0 : prev + 1));
     }, 5000);
@@ -145,26 +123,46 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
     <div className="w-full min-h-screen overflow-x-hidden bg-white pt-0 sm:pt-1 md:pt-2 font-sans text-[#212121]">
       <div className="w-full">
         {/* BANNERS */}
-        <section className="w-full px-3 sm:px-4 lg:px-6 py-1 sm:py-2">
-          <div className="mx-auto w-full max-w-7xl">
-            <div
-              onClick={() => activeBanners[currentBanner].link && navigate(activeBanners[currentBanner].link)}
-              className={`relative cursor-pointer h-[120px] sm:h-[180px] md:h-[260px] lg:h-[300px] overflow-hidden rounded-2xl sm:rounded-3xl text-white shadow-xl transition-all duration-700 ${activeBanners[currentBanner].bg || 'bg-slate-800'}`}
-            >
-              {activeBanners[currentBanner].image && (
-                <img src={activeBanners[currentBanner].image} className="absolute inset-0 h-full w-full object-cover" alt="banner" />
-              )}
-              <div className="absolute inset-0 z-10 flex flex-col justify-center px-4 sm:px-8 md:px-12">
-                <h1 className="mb-2 max-w-[95%] text-lg sm:text-3xl md:text-5xl font-black uppercase italic tracking-tight leading-tight">
-                  {activeBanners[currentBanner].title}
-                </h1>
-                <p className="max-w-[95%] sm:max-w-md text-[10px] sm:text-base md:text-lg font-bold italic opacity-90 leading-snug">
-                  {activeBanners[currentBanner].desc || activeBanners[currentBanner].title}
-                </p>
+        {activeBanners.length > 0 && (
+          <section className="w-full px-3 sm:px-4 lg:px-6 py-1 sm:py-2 relative">
+            <div className="mx-auto w-full max-w-7xl">
+              <div
+                onClick={() => activeBanners[currentBanner].link && navigate(activeBanners[currentBanner].link)}
+                className={`relative cursor-pointer h-[120px] sm:h-[180px] md:h-[260px] lg:h-[300px] overflow-hidden rounded-2xl sm:rounded-3xl text-white shadow-xl transition-all duration-700 ${activeBanners[currentBanner].bg || 'bg-slate-800'}`}
+              >
+                {activeBanners[currentBanner].image && (
+                  <img src={activeBanners[currentBanner].image} className="absolute inset-0 h-full w-full object-cover" alt="banner" />
+                )}
+                <div className="absolute inset-0 z-10 flex flex-col justify-center px-4 sm:px-8 md:px-12">
+                  <h1 className="mb-2 max-w-[95%] text-lg sm:text-3xl md:text-5xl font-black uppercase italic tracking-tight leading-tight">
+                    {activeBanners[currentBanner].title}
+                  </h1>
+                  <p className="max-w-[95%] sm:max-w-md text-[10px] sm:text-base md:text-lg font-bold italic opacity-90 leading-snug">
+                    {activeBanners[currentBanner].desc || activeBanners[currentBanner].title}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+
+            {/* Slider Dots */}
+            {activeBanners.length > 1 && (
+              <div className="absolute bottom-4 sm:bottom-6 lg:bottom-8 left-1/2 flex -translate-x-1/2 gap-1.5 sm:gap-2 z-20">
+                {activeBanners.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentBanner(idx);
+                    }}
+                    className={`h-1.5 sm:h-2 rounded-full transition-all duration-300 ${
+                      currentBanner === idx ? 'w-4 sm:w-6 bg-white opacity-100' : 'w-1.5 sm:w-2 bg-white opacity-40 hover:opacity-75'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        )}
 
         {/* SERVICES */}
         <section className="w-full px-3 sm:px-4 lg:px-6 pt-2 pb-2 sm:pt-3 sm:pb-3">
