@@ -141,13 +141,13 @@ const AdminDashboard = () => {
   };
 
   const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, staggerChildren: 0.1 } }
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 20, staggerChildren: 0.05 } }
   };
 
   const cardVariants = {
-    hidden: { opacity: 0, scale: 0.95 },
-    visible: { opacity: 1, scale: 1 }
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } }
   };
 
   if (loading) {
@@ -163,7 +163,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc]">
+    <div className="min-h-screen bg-slate-50/50 text-slate-800 font-sans">
       <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <main className="sm:ml-20 transition-all duration-300 min-h-screen p-4 sm:p-8 lg:p-12">
@@ -174,15 +174,15 @@ const AdminDashboard = () => {
           className="mx-auto max-w-7xl"
         >
           {/* Header */}
-          <div className="mb-12 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <motion.h1 
-                className="text-3xl font-black uppercase italic tracking-tighter text-gray-900 sm:text-4xl"
+                className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl"
               >
-                Operational <span className="text-blue-600">Hub</span>
+                Dashboard <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Overview</span>
               </motion.h1>
-              <p className="mt-2 text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">
-                Command & Control Interface v2.0
+              <p className="mt-2 text-sm font-medium text-slate-500">
+                Manage your inventory, users, and platform settings.
               </p>
             </div>
 
@@ -190,47 +190,51 @@ const AdminDashboard = () => {
               {activeTab === 'inventory' && (
                 <Link
                   to="/admin/flash-deals"
-                  className="group relative flex items-center gap-2 overflow-hidden rounded-xl bg-orange-500 px-6 py-4 text-xs font-black uppercase italic tracking-widest text-white transition-all hover:bg-orange-600 active:scale-95 shadow-lg shadow-orange-500/20"
+                  className="group relative flex items-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-orange-500 to-rose-500 px-5 py-3 text-sm font-semibold text-white transition-all hover:shadow-lg hover:shadow-orange-500/25 hover:-translate-y-0.5 active:scale-95"
                 >
                   <Zap className="h-4 w-4" />
                   <span>Flash Deals</span>
                 </Link>
               )}
               <motion.button
-                whileHover={{ scale: 1.02 }}
+                whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => {
                   if (activeTab === 'inventory') handleAddNew();
                   if (activeTab === 'banners') setIsBannerModalOpen(true);
                   if (activeTab === 'brands') setIsBrandModalOpen(true);
                 }}
-                className="flex items-center gap-2 rounded-xl bg-blue-600 px-8 py-4 text-xs font-black uppercase italic tracking-widest text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-700"
+                className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-md shadow-blue-500/20 transition-all hover:shadow-lg hover:shadow-blue-500/30"
               >
                 <Plus className="h-4 w-4" />
-                {activeTab === 'inventory' ? 'Add Unit' : activeTab === 'banners' ? 'Add Banner' : activeTab === 'brands' ? 'Add Brand' : 'Admin Status'}
+                {activeTab === 'inventory' ? 'Add Product' : activeTab === 'banners' ? 'Add Banner' : activeTab === 'brands' ? 'Add Brand' : 'Manage'}
               </motion.button>
             </div>
           </div>
 
           {/* Quick Stats Grid */}
-          <div className="mb-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mb-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { label: 'Inventory', value: inventory.length, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
-              { label: 'Total Users', value: users.length, icon: Users, color: 'text-purple-600', bg: 'bg-purple-50' },
-              { label: 'Active Banners', value: banners.length, icon: ImageIcon, color: 'text-green-600', bg: 'bg-green-50' },
-              { label: 'Market Reach', value: 'Live', icon: Activity, color: 'text-orange-600', bg: 'bg-orange-50' },
+              { label: 'Total Products', value: inventory.length, icon: Package, color: 'text-blue-600', bg: 'bg-blue-50' },
+              { label: 'Registered Users', value: users.length, icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+              { label: 'Active Banners', value: banners.length, icon: ImageIcon, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+              { label: 'System Status', value: 'Online', icon: Activity, color: 'text-teal-600', bg: 'bg-teal-50' },
             ].map((stat, i) => (
               <motion.div
                 key={i}
                 variants={cardVariants}
-                className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:shadow-xl hover:shadow-gray-200/50"
+                className="group relative overflow-hidden rounded-2xl border border-slate-100 bg-white/80 backdrop-blur-xl p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-200/50"
               >
-                <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${stat.bg} ${stat.color} transition-transform group-hover:scale-110`}>
-                  <stat.icon className="h-6 w-6" />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-slate-500">{stat.label}</p>
+                    <p className="mt-2 text-3xl font-bold text-slate-800">{stat.value}</p>
+                  </div>
+                  <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${stat.bg} ${stat.color} transition-transform group-hover:scale-110 group-hover:rotate-3`}>
+                    <stat.icon className="h-7 w-7" />
+                  </div>
                 </div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">{stat.label}</p>
-                <p className="mt-1 text-2xl font-black italic text-gray-900">{stat.value}</p>
-                <div className="absolute -bottom-2 -right-2 text-6xl opacity-[0.03]">
+                <div className="absolute -bottom-4 -right-4 text-8xl opacity-[0.02] text-slate-900 transition-transform group-hover:scale-110">
                   <stat.icon />
                 </div>
               </motion.div>
@@ -241,58 +245,59 @@ const AdminDashboard = () => {
           <AnimatePresence mode="wait">
             <motion.div
               key={activeTab}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-2xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+              className="overflow-hidden rounded-2xl border border-slate-100 bg-white/80 backdrop-blur-xl shadow-lg shadow-slate-200/50"
             >
               <div className="overflow-x-auto custom-scrollbar">
                 {activeTab === 'inventory' && (
                   <table className="w-full text-left">
-                    <thead className="bg-gray-50/50 border-b border-gray-100">
+                    <thead className="bg-slate-50/50 border-b border-slate-100">
                       <tr>
-                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Inventory Unit</th>
-                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Classification</th>
-                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Status</th>
-                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Valuation</th>
-                        <th className="p-6 text-center text-[10px] font-black uppercase tracking-widest text-gray-400">Operations</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Product Info</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Price</th>
+                        <th className="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-slate-100 bg-white/50">
                       {inventory.map((med) => (
-                        <tr key={med._id} className="group hover:bg-gray-50/50 transition-colors">
-                          <td className="p-6">
+                        <tr key={med._id} className="group hover:bg-slate-50 transition-colors">
+                          <td className="p-4 sm:px-6">
                             <div className="flex items-center gap-4">
-                              <div className="h-14 w-14 rounded-xl border border-gray-100 bg-white p-2 shadow-sm">
+                              <div className="h-12 w-12 rounded-xl border border-slate-100 bg-white p-2 shadow-sm">
                                 <img src={med.image} alt="" className="h-full w-full object-contain" />
                               </div>
                               <div>
-                                <span className="block text-sm font-black uppercase italic text-gray-900">{med.name}</span>
-                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{med.brand}</span>
+                                <span className="block text-sm font-semibold text-slate-800">{med.name}</span>
+                                <span className="text-xs font-medium text-slate-500">{med.brand}</span>
                               </div>
                             </div>
                           </td>
-                          <td className="p-6">
-                            <span className="inline-flex items-center rounded-lg bg-gray-100 px-3 py-1 text-[10px] font-black uppercase text-gray-600">
+                          <td className="p-4 sm:px-6">
+                            <span className="inline-flex items-center rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
                               {med.category}
                             </span>
                           </td>
-                          <td className="p-6">
+                          <td className="p-4 sm:px-6">
                             {med.isFlashDeal ? (
-                              <span className="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-3 py-1 text-[10px] font-black uppercase text-blue-600">
-                                <Zap className="h-3 w-3" /> Deal
+                              <span className="inline-flex items-center gap-1 rounded-lg bg-orange-50 px-2.5 py-1 text-xs font-medium text-orange-600 border border-orange-100">
+                                <Zap className="h-3 w-3" /> Flash Deal
                               </span>
                             ) : (
-                              <span className="text-[10px] font-black uppercase text-gray-300 tracking-widest">Normal</span>
+                              <span className="inline-flex items-center rounded-lg bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-500 border border-slate-100">Standard</span>
                             )}
                           </td>
-                          <td className="p-6">
-                            <span className="text-sm font-black text-blue-600">₹{med.price}</span>
+                          <td className="p-4 sm:px-6">
+                            <span className="text-sm font-bold text-slate-800">₹{med.price}</span>
                           </td>
-                          <td className="p-6">
-                            <div className="flex justify-center gap-4">
-                              <button onClick={() => handleEdit(med)} className="rounded-lg p-2 text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-all"><Edit3 className="h-4 w-4" /></button>
-                              <button onClick={() => handleDelete(med._id)} className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all"><Trash2 className="h-4 w-4" /></button>
+                          <td className="p-4 sm:px-6">
+                            <div className="flex justify-center gap-3">
+                              <button onClick={() => handleEdit(med)} className="rounded-lg p-2 text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-all"><Edit3 className="h-4 w-4" /></button>
+                              <button onClick={() => handleDelete(med._id)} className="rounded-lg p-2 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"><Trash2 className="h-4 w-4" /></button>
                             </div>
                           </td>
                         </tr>
@@ -303,50 +308,50 @@ const AdminDashboard = () => {
 
                 {activeTab === 'users' && (
                   <table className="w-full text-left">
-                    <thead className="bg-gray-50/50 border-b border-gray-100">
+                    <thead className="bg-slate-50/50 border-b border-slate-100">
                       <tr>
-                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Personnel Profile</th>
-                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Communication</th>
-                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Security Clearance</th>
-                        <th className="p-6 text-center text-[10px] font-black uppercase tracking-widest text-gray-400">Protocols</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">User Profile</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Contact Details</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                        <th className="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-slate-100 bg-white/50">
                       {users.map((u) => (
-                        <tr key={u._id} className="group hover:bg-gray-50/50 transition-colors">
-                          <td className="p-6">
+                        <tr key={u._id} className="group hover:bg-slate-50 transition-colors">
+                          <td className="p-4 sm:px-6">
                             <div className="flex items-center gap-4">
-                              <div className="h-10 w-10 flex items-center justify-center rounded-full bg-gray-100 text-gray-400 font-black">
+                              <div className="h-10 w-10 flex items-center justify-center rounded-full bg-indigo-50 text-indigo-600 font-bold border border-indigo-100">
                                 {u.name[0]}
                               </div>
                               <div>
-                                <span className="block text-sm font-black uppercase italic text-gray-900">{u.name}</span>
-                                <span className="text-[10px] font-bold text-gray-400 uppercase">Sector {u._id.slice(-4)}</span>
+                                <span className="block text-sm font-semibold text-slate-800">{u.name}</span>
+                                <span className="text-xs font-medium text-slate-500">ID: {u._id.slice(-6)}</span>
                               </div>
                             </div>
                           </td>
-                          <td className="p-6">
-                            <span className="block text-xs font-bold text-gray-600">{u.email}</span>
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{u.phone}</span>
+                          <td className="p-4 sm:px-6">
+                            <span className="block text-sm font-medium text-slate-700">{u.email}</span>
+                            <span className="text-xs text-slate-500">{u.phone}</span>
                           </td>
-                          <td className="p-6">
+                          <td className="p-4 sm:px-6">
                             {u.isAdmin ? (
-                              <span className="rounded-lg bg-purple-50 px-3 py-1 text-[10px] font-black uppercase text-purple-600">Master Level</span>
+                              <span className="inline-flex rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-600 border border-indigo-100">Admin</span>
                             ) : u.isBlocked ? (
-                              <span className="rounded-lg bg-red-600 px-3 py-1 text-[10px] font-black uppercase text-white shadow-lg shadow-red-500/20">Access Revoked</span>
+                              <span className="inline-flex rounded-lg bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600 border border-red-100">Blocked</span>
                             ) : (
-                              <span className="rounded-lg bg-green-50 px-3 py-1 text-[10px] font-black uppercase text-green-600">Verified</span>
+                              <span className="inline-flex rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-600 border border-emerald-100">Active</span>
                             )}
                           </td>
-                          <td className="p-6">
-                            <div className="flex justify-center gap-4">
-                              <button onClick={() => { setSelectedUser(u); setIsEmailModalOpen(true); }} className="rounded-lg p-2 text-gray-400 hover:bg-blue-50 hover:text-blue-600"><Mail className="h-4 w-4" /></button>
+                          <td className="p-4 sm:px-6">
+                            <div className="flex justify-center gap-3">
+                              <button onClick={() => { setSelectedUser(u); setIsEmailModalOpen(true); }} className="rounded-lg p-2 text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-all"><Mail className="h-4 w-4" /></button>
                               {!u.isAdmin && (
                                 <>
-                                  <button onClick={() => handleBlockUser(u._id)} className={`rounded-lg p-2 transition-all ${u.isBlocked ? 'text-green-600 hover:bg-green-50' : 'text-orange-500 hover:bg-orange-50'}`}>
+                                  <button onClick={() => handleBlockUser(u._id)} className={`rounded-lg p-2 transition-all ${u.isBlocked ? 'text-emerald-600 hover:bg-emerald-50' : 'text-orange-500 hover:bg-orange-50'}`}>
                                     <ShieldAlert className="h-4 w-4" />
                                   </button>
-                                  <button onClick={() => handleDeleteUser(u._id)} className="rounded-lg p-2 text-gray-400 hover:bg-red-50 hover:text-red-500"><Trash2 className="h-4 w-4" /></button>
+                                  <button onClick={() => handleDeleteUser(u._id)} className="rounded-lg p-2 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-all"><Trash2 className="h-4 w-4" /></button>
                                 </>
                               )}
                             </div>
@@ -359,30 +364,30 @@ const AdminDashboard = () => {
 
                 {activeTab === 'banners' && (
                   <table className="w-full text-left">
-                    <thead className="bg-gray-50/50 border-b border-gray-100">
+                    <thead className="bg-slate-50/50 border-b border-slate-100">
                       <tr>
-                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Visual Payload</th>
-                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Deployment Logic</th>
-                        <th className="p-6 text-center text-[10px] font-black uppercase tracking-widest text-gray-400">Actions</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Visual Payload</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Deployment Logic</th>
+                        <th className="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-slate-100 bg-white/50">
                       {banners.map((b) => (
-                        <tr key={b._id}>
-                          <td className="p-6">
-                            <div className="relative group/img overflow-hidden rounded-2xl border border-gray-100 shadow-sm h-24 w-64 bg-gray-50">
-                              <img src={b.image} className="h-full w-full object-cover transition-transform group-hover/img:scale-110" alt="" />
-                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                        <tr key={b._id} className="group hover:bg-slate-50 transition-colors">
+                          <td className="p-4 sm:px-6">
+                            <div className="relative group/img overflow-hidden rounded-xl border border-slate-100 shadow-sm h-24 w-64 bg-slate-50">
+                              <img src={b.image} className="h-full w-full object-cover transition-transform duration-500 group-hover/img:scale-105" alt="" />
+                              <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
                                 <ExternalLink className="text-white h-6 w-6" />
                               </div>
                             </div>
                           </td>
-                          <td className="p-6">
-                            <span className="block text-xs font-black uppercase italic text-gray-900">{b.title}</span>
-                            <span className="text-[10px] font-bold text-blue-500 underline truncate block max-w-xs">{b.link}</span>
+                          <td className="p-4 sm:px-6">
+                            <span className="block text-sm font-semibold text-slate-800">{b.title}</span>
+                            <span className="text-xs font-medium text-blue-500 hover:underline truncate block max-w-xs">{b.link}</span>
                           </td>
-                          <td className="p-6 text-center">
-                            <button onClick={() => handleDeleteBanner(b._id)} className="rounded-xl bg-red-50 px-4 py-2 text-[10px] font-black uppercase text-red-500 transition-all hover:bg-red-500 hover:text-white">Decommission</button>
+                          <td className="p-4 sm:px-6 text-center">
+                            <button onClick={() => handleDeleteBanner(b._id)} className="rounded-lg bg-red-50 px-4 py-2 text-xs font-semibold text-red-600 transition-all hover:bg-red-500 hover:text-white shadow-sm">Delete</button>
                           </td>
                         </tr>
                       ))}
@@ -392,24 +397,24 @@ const AdminDashboard = () => {
 
                 {activeTab === 'brands' && (
                   <table className="w-full text-left">
-                    <thead className="bg-gray-50/50 border-b border-gray-100">
+                    <thead className="bg-slate-50/50 border-b border-slate-100">
                       <tr>
-                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Brand Identity</th>
-                        <th className="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Name</th>
-                        <th className="p-6 text-center text-[10px] font-black uppercase tracking-widest text-gray-400">Actions</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Brand Logo</th>
+                        <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>
+                        <th className="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-slate-100 bg-white/50">
                       {brands.map((brand) => (
-                        <tr key={brand._id}>
-                          <td className="p-6">
-                            <div className="h-16 w-16 flex items-center justify-center rounded-xl border border-gray-100 bg-white p-2 shadow-sm">
+                        <tr key={brand._id} className="group hover:bg-slate-50 transition-colors">
+                          <td className="p-4 sm:px-6">
+                            <div className="h-16 w-16 flex items-center justify-center rounded-xl border border-slate-100 bg-white p-2 shadow-sm">
                               <img src={brand.image} className="h-full w-full object-contain" alt="" />
                             </div>
                           </td>
-                          <td className="p-6 text-xs font-black uppercase italic text-gray-900 tracking-tight">{brand.name}</td>
-                          <td className="p-6 text-center">
-                            <button onClick={() => handleDeleteBrand(brand._id)} className="text-[10px] font-black uppercase text-red-400 hover:text-red-600 hover:underline">Remove Associate</button>
+                          <td className="p-4 sm:px-6 text-sm font-semibold text-slate-800">{brand.name}</td>
+                          <td className="p-4 sm:px-6 text-center">
+                            <button onClick={() => handleDeleteBrand(brand._id)} className="text-sm font-medium text-red-500 hover:text-red-700 hover:underline transition-colors">Remove</button>
                           </td>
                         </tr>
                       ))}
