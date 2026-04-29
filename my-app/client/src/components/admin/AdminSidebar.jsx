@@ -15,6 +15,7 @@ import {
 
 const AdminSidebar = ({ activeTab, setActiveTab }) => {
   const menuItems = [
+    { id: 'overview', label: 'Overview', icon: LayoutDashboard, color: 'text-slate-500' },
     { id: 'products', label: 'Products', icon: Package, color: 'text-blue-500' },
     { id: 'users', label: 'User Base', icon: Users, color: 'text-purple-500' },
     { id: 'banners', label: 'Banners', icon: ImageIcon, color: 'text-green-500' },
