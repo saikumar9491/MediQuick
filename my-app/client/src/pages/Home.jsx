@@ -146,23 +146,18 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
           <div className="mx-auto w-full max-w-7xl">
             <div
               onClick={() => activeBanners[currentBanner].link && navigate(activeBanners[currentBanner].link)}
-              className={`group flex relative cursor-pointer h-[140px] sm:h-[200px] md:h-[280px] lg:h-[320px] w-full overflow-hidden rounded-[30px] sm:rounded-[50px] lg:rounded-[80px] shadow-xl transition-all duration-700 ${activeBanners[currentBanner].bg || 'bg-gradient-to-r from-purple-500 to-purple-700'}`}
+              className={`relative cursor-pointer h-[120px] sm:h-[180px] md:h-[260px] lg:h-[300px] overflow-hidden rounded-2xl sm:rounded-3xl text-white shadow-xl transition-all duration-700 ${activeBanners[currentBanner].bg || 'bg-slate-800'}`}
             >
-              {/* Left side text content */}
-              <div className="flex w-2/3 flex-col justify-center pl-6 pr-2 sm:pl-12 sm:pr-8 md:pl-16 lg:pl-24 z-10">
-                <h1 className="text-xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight drop-shadow-md">
+              {activeBanners[currentBanner].image && (
+                <img src={activeBanners[currentBanner].image} className="absolute inset-0 h-full w-full object-cover opacity-60" alt="banner" />
+              )}
+              <div className="absolute inset-0 z-10 flex flex-col justify-center px-4 sm:px-8 md:px-12">
+                <h1 className="mb-2 max-w-[95%] text-lg sm:text-3xl md:text-5xl font-black uppercase italic tracking-tight leading-tight">
                   {activeBanners[currentBanner].title}
                 </h1>
-                <p className="mt-1 sm:mt-3 text-[9px] sm:text-xs md:text-sm lg:text-base font-bold uppercase tracking-widest text-white/90">
+                <p className="max-w-[95%] sm:max-w-md text-[10px] sm:text-base md:text-lg font-bold italic opacity-90 leading-snug">
                   {activeBanners[currentBanner].desc || activeBanners[currentBanner].title}
                 </p>
-              </div>
-              
-              {/* Right side image */}
-              <div className="relative w-1/3 h-full overflow-hidden border-l-[3px] sm:border-l-[6px] border-white/20 shadow-[-10px_0_30px_rgba(0,0,0,0.15)]">
-                {activeBanners[currentBanner].image && (
-                  <img src={activeBanners[currentBanner].image} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" alt="banner" />
-                )}
               </div>
             </div>
           </div>
