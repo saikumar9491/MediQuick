@@ -182,7 +182,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] text-slate-800 font-sans">
+    <div className="min-h-screen bg-[#f8f9fa] text-slate-800 font-sans pt-16 sm:pt-20">
       <main className="min-h-screen p-4 sm:p-6 lg:p-8">
         <motion.div 
           initial="hidden"

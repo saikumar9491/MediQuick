@@ -232,7 +232,18 @@ const AdminFlashDealsSection = ({ inventory, setInventory, banners = [], setBann
                 <tr>
                   <td colSpan="4" className="p-12 text-center">
                     <Zap className="mx-auto h-12 w-12 text-gray-200" />
-                    <p className="text-xs font-black uppercase tracking-widest text-gray-400 mt-2">No Active Flash Deals</p>
+                    <p className="text-xs font-black uppercase tracking-widest text-gray-400 mt-2 mb-4">No Active Flash Deals</p>
+                    <button
+                      onClick={() => {
+                        setSelectedMedicine(null);
+                        setDiscountPrice('');
+                        setSearchQuery('');
+                        setShowAddModal(true);
+                      }}
+                      className="inline-flex items-center gap-2 rounded-xl bg-orange-500 px-6 py-3 text-xs font-black uppercase tracking-widest text-white shadow-lg transition-all hover:bg-orange-600"
+                    >
+                      <Plus className="h-4 w-4" /> Add Products to Flash Deals
+                    </button>
                   </td>
                 </tr>
               )}
