@@ -61,7 +61,7 @@ const AdminFlashDeals = () => {
 
       if (!res.ok) throw new Error('Failed to update flash deal');
       toast.success(isFlashDeal ? 'Flash Deal added!' : 'Flash Deal removed!');
-      fetchMedicines();
+      fetchMedicinesAndBanners();
       setShowAddModal(false);
       setSelectedMedicine(null);
       setDiscountPrice('');
@@ -261,13 +261,13 @@ const AdminFlashDeals = () => {
                         </button>
                         <button
                           onClick={() => {
-                            if (window.confirm(`Remove ${deal.name} from Flash Deals?`)) {
+                            if (window.confirm(`Delete ${deal.name} from Flash Deals?`)) {
                               handleToggleFlashDeal(deal._id, false, null);
                             }
                           }}
                           className="rounded-lg bg-red-50 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-red-600 transition-colors hover:bg-red-100"
                         >
-                          Remove
+                          Delete
                         </button>
                       </div>
                     </td>

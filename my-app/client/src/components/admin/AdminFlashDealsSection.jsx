@@ -216,13 +216,13 @@ const AdminFlashDealsSection = ({ inventory, setInventory, banners = [], setBann
                       </button>
                       <button
                         onClick={() => {
-                          if (window.confirm(`Remove ${deal.name} from Flash Deals?`)) {
+                          if (window.confirm(`Delete ${deal.name} from Flash Deals?`)) {
                             handleToggleFlashDeal(deal._id, false, null);
                           }
                         }}
                         className="rounded-lg bg-red-50 px-3 py-1.5 text-[10px] font-black uppercase text-red-600 hover:bg-red-100 transition-colors"
                       >
-                        Remove
+                        Delete
                       </button>
                     </div>
                   </td>
