@@ -252,6 +252,65 @@ const AdminFlashDealsSection = ({ inventory, setInventory, banners = [], setBann
         </div>
       </div>
 
+      {/* Available Products Section */}
+      <div className="mt-8 bg-white rounded-2xl border border-gray-50 overflow-hidden shadow-sm">
+        <div className="p-4 bg-gray-50/50 border-b border-gray-100 flex justify-between items-center">
+          <h3 className="text-sm font-black uppercase tracking-widest text-slate-700">Available Products</h3>
+          <div className="relative w-64">
+            <input
+              type="text"
+              placeholder="Search products..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full p-2 pl-8 border border-gray-200 rounded-lg text-xs font-bold outline-none focus:border-blue-500"
+            />
+            <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-gray-400" />
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="bg-gray-50 border-b border-gray-100">
+              <tr>
+                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Product</th>
+                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400">Base Price</th>
+                <th className="p-4 text-[10px] font-black uppercase tracking-widest text-gray-400 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {availableForFlash.map((med) => (
+                <tr key={med._id} className="transition-colors hover:bg-slate-50/50">
+                  <td className="p-4">
+                    <div className="flex items-center gap-3">
+                      <img src={med.image} alt={med.name} className="h-10 w-10 rounded-xl object-contain bg-white border border-gray-100 shadow-sm" />
+                      <div>
+                        <p className="text-sm font-black text-slate-800 line-clamp-1">{med.name}</p>
+                        <span className="text-[9px] font-bold uppercase text-gray-400">{med.brand}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="p-4 text-sm font-bold text-slate-700">₹{med.price}</td>
+                  <td className="p-4 text-center">
+                    <button
+                      onClick={() => openEditModal(med)}
+                      className="rounded-lg bg-orange-50 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-orange-600 transition-all hover:bg-orange-500 hover:text-white"
+                    >
+                      Make Flash Deal
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {availableForFlash.length === 0 && (
+                <tr>
+                  <td colSpan="3" className="p-8 text-center text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    No available products found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm animate-fadeIn">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
