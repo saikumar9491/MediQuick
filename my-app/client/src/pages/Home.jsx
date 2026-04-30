@@ -416,44 +416,52 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
                 </div>
               </>
             ) : (
-              <>
-                <div className="sm:hidden rounded-2xl bg-[#fff7f5] p-3 shadow-sm border border-[#ffe1dc]">
-                  <div className="grid grid-cols-4 gap-2">
-                    {featured.slice(0, 8).map((med) => (
-                      <div
-                        key={med._id}
-                        onClick={() => navigate(`/product/${med._id}`)}
-                        className="cursor-pointer rounded-xl bg-white p-2 shadow-sm border border-gray-100 active:scale-[0.98] transition"
-                      >
-                        <div className="aspect-square w-full overflow-hidden rounded-lg bg-gray-50 flex items-center justify-center p-1.5">
-                          <img
-                            src={
-                              med.image ||
-                              `https://placehold.co/300x300/f3f4f6/3b82f6?text=${med.name || 'Medicine'}`
-                            }
-                            alt={med.name}
-                            className="h-full w-full object-contain"
-                          />
-                        </div>
-                        <p className="mt-1 text-[8px] font-bold leading-tight text-center text-gray-700 line-clamp-2 min-h-[22px]">
-                          {med.name}
-                        </p>
+                {featured.length === 0 ? (
+                  <div className="w-full rounded-2xl bg-gray-50 border border-gray-100 p-8 text-center">
+                    <p className="text-sm font-black uppercase tracking-widest text-gray-400">Stay Tuned!</p>
+                    <p className="mt-2 text-xs font-bold text-gray-500">More exciting flash deals are coming soon.</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="sm:hidden rounded-2xl bg-[#fff7f5] p-3 shadow-sm border border-[#ffe1dc]">
+                      <div className="grid grid-cols-4 gap-2">
+                        {featured.slice(0, 8).map((med) => (
+                          <div
+                            key={med._id}
+                            onClick={() => navigate(`/product/${med._id}`)}
+                            className="cursor-pointer rounded-xl bg-white p-2 shadow-sm border border-gray-100 active:scale-[0.98] transition"
+                          >
+                            <div className="aspect-square w-full overflow-hidden rounded-lg bg-gray-50 flex items-center justify-center p-1.5">
+                              <img
+                                src={
+                                  med.image ||
+                                  `https://placehold.co/300x300/f3f4f6/3b82f6?text=${med.name || 'Medicine'}`
+                                }
+                                alt={med.name}
+                                className="h-full w-full object-contain"
+                              />
+                            </div>
+                            <p className="mt-1 text-[8px] font-bold leading-tight text-center text-gray-700 line-clamp-2 min-h-[22px]">
+                              {med.name}
+                            </p>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="hidden sm:block">
-                  <div className="overflow-x-auto no-scrollbar pb-2">
-                    <div className="flex gap-4 w-max">
-                      {featured.map((med) => (
-                        <div key={med._id} className="w-[220px] md:w-[240px] lg:w-[260px] shrink-0">
-                          <MedicineCard {...med} />
-                        </div>
-                      ))}
                     </div>
-                  </div>
-                </div>
+
+                    <div className="hidden sm:block">
+                      <div className="overflow-x-auto no-scrollbar pb-2">
+                        <div className="flex gap-4 w-max">
+                          {featured.map((med) => (
+                            <div key={med._id} className="w-[220px] md:w-[240px] lg:w-[260px] shrink-0">
+                              <MedicineCard {...med} />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </>
             )}
           </div>

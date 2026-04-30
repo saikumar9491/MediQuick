@@ -46,31 +46,11 @@ export const getRelatedMedicines = async (req, res) => {
 // @route   GET /api/medicines/top
 export const getTopMedicines = async (req, res) => {
   try {
-    // 1. Fetch Explicit Flash Deals first
+    // 1. Fetch Explicit Flash Deals only
     let flashDeals = await Medicine.find({ isFlashDeal: true })
-      .sort({ createdAt: -1 })
-      .limit(8);
+      .sort({ createdAt: -1 });
 
-    // 2. If fewer than 8 flash deals, supplement with top-rated medicines
-    let supplementaryMedicines = [];
-    if (flashDeals.length < 8) {
-      supplementaryMedicines = await Medicine.find({ 
-        isFlashDeal: false, 
-        rating: { $gte: 4 } 
-      })
-        .sort({ rating: -1, createdAt: -1 })
-        .limit(8 - flashDeals.length);
-    }
-
-    // 3. Final Fallback: Latest medicines if still empty
-    let finalMedicines = [...flashDeals, ...supplementaryMedicines];
-    if (finalMedicines.length === 0) {
-      finalMedicines = await Medicine.find({})
-        .sort({ createdAt: -1 })
-        .limit(8);
-    }
-
-    res.status(200).json(finalMedicines || []);
+    res.status(200).json(flashDeals || []);
   } catch (error) {
     console.error('getTopMedicines error:', error);
     res.status(200).json([]);
