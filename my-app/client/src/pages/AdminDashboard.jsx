@@ -49,29 +49,32 @@ const AdminDashboard = () => {
 
   const { user, token } = useAuth();
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [invRes, userRes, bannerRes, brandRes] = await Promise.all([
-        fetch(`${API_BASE}/api/medicines`),
-        fetch(`${API_BASE}/api/users`, { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(`${API_BASE}/api/banners`),
-        fetch(`${API_BASE}/api/brands`)
-      ]);
+  const fetchData = useCallback(() => {
+    // We remove the global loading block to make the page render instantly.
+    // Each fetch updates its own state asynchronously.
 
-      const [invData, userData, bannerData, brandData] = await Promise.all([
-        invRes.json(), userRes.json(), bannerRes.json(), brandRes.json()
-      ]);
+    fetch(`${API_BASE}/api/medicines`)
+      .then(res => res.json())
+      .then(data => setInventory(Array.isArray(data) ? data : []))
+      .catch(err => console.error('Failed to fetch medicines', err));
 
-      setInventory(Array.isArray(invData) ? invData : []);
-      setUsers(Array.isArray(userData) ? userData : []);
-      setBanners(Array.isArray(bannerData) ? bannerData : []);
-      setBrands(Array.isArray(brandData) ? brandData : []);
-    } catch (err) {
-      toast.error('Hub sync failed');
-    } finally {
-      setLoading(false);
-    }
+    fetch(`${API_BASE}/api/users`, { headers: { Authorization: `Bearer ${token}` } })
+      .then(res => res.json())
+      .then(data => setUsers(Array.isArray(data) ? data : []))
+      .catch(err => console.error('Failed to fetch users', err));
+
+    fetch(`${API_BASE}/api/banners`)
+      .then(res => res.json())
+      .then(data => setBanners(Array.isArray(data) ? data : []))
+      .catch(err => console.error('Failed to fetch banners', err));
+
+    fetch(`${API_BASE}/api/brands`)
+      .then(res => res.json())
+      .then(data => setBrands(Array.isArray(data) ? data : []))
+      .catch(err => console.error('Failed to fetch brands', err));
+
+    // Disable the initial global loading overlay so UI is snappy
+    setLoading(false);
   }, [API_BASE, token]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
