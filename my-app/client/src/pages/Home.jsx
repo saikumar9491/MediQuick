@@ -416,6 +416,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
                 </div>
               </>
             ) : (
+              <>
                 {featured.length === 0 ? (
                   <div className="w-full rounded-2xl bg-gray-50 border border-gray-100 p-8 text-center">
                     <p className="text-sm font-black uppercase tracking-widest text-gray-400">Stay Tuned!</p>
