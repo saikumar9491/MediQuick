@@ -61,8 +61,9 @@ const Navbar = () => {
         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
         const data = await res.json();
         
-        // Extract city, town, or village
-        const city = data.address.city || data.address.town || data.address.village || data.address.suburb || "Current Location";
+        // Enhanced extraction for maximum specificity
+        const addr = data.address;
+        const city = addr.city || addr.town || addr.village || addr.hamlet || addr.suburb || addr.neighbourhood || addr.state_district || addr.city_district || addr.county || "Current Location";
         setLocationName(city);
       } catch (error) {
         console.error("Error detecting location:", error);
