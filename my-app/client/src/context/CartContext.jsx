@@ -6,77 +6,78 @@ const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const { user, token } = useAuth();
-  const [cart, setCart] = useState([]);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [saveStatus, setSaveStatus] = useState('idle'); // idle | saving | saved
+  
+  // 🚀 INITIALIZE FROM LOCAL STORAGE FOR INSTANT UI
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem('mediQuickCart');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
 
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [saveStatus, setSaveStatus] = useState('idle');
   const blockSave = useRef(true);
 
-  // --- HUB SYNC: Fetch Cart on Login ---
+  // 📦 PERSIST TO LOCAL STORAGE ON EVERY CHANGE
   useEffect(() => {
-    const fetchUserData = async () => {
-      if (!user?._id || !token) {
-        setCart([]);
-        setIsLoaded(false);
-        blockSave.current = true;
+    localStorage.setItem('mediQuickCart', JSON.stringify(cart));
+  }, [cart]);
+
+  // 🛰️ SYNC WITH BACKEND ON MOUNT / AUTH CHANGE
+  useEffect(() => {
+    const syncWithBackend = async () => {
+      if (!user || !token) {
+        setIsLoaded(true);
+        blockSave.current = false;
         return;
       }
 
       try {
         const res = await fetch(`${API_BASE}/api/users/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
 
-        const contentType = res.headers.get('content-type');
-
-        if (res.ok && contentType && contentType.includes('application/json')) {
+        if (res.ok) {
           const data = await res.json();
-
           if (data?.cart) {
-            // Reconstruct cart items with product details from the populated productId
-            const formattedCart = data.cart
-              .filter((item) => item.productId)
-              .map((item) => ({
+            // Reconstruct the flat cart structure used in the frontend
+            const backendCart = data.cart
+              .filter(item => item.productId)
+              .map(item => ({
                 ...item.productId,
-                quantity: item.quantity,
+                quantity: item.quantity
               }));
 
-            setCart(formattedCart);
-          } else {
-            setCart([]);
+            // Only overwrite if backend has items or if local is empty
+            // This prevents race conditions on slow reloads
+            if (backendCart.length > 0 || cart.length === 0) {
+              setCart(backendCart);
+            }
           }
-        } else {
-          setCart([]);
         }
       } catch (err) {
-        console.error('Cart Sync error:', err);
-        setCart([]);
+        console.error('Cart Backend Sync Failed:', err);
       } finally {
-        // Allow saving once the initial hub data is loaded
-        // Using a micro-task delay to ensure state updates finish
+        setIsLoaded(true);
+        // Delay allowing auto-save to ensure state updates are flushed
         setTimeout(() => {
           blockSave.current = false;
-          setIsLoaded(true);
-        }, 0);
+        }, 1000);
       }
     };
 
-    fetchUserData();
+    syncWithBackend();
   }, [user?._id, token]);
 
-  // --- AUTO-SAVE: Sync Local State to MongoDB ---
+  // 💾 AUTO-SAVE TO BACKEND
   useEffect(() => {
-    // blockSave prevents overwriting DB with an empty array during initial load
-    if (blockSave.current || !user?._id || !token || !isLoaded) return;
+    // PREVENT: Saving while loading, or if no user, or if explicitly blocked
+    if (blockSave.current || !user || !token || !isLoaded) return;
 
-    const syncCartWithDB = async () => {
+    const autoSave = async () => {
       setSaveStatus('saving');
-
-      const dbItems = cart.map((item) => ({
+      const dbPayload = cart.map(item => ({
         productId: item._id,
-        quantity: item.quantity,
+        quantity: item.quantity
       }));
 
       try {
@@ -86,40 +87,31 @@ export const CartProvider = ({ children }) => {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ cart: dbItems }),
+          body: JSON.stringify({ cart: dbPayload }),
         });
 
         if (res.ok) {
           setSaveStatus('saved');
           setTimeout(() => setSaveStatus('idle'), 2000);
-        } else {
-          console.error(`Hub Sync Error: ${res.status}`);
-          setSaveStatus('idle');
         }
       } catch (err) {
-        console.error('Failed to auto-save cart:', err);
-        setSaveStatus('idle');
+        console.error('Auto-save failed:', err);
       }
     };
 
-    // Debounce: Wait 800ms after the last change before hitting the API
-    const timeoutId = setTimeout(syncCartWithDB, 800);
-    return () => clearTimeout(timeoutId);
+    const debounce = setTimeout(autoSave, 1000);
+    return () => clearTimeout(debounce);
   }, [cart, user?._id, token, isLoaded]);
 
   // --- ACTIONS ---
-
   const addToCart = (product) => {
-    if (!user) return; // Note: MedicineDetails should handle the alert/redirect
-    blockSave.current = false;
-
-    setCart((prev) => {
-      const exists = prev.find((item) => item._id === product._id);
+    if (!user) return;
+    blockSave.current = false; // Enable saving for this user action
+    setCart(prev => {
+      const exists = prev.find(item => item._id === product._id);
       if (exists) {
-        return prev.map((item) =>
-          item._id === product._id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+        return prev.map(item => 
+          item._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
       return [...prev, { ...product, quantity: 1 }];
@@ -128,49 +120,34 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = (productId) => {
     blockSave.current = false;
-    setCart((prev) => prev.filter((item) => item._id !== productId));
+    setCart(prev => prev.filter(item => item._id !== productId));
   };
 
-  const updateQuantity = (productId, newQuantity) => {
-    if (newQuantity < 1) return;
+  const updateQuantity = (productId, newQty) => {
+    if (newQty < 1) return;
     blockSave.current = false;
-
-    setCart((prev) =>
-      prev.map((item) =>
-        item._id === productId
-          ? { ...item, quantity: newQuantity }
-          : item
-      )
-    );
+    setCart(prev => prev.map(item => 
+      item._id === productId ? { ...item, quantity: newQty } : item
+    ));
   };
 
-  /**
-   * PROTOCOL: CLEAR HUB INVENTORY
-   * Used after successful checkout. 
-   * blockSave.current = false ensures the empty array is pushed to the DB.
-   */
   const clearCart = () => {
-    blockSave.current = false; 
+    blockSave.current = false;
     setCart([]);
   };
 
-  const getCartTotal = () => {
-    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
-  };
+  const getCartTotal = () => cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
 
   return (
-    <CartContext.Provider
-      value={{
-        cartItems: cart,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        clearCart,
-        getCartTotal,
-        setCart,
-        saveStatus,
-      }}
-    >
+    <CartContext.Provider value={{ 
+      cartItems: cart, 
+      addToCart, 
+      removeFromCart, 
+      updateQuantity, 
+      clearCart, 
+      getCartTotal, 
+      saveStatus 
+    }}>
       {children}
     </CartContext.Provider>
   );
