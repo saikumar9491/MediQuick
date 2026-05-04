@@ -14,7 +14,8 @@ import {
   AlertCircle,
   Plus,
   Minus,
-  ChevronRight
+  ChevronRight,
+  ArrowRight
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
