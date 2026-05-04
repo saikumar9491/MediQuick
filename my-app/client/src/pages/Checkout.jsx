@@ -46,7 +46,9 @@ const Checkout = () => {
     area: '',
     landmark: '',
     city: 'Amritsar',
+    district: '',
     state: 'Punjab',
+    country: 'India',
     type: 'Home',
   });
 
@@ -70,14 +72,40 @@ const Checkout = () => {
     setIsLocating(true);
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setAddressData((prev) => ({
-            ...prev,
-            pincode: '143001',
-            area: `GPS: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`,
-          }));
-          setIsLocating(false);
-          toast.success("Location locked successfully");
+        async (pos) => {
+          try {
+            const { latitude, longitude } = pos.coords;
+            // Reverse Geocoding using OpenStreetMap (Free)
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`
+            );
+            const data = await response.json();
+            
+            if (data.address) {
+              const addr = data.address;
+              const village = addr.village || addr.suburb || addr.neighbourhood || addr.road || '';
+              const district = addr.city_district || addr.county || addr.state_district || '';
+              const city = addr.city || addr.town || addr.village || 'Amritsar';
+              
+              setAddressData((prev) => ({
+                ...prev,
+                area: village,
+                city: city,
+                district: district,
+                state: addr.state || 'Punjab',
+                country: addr.country || 'India',
+                pincode: addr.postcode || prev.pincode,
+              }));
+              toast.success("Address resolved successfully");
+            } else {
+              // Fallback to raw if API fails
+              setAddressData(prev => ({...prev, area: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`}));
+            }
+          } catch (err) {
+            toast.error("Address resolution failed");
+          } finally {
+            setIsLocating(false);
+          }
         },
         () => {
           setIsLocating(false);
@@ -87,6 +115,7 @@ const Checkout = () => {
       );
     } else {
       setIsLocating(false);
+      toast.error("Geolocation not supported");
     }
   };
 
@@ -219,7 +248,7 @@ const Checkout = () => {
                     className="hidden sm:flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white hover:bg-[#00a2a4] transition-all"
                   >
                     {isLocating ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} className="fill-current text-teal-400" />}
-                    GPS Detect
+                    {isLocating ? 'Locating...' : 'Smart Detect'}
                   </button>
                 )}
               </div>
@@ -238,7 +267,7 @@ const Checkout = () => {
                       />
                     </div>
                     <div>
-                      <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-slate-400">Mobile Number (OTP Verified)</label>
+                      <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-slate-400">Mobile Number</label>
                       <input 
                         type="text" 
                         value={addressData.phone}
@@ -248,12 +277,12 @@ const Checkout = () => {
                       />
                     </div>
                     <div>
-                      <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-slate-400">Email Address (Optional)</label>
+                      <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-slate-400">Pincode</label>
                       <input 
-                        type="email" 
-                        value={addressData.email}
-                        placeholder="john@example.com" 
-                        onChange={(e) => setAddressData({...addressData, email: e.target.value})}
+                        type="text" 
+                        value={addressData.pincode}
+                        placeholder="143001" 
+                        onChange={(e) => setAddressData({...addressData, pincode: e.target.value})}
                         className="w-full rounded-2xl bg-slate-50 p-4 text-sm font-black outline-none border-2 border-transparent focus:border-[#00a2a4] focus:bg-white transition-all"
                       />
                     </div>
@@ -268,17 +297,7 @@ const Checkout = () => {
                       />
                     </div>
                     <div>
-                      <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-slate-400">Pincode</label>
-                      <input 
-                        type="text" 
-                        value={addressData.pincode}
-                        placeholder="143001" 
-                        onChange={(e) => setAddressData({...addressData, pincode: e.target.value})}
-                        className="w-full rounded-2xl bg-slate-50 p-4 text-sm font-black outline-none border-2 border-transparent focus:border-[#00a2a4] focus:bg-white transition-all"
-                      />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-slate-400">Area / Locality / Street</label>
+                      <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-slate-400">Village / Locality / Street</label>
                       <input 
                         type="text" 
                         value={addressData.area}
@@ -288,6 +307,23 @@ const Checkout = () => {
                       />
                     </div>
                     <div>
+                      <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-slate-400">District / City</label>
+                      <input 
+                        type="text" 
+                        value={addressData.district || addressData.city}
+                        placeholder="Amritsar" 
+                        onChange={(e) => setAddressData({...addressData, district: e.target.value, city: e.target.value})}
+                        className="w-full rounded-2xl bg-slate-50 p-4 text-sm font-black outline-none border-2 border-transparent focus:border-[#00a2a4] focus:bg-white transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-slate-400">State / Country</label>
+                      <div className="flex gap-2">
+                        <input type="text" value={addressData.state} onChange={(e) => setAddressData({...addressData, state: e.target.value})} className="w-1/2 rounded-2xl bg-slate-50 p-4 text-sm font-black outline-none border-2 border-transparent focus:border-[#00a2a4] focus:bg-white transition-all" />
+                        <input type="text" value={addressData.country} onChange={(e) => setAddressData({...addressData, country: e.target.value})} className="w-1/2 rounded-2xl bg-slate-50 p-4 text-sm font-black outline-none border-2 border-transparent focus:border-[#00a2a4] focus:bg-white transition-all" />
+                      </div>
+                    </div>
+                    <div className="sm:col-span-2">
                       <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-slate-400">Landmark (Optional)</label>
                       <input 
                         type="text" 
@@ -296,13 +332,6 @@ const Checkout = () => {
                         onChange={(e) => setAddressData({...addressData, landmark: e.target.value})}
                         className="w-full rounded-2xl bg-slate-50 p-4 text-sm font-black outline-none border-2 border-transparent focus:border-[#00a2a4] focus:bg-white transition-all"
                       />
-                    </div>
-                    <div>
-                      <label className="mb-2 block text-[10px] font-black uppercase tracking-widest text-slate-400">City / State</label>
-                      <div className="flex gap-2">
-                        <input type="text" value={addressData.city} disabled className="w-1/2 rounded-2xl bg-slate-100 p-4 text-sm font-black text-slate-400 outline-none" />
-                        <input type="text" value={addressData.state} disabled className="w-1/2 rounded-2xl bg-slate-100 p-4 text-sm font-black text-slate-400 outline-none" />
-                      </div>
                     </div>
                   </div>
 
@@ -330,7 +359,7 @@ const Checkout = () => {
                 <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-6 border border-slate-100">
                   <div>
                     <p className="text-xs font-black text-slate-900 uppercase tracking-tight">{addressData.name} — {addressData.phone}</p>
-                    <p className="mt-1 text-[9px] font-bold text-slate-400 uppercase tracking-widest">{addressData.building}, {addressData.area} ({addressData.pincode})</p>
+                    <p className="mt-1 text-[9px] font-bold text-slate-400 uppercase tracking-widest">{addressData.area}, {addressData.district}, {addressData.state}, {addressData.country} ({addressData.pincode})</p>
                   </div>
                   <button onClick={() => setActiveStep(1)} className="text-[10px] font-black text-[#00a2a4] uppercase tracking-widest hover:underline">Edit</button>
                 </div>
