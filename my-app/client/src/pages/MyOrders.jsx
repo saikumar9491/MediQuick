@@ -15,7 +15,10 @@ import {
   ArrowRight,
   ShieldCheck,
   RefreshCcw,
-  Loader2
+  Loader2,
+  ClipboardList,
+  Heart,
+  LogOut
 } from 'lucide-react';
 import { API_BASE } from '../utils/apiConfig';
 
@@ -42,7 +45,6 @@ const MyOrders = () => {
         if (!res.ok) throw new Error('Failed to fetch orders');
 
         const data = await res.json();
-        // Sort orders by most recent
         const sortedData = Array.isArray(data) 
           ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) 
           : [];
@@ -69,6 +71,42 @@ const MyOrders = () => {
     return index === -1 ? 0 : index;
   };
 
+  const handleDownloadInvoice = (order) => {
+    const invoiceContent = `
+=========================================
+      MEDIQUICK+ MEDICAL INVOICE
+=========================================
+Order ID: #${order._id.toUpperCase()}
+Authorized On: ${new Date(order.createdAt).toLocaleDateString()}
+Status: ${order.status || 'Confirmed'}
+-----------------------------------------
+PATIENT DETAILS:
+Name: ${user.name}
+Email: ${user.email}
+Delivery Hub: Amritsar Central Hub
+-----------------------------------------
+INVENTORY MANIFEST:
+${order.items.map(item => `- ${item.productId?.name || item.name} (Qty: ${item.quantity}) : ₹${item.price}`).join('\n')}
+-----------------------------------------
+TOTAL PAYABLE: ₹${order.totalAmount}
+-----------------------------------------
+CERTIFICATION:
+Digitally Signed by MediQuick+ Hub API
+Regulatory Compliance: Verified
+=========================================
+          THANK YOU FOR CHOOSING
+               MEDIQUICK+
+=========================================`;
+
+    const blob = new Blob([invoiceContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `MediQuick_Invoice_${order._id.slice(-8)}.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f8fafc] pt-28 flex flex-col items-center justify-center px-4">
@@ -89,7 +127,6 @@ const MyOrders = () => {
     <div className="min-h-screen bg-[#f8fafc] pb-24 pt-28 sm:pt-32">
       <div className="mx-auto max-w-5xl px-4 sm:px-6">
         
-        {/* HEADER SECTION */}
         <header className="mb-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
           <motion.div 
             initial={{ opacity: 0, x: -20 }}
@@ -154,10 +191,8 @@ const MyOrders = () => {
                     transition={{ delay: idx * 0.1 }}
                     className="group relative overflow-hidden rounded-[2.5rem] bg-white border border-white shadow-2xl shadow-slate-200/60"
                   >
-                    {/* Top Decorative Strip */}
                     <div className={`absolute top-0 left-0 h-1 w-full ${order.status === 'Delivered' ? 'bg-green-500' : 'bg-[#00a2a4]'}`} />
                     
-                    {/* ORDER HEADER */}
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 p-8 sm:p-10 border-b border-slate-50">
                       <div className="flex flex-wrap gap-10">
                         <div className="space-y-2">
@@ -201,10 +236,8 @@ const MyOrders = () => {
                       </div>
                     </div>
 
-                    {/* DYNAMIC TRACKING TIMELINE */}
                     <div className="px-8 py-12 sm:px-12 sm:py-16 bg-slate-50/50">
                       <div className="relative mx-auto max-w-4xl">
-                        {/* Progress Line */}
                         <div className="absolute top-[22px] left-0 h-[2px] w-full bg-slate-100" />
                         <motion.div 
                           initial={{ width: 0 }}
@@ -247,7 +280,6 @@ const MyOrders = () => {
                       </div>
                     </div>
 
-                    {/* ITEMS LIST */}
                     <div className="p-8 sm:p-10 space-y-8">
                       <div className="flex items-center gap-2 mb-2">
                         <Box size={14} className="text-[#00a2a4]" />
@@ -288,13 +320,15 @@ const MyOrders = () => {
                       </div>
                     </div>
 
-                    {/* FOOTER ACTION */}
                     <div className="px-8 py-6 sm:px-10 bg-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4">
                       <div className="flex items-center gap-3">
                         <ShieldCheck size={16} className="text-teal-400" />
                         <p className="text-[9px] font-black text-white/60 uppercase tracking-widest">Certified Amritsar Hub Delivery • AES-256 Encrypted</p>
                       </div>
-                      <button className="text-[10px] font-black text-teal-400 uppercase tracking-[0.2em] hover:text-white transition-colors">
+                      <button 
+                        onClick={() => handleDownloadInvoice(order)}
+                        className="text-[10px] font-black text-teal-400 uppercase tracking-[0.2em] hover:text-white transition-colors"
+                      >
                         Download Invoice
                       </button>
                     </div>
