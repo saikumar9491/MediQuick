@@ -24,8 +24,6 @@ const MedicinesPage = () => {
   const [filter, setFilter] = useState(initialFilter);
   const [currentBanner, setCurrentBanner] = useState(0);
 
-  // ... rest of the component
-
   const banners = useMemo(() => [
     {
       title: "Diabetes Care Hub",

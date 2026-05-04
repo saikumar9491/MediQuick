@@ -17,7 +17,8 @@ import {
   ShieldCheck,
   Stethoscope,
   FlaskConical,
-  ShoppingBag
+  ShoppingBag,
+  Zap
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
