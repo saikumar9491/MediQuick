@@ -81,6 +81,38 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const [searchResults, setSearchResults] = useState([]);
+  const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      if (searchQuery.length > 1) {
+        try {
+          const res = await fetch(`${API_BASE}/api/medicines?search=${searchQuery}`);
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            setSearchResults(data.slice(0, 6)); // Show top 6 results
+            setShowSearchSuggestions(true);
+          }
+        } catch (error) {
+          console.error("Search error:", error);
+        }
+      } else {
+        setSearchResults([]);
+        setShowSearchSuggestions(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setShowSearchSuggestions(false);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   const categories = [
     { name: 'Health Resource Center', icon: <BookOpen className="h-4 w-4" />, path: '/medicines' },
     { name: 'Hair Care', icon: <Scissors className="h-4 w-4" />, path: '/medicines?filter=hair-care' },
@@ -149,16 +181,66 @@ const Navbar = () => {
           </div>
 
           {/* Search Bar (Centered) */}
-          <form onSubmit={handleSearch} className="relative flex-1 group min-w-[300px]">
-            <input
-              type="text"
-              placeholder="Search for Medicines and Health Products"
-              className="w-full rounded bg-slate-50 border border-slate-100 px-4 py-2 text-[13px] font-medium outline-none transition-all focus:border-slate-300 focus:bg-white"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600" size={18} />
-          </form>
+          <div className="relative flex-1 group min-w-[300px]">
+            <form onSubmit={handleSearch} className="relative w-full">
+              <input
+                type="text"
+                placeholder="Search for Medicines and Health Products"
+                className="w-full rounded bg-slate-50 border border-slate-100 px-4 py-2 text-[13px] font-medium outline-none transition-all focus:border-slate-300 focus:bg-white"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onFocus={() => searchQuery.length > 1 && setShowSearchSuggestions(true)}
+              />
+              <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600" size={18} />
+            </form>
+
+            {/* Live Suggestions Dropdown */}
+            <AnimatePresence>
+              {showSearchSuggestions && searchResults.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  className="absolute left-0 right-0 top-full z-[80] mt-1 overflow-hidden rounded-xl bg-white shadow-2xl border border-slate-100"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="bg-slate-50 px-4 py-2 border-b border-slate-100">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Products</span>
+                  </div>
+                  <div className="max-h-[400px] overflow-y-auto">
+                    {searchResults.map((product) => (
+                      <Link
+                        key={product._id}
+                        to={`/product/${product._id}`}
+                        onClick={() => {
+                          setShowSearchSuggestions(false);
+                          setSearchQuery('');
+                        }}
+                        className="flex items-center gap-4 px-4 py-3 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 group"
+                      >
+                        <div className="h-10 w-10 shrink-0 rounded bg-white border border-slate-100 p-1">
+                          <img src={product.image} alt="" className="h-full w-full object-contain" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[12px] font-bold text-slate-800 group-hover:text-[#00a2a4] truncate">{product.name}</p>
+                          <p className="text-[10px] text-slate-500 uppercase tracking-tighter">{product.category}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[11px] font-black text-[#00a2a4]">₹{product.price}</p>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                  <button 
+                    onClick={handleSearch}
+                    className="w-full bg-slate-900 py-2.5 text-[11px] font-bold text-white hover:bg-[#00a2a4] transition-colors uppercase tracking-widest"
+                  >
+                    View All Results
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Promotion & Actions */}
           <div className="hidden items-center gap-6 xl:flex shrink-0 relative">
