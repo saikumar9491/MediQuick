@@ -150,7 +150,7 @@ const Navbar = () => {
                       <div className="space-y-1">
                         {user.isAdmin && (
                           <Link
-                            to="/admin"
+                            to="/admin-dashboard"
                             className="flex items-center gap-3 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest text-[#00a2a4] bg-teal-50 hover:bg-teal-100 transition-all mb-2"
                           >
                             <ShieldCheck size={16} />
