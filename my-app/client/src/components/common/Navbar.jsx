@@ -129,7 +129,6 @@ const Navbar = () => {
                     {user.image ? <img src={user.image} className="h-full w-full object-cover" alt="" /> : <User size={16} />}
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none mb-1">Patient</span>
                     <span className="max-w-[100px] truncate leading-none">{user.name}</span>
                   </div>
                   <ChevronDown size={14} className={`transition-transform duration-300 ${showUserDropdown ? 'rotate-180 text-teal-600' : 'text-slate-400'}`} />
