@@ -55,221 +55,170 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pb-24 pt-8">
+    <div className="min-h-screen bg-[#f1f3f6] pb-20 pt-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
-        {/* Header Area */}
-        <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">
-              <ShoppingBag size={12} className="text-[#00a2a4]" /> 
-              Your Selections
+        <div className="flex flex-col lg:flex-row gap-4">
+          
+          {/* Main Cart Content (Left) */}
+          <div className="flex-1 space-y-4">
+            
+            {/* Header / Pin Code Area */}
+            <div className="flex items-center justify-between bg-white px-6 py-4 shadow-sm border border-slate-100">
+              <h2 className="text-lg font-bold text-slate-800">My Cart ({cartItems.length})</h2>
+              <div className="flex items-center gap-2 text-xs font-bold text-blue-600 cursor-pointer">
+                <MapPin size={14} /> Deliver to: Amritsar, 143001
+              </div>
             </div>
-            <h1 className="text-4xl font-black text-slate-900 tracking-tight uppercase">
-              Shopping <span className="text-[#00a2a4]">Bag</span>
-            </h1>
-            <p className="mt-2 text-xs font-bold text-slate-400 uppercase tracking-widest">
-              You have {cartItems.length} verified items in your bag
-            </p>
-          </div>
-          
-          <AnimatePresence>
-            {saveStatus === 'saving' && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                className="flex items-center gap-3 rounded-xl bg-white px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-[#00a2a4] shadow-sm border border-teal-50"
-              >
-                <Loader2 size={14} className="animate-spin" /> Syncing Bag...
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
 
-        <div className="flex flex-col lg:flex-row gap-12">
-          
-          {/* Main Cart Items Area */}
-          <div className="flex-1 space-y-6">
-            <div className="overflow-hidden rounded-[2.5rem] bg-white shadow-xl shadow-slate-200/50 border border-white">
-              <div className="divide-y divide-slate-50">
-                {cartItems.map((item) => (
-                  <motion.div 
-                    layout
-                    key={item._id} 
-                    className="group flex flex-col sm:flex-row gap-8 p-8 sm:p-10 hover:bg-slate-50/30 transition-all duration-500"
-                  >
-                    {/* Item Image */}
-                    <div 
-                      onClick={() => navigate(`/product/${item._id}`)}
-                      className="relative h-32 w-32 shrink-0 cursor-pointer overflow-hidden rounded-3xl bg-slate-50 p-6 border border-slate-100 transition-all group-hover:shadow-lg flex items-center justify-center"
-                    >
+            {/* Cart Items */}
+            <div className="bg-white shadow-sm border border-slate-100 divide-y divide-slate-100">
+              {cartItems.map((item) => (
+                <div key={item._id} className="p-6 flex flex-col sm:flex-row gap-6">
+                  {/* Image Column */}
+                  <div className="w-full sm:w-32 flex flex-col items-center gap-4">
+                    <div className="h-28 w-28 flex items-center justify-center p-2">
                       <img 
                         src={item.image} 
                         alt={item.name} 
-                        className="h-full w-full object-contain mix-blend-multiply transition-transform duration-700 group-hover:scale-110" 
+                        className="max-h-full max-w-full object-contain" 
                       />
                     </div>
+                    {/* Quantity Selector - Flipkart Style */}
+                    <div className="flex items-center border border-slate-200 rounded-sm">
+                      <button 
+                        onClick={() => updateQuantity(item._id, Math.max(1, item.quantity - 1))}
+                        className="w-8 h-8 flex items-center justify-center bg-white hover:bg-slate-50 transition-colors"
+                      >
+                        <Minus size={12} strokeWidth={3} />
+                      </button>
+                      <input 
+                        type="text" 
+                        readOnly 
+                        value={item.quantity} 
+                        className="w-10 h-8 text-center text-sm font-bold border-x border-slate-200 focus:outline-none"
+                      />
+                      <button 
+                        onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                        className="w-8 h-8 flex items-center justify-center bg-white hover:bg-slate-50 transition-colors"
+                      >
+                        <Plus size={12} strokeWidth={3} />
+                      </button>
+                    </div>
+                  </div>
 
-                    {/* Item Details */}
-                    <div className="flex flex-1 flex-col justify-between">
-                      <div className="flex flex-col sm:flex-row justify-between gap-4">
-                        <div className="space-y-1">
-                          <h3 
-                            onClick={() => navigate(`/product/${item._id}`)}
-                            className="cursor-pointer text-xl font-black text-slate-900 hover:text-[#00a2a4] transition-colors leading-tight uppercase tracking-tight"
-                          >
-                            {item.name}
-                          </h3>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-[#00a2a4]">{item.brand}</span>
-                            <span className="h-1 w-1 rounded-full bg-slate-200" />
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">In Stock</span>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-black text-slate-900 tracking-tighter">
-                            ₹{item.price * item.quantity}
-                          </p>
-                          <p className="text-[10px] font-bold text-green-600 uppercase">You saved ₹{Math.round(item.price * 0.25)}</p>
-                        </div>
+                  {/* Info Column */}
+                  <div className="flex-1">
+                    <div className="flex flex-col sm:flex-row justify-between gap-2">
+                      <div className="space-y-1">
+                        <h3 className="text-base font-medium text-slate-800 hover:text-blue-600 cursor-pointer leading-snug">
+                          {item.name}
+                        </h3>
+                        <p className="text-xs text-slate-400 font-bold">{item.brand}</p>
                       </div>
-
-                      {/* Item Actions */}
-                      <div className="mt-8 flex flex-wrap items-center justify-between gap-6">
-                        <div className="flex items-center gap-6 rounded-2xl bg-slate-50 p-1.5 border border-slate-100 shadow-inner">
-                          <button 
-                            onClick={() => updateQuantity(item._id, Math.max(1, item.quantity - 1))}
-                            className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-slate-900 shadow-sm border border-slate-100 disabled:opacity-30 hover:bg-slate-900 hover:text-white transition-all active:scale-90"
-                          >
-                            <Minus size={14} strokeWidth={3} />
-                          </button>
-                          <span className="w-6 text-center text-lg font-black text-slate-900">{item.quantity}</span>
-                          <button 
-                            onClick={() => updateQuantity(item._id, item.quantity + 1)}
-                            className="flex h-9 w-9 items-center justify-center rounded-xl bg-white text-slate-900 shadow-sm border border-slate-100 hover:bg-slate-900 hover:text-white transition-all active:scale-90"
-                          >
-                            <Plus size={14} strokeWidth={3} />
-                          </button>
+                      <div className="text-left sm:text-right">
+                        <div className="flex items-center sm:justify-end gap-2">
+                          <span className="text-sm text-slate-400 line-through">₹{Math.round(item.price * 1.3)}</span>
+                          <span className="text-lg font-bold text-slate-900">₹{item.price}</span>
+                          <span className="text-xs font-bold text-green-600">25% Off</span>
                         </div>
-
-                        <button 
-                          onClick={() => {
-                            removeFromCart(item._id);
-                            toast.success('Item removed from bag');
-                          }}
-                          className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-red-500 transition-all active:scale-95"
-                        >
-                          <Trash2 size={16} /> Remove Item
-                        </button>
+                        <p className="text-[10px] text-slate-400 font-bold mt-1 uppercase">Inclusive of all taxes</p>
                       </div>
                     </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
 
-            {/* Promo Code Section */}
-            <div className="rounded-[2.5rem] bg-white p-8 border border-white shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-2xl bg-teal-50 flex items-center justify-center text-[#00a2a4]">
-                  <ShieldCheck size={24} />
-                </div>
-                <div>
-                  <h4 className="text-xs font-black uppercase tracking-widest text-slate-900">Have a Promo Code?</h4>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Apply to get extra discounts</p>
-                </div>
-              </div>
-              <div className="flex w-full sm:w-auto gap-2">
-                <input 
-                  type="text" 
-                  placeholder="CODE2024"
-                  className="flex-1 sm:w-40 rounded-xl bg-slate-50 px-4 py-3 text-xs font-black uppercase tracking-widest border border-slate-100 focus:outline-none focus:border-[#00a2a4] transition-all"
-                />
-                <button className="rounded-xl bg-slate-900 px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white hover:bg-[#00a2a4] transition-all active:scale-95">
-                  Apply
-                </button>
-              </div>
-            </div>
+                    <div className="mt-4 flex items-center gap-6">
+                      <button 
+                        className="text-sm font-bold text-slate-800 uppercase hover:text-blue-600 transition-colors"
+                      >
+                        Save For Later
+                      </button>
+                      <button 
+                        onClick={() => {
+                          removeFromCart(item._id);
+                          toast.success('Removed from cart');
+                        }}
+                        className="text-sm font-bold text-slate-800 uppercase hover:text-blue-600 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
 
-            <button 
-              onClick={() => navigate('/medicines')}
-              className="group flex items-center gap-3 px-6 py-2 text-xs font-black uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-all"
-            >
-              <ChevronLeft size={18} className="transition-transform group-hover:-translate-x-1" /> Continue Shopping
-            </button>
-          </div>
-
-          {/* Bill Details Sidebar */}
-          <aside className="w-full lg:w-[400px] shrink-0">
-            <div className="sticky top-28 space-y-8">
-              <div className="overflow-hidden rounded-[2.5rem] bg-slate-900 p-10 text-white shadow-2xl relative border border-white/5">
-                <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#00a2a4]/10 blur-[80px]" />
-                
-                <h3 className="mb-10 text-xs font-black uppercase tracking-[0.2em] text-slate-500 border-b border-white/10 pb-4">Bill Details</h3>
-                
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest">
-                    <span className="text-slate-500">Cart Subtotal</span>
-                    <span className="text-white">₹{subtotal}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest">
-                    <span className="text-slate-500">Medical Discount</span>
-                    <span className="text-green-400">-₹{discount}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest">
-                    <span className="text-slate-500">Hub Delivery Fee</span>
-                    <span className={deliveryFee === 0 ? 'text-green-400' : 'text-white'}>
-                      {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}
-                    </span>
-                  </div>
-                  
-                  <div className="my-10 border-t-2 border-dashed border-white/10 pt-10">
-                    <div className="flex flex-col gap-2">
-                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Amount to Pay</span>
-                      <div className="flex items-baseline justify-between">
-                        <span className="text-5xl font-black text-[#00a2a4] tracking-tighter">₹{totalAmount}</span>
-                        {discount > 0 && (
-                          <div className="rounded-lg bg-green-500/10 px-3 py-1.5 text-[9px] font-black text-green-400 uppercase tracking-widest">
-                            SAVED ₹{discount}
-                          </div>
-                        )}
-                      </div>
+                    <div className="mt-4 flex items-center gap-2 text-xs text-slate-500">
+                      <Truck size={14} className="text-slate-400" />
+                      Delivery by <span className="font-bold text-slate-800">Tomorrow, 10 AM</span> | <span className="text-green-600 font-bold">FREE Delivery</span>
                     </div>
                   </div>
                 </div>
+              ))}
 
+              {/* Sticky Place Order Area - Mobile Friendly */}
+              <div className="p-4 flex justify-end sticky bottom-0 bg-white border-t border-slate-100 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
                 <button 
                   onClick={() => navigate('/checkout')}
-                  className="group mt-10 flex w-full items-center justify-center gap-4 rounded-2xl bg-white py-5 text-xs font-black uppercase tracking-widest text-slate-900 shadow-xl transition-all hover:bg-[#00a2a4] hover:text-white active:scale-95"
+                  className="w-full sm:w-60 bg-[#fb641b] text-white py-3.5 px-8 font-black uppercase tracking-wider rounded-sm shadow-md hover:bg-[#e65a15] transition-all active:scale-95"
                 >
-                  Confirm Order <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
+                  Place Order
                 </button>
-
-                <p className="mt-8 text-center text-[9px] font-bold text-slate-500 uppercase tracking-widest leading-relaxed">
-                  By proceeding, you agree to our <br/> <span className="text-slate-300 underline cursor-pointer">Terms & Conditions</span>
-                </p>
               </div>
+            </div>
+          </div>
 
-              {/* Secure Checkout Signals */}
-              <div className="rounded-[2.5rem] bg-white p-8 shadow-sm border border-slate-100 space-y-6">
-                <div className="flex items-center gap-4 border-b border-slate-50 pb-6">
-                  <ShieldCheck className="text-[#00a2a4]" size={24} />
-                  <div>
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-900">Encrypted Payments</h4>
-                    <p className="mt-1 text-[9px] font-bold text-slate-400 uppercase">256-bit SSL Secure Checkout</p>
+          {/* Right Sidebar (Price Details) */}
+          <aside className="w-full lg:w-[380px] shrink-0">
+            <div className="sticky top-28 bg-white shadow-sm border border-slate-100 rounded-sm">
+              <h3 className="px-6 py-3 border-b border-slate-100 text-[13px] font-black uppercase tracking-widest text-slate-400">
+                Price Details
+              </h3>
+              
+              <div className="p-6 space-y-5">
+                <div className="flex justify-between text-sm text-slate-800">
+                  <span>Price ({cartItems.length} items)</span>
+                  <span>₹{subtotal}</span>
+                </div>
+                <div className="flex justify-between text-sm text-slate-800">
+                  <span>Discount</span>
+                  <span className="text-green-600">-₹{discount}</span>
+                </div>
+                <div className="flex justify-between text-sm text-slate-800">
+                  <span>Delivery Charges</span>
+                  <span className={deliveryFee === 0 ? 'text-green-600' : ''}>
+                    {deliveryFee === 0 ? 'FREE Delivery' : `₹${deliveryFee}`}
+                  </span>
+                </div>
+                
+                <div className="pt-5 border-t border-dashed border-slate-200">
+                  <div className="flex justify-between text-lg font-black text-slate-900 tracking-tight">
+                    <span>Total Amount</span>
+                    <span>₹{totalAmount}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-50 text-slate-400">
-                    <Truck size={20} />
-                  </div>
-                  <div>
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-900">Hub Dispatch</h4>
-                    <p className="mt-1 text-[9px] font-bold text-slate-400 uppercase">Verified at Amritsar Warehouse</p>
-                  </div>
+
+                <div className="pt-2">
+                  <p className="text-sm font-bold text-green-600">
+                    You will save ₹{discount} on this order
+                  </p>
                 </div>
               </div>
+
+              {/* Safety Badges */}
+              <div className="p-6 bg-slate-50/50 border-t border-slate-100 flex flex-col gap-4">
+                <div className="flex items-center gap-3">
+                  <ShieldCheck size={28} className="text-slate-400" />
+                  <p className="text-[10px] font-bold text-slate-500 leading-tight">
+                    Safe and Secure Payments. 100% Authentic products.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Trust Footer */}
+            <div className="mt-4 flex flex-col gap-4 px-2">
+              <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                <ShieldCheck size={14} /> 256-Bit SSL Encryption
+              </div>
+              <p className="text-[10px] text-slate-400 leading-relaxed">
+                MediQuick is committed to providing genuine medicines. Every order is verified by our hub before dispatch.
+              </p>
             </div>
           </aside>
         </div>
