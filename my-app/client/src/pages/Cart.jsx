@@ -1,15 +1,13 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
   ShoppingBag, 
   Trash2, 
   Plus, 
   Minus, 
-  ArrowRight, 
   ShieldCheck, 
-  Loader2,
-  ChevronLeft,
+  MapPin,
   Truck
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
