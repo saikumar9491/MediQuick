@@ -335,49 +335,72 @@ const Checkout = () => {
                     onClick={handlePlaceOrder} 
                     disabled={isProcessing || !paymentMethod}
                     className="mt-6 flex w-full items-center justify-center gap-3 rounded-2xl bg-blue-600 py-6 text-sm font-black uppercase tracking-widest text-white shadow-2xl transition-all hover:bg-slate-900 active:scale-95 disabled:bg-slate-200"
+                    className="mt-4 flex w-full items-center justify-center gap-4 rounded-[2rem] bg-slate-900 py-6 text-sm font-black uppercase tracking-[0.2em] text-white shadow-2xl transition-all hover:bg-[#00a2a4] active:scale-95 disabled:bg-slate-100 disabled:text-slate-300"
                   >
-                    {isProcessing ? <Loader2 className="animate-spin" /> : <ShieldCheck size={20} />}
-                    {isProcessing ? 'AUTHORIZING...' : `Place Order — ₹${total}`}
+                    {isProcessing ? <Loader2 className="animate-spin" /> : <CheckCircle2 size={24} />}
+                    {isProcessing ? 'AUTHORIZING...' : `Place Secure Order — ₹${total}`}
                   </button>
                 </div>
               )}
             </section>
           </div>
 
-          {/* Right Summary Card */}
-          <aside className="w-full lg:w-96 shrink-0">
-            <div className="sticky top-28 overflow-hidden rounded-[2.5rem] bg-slate-900 p-8 text-white shadow-2xl">
-              <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-blue-600/20 blur-2xl" />
-              <h3 className="mb-8 text-sm font-bold uppercase tracking-widest text-slate-400">Assessment</h3>
-              
-              <div className="space-y-4">
-                <div className="flex justify-between text-sm font-medium">
-                  <span className="text-slate-400">Gross Value</span>
-                  <span>₹{subtotal}</span>
-                </div>
-                <div className="flex justify-between text-sm font-medium">
-                  <span className="text-slate-400">Hub Subsidy</span>
-                  <span className="text-green-400">-₹{discount}</span>
-                </div>
-                <div className="flex justify-between text-sm font-medium">
-                  <span className="text-slate-400">Logistic Charge</span>
-                  <span className={deliveryFee === 0 ? 'text-green-400' : ''}>
-                    {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}
-                  </span>
-                </div>
+          {/* Right Assessment Sidebar */}
+          <aside className="w-full lg:w-[400px] shrink-0">
+            <div className="sticky top-28 space-y-8">
+              <div className="overflow-hidden rounded-[2.5rem] bg-slate-900 p-10 text-white shadow-2xl relative border border-white/5">
+                <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#00a2a4]/10 blur-[80px]" />
                 
-                <div className="my-8 border-t border-white/10 pt-8">
-                  <div className="flex items-end justify-between">
-                    <span className="text-sm font-bold text-slate-400">Net Payable</span>
-                    <span className="text-4xl font-black text-blue-400 tracking-tight">₹{total}</span>
+                <h3 className="mb-10 text-xs font-black uppercase tracking-[0.2em] text-slate-500 border-b border-white/10 pb-4">Order Assessment</h3>
+                
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest">
+                    <span className="text-slate-500">Gross Value</span>
+                    <span className="text-white">₹{subtotal}</span>
                   </div>
+                  <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest">
+                    <span className="text-slate-500">Hub Subsidy</span>
+                    <span className="text-green-400">-₹{discount}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest">
+                    <span className="text-slate-500">Logistic Charge</span>
+                    <span className={deliveryFee === 0 ? 'text-green-400' : 'text-white'}>
+                      {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}
+                    </span>
+                  </div>
+                  
+                  <div className="my-10 border-t-2 border-dashed border-white/10 pt-10">
+                    <div className="flex flex-col gap-2">
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Net Payable Amount</span>
+                      <div className="flex items-baseline justify-between">
+                        <span className="text-5xl font-black text-[#00a2a4] tracking-tighter">₹{total}</span>
+                        <div className="rounded-lg bg-green-500/10 px-3 py-1.5 text-[9px] font-black text-green-400 uppercase tracking-widest">
+                          APPROVED
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-8 rounded-2xl bg-white/5 p-5 border border-white/10 flex items-start gap-4">
+                  <div className="h-8 w-8 rounded-xl bg-[#00a2a4]/20 flex items-center justify-center text-[#00a2a4]">
+                    <ShieldCheck size={18} />
+                  </div>
+                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-relaxed">
+                    MediQuick utilizes 256-bit AES encryption to protect your medical and payment data.
+                  </p>
                 </div>
               </div>
 
-              <div className="mt-8 rounded-2xl bg-white/5 p-4 border border-white/10">
-                <div className="flex items-center gap-3">
-                  <ShieldCheck className="text-blue-400 h-5 w-5" />
-                  <p className="text-[10px] font-medium text-slate-300">Certified secure terminal. All transactions are encrypted.</p>
+              {/* Verified Trust Badges */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-[2rem] bg-white p-6 shadow-sm border border-slate-100 flex flex-col items-center text-center gap-3">
+                  <Truck className="text-slate-300" size={24} />
+                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-900 leading-tight">Fast Hub <br/> Delivery</p>
+                </div>
+                <div className="rounded-[2rem] bg-white p-6 shadow-sm border border-slate-100 flex flex-col items-center text-center gap-3">
+                  <RotateCcw className="text-slate-300" size={24} />
+                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-900 leading-tight">Easy Returns <br/> Policy</p>
                 </div>
               </div>
             </div>
