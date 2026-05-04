@@ -27,7 +27,8 @@ import {
   Activity,
   Shield,
   Leaf,
-  Dog
+  Dog,
+  Crosshair
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
@@ -91,208 +92,134 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-sm">
-      {/* Top Bar: Location & Primary Actions */}
-      <div className="border-b border-slate-100 bg-white px-4 py-3 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+      <div className="border-b border-slate-100 bg-white px-4 py-2 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-[1440px] items-center gap-4 lg:gap-8">
           
           {/* Logo */}
           <Link to="/" className="flex shrink-0 items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#00a2a4] text-white shadow-lg shadow-teal-100">
-              <ShoppingBag size={20} strokeWidth={3} />
+            <div className="flex h-7 w-7 items-center justify-center rounded bg-[#00a2a4] text-white">
+              <ShoppingBag size={16} strokeWidth={3} />
             </div>
-            <span className="hidden text-xl font-black tracking-tighter text-slate-900 sm:block">
+            <span className="hidden text-lg font-black tracking-tighter text-slate-900 lg:block uppercase">
               MEDI<span className="text-[#00a2a4]">QUICK</span>
             </span>
           </Link>
 
-          {/* Location Selector (Desktop) */}
-          <div className="hidden lg:flex items-center gap-1.5 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-500 cursor-pointer hover:bg-slate-100 transition-colors">
-            <MapPin size={14} className="text-[#00a2a4]" />
-            <span>Amritsar, 143001</span>
-            <ChevronDown size={14} />
+          {/* Location Selector */}
+          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 hover:bg-slate-50 transition-colors cursor-pointer group shrink-0 border-r border-slate-100 pr-6">
+            <MapPin size={18} className="text-slate-400 group-hover:text-[#00a2a4]" />
+            <div className="flex flex-col">
+              <span className="text-[13px] font-bold text-slate-800">New Delhi</span>
+            </div>
+            <Crosshair size={14} className="text-slate-400 ml-1" />
           </div>
 
-          {/* Search Bar (Star of the Nav) */}
-          <form onSubmit={handleSearch} className="relative flex-1 max-w-2xl">
+          {/* Search Bar (Centered) */}
+          <form onSubmit={handleSearch} className="relative flex-1 group min-w-[300px]">
             <input
               type="text"
-              placeholder="Search for medicines, health products..."
-              className="w-full rounded-xl bg-slate-50 border border-slate-100 px-10 py-2.5 text-sm font-medium outline-none transition-all focus:border-teal-300 focus:bg-white focus:shadow-lg focus:shadow-teal-50"
+              placeholder="Search for Medicines and Health Products"
+              className="w-full rounded bg-slate-50 border border-slate-100 px-4 py-2 text-[13px] font-medium outline-none transition-all focus:border-slate-300 focus:bg-white"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-[#00a2a4] px-3 py-1 text-[10px] font-bold text-white transition-all hover:bg-slate-900">
-              SEARCH
-            </button>
+            <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600" size={18} />
           </form>
 
-          {/* Auth & Cart (Desktop) */}
-          <div className="hidden items-center gap-6 sm:flex">
-            {user ? (
-              <div 
-                className="relative group cursor-pointer py-2"
-                onMouseEnter={() => setShowUserDropdown(true)}
-                onMouseLeave={() => setShowUserDropdown(false)}
-              >
-                <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                  <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden group-hover:border-teal-400 transition-colors">
-                    {user.image ? <img src={user.image} className="h-full w-full object-cover" alt="" /> : <User size={16} />}
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="max-w-[100px] truncate leading-none">{user.name}</span>
-                  </div>
-                  <ChevronDown size={14} className={`transition-transform duration-300 ${showUserDropdown ? 'rotate-180 text-teal-600' : 'text-slate-400'}`} />
-                </div>
+          {/* Promotion & Actions */}
+          <div className="hidden items-center gap-6 xl:flex shrink-0">
+            <div className="flex items-center gap-1.5 text-[12px] font-medium text-slate-700">
+              <Zap size={14} className="text-red-500 fill-red-500" />
+              <span>QUICK BUY! Get 25% off on medicines</span>
+              <ChevronDown size={14} className="text-slate-400" />
+            </div>
+            <button className="rounded bg-[#ff6f61] px-5 py-2 text-[13px] font-bold text-white transition-all hover:bg-[#ff5a4d] active:scale-95 shadow-sm uppercase tracking-wide">
+              Quick order
+            </button>
 
-                {/* User Dropdown Menu */}
-                <AnimatePresence>
-                  {showUserDropdown && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute right-0 top-full z-[70] mt-2 w-56 rounded-[2rem] bg-white p-3 shadow-2xl border border-slate-100 shadow-teal-900/5"
-                    >
-                      <div className="mb-2 px-4 py-3 border-b border-slate-50">
-                        <p className="truncate text-xs font-black text-slate-900">{user.email}</p>
-                      </div>
+            {/* User & Cart */}
+            <div className="flex items-center gap-5 border-l border-slate-100 pl-6">
+              {user ? (
+                <div 
+                  className="relative group cursor-pointer"
+                  onMouseEnter={() => setShowUserDropdown(true)}
+                  onMouseLeave={() => setShowUserDropdown(false)}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden group-hover:border-teal-400 transition-colors">
+                      {user.image ? <img src={user.image} className="h-full w-full object-cover" alt="" /> : <User size={16} className="text-slate-400" />}
+                    </div>
+                    <ChevronDown size={14} className={`text-slate-400 transition-transform ${showUserDropdown ? 'rotate-180' : ''}`} />
+                  </div>
 
-                      <div className="space-y-1">
+                  <AnimatePresence>
+                    {showUserDropdown && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        className="absolute right-0 top-full z-[70] mt-2 w-52 rounded-xl bg-white p-2 shadow-2xl border border-slate-100"
+                      >
+                        <div className="px-3 py-2 border-b border-slate-50 mb-1">
+                          <p className="truncate text-[10px] font-bold text-slate-400 uppercase tracking-widest">{user.email}</p>
+                        </div>
                         {user.isAdmin && (
-                          <Link
-                            to="/admin-dashboard"
-                            className="flex items-center gap-3 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest text-[#00a2a4] bg-teal-50 hover:bg-teal-100 transition-all mb-2"
-                          >
-                            <ShieldCheck size={16} />
-                            Admin Dashboard
+                          <Link to="/admin-dashboard" className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-[#00a2a4] hover:bg-teal-50 transition-colors">
+                            <ShieldCheck size={14} /> Admin Dashboard
                           </Link>
                         )}
-                        {[
-                          { label: 'Profile', path: '/profile', icon: User },
-                          { label: 'My Orders', path: '/my-orders', icon: ClipboardList },
-                          { label: 'Wishlist', path: '/wishlist', icon: Heart },
-                        ].map((item) => (
-                          <Link
-                            key={item.label}
-                            to={item.path}
-                            className="flex items-center gap-3 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 hover:text-[#00a2a4] transition-all"
-                          >
-                            <item.icon size={16} className="text-slate-300 group-hover:text-[#00a2a4]" />
-                            {item.label}
-                          </Link>
-                        ))}
-
-                        <button
-                          onClick={logout}
-                          className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 transition-all border-t border-slate-50 mt-2"
-                        >
-                          <LogOut size={16} />
-                          Logout Account
+                        <Link to="/profile" className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-colors">
+                          <User size={14} /> My Profile
+                        </Link>
+                        <Link to="/my-orders" className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-colors">
+                          <ClipboardList size={14} /> My Orders
+                        </Link>
+                        <button onClick={logout} className="w-full flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-red-500 hover:bg-red-50 transition-colors border-t border-slate-50 mt-1">
+                          <LogOut size={14} /> Logout
                         </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : (
-              <Link to="/login" className="text-xs font-bold text-slate-900 hover:text-[#00a2a4]">
-                Login / Signup
-              </Link>
-            )}
-
-            <Link to="/cart" className="relative flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95">
-              <ShoppingCart size={16} />
-              <span>BAG</span>
-              {cartItems.length > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#ff6f61] text-[10px] font-black text-white shadow-md border-2 border-white">
-                  {cartItems.length}
-                </span>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <Link to="/login" className="text-[13px] font-bold text-slate-700 hover:text-[#00a2a4] whitespace-nowrap">
+                  Login | Signup
+                </Link>
               )}
-            </Link>
+              
+              <Link to="/cart" className="relative text-slate-700 hover:text-[#00a2a4] transition-colors">
+                <ShoppingCart size={22} />
+                {cartItems.length > 0 && (
+                  <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#ff6f61] text-[9px] font-bold text-white shadow-sm">
+                    {cartItems.length}
+                  </span>
+                )}
+              </Link>
+            </div>
           </div>
 
           {/* Mobile Menu Toggle */}
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="rounded-lg p-2 text-slate-900 sm:hidden">
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="rounded-lg p-2 text-slate-900 xl:hidden">
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
-      {/* Sub Row: Categories (Desktop Only) */}
-      <nav className="hidden border-b border-slate-50 bg-white sm:block px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl items-center gap-8 py-2.5 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex-nowrap">
+      {/* Sub Row: Categories (Centered) */}
+      <nav className="hidden border-b border-slate-100 bg-white sm:block px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-center gap-8 py-3 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex-nowrap">
           {categories.map((cat) => (
             <Link
               key={cat.name}
               to={cat.path}
-              className="group flex items-center gap-1.5 text-[13px] font-medium text-slate-600 transition-all hover:text-[#00a2a4]"
+              className="group flex items-center gap-1 text-[13px] font-normal text-slate-700 transition-all hover:text-[#00a2a4] whitespace-nowrap"
             >
-              <span className="whitespace-nowrap">{cat.name}</span>
-              <ChevronDown size={14} className="text-slate-400 transition-transform group-hover:translate-y-0.5 group-hover:text-[#00a2a4]" />
+              <span>{cat.name}</span>
+              <ChevronDown size={12} className="text-slate-400 transition-transform group-hover:translate-y-0.5 group-hover:text-[#00a2a4]" />
             </Link>
           ))}
-          <div className="relative flex items-center gap-4">
-            <button 
-              onMouseEnter={() => setShowFlashDeals(true)}
-              onMouseLeave={() => setShowFlashDeals(false)}
-              className="group flex items-center gap-1.5 text-[10px] font-bold text-[#ff6f61] uppercase tracking-[0.1em] transition-all hover:scale-105"
-            >
-              <Zap size={14} className="fill-[#ff6f61] text-[#ff6f61]" /> 
-              <span>Flash Offers</span>
-              <ChevronDown size={12} className={`transition-transform duration-200 ${showFlashDeals ? 'rotate-180' : ''}`} />
-            </button>
-
-            {/* Flash Deals Dropdown */}
-            <AnimatePresence>
-              {showFlashDeals && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  onMouseEnter={() => setShowFlashDeals(true)}
-                  onMouseLeave={() => setShowFlashDeals(false)}
-                  className="absolute right-0 top-full z-[60] mt-2 w-80 rounded-2xl bg-white p-4 shadow-2xl border border-slate-100"
-                >
-                  <div className="mb-4 flex items-center justify-between border-b border-slate-50 pb-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">Trending Deals</span>
-                    <span className="rounded bg-[#ff6f61] px-2 py-0.5 text-[8px] font-black text-white animate-pulse">LIVE NOW</span>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    {flashDeals.length > 0 ? flashDeals.map((deal) => (
-                      <Link 
-                        key={deal._id} 
-                        to={`/product/${deal._id}`}
-                        className="flex items-center gap-3 rounded-xl p-2 hover:bg-slate-50 transition-colors group"
-                      >
-                        <div className="h-12 w-12 shrink-0 rounded-lg bg-white border border-slate-100 p-1">
-                          <img src={deal.image} className="h-full w-full object-contain" alt="" />
-                        </div>
-                        <div className="flex-1 overflow-hidden">
-                          <p className="truncate text-[11px] font-bold text-slate-900 group-hover:text-teal-600 transition-colors">{deal.name}</p>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-black text-[#ff6f61]">₹{deal.discountPrice || deal.price}</span>
-                            <span className="text-[9px] text-slate-400 line-through">₹{Math.round(deal.price * 1.3)}</span>
-                          </div>
-                        </div>
-                        <ChevronRight size={14} className="text-slate-300" />
-                      </Link>
-                    )) : (
-                      <p className="text-center py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Checking for deals...</p>
-                    )}
-                  </div>
-                  
-                  <Link to="/medicines?filter=flash" className="mt-4 block rounded-xl bg-slate-900 py-2.5 text-center text-[10px] font-black uppercase tracking-widest text-white hover:bg-teal-600 transition-colors">
-                    VIEW ALL OFFERS
-                  </Link>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
         </div>
       </nav>
-
       {/* Mobile Drawer Navigation */}
       <AnimatePresence>
         {isMenuOpen && (
@@ -317,7 +244,7 @@ const Navbar = () => {
                   </div>
                   <div>
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Welcome</p>
-                    <p className="text-sm font-black text-slate-900">Guest User</p>
+                    <p className="text-sm font-black text-slate-900">{user ? user.name : 'Guest User'}</p>
                   </div>
                 </div>
 
@@ -327,10 +254,9 @@ const Navbar = () => {
                       key={cat.name}
                       to={cat.path}
                       onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center justify-between rounded-xl p-4 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-blue-600 transition-all"
+                      className="flex items-center justify-between rounded-xl p-4 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-[#00a2a4] transition-all"
                     >
                       <div className="flex items-center gap-3">
-                        {cat.icon}
                         <span>{cat.name}</span>
                       </div>
                       <ChevronRight size={16} />
@@ -339,9 +265,15 @@ const Navbar = () => {
                 </div>
 
                 <div className="mt-8 border-t border-slate-100 pt-8">
-                  <button onClick={() => navigate('/login')} className="w-full rounded-xl bg-blue-600 py-4 text-sm font-bold text-white shadow-xl active:scale-95">
-                    LOGIN / SIGNUP
-                  </button>
+                  {user ? (
+                    <button onClick={logout} className="w-full rounded-xl bg-red-500 py-4 text-sm font-bold text-white shadow-xl active:scale-95">
+                      LOGOUT
+                    </button>
+                  ) : (
+                    <button onClick={() => navigate('/login')} className="w-full rounded-xl bg-[#00a2a4] py-4 text-sm font-bold text-white shadow-xl active:scale-95">
+                      LOGIN / SIGNUP
+                    </button>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -362,7 +294,7 @@ const Navbar = () => {
             key={item.label}
             to={item.path}
             className={`flex flex-col items-center gap-1 transition-colors ${
-              location.pathname === item.path ? 'text-blue-600' : 'text-slate-400 hover:text-slate-900'
+              location.pathname === item.path ? 'text-[#00a2a4]' : 'text-slate-400 hover:text-slate-900'
             }`}
           >
             <span className={`${location.pathname === item.path ? 'scale-110' : ''} transition-transform`}>
