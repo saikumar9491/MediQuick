@@ -226,21 +226,21 @@ const Navbar = () => {
             <Link
               key={cat.name}
               to={cat.path}
-              className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-500 transition-colors hover:text-[#00a2a4]"
+              className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.1em] text-slate-600 transition-all hover:text-[#00a2a4]"
             >
-              <span className="text-[#00a2a4]/50">{cat.icon}</span>
-              {cat.name}
+              <span className="shrink-0 text-[#00a2a4] transition-transform group-hover:scale-110">{cat.icon}</span>
+              <span className="max-w-[85px] leading-[1.2]">{cat.name}</span>
             </Link>
           ))}
-          <div className="relative ml-auto flex items-center gap-4">
+          <div className="relative flex items-center gap-4">
             <button 
               onMouseEnter={() => setShowFlashDeals(true)}
               onMouseLeave={() => setShowFlashDeals(false)}
-              className="flex items-center gap-1.5 text-[10px] font-black text-[#ff6f61] uppercase tracking-[0.2em] transition-all hover:scale-105"
+              className="group flex items-center gap-1.5 text-[10px] font-bold text-[#ff6f61] uppercase tracking-[0.1em] transition-all hover:scale-105"
             >
-              <Zap size={14} className="fill-[#ff6f61]" /> 
+              <Zap size={14} className="fill-[#ff6f61] text-[#ff6f61]" /> 
               <span>Flash Offers</span>
-              <ChevronDown size={12} className={`transition-transform ${showFlashDeals ? 'rotate-180' : ''}`} />
+              <ChevronDown size={12} className={`transition-transform duration-200 ${showFlashDeals ? 'rotate-180' : ''}`} />
             </button>
 
             {/* Flash Deals Dropdown */}
