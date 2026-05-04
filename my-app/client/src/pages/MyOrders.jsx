@@ -18,7 +18,8 @@ import {
   Loader2,
   ClipboardList,
   Heart,
-  LogOut
+  LogOut,
+  FileText
 } from 'lucide-react';
 import { API_BASE } from '../utils/apiConfig';
 
@@ -71,40 +72,161 @@ const MyOrders = () => {
     return index === -1 ? 0 : index;
   };
 
-  const handleDownloadInvoice = (order) => {
-    const invoiceContent = `
-=========================================
-      MEDIQUICK+ MEDICAL INVOICE
-=========================================
-Order ID: #${order._id.toUpperCase()}
-Authorized On: ${new Date(order.createdAt).toLocaleDateString()}
-Status: ${order.status || 'Confirmed'}
------------------------------------------
-PATIENT DETAILS:
-Name: ${user.name}
-Email: ${user.email}
-Delivery Hub: Amritsar Central Hub
------------------------------------------
-INVENTORY MANIFEST:
-${order.items.map(item => `- ${item.productId?.name || item.name} (Qty: ${item.quantity}) : ₹${item.price}`).join('\n')}
------------------------------------------
-TOTAL PAYABLE: ₹${order.totalAmount}
------------------------------------------
-CERTIFICATION:
-Digitally Signed by MediQuick+ Hub API
-Regulatory Compliance: Verified
-=========================================
-          THANK YOU FOR CHOOSING
-               MEDIQUICK+
-=========================================`;
+  const handleDownloadPDF = (order) => {
+    const printWindow = window.open('', '_blank');
+    const invoiceHTML = `
+      <html>
+        <head>
+          <title>Invoice - ${order._id.slice(-8)}</title>
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+            body { 
+              font-family: 'Inter', sans-serif; 
+              padding: 40px; 
+              color: #0f172a; 
+              line-height: 1.5;
+            }
+            .header { 
+              display: flex; 
+              justify-content: space-between; 
+              align-items: center; 
+              border-bottom: 4px solid #00a2a4; 
+              padding-bottom: 20px;
+              margin-bottom: 40px;
+            }
+            .logo { 
+              font-size: 24px; 
+              font-weight: 900; 
+              letter-spacing: -1px;
+            }
+            .logo span { color: #00a2a4; }
+            .invoice-title { 
+              text-align: right; 
+              font-size: 32px; 
+              font-weight: 900; 
+              text-transform: uppercase; 
+              letter-spacing: -1px;
+              color: #e2e8f0;
+            }
+            .meta-grid { 
+              display: grid; 
+              grid-template-columns: 1fr 1fr; 
+              gap: 40px; 
+              margin-bottom: 40px;
+            }
+            .section-title { 
+              font-size: 10px; 
+              font-weight: 900; 
+              text-transform: uppercase; 
+              letter-spacing: 2px; 
+              color: #94a3b8; 
+              margin-bottom: 8px;
+            }
+            .meta-value { 
+              font-size: 14px; 
+              font-weight: 700;
+            }
+            table { 
+              width: 100%; 
+              border-collapse: collapse; 
+              margin-bottom: 40px;
+            }
+            th { 
+              text-align: left; 
+              font-size: 10px; 
+              font-weight: 900; 
+              text-transform: uppercase; 
+              letter-spacing: 1px; 
+              padding: 12px; 
+              background: #f8fafc;
+              border-bottom: 2px solid #e2e8f0;
+            }
+            td { 
+              padding: 12px; 
+              border-bottom: 1px solid #f1f5f9; 
+              font-size: 13px; 
+            }
+            .total-row { 
+              text-align: right; 
+              font-size: 18px; 
+              font-weight: 900; 
+              margin-top: 20px;
+            }
+            .footer { 
+              margin-top: 60px; 
+              padding-top: 20px; 
+              border-top: 1px solid #e2e8f0; 
+              font-size: 10px; 
+              color: #94a3b8; 
+              text-align: center;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+            }
+            @media print {
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="logo">MEDI<span>QUICK+</span></div>
+            <div class="invoice-title">Invoice</div>
+          </div>
 
-    const blob = new Blob([invoiceContent], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `MediQuick_Invoice_${order._id.slice(-8)}.txt`;
-    link.click();
-    URL.revokeObjectURL(url);
+          <div class="meta-grid">
+            <div>
+              <div class="section-title">Patient Billing</div>
+              <div class="meta-value">${user.name}</div>
+              <div class="meta-value" style="font-weight: 400; color: #64748b;">${user.email}</div>
+            </div>
+            <div style="text-align: right;">
+              <div class="section-title">Shipment Details</div>
+              <div class="meta-value">Order #${order._id.toUpperCase()}</div>
+              <div class="meta-value" style="font-weight: 400; color: #64748b;">Authorized: ${new Date(order.createdAt).toLocaleDateString()}</div>
+            </div>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Medical Description</th>
+                <th>Qty</th>
+                <th style="text-align: right;">Unit Price</th>
+                <th style="text-align: right;">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${order.items.map(item => `
+                <tr>
+                  <td style="font-weight: 700;">${item.productId?.name || item.name}</td>
+                  <td>${item.quantity}</td>
+                  <td style="text-align: right;">₹${item.price}</td>
+                  <td style="text-align: right; font-weight: 700;">₹${item.price * item.quantity}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+
+          <div class="total-row">
+            <span style="color: #94a3b8; font-size: 12px; margin-right: 20px;">NET PAYABLE AMOUNT:</span>
+            <span>₹${order.totalAmount}</span>
+          </div>
+
+          <div class="footer">
+            Certified Amritsar Hub Delivery &bull; AES-256 Encrypted &bull; Digitally Signed
+          </div>
+
+          <script>
+            window.onload = () => {
+              window.print();
+              // window.close(); // Optional: close after printing
+            };
+          </script>
+        </body>
+      </html>
+    `;
+    printWindow.document.write(invoiceHTML);
+    printWindow.document.close();
   };
 
   if (loading) {
@@ -326,10 +448,11 @@ Regulatory Compliance: Verified
                         <p className="text-[9px] font-black text-white/60 uppercase tracking-widest">Certified Amritsar Hub Delivery • AES-256 Encrypted</p>
                       </div>
                       <button 
-                        onClick={() => handleDownloadInvoice(order)}
-                        className="text-[10px] font-black text-teal-400 uppercase tracking-[0.2em] hover:text-white transition-colors"
+                        onClick={() => handleDownloadPDF(order)}
+                        className="flex items-center gap-2 text-[10px] font-black text-teal-400 uppercase tracking-[0.2em] hover:text-white transition-colors"
                       >
-                        Download Invoice
+                        <FileText size={14} />
+                        Download PDF Invoice
                       </button>
                     </div>
                   </motion.div>
