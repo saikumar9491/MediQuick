@@ -221,15 +221,15 @@ const Navbar = () => {
 
       {/* Sub Row: Categories (Desktop Only) */}
       <nav className="hidden border-b border-slate-50 bg-white sm:block px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-7xl items-center gap-8 py-2.5">
+        <div className="mx-auto flex max-w-7xl items-center gap-8 py-2.5 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex-nowrap">
           {categories.map((cat) => (
             <Link
               key={cat.name}
               to={cat.path}
-              className="group flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.1em] text-slate-600 transition-all hover:text-[#00a2a4]"
+              className="group flex items-center gap-1.5 text-[13px] font-medium text-slate-600 transition-all hover:text-[#00a2a4]"
             >
-              <span className="shrink-0 text-[#00a2a4] transition-transform group-hover:scale-110">{cat.icon}</span>
-              <span className="max-w-[85px] leading-[1.2]">{cat.name}</span>
+              <span className="whitespace-nowrap">{cat.name}</span>
+              <ChevronDown size={14} className="text-slate-400 transition-transform group-hover:translate-y-0.5 group-hover:text-[#00a2a4]" />
             </Link>
           ))}
           <div className="relative flex items-center gap-4">
