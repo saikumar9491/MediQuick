@@ -41,11 +41,14 @@ export const AuthProvider = ({ children }) => {
           setUser(freshData);
           localStorage.setItem('mediQuickUser', JSON.stringify(freshData));
         } else if (res.status === 401) {
-          // Token expired, clean up
+          // Token expired, clean up and notify
           setUser(null);
           setToken(null);
           localStorage.removeItem('mediQuickUser');
           localStorage.removeItem('userToken');
+          import('react-hot-toast').then(({ default: toast }) => {
+            toast.error("Session Expired. Please Login Again.");
+          });
         }
       } catch (err) {
         console.error('Profile Sync Failed (Background):', err);

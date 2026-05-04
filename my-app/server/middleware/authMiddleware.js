@@ -33,7 +33,7 @@ export const verifyToken = async (req, res, next) => {
       ? "Session Expired. Please Login Again." 
       : "Invalid Security Token";
       
-    res.status(403).json({ message: errorMessage });
+    res.status(401).json({ message: errorMessage });
   }
 };
 

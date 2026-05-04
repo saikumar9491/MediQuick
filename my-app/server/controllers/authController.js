@@ -144,7 +144,7 @@ export const login = async (req, res) => {
     }
     if (!user.isVerified) return res.status(403).json({ message: 'Please verify your email first' });
 
-    const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '7d' });
     return res.json({ token, user: { _id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin } });
   } catch (error) {
     return res.status(500).json({ message: 'Login failed' });
@@ -216,7 +216,7 @@ export const googleLogin = async (req, res) => {
         image: payload.picture,
       });
     }
-    const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '7d' });
     return res.json({ token, user: { _id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin } });
   } catch (error) {
     console.error("❌ Google Auth Failure:", error.message);

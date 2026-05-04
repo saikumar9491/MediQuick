@@ -22,7 +22,7 @@ import { API_BASE } from '../utils/apiConfig';
 
 const Checkout = () => {
   const { cartItems, clearCart } = useCart();
-  const { user, token } = useAuth();
+  const { user, token, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -160,6 +160,10 @@ const Checkout = () => {
         if (!isDirectBuy) clearCart();
         toast.success("Order placed successfully!");
         setTimeout(() => navigate('/my-orders'), 4000);
+      } else if (response.status === 401) {
+        toast.error("Session expired. Please login again.");
+        logout();
+        navigate('/login');
       } else {
         const data = await response.json();
         toast.error(data.message || 'Failed to place order');
