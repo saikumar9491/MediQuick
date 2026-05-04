@@ -35,6 +35,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -118,13 +119,63 @@ const Navbar = () => {
           {/* Auth & Cart (Desktop) */}
           <div className="hidden items-center gap-6 sm:flex">
             {user ? (
-              <div className="relative group cursor-pointer py-2">
+              <div 
+                className="relative group cursor-pointer py-2"
+                onMouseEnter={() => setShowUserDropdown(true)}
+                onMouseLeave={() => setShowUserDropdown(false)}
+              >
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                  <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden">
-                    {user.avatar ? <img src={user.avatar} className="h-full w-full object-cover" alt="" /> : <User size={16} />}
+                  <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden group-hover:border-teal-400 transition-colors">
+                    {user.image ? <img src={user.image} className="h-full w-full object-cover" alt="" /> : <User size={16} />}
                   </div>
-                  <span className="max-w-[100px] truncate">{user.name}</span>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none mb-1">Patient</span>
+                    <span className="max-w-[100px] truncate leading-none">{user.name}</span>
+                  </div>
+                  <ChevronDown size={14} className={`transition-transform duration-300 ${showUserDropdown ? 'rotate-180 text-teal-600' : 'text-slate-400'}`} />
                 </div>
+
+                {/* User Dropdown Menu */}
+                <AnimatePresence>
+                  {showUserDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="absolute right-0 top-full z-[70] mt-2 w-56 rounded-[2rem] bg-white p-3 shadow-2xl border border-slate-100 shadow-teal-900/5"
+                    >
+                      <div className="mb-2 px-4 py-3 border-b border-slate-50">
+                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Clinical Account</p>
+                        <p className="truncate text-xs font-black text-slate-900 mt-1">{user.email}</p>
+                      </div>
+
+                      <div className="space-y-1">
+                        {[
+                          { label: 'Profile', path: '/profile', icon: User },
+                          { label: 'My Orders', path: '/my-orders', icon: ClipboardList },
+                          { label: 'Wishlist', path: '/wishlist', icon: Heart },
+                        ].map((item) => (
+                          <Link
+                            key={item.label}
+                            to={item.path}
+                            className="flex items-center gap-3 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-slate-50 hover:text-[#00a2a4] transition-all"
+                          >
+                            <item.icon size={16} className="text-slate-300 group-hover:text-[#00a2a4]" />
+                            {item.label}
+                          </Link>
+                        ))}
+
+                        <button
+                          onClick={logout}
+                          className="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 transition-all border-t border-slate-50 mt-2"
+                        >
+                          <LogOut size={16} />
+                          Logout Account
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             ) : (
               <Link to="/login" className="text-xs font-bold text-slate-900 hover:text-[#00a2a4]">
