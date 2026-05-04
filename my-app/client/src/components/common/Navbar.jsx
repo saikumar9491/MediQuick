@@ -42,11 +42,12 @@ const Navbar = () => {
   }, []);
 
   const categories = [
-    { name: 'Medicines', icon: <ShoppingBag className="h-4 w-4" />, path: '/medicines' },
+    { name: 'All Medicines', icon: <ShoppingBag className="h-4 w-4" />, path: '/medicines' },
     { name: 'Lab Tests', icon: <FlaskConical className="h-4 w-4" />, path: '/lab-tests' },
-    { name: 'Consult', icon: <Stethoscope className="h-4 w-4" />, path: '/consult' },
-    { name: 'Ayurveda', icon: <LayoutGrid className="h-4 w-4" />, path: '/ayurveda' },
-    { name: 'Care Plan', icon: <ShieldCheck className="h-4 w-4" />, path: '/care-plan' },
+    { name: 'Consult Doctor', icon: <Stethoscope className="h-4 w-4" />, path: '/consult' },
+    { name: 'Skin Care', icon: <Heart className="h-4 w-4" />, path: '/skin-care' },
+    { name: 'Vitamins', icon: <Sparkles className="h-4 w-4" />, path: '/medicines?filter=vitamins' },
+    { name: 'Healthcare', icon: <ShieldCheck className="h-4 w-4" />, path: '/care-plan' },
   ];
 
   const handleSearch = (e) => {

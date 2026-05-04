@@ -17,7 +17,12 @@ import { useLocation } from 'react-router-dom';
 const MedicinesPage = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const initialFilter = queryParams.get('filter') === 'flash' ? 'Flash Deals' : 'All';
+  const rawFilter = queryParams.get('filter');
+  
+  // Dynamic filter initialization
+  let initialFilter = 'All';
+  if (rawFilter === 'flash') initialFilter = 'Flash Deals';
+  else if (rawFilter) initialFilter = rawFilter.charAt(0).toUpperCase() + rawFilter.slice(1);
 
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
