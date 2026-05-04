@@ -19,7 +19,15 @@ import {
   FlaskConical,
   ShoppingBag,
   Zap,
-  Sparkles
+  Sparkles,
+  BookOpen,
+  Scissors,
+  Dumbbell,
+  HeartPulse,
+  Activity,
+  Shield,
+  Leaf,
+  Dog
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
@@ -44,12 +52,15 @@ const Navbar = () => {
   }, []);
 
   const categories = [
-    { name: 'All Medicines', icon: <ShoppingBag className="h-4 w-4" />, path: '/medicines' },
-    { name: 'Lab Tests', icon: <FlaskConical className="h-4 w-4" />, path: '/lab-tests' },
-    { name: 'Consult Doctor', icon: <Stethoscope className="h-4 w-4" />, path: '/consult' },
-    { name: 'Skin Care', icon: <Heart className="h-4 w-4" />, path: '/skin-care' },
-    { name: 'Vitamins', icon: <Sparkles className="h-4 w-4" />, path: '/medicines?filter=vitamins' },
-    { name: 'Healthcare', icon: <ShieldCheck className="h-4 w-4" />, path: '/care-plan' },
+    { name: 'Health Resource Center', icon: <BookOpen className="h-4 w-4" />, path: '/medicines' },
+    { name: 'Hair Care', icon: <Scissors className="h-4 w-4" />, path: '/medicines?filter=hair-care' },
+    { name: 'Fitness & Health', icon: <Dumbbell className="h-4 w-4" />, path: '/medicines?filter=fitness' },
+    { name: 'Sexual Wellness', icon: <HeartPulse className="h-4 w-4" />, path: '/medicines?filter=sexual-wellness' },
+    { name: 'Vitamins & Nutrition', icon: <Sparkles className="h-4 w-4" />, path: '/medicines?filter=vitamins' },
+    { name: 'Supports & Braces', icon: <Activity className="h-4 w-4" />, path: '/medicines?filter=supports' },
+    { name: 'Immunity Boosters', icon: <Shield className="h-4 w-4" />, path: '/medicines?filter=immunity' },
+    { name: 'Homeopathy', icon: <Leaf className="h-4 w-4" />, path: '/medicines?filter=homeopathy' },
+    { name: 'Pet Care', icon: <Dog className="h-4 w-4" />, path: '/medicines?filter=pet-care' },
   ];
 
   const handleSearch = (e) => {
