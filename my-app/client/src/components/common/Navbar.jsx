@@ -55,6 +55,24 @@ const Navbar = () => {
     }
   };
 
+  const [showFlashDeals, setShowFlashDeals] = useState(false);
+  const [flashDeals, setFlashDeals] = useState([]);
+
+  useEffect(() => {
+    const fetchFlashDeals = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/medicines`);
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setFlashDeals(data.filter(m => m.isFlashDeal).slice(0, 4));
+        }
+      } catch (err) {
+        console.error("Flash deals fetch failed", err);
+      }
+    };
+    fetchFlashDeals();
+  }, []);
+
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-sm">
       {/* Top Bar: Location & Primary Actions */}
@@ -63,17 +81,17 @@ const Navbar = () => {
           
           {/* Logo */}
           <Link to="/" className="flex shrink-0 items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white shadow-lg shadow-blue-200">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#00a2a4] text-white shadow-lg shadow-teal-100">
               <ShoppingBag size={20} strokeWidth={3} />
             </div>
             <span className="hidden text-xl font-black tracking-tighter text-slate-900 sm:block">
-              MEDI<span className="text-blue-600">QUICK</span>
+              MEDI<span className="text-[#00a2a4]">QUICK</span>
             </span>
           </Link>
 
           {/* Location Selector (Desktop) */}
           <div className="hidden lg:flex items-center gap-1.5 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2 text-xs font-bold text-slate-500 cursor-pointer hover:bg-slate-100 transition-colors">
-            <MapPin size={14} className="text-blue-600" />
+            <MapPin size={14} className="text-[#00a2a4]" />
             <span>Amritsar, 143001</span>
             <ChevronDown size={14} />
           </div>
@@ -83,12 +101,12 @@ const Navbar = () => {
             <input
               type="text"
               placeholder="Search for medicines, health products..."
-              className="w-full rounded-xl bg-slate-50 border border-slate-100 px-10 py-2.5 text-sm font-medium outline-none transition-all focus:border-blue-300 focus:bg-white focus:shadow-lg focus:shadow-blue-50"
+              className="w-full rounded-xl bg-slate-50 border border-slate-100 px-10 py-2.5 text-sm font-medium outline-none transition-all focus:border-teal-300 focus:bg-white focus:shadow-lg focus:shadow-teal-50"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-blue-600 px-3 py-1 text-[10px] font-bold text-white transition-all hover:bg-slate-900">
+            <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg bg-[#00a2a4] px-3 py-1 text-[10px] font-bold text-white transition-all hover:bg-slate-900">
               SEARCH
             </button>
           </form>
@@ -98,15 +116,14 @@ const Navbar = () => {
             {user ? (
               <div className="relative group cursor-pointer py-2">
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
-                  <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200">
-                    <User size={16} />
+                  <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden">
+                    {user.avatar ? <img src={user.avatar} className="h-full w-full object-cover" alt="" /> : <User size={16} />}
                   </div>
                   <span className="max-w-[100px] truncate">{user.name}</span>
                 </div>
-                {/* Dropdown Placeholder */}
               </div>
             ) : (
-              <Link to="/login" className="text-xs font-bold text-slate-900 hover:text-blue-600">
+              <Link to="/login" className="text-xs font-bold text-slate-900 hover:text-[#00a2a4]">
                 Login / Signup
               </Link>
             )}
@@ -136,16 +153,69 @@ const Navbar = () => {
             <Link
               key={cat.name}
               to={cat.path}
-              className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-500 transition-colors hover:text-blue-600"
+              className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-slate-500 transition-colors hover:text-[#00a2a4]"
             >
-              <span className="text-blue-600/50">{cat.icon}</span>
+              <span className="text-[#00a2a4]/50">{cat.icon}</span>
               {cat.name}
             </Link>
           ))}
-          <div className="ml-auto flex items-center gap-4">
-            <span className="flex items-center gap-1 text-[10px] font-black text-[#ff6f61] uppercase tracking-widest">
-              ⚡ Flash Offers
-            </span>
+          <div className="relative ml-auto flex items-center gap-4">
+            <button 
+              onMouseEnter={() => setShowFlashDeals(true)}
+              onMouseLeave={() => setShowFlashDeals(false)}
+              className="flex items-center gap-1.5 text-[10px] font-black text-[#ff6f61] uppercase tracking-[0.2em] transition-all hover:scale-105"
+            >
+              <Zap size={14} className="fill-[#ff6f61]" /> 
+              <span>Flash Offers</span>
+              <ChevronDown size={12} className={`transition-transform ${showFlashDeals ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Flash Deals Dropdown */}
+            <AnimatePresence>
+              {showFlashDeals && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  onMouseEnter={() => setShowFlashDeals(true)}
+                  onMouseLeave={() => setShowFlashDeals(false)}
+                  className="absolute right-0 top-full z-[60] mt-2 w-80 rounded-2xl bg-white p-4 shadow-2xl border border-slate-100"
+                >
+                  <div className="mb-4 flex items-center justify-between border-b border-slate-50 pb-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">Trending Deals</span>
+                    <span className="rounded bg-[#ff6f61] px-2 py-0.5 text-[8px] font-black text-white animate-pulse">LIVE NOW</span>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    {flashDeals.length > 0 ? flashDeals.map((deal) => (
+                      <Link 
+                        key={deal._id} 
+                        to={`/product/${deal._id}`}
+                        className="flex items-center gap-3 rounded-xl p-2 hover:bg-slate-50 transition-colors group"
+                      >
+                        <div className="h-12 w-12 shrink-0 rounded-lg bg-white border border-slate-100 p-1">
+                          <img src={deal.image} className="h-full w-full object-contain" alt="" />
+                        </div>
+                        <div className="flex-1 overflow-hidden">
+                          <p className="truncate text-[11px] font-bold text-slate-900 group-hover:text-teal-600 transition-colors">{deal.name}</p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-black text-[#ff6f61]">₹{deal.discountPrice || deal.price}</span>
+                            <span className="text-[9px] text-slate-400 line-through">₹{Math.round(deal.price * 1.3)}</span>
+                          </div>
+                        </div>
+                        <ChevronRight size={14} className="text-slate-300" />
+                      </Link>
+                    )) : (
+                      <p className="text-center py-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Checking for deals...</p>
+                    )}
+                  </div>
+                  
+                  <Link to="/medicines?filter=flash" className="mt-4 block rounded-xl bg-slate-900 py-2.5 text-center text-[10px] font-black uppercase tracking-widest text-white hover:bg-teal-600 transition-colors">
+                    VIEW ALL OFFERS
+                  </Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </nav>

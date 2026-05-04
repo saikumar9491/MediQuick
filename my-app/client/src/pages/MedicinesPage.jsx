@@ -12,11 +12,19 @@ import {
 import MedicineCard from '../components/medicine/MedicineCard';
 import { API_BASE } from '../utils/apiConfig';
 
+import { useLocation } from 'react-router-dom';
+
 const MedicinesPage = () => {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const initialFilter = queryParams.get('filter') === 'flash' ? 'Flash Deals' : 'All';
+
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('All');
+  const [filter, setFilter] = useState(initialFilter);
   const [currentBanner, setCurrentBanner] = useState(0);
+
+  // ... rest of the component
 
   const banners = useMemo(() => [
     {
@@ -66,6 +74,7 @@ const MedicinesPage = () => {
 
   const categories = [
     'All',
+    'Flash Deals',
     'Diabetes',
     'Cardiac',
     'Pain Relief',
@@ -76,6 +85,7 @@ const MedicinesPage = () => {
 
   const filteredMedicines = useMemo(() => {
     if (filter === 'All') return medicines;
+    if (filter === 'Flash Deals') return medicines.filter(m => m.isFlashDeal);
     return medicines.filter((m) => m.category?.toLowerCase() === filter.toLowerCase());
   }, [filter, medicines]);
 
