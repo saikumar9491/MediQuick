@@ -32,18 +32,41 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   const fileInputRef = useRef(null);
 
   const [selectedFile, setSelectedFile] = useState(null);
+  const defaultBanners = [
+    {
+      _id: 'default1',
+      title: 'Genuine Medicines. Guaranteed.',
+      desc: 'Sourced from verified manufacturers and stored at optimal temperatures.',
+      image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbbb88?auto=format&fit=crop&q=80&w=2000',
+      category: 'general'
+    },
+    {
+      _id: 'default2',
+      title: 'Flat 25% Off on First Order',
+      desc: 'Use code MEDI25 at checkout. Rapid delivery to your doorstep.',
+      image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=2000',
+      category: 'general'
+    }
+  ];
+
+  const [dbBanners, setDbBanners] = useState(defaultBanners);
   const [isUploading, setIsUploading] = useState(false);
+  const [isBannerLoading, setIsBannerLoading] = useState(true);
   const [currentBanner, setCurrentBanner] = useState(0);
-  const [dbBanners, setDbBanners] = useState([]);
 
   useEffect(() => {
     const fetchBanners = async () => {
       try {
         const res = await fetch(`${API_BASE}/api/banners`);
+        if (!res.ok) throw new Error('API Error');
         const data = await res.json();
-        setDbBanners(Array.isArray(data) ? data : []);
+        if (Array.isArray(data) && data.length > 0) {
+          setDbBanners(data);
+        }
       } catch (err) {
-        console.error("Banner fetch failed:", err);
+        console.error("Banner fetch failed, using fallbacks:", err);
+      } finally {
+        setIsBannerLoading(false);
       }
     };
     fetchBanners();
