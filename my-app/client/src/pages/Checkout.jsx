@@ -204,7 +204,7 @@ const Checkout = () => {
         {/* Step Indicator - Premium Clinical Style */}
         <div className="mx-auto mb-16 flex max-w-4xl items-center justify-between relative px-4">
           <div className="absolute top-[22px] left-0 h-[2px] w-full bg-slate-100 z-0" />
-          {[1, 2, 3, 4].map((step) => (
+          {[1, 2, 3].map((step) => (
             <div key={step} className="relative z-10 flex flex-col items-center">
               <motion.div
                 initial={false}
@@ -220,7 +220,7 @@ const Checkout = () => {
                 {activeStep > step ? <CheckCircle2 size={18} strokeWidth={3} /> : step}
               </motion.div>
               <span className={`mt-4 text-[9px] font-black uppercase tracking-[0.2em] ${activeStep >= step ? 'text-[#00a2a4]' : 'text-slate-400'}`}>
-                {step === 1 ? 'Identity' : step === 2 ? 'Prescription' : step === 3 ? 'Review' : 'Payment'}
+                {step === 1 ? 'Identity' : step === 2 ? 'Review' : 'Payment'}
               </span>
             </div>
           ))}
@@ -366,49 +366,20 @@ const Checkout = () => {
               )}
             </section>
 
-            {/* 2. Prescription & Delivery Speed */}
+            {/* 2. Review & Delivery Options */}
             <section className={`overflow-hidden rounded-[2.5rem] bg-white p-10 shadow-xl shadow-slate-200/50 border border-white transition-all duration-500 ${activeStep !== 2 && 'opacity-50 grayscale scale-[0.98]'}`}>
               <div className="mb-10 flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-600">
                   <Package size={24} />
                 </div>
                 <div>
-                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Prescription & <span className="text-orange-600">Transit</span></h2>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Regulatory compliance & delivery speed</p>
+                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Order <span className="text-orange-600">Review</span></h2>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Final checklist & delivery speed</p>
                 </div>
               </div>
 
               {activeStep === 2 && (
                 <div className="space-y-10">
-                  {/* Prescription Section */}
-                  <div className="space-y-6">
-                    <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Medical Prescription (Required for Rx medicines)</p>
-                    <div className="flex flex-col sm:flex-row gap-6">
-                      <div className="flex-1">
-                        <label className="group flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-slate-200 rounded-[2rem] bg-slate-50 cursor-pointer hover:border-[#00a2a4] hover:bg-teal-50/50 transition-all">
-                          <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
-                            <ShieldCheck className="w-10 h-10 mb-4 text-slate-400 group-hover:text-[#00a2a4]" />
-                            <p className="text-[10px] font-black uppercase text-slate-500 group-hover:text-slate-900">Upload Images / PDF</p>
-                            <p className="text-[8px] font-bold text-slate-300 mt-1 uppercase tracking-widest">JPEG, PNG, PDF (MAX 5MB)</p>
-                          </div>
-                          <input type="file" className="hidden" onChange={(e) => setPrescription(e.target.files[0])} />
-                        </label>
-                      </div>
-                      <div className="flex-1 flex flex-col justify-center gap-4">
-                        <div 
-                          onClick={() => {setUploadLater(!uploadLater); if(!uploadLater) setPrescription(null);}}
-                          className={`cursor-pointer p-6 rounded-[2rem] border-2 transition-all flex items-center justify-between ${uploadLater ? 'border-[#00a2a4] bg-teal-50' : 'border-slate-50 bg-slate-50'}`}
-                        >
-                          <span className="text-[10px] font-black uppercase tracking-widest">I will upload later</span>
-                          <div className={`h-5 w-5 rounded-full border-2 ${uploadLater ? 'bg-[#00a2a4] border-[#00a2a4]' : 'border-slate-200'}`} />
-                        </div>
-                        <p className="text-[8px] font-bold text-slate-400 uppercase leading-relaxed px-4">
-                          Note: Orders with restricted medicines will only be verified after a valid prescription is uploaded.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
                   {/* Delivery Speed Section */}
                   <div className="space-y-6">
                     <p className="text-[10px] font-black text-slate-900 uppercase tracking-widest">Select Delivery Protocol</p>
@@ -436,30 +407,6 @@ const Checkout = () => {
                     </div>
                   </div>
 
-                  <button 
-                    onClick={() => setActiveStep(3)} 
-                    className="w-full rounded-[2rem] bg-slate-900 py-6 text-xs font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all hover:bg-[#00a2a4]"
-                  >
-                    Proceed to Review
-                  </button>
-                </div>
-              )}
-            </section>
-
-            {/* 3. Review & Coupons */}
-            <section className={`overflow-hidden rounded-[2.5rem] bg-white p-10 shadow-xl shadow-slate-200/50 border border-white transition-all duration-500 ${activeStep !== 3 && 'opacity-50 grayscale scale-[0.98]'}`}>
-              <div className="mb-10 flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
-                  <CheckCircle2 size={24} />
-                </div>
-                <div>
-                  <h2 className="text-xl font-black text-slate-900 uppercase tracking-tight">Inventory <span className="text-blue-600">Review</span></h2>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Final checklist before authorization</p>
-                </div>
-              </div>
-
-              {activeStep === 3 && (
-                <div className="space-y-8">
                   <div className="rounded-[2rem] bg-slate-50 p-8 border border-slate-100">
                     <div className="space-y-6">
                       {activeCart.map(item => (
@@ -475,29 +422,18 @@ const Checkout = () => {
                     </div>
                   </div>
 
-                  <div className="flex gap-4">
-                    <input 
-                      type="text" 
-                      placeholder="ENTER COUPON CODE" 
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                      className="flex-1 rounded-2xl bg-white border-2 border-slate-100 p-4 text-[10px] font-black uppercase tracking-widest outline-none focus:border-[#00a2a4]"
-                    />
-                    <button className="px-8 rounded-2xl bg-slate-900 text-[10px] font-black uppercase tracking-widest text-white hover:bg-[#00a2a4] transition-all">Apply</button>
-                  </div>
-
                   <button 
-                    onClick={() => setActiveStep(4)} 
+                    onClick={() => setActiveStep(3)} 
                     className="w-full rounded-[2rem] bg-slate-900 py-6 text-xs font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all hover:bg-[#00a2a4]"
                   >
-                    Authorize Payment
+                    Proceed to Payment
                   </button>
                 </div>
               )}
             </section>
 
-            {/* 4. Payment Gateway */}
-            <section className={`overflow-hidden rounded-[2.5rem] bg-white p-10 shadow-xl shadow-slate-200/50 border border-white transition-all duration-500 ${activeStep !== 4 && 'opacity-50 grayscale scale-[0.98]'}`}>
+            {/* 3. Payment Gateway */}
+            <section className={`overflow-hidden rounded-[2.5rem] bg-white p-10 shadow-xl shadow-slate-200/50 border border-white transition-all duration-500 ${activeStep !== 3 && 'opacity-50 grayscale scale-[0.98]'}`}>
               <div className="mb-10 flex items-center gap-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-50 text-green-600">
                   <CreditCard size={24} />
@@ -508,7 +444,7 @@ const Checkout = () => {
                 </div>
               </div>
 
-              {activeStep === 4 && (
+              {activeStep === 3 && (
                 <div className="space-y-6">
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {[
@@ -537,7 +473,7 @@ const Checkout = () => {
                       onChange={(e) => setTermsAccepted(e.target.checked)}
                     />
                     <label htmlFor="terms" className="text-[10px] font-bold text-slate-400 uppercase tracking-tight leading-relaxed">
-                      I agree to the <span className="text-slate-900 underline">Terms of Service</span> and authorize MediQuick to verify my prescription and process satellite delivery to Amritsar Hub coordinates.
+                      I agree to the <span className="text-slate-900 underline">Terms of Service</span> and authorize MediQuick to process satellite delivery to Amritsar Hub coordinates.
                     </label>
                   </div>
 
