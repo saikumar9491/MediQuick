@@ -335,7 +335,6 @@ const Checkout = () => {
                   <button 
                     onClick={handlePlaceOrder} 
                     disabled={isProcessing || !paymentMethod}
-                    className="mt-6 flex w-full items-center justify-center gap-3 rounded-2xl bg-blue-600 py-6 text-sm font-black uppercase tracking-widest text-white shadow-2xl transition-all hover:bg-slate-900 active:scale-95 disabled:bg-slate-200"
                     className="mt-4 flex w-full items-center justify-center gap-4 rounded-[2rem] bg-slate-900 py-6 text-sm font-black uppercase tracking-[0.2em] text-white shadow-2xl transition-all hover:bg-[#00a2a4] active:scale-95 disabled:bg-slate-100 disabled:text-slate-300"
                   >
                     {isProcessing ? <Loader2 className="animate-spin" /> : <CheckCircle2 size={24} />}
