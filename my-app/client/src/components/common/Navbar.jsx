@@ -86,7 +86,7 @@ const Navbar = () => {
 
   useEffect(() => {
     const timer = setTimeout(async () => {
-      if (searchQuery.length > 1) {
+      if (searchQuery.length > 0) {
         try {
           const res = await fetch(`${API_BASE}/api/medicines?search=${searchQuery}`);
           const data = await res.json();
@@ -101,7 +101,7 @@ const Navbar = () => {
         setSearchResults([]);
         setShowSearchSuggestions(false);
       }
-    }, 300);
+    }, 150); // Faster response
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
@@ -189,7 +189,7 @@ const Navbar = () => {
                 className="w-full rounded bg-slate-50 border border-slate-100 px-4 py-2 text-[13px] font-medium outline-none transition-all focus:border-slate-300 focus:bg-white"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => searchQuery.length > 1 && setShowSearchSuggestions(true)}
+                onFocus={() => searchQuery.length > 0 && setShowSearchSuggestions(true)}
               />
               <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-600" size={18} />
             </form>
