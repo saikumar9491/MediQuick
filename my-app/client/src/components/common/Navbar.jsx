@@ -45,6 +45,35 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [locationName, setLocationName] = useState('New Delhi');
+  const [isDetecting, setIsDetecting] = useState(false);
+
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
+
+    setIsDetecting(true);
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      try {
+        const { latitude, longitude } = position.coords;
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+        const data = await res.json();
+        
+        // Extract city, town, or village
+        const city = data.address.city || data.address.town || data.address.village || data.address.suburb || "Current Location";
+        setLocationName(city);
+      } catch (error) {
+        console.error("Error detecting location:", error);
+      } finally {
+        setIsDetecting(false);
+      }
+    }, (error) => {
+      console.error(error);
+      setIsDetecting(false);
+    });
+  };
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -106,12 +135,17 @@ const Navbar = () => {
           </Link>
 
           {/* Location Selector */}
-          <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 hover:bg-slate-50 transition-colors cursor-pointer group shrink-0 border-r border-slate-100 pr-6">
+          <div 
+            onClick={handleDetectLocation}
+            className="hidden lg:flex items-center gap-2 px-3 py-1.5 hover:bg-slate-50 transition-colors cursor-pointer group shrink-0 border-r border-slate-100 pr-6"
+          >
             <MapPin size={18} className="text-slate-400 group-hover:text-[#00a2a4]" />
             <div className="flex flex-col">
-              <span className="text-[13px] font-bold text-slate-800">New Delhi</span>
+              <span className="text-[13px] font-bold text-slate-800">
+                {isDetecting ? 'Detecting...' : locationName}
+              </span>
             </div>
-            <Crosshair size={14} className="text-slate-400 ml-1" />
+            <Crosshair size={14} className={`text-slate-400 ml-1 ${isDetecting ? 'animate-spin text-[#00a2a4]' : ''}`} />
           </div>
 
           {/* Search Bar (Centered) */}
