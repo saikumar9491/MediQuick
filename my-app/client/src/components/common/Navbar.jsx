@@ -127,15 +127,58 @@ const Navbar = () => {
           </form>
 
           {/* Promotion & Actions */}
-          <div className="hidden items-center gap-6 xl:flex shrink-0">
-            <div className="flex items-center gap-1.5 text-[12px] font-medium text-slate-700">
+          <div className="hidden items-center gap-6 xl:flex shrink-0 relative">
+            <div 
+              onMouseEnter={() => setShowFlashDeals(true)}
+              onMouseLeave={() => setShowFlashDeals(false)}
+              className="flex items-center gap-1.5 text-[12px] font-medium text-slate-700 cursor-pointer group py-2"
+            >
               <Zap size={14} className="text-red-500 fill-red-500" />
-              <span>QUICK BUY! Get 25% off on medicines</span>
-              <ChevronDown size={14} className="text-slate-400" />
+              <span className="group-hover:text-[#00a2a4] transition-colors">QUICK BUY! Get 25% off on medicines</span>
+              <ChevronDown size={14} className={`text-slate-400 transition-transform ${showFlashDeals ? 'rotate-180' : ''}`} />
             </div>
-            <button className="rounded bg-[#ff6f61] px-5 py-2 text-[13px] font-bold text-white transition-all hover:bg-[#ff5a4d] active:scale-95 shadow-sm uppercase tracking-wide">
-              Quick order
-            </button>
+
+            {/* Daily Deals Dropdown */}
+            <AnimatePresence>
+              {showFlashDeals && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  onMouseEnter={() => setShowFlashDeals(true)}
+                  onMouseLeave={() => setShowFlashDeals(false)}
+                  className="absolute left-0 top-full z-[70] mt-1 w-72 rounded-xl bg-white p-4 shadow-2xl border border-slate-100"
+                >
+                  <div className="mb-3 flex items-center justify-between border-b border-slate-50 pb-2">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">Today's Flash Deals</span>
+                    <span className="rounded bg-red-500 px-1.5 py-0.5 text-[8px] font-bold text-white animate-pulse">LIVE</span>
+                  </div>
+                  <div className="space-y-3">
+                    {flashDeals.length > 0 ? flashDeals.map((deal) => (
+                      <Link 
+                        key={deal._id} 
+                        to={`/product/${deal._id}`}
+                        className="flex items-center gap-3 rounded-lg p-1.5 hover:bg-slate-50 transition-colors group"
+                      >
+                        <div className="h-10 w-10 shrink-0 rounded bg-white border border-slate-100 p-1">
+                          <img src={deal.image} className="h-full w-full object-contain" alt="" />
+                        </div>
+                        <div className="flex-1 overflow-hidden">
+                          <p className="truncate text-[11px] font-bold text-slate-700 group-hover:text-[#00a2a4]">{deal.name}</p>
+                          <p className="text-[10px] font-black text-red-500">₹{deal.discountPrice || deal.price}</p>
+                        </div>
+                        <ChevronRight size={14} className="text-slate-300" />
+                      </Link>
+                    )) : (
+                      <p className="text-center py-4 text-[10px] font-bold text-slate-400 uppercase">Fetching deals...</p>
+                    )}
+                  </div>
+                  <Link to="/medicines?filter=flash" className="mt-3 block rounded bg-slate-900 py-2 text-center text-[10px] font-bold text-white hover:bg-[#00a2a4] transition-colors uppercase tracking-widest">
+                    View All Offers
+                  </Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* User & Cart */}
             <div className="flex items-center gap-5 border-l border-slate-100 pl-6">
