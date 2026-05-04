@@ -144,11 +144,19 @@ const Navbar = () => {
                       className="absolute right-0 top-full z-[70] mt-2 w-56 rounded-[2rem] bg-white p-3 shadow-2xl border border-slate-100 shadow-teal-900/5"
                     >
                       <div className="mb-2 px-4 py-3 border-b border-slate-50">
-                        <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Clinical Account</p>
-                        <p className="truncate text-xs font-black text-slate-900 mt-1">{user.email}</p>
+                        <p className="truncate text-xs font-black text-slate-900">{user.email}</p>
                       </div>
 
                       <div className="space-y-1">
+                        {user.isAdmin && (
+                          <Link
+                            to="/admin"
+                            className="flex items-center gap-3 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest text-[#00a2a4] bg-teal-50 hover:bg-teal-100 transition-all mb-2"
+                          >
+                            <ShieldCheck size={16} />
+                            Admin Dashboard
+                          </Link>
+                        )}
                         {[
                           { label: 'Profile', path: '/profile', icon: User },
                           { label: 'My Orders', path: '/my-orders', icon: ClipboardList },
