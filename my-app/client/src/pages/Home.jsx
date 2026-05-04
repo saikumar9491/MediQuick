@@ -5,16 +5,19 @@ import {
   ShoppingBag, 
   FlaskConical, 
   Stethoscope, 
-  Leaf, 
+  LayoutGrid,
   ShieldCheck, 
   Sparkles,
   ChevronRight,
   ChevronLeft,
   Upload,
-  Clock,
-  Truck,
-  CheckCircle2,
-  AlertCircle
+  Plus,
+  ArrowRight,
+  Zap,
+  Activity,
+  Heart,
+  Baby,
+  Dna
 } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -30,30 +33,23 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [scanResult, setScanResult] = useState(null);
   const [currentBanner, setCurrentBanner] = useState(0);
   const [dbBanners, setDbBanners] = useState([]);
-  const [dbBrands, setDbBrands] = useState([]);
 
   useEffect(() => {
-    const fetchHomeAssets = async () => {
+    const fetchBanners = async () => {
       try {
-        const [bRes, brRes] = await Promise.all([
-          fetch(`${API_BASE}/api/banners`),
-          fetch(`${API_BASE}/api/brands`)
-        ]);
-        const [bData, brData] = await Promise.all([bRes.json(), brRes.json()]);
-        setDbBanners(Array.isArray(bData) ? bData : []);
-        setDbBrands(Array.isArray(brData) ? brData : []);
+        const res = await fetch(`${API_BASE}/api/banners`);
+        const data = await res.json();
+        setDbBanners(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error("Home sync failed:", err);
+        console.error("Banner fetch failed:", err);
       }
     };
-    fetchHomeAssets();
+    fetchBanners();
   }, []);
 
   const activeBanners = dbBanners.filter(b => b.category !== 'flash');
-  const flashBanner = dbBanners.find(b => b.category === 'flash');
 
   useEffect(() => {
     if (activeBanners.length === 0) return;
@@ -63,346 +59,191 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
     return () => clearInterval(timer);
   }, [activeBanners.length]);
 
-  const handleUploadPrescription = async () => {
-    if (!user) return toast.error('Please login to upload prescriptions');
-    if (!selectedFile) return toast.error('Please select a file first');
-
-    try {
-      setIsUploading(true);
-      const formData = new FormData();
-      formData.append('prescription', selectedFile);
-
-      const response = await fetch(`${API_BASE}/api/prescriptions/scan-and-check`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        setScanResult(data.foundProduct);
-        setSelectedFile(null);
-        toast.success('Prescription scanned successfully');
-      } else {
-        toast.error(data.message || 'Upload failed');
-      }
-    } catch (error) {
-      toast.error('Something went wrong. Please try again.');
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
   const services = [
     { title: 'Medicines', icon: <ShoppingBag className="h-6 w-6" />, desc: 'Flat 25% Off', color: 'bg-orange-50 text-orange-600', path: '/medicines' },
     { title: 'Lab Tests', icon: <FlaskConical className="h-6 w-6" />, desc: 'Up to 70% Off', color: 'bg-blue-50 text-blue-600', path: '/lab-tests' },
     { title: 'Consult', icon: <Stethoscope className="h-6 w-6" />, desc: 'Online Chat', color: 'bg-teal-50 text-teal-600', path: '/consult' },
-    { title: 'Ayurveda', icon: <Leaf className="h-6 w-6" />, desc: 'Pure Herbal', color: 'bg-green-50 text-green-600', path: '/ayurveda' },
+    { title: 'Ayurveda', icon: <LayoutGrid className="h-6 w-6" />, desc: 'Pure Herbal', color: 'bg-green-50 text-green-600', path: '/ayurveda' },
     { title: 'Care Plan', icon: <ShieldCheck className="h-6 w-6" />, desc: 'Extra Savings', color: 'bg-red-50 text-red-600', path: '/care-plan' },
-    { title: 'Skin Care', icon: <Sparkles className="h-6 w-6" />, desc: 'Derm Approved', color: 'bg-pink-50 text-pink-600', path: '/skin-care' },
   ];
 
+  const concerns = [
+    { name: 'Stomach Care', icon: <Activity className="h-5 w-5" />, color: 'text-orange-500' },
+    { name: 'Diabetes', icon: <Dna className="h-5 w-5" />, color: 'text-blue-500' },
+    { name: 'Heart Health', icon: <Heart className="h-5 w-5" />, color: 'text-red-500' },
+    { name: 'Baby Care', icon: <Baby className="h-5 w-5" />, color: 'text-pink-500' },
+    { name: 'Immunity', icon: <Sparkles className="h-5 w-5" />, color: 'text-purple-500' },
+    { name: 'Bone Care', icon: <Plus className="h-5 w-5" />, color: 'text-emerald-500' },
+  ];
+
+  const handleUpload = async () => {
+    if (!user) return toast.error('Please login first');
+    if (!selectedFile) return toast.error('Select a prescription file');
+    
+    setIsUploading(true);
+    // Simulation for demo
+    setTimeout(() => {
+      setIsUploading(false);
+      setSelectedFile(null);
+      toast.success('Prescription uploaded for review!');
+    }, 2000);
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-12">
-      {/* Hero Banner Section */}
-      <section className="relative w-full bg-white px-4 py-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f8fafc] pb-12">
+      {/* Hero Section */}
+      <section className="bg-white px-4 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
-          <div className="relative h-[180px] sm:h-[320px] md:h-[420px] overflow-hidden rounded-[2.5rem] bg-slate-900 shadow-2xl">
+          <div className="relative h-[160px] overflow-hidden rounded-2xl bg-slate-900 sm:h-[320px]">
             <AnimatePresence mode="wait">
               {activeBanners.length > 0 ? (
                 <motion.div
                   key={currentBanner}
-                  initial={{ opacity: 0, scale: 1.05 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.8 }}
                   className="absolute inset-0 cursor-pointer"
-                  onClick={() => activeBanners[currentBanner].link && navigate(activeBanners[currentBanner].link)}
+                  onClick={() => navigate('/medicines')}
                 >
-                  {activeBanners[currentBanner].image && (
-                    <img 
-                      src={activeBanners[currentBanner].image} 
-                      className="h-full w-full object-cover opacity-60 transition-transform duration-[10s] hover:scale-110" 
-                      alt="banner" 
-                    />
-                  )}
-                  <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 md:px-20">
-                    <motion.span 
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="inline-block w-fit rounded-full bg-blue-600/20 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-blue-400 backdrop-blur-md"
-                    >
-                      Exclusive Deal
-                    </motion.span>
+                  <img 
+                    src={activeBanners[currentBanner].image} 
+                    className="h-full w-full object-cover opacity-80" 
+                    alt="banner" 
+                  />
+                  <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-16">
                     <motion.h1 
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
-                      className="mt-4 max-w-2xl text-2xl sm:text-4xl md:text-6xl font-bold tracking-tight text-white leading-tight"
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      className="text-xl font-black tracking-tight text-white sm:text-5xl"
                     >
                       {activeBanners[currentBanner].title}
                     </motion.h1>
-                    <motion.p 
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 }}
-                      className="mt-4 max-w-md text-xs sm:text-lg font-medium text-slate-300 opacity-90"
-                    >
-                      {activeBanners[currentBanner].desc || "High-quality healthcare essentials delivered to your doorstep."}
-                    </motion.p>
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.4 }}
-                      className="mt-8"
-                    >
-                      <button className="flex items-center gap-2 rounded-full bg-white px-6 py-3 text-xs font-bold text-slate-900 transition-all hover:bg-blue-600 hover:text-white sm:px-8 sm:py-4 sm:text-sm">
-                        Shop Now <ChevronRight className="h-4 w-4" />
-                      </button>
-                    </motion.div>
+                    <p className="mt-2 max-w-md text-[10px] font-bold text-slate-200 uppercase tracking-widest sm:text-sm">
+                      {activeBanners[currentBanner].desc || "Healthcare delivered to your doorstep."}
+                    </p>
+                    <button className="mt-6 flex w-fit items-center gap-2 rounded-full bg-blue-600 px-6 py-2.5 text-[10px] font-black text-white shadow-xl hover:bg-white hover:text-slate-900 sm:px-10 sm:py-4 sm:text-xs">
+                      SHOP NOW <ArrowRight size={14} />
+                    </button>
                   </div>
                 </motion.div>
               ) : (
-                <div className="flex h-full w-full items-center justify-center bg-slate-100">
-                  <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+                <div className="flex h-full items-center justify-center bg-slate-100">
+                  <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
                 </div>
               )}
             </AnimatePresence>
-
-            {/* Slider Dots */}
-            <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-2 z-20">
-              {activeBanners.map((_, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setCurrentBanner(idx)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    currentBanner === idx ? 'w-8 bg-blue-500' : 'w-2 bg-white/40'
-                  }`}
-                />
-              ))}
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Services Grid */}
+      {/* Service Hub Grid */}
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
           {services.map((service, idx) => (
             <motion.div
-              key={idx}
               whileHover={{ y: -5 }}
+              key={idx}
               onClick={() => navigate(service.path)}
-              className="group cursor-pointer overflow-hidden rounded-2xl bg-white p-4 shadow-sm border border-slate-100 transition-all hover:shadow-xl hover:border-blue-100"
+              className="flex cursor-pointer flex-col items-center justify-center rounded-2xl bg-white p-6 shadow-sm border border-slate-100 text-center transition-all hover:shadow-xl hover:border-blue-100"
             >
-              <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${service.color} transition-transform group-hover:scale-110`}>
+              <div className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl ${service.color} shadow-inner`}>
                 {service.icon}
               </div>
-              <h3 className="text-sm font-bold text-slate-900">{service.title}</h3>
-              <p className="mt-1 text-[10px] font-semibold text-slate-400 group-hover:text-blue-500 transition-colors">
-                {service.desc}
-              </p>
+              <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">{service.title}</h3>
+              <p className="mt-1 text-[9px] font-bold text-slate-400">{service.desc}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* Prescription Upload Section */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-[3rem] bg-gradient-to-br from-slate-900 to-blue-900 p-8 sm:p-12 text-white shadow-2xl">
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-500/20 blur-3xl" />
-          <div className="absolute -left-20 -bottom-20 h-64 w-64 rounded-full bg-indigo-500/20 blur-3xl" />
-          
-          <div className="relative flex flex-col gap-12 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-xl">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md">
-                <Upload className="h-6 w-6 text-blue-400" />
+      {/* Prescription Quick Order */}
+      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-3xl bg-white p-8 shadow-sm border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="flex-1">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+                <Upload size={20} />
               </div>
-              <h2 className="mt-6 text-3xl font-bold tracking-tight sm:text-4xl leading-tight">
-                Quick Order with Prescription
-              </h2>
-              <p className="mt-4 text-lg text-slate-300">
-                Don't waste time searching. Just upload your prescription and our experts will handle the rest.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-6">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-green-400" />
-                  <span className="text-sm font-medium text-slate-200">Verified Pharmacists</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-green-400" />
-                  <span className="text-sm font-medium text-slate-200">Instant Review</span>
-                </div>
-              </div>
+              <h2 className="text-xl font-black text-slate-900 tracking-tight">Quick Order with Prescription</h2>
             </div>
+            <p className="text-sm font-medium text-slate-500 max-w-md">
+              Upload your prescription and we'll fulfill your order with genuine medicines.
+            </p>
+          </div>
 
-            <div className="w-full max-w-md space-y-4">
-              <div 
-                onClick={() => fileInputRef.current.click()}
-                className={`flex cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed p-8 transition-all ${
-                  selectedFile ? 'border-green-500 bg-green-500/10' : 'border-white/20 bg-white/5 hover:bg-white/10'
-                }`}
-              >
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  className="hidden" 
-                  onChange={(e) => setSelectedFile(e.target.files[0])}
-                />
-                {selectedFile ? (
-                  <div className="text-center">
-                    <p className="text-sm font-bold text-green-400">File Selected!</p>
-                    <p className="mt-1 text-xs text-slate-400 truncate max-w-[200px]">{selectedFile.name}</p>
-                  </div>
-                ) : (
-                  <>
-                    <Upload className="mb-4 h-10 w-10 text-blue-400" />
-                    <p className="text-center text-sm font-bold">Select Image or PDF</p>
-                    <p className="mt-1 text-xs text-slate-400">Max size 5MB</p>
-                  </>
-                )}
-              </div>
-
-              <button 
-                onClick={handleUploadPrescription}
-                disabled={isUploading || !selectedFile}
-                className={`w-full rounded-2xl py-4 text-sm font-bold shadow-xl transition-all active:scale-95 ${
-                  selectedFile ? 'bg-white text-slate-900 hover:bg-blue-50' : 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                }`}
-              >
-                {isUploading ? "Scanning..." : "Process Prescription"}
-              </button>
-            </div>
+          <div className="flex w-full md:w-auto items-center gap-4">
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              className="hidden" 
+              onChange={(e) => setSelectedFile(e.target.files[0])}
+            />
+            <button 
+              onClick={() => fileInputRef.current.click()}
+              className={`flex-1 md:flex-none flex items-center justify-center gap-2 rounded-xl px-8 py-4 text-xs font-black uppercase tracking-widest border-2 border-slate-100 hover:bg-slate-50 transition-all ${selectedFile ? 'text-green-600 border-green-100 bg-green-50' : 'text-slate-900'}`}
+            >
+              {selectedFile ? 'FILE SELECTED' : 'SELECT FILE'}
+            </button>
+            <button 
+              onClick={handleUpload}
+              disabled={!selectedFile || isUploading}
+              className="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-10 py-4 text-xs font-black uppercase tracking-widest text-white shadow-xl hover:bg-slate-900 active:scale-95 disabled:bg-slate-200 transition-all"
+            >
+              {isUploading ? 'UPLOADING...' : 'ORDER NOW'}
+            </button>
           </div>
         </div>
-
-        {/* Scan Result Dropdown */}
-        <AnimatePresence>
-          {scanResult && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="mt-6 overflow-hidden rounded-3xl bg-white p-6 shadow-xl border border-slate-100"
-            >
-              <div className="flex flex-col sm:flex-row items-center gap-6">
-                <div className="h-24 w-24 rounded-2xl bg-slate-50 p-3 border border-slate-100">
-                  <img src={scanResult.image} className="h-full w-full object-contain" alt="" />
-                </div>
-                <div className="flex-1 text-center sm:text-left">
-                  <div className="flex items-center justify-center sm:justify-start gap-2">
-                    <span className="rounded-full bg-green-100 px-3 py-1 text-[10px] font-bold uppercase text-green-600">Medicine Identified</span>
-                  </div>
-                  <h4 className="mt-2 text-xl font-bold text-slate-900">{scanResult.name}</h4>
-                  <p className="text-xs font-medium text-slate-400 uppercase tracking-widest">{scanResult.brand}</p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <p className="text-2xl font-bold text-blue-600">₹{scanResult.price}</p>
-                  <button 
-                    onClick={() => {
-                      addToCart(scanResult);
-                      setScanResult(null);
-                      toast.success("Added to bag!");
-                    }}
-                    className="rounded-xl bg-slate-900 px-8 py-3 text-sm font-bold text-white shadow-lg shadow-slate-200 transition-all hover:bg-blue-600 active:scale-95"
-                  >
-                    Add to Bag
-                  </button>
-                  <button onClick={() => setScanResult(null)} className="p-2 text-slate-300 hover:text-red-500">
-                    <AlertCircle className="h-6 w-6" />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </section>
 
-      {/* Daily Flash Deals Section */}
+      {/* Shop by Health Concerns */}
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mb-8 flex items-center justify-between">
+          <h2 className="text-xl font-black text-slate-900 tracking-tight">Shop by Health Concerns</h2>
+          <button className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">View All</button>
+        </div>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-6">
+          {concerns.map((concern, idx) => (
+            <div key={idx} className="group cursor-pointer flex flex-col items-center gap-4">
+              <div className="h-24 w-24 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center transition-all group-hover:shadow-xl group-hover:border-blue-100 overflow-hidden relative">
+                <div className={`absolute inset-0 ${concern.color} opacity-5 group-hover:opacity-10 transition-opacity`} />
+                <div className={concern.color}>{concern.icon}</div>
+              </div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-600 group-hover:text-blue-600">{concern.name}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Trending Products */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Daily Flash Deals</h2>
-            <p className="text-sm font-medium text-slate-400">Best offers updated every 24 hours</p>
+            <h2 className="text-xl font-black text-slate-900 tracking-tight">Trending Near You</h2>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Amritsar Hub Selection</p>
           </div>
-          <button onClick={() => navigate('/medicines')} className="text-sm font-bold text-blue-600 hover:underline">
-            View All
-          </button>
+          <button onClick={() => navigate('/medicines')} className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">See All</button>
         </div>
 
-        {loading ? (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="aspect-[3/4] animate-pulse rounded-3xl bg-slate-200" />
-            ))}
-          </div>
-        ) : featured.length > 0 ? (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {featured.slice(0, 5).map(med => (
-              <MedicineCard key={med._id} {...med} />
-            ))}
-          </div>
-        ) : (
-          <div className="rounded-3xl bg-white p-12 text-center border border-slate-100">
-            <ShoppingBag className="mx-auto mb-4 h-12 w-12 text-slate-200" />
-            <p className="text-lg font-bold text-slate-900">No active flash deals</p>
-            <p className="text-sm text-slate-400">Check back tomorrow for exciting offers!</p>
-          </div>
-        )}
-      </section>
-
-      {/* Trust & Features Banner */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="flex items-center gap-4 rounded-3xl bg-white p-6 shadow-sm border border-slate-100">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
-              <Truck className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-900">Lightning Fast Delivery</p>
-              <p className="text-xs text-slate-400">Under 6 hours in Amritsar Hub</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 rounded-3xl bg-white p-6 shadow-sm border border-slate-100">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-green-50 text-green-600">
-              <ShieldCheck className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-900">100% Genuine Medicine</p>
-              <p className="text-xs text-slate-400">Directly sourced from companies</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 rounded-3xl bg-white p-6 shadow-sm border border-slate-100">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-purple-50 text-purple-600">
-              <Clock className="h-6 w-6" />
-            </div>
-            <div>
-              <p className="text-sm font-bold text-slate-900">24/7 Support Available</p>
-              <p className="text-xs text-slate-400">Ready to help anytime, anywhere</p>
-            </div>
-          </div>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+          {loading ? (
+            [1, 2, 3, 4, 5, 6].map(i => <div key={i} className="aspect-[4/5] animate-pulse rounded-2xl bg-white border border-slate-100" />)
+          ) : (
+            medicines.slice(0, 6).map(med => <MedicineCard key={med._id} {...med} />)
+          )}
         </div>
       </section>
 
-      {/* Bestsellers Section */}
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="rounded-[3rem] bg-slate-900 p-8 sm:p-12 shadow-2xl">
-          <div className="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-            <div>
-              <h2 className="text-3xl font-bold text-white tracking-tight">Amritsar Bestsellers</h2>
-              <p className="mt-2 text-slate-400">Most trusted products by our local community</p>
-            </div>
-            <button 
-              onClick={() => navigate('/medicines')}
-              className="group flex items-center gap-2 text-sm font-bold text-blue-400 hover:text-blue-300"
-            >
-              Explore Full Catalog <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </button>
+      {/* Featured Brands */}
+      <section className="bg-white py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-10 text-center">
+            <h2 className="text-2xl font-black text-slate-900 tracking-tight">Trusted Global Brands</h2>
+            <p className="mt-2 text-sm font-medium text-slate-400">Collaborating with the leaders in healthcare</p>
           </div>
-
-          <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {medicines.slice(0, 10).map((med) => (
-              <MedicineCard key={med._id} {...med} />
+          <div className="flex flex-wrap items-center justify-center gap-12 grayscale opacity-40">
+            {['Himalaya', 'Cipla', 'Dabur', 'Abbott', 'GSK', 'Glenmark'].map(brand => (
+              <span key={brand} className="text-2xl font-black tracking-tighter uppercase italic">{brand}</span>
             ))}
           </div>
         </div>

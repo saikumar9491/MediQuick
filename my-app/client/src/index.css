@@ -1,21 +1,25 @@
 @import "tailwindcss";
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   scroll-behavior: smooth;
+  --primary-teal: #00a2a4;
+  --primary-orange: #ff6f61;
+  --bg-soft: #f6f6f7;
+  --text-main: #212121;
 }
 
 body {
-  @apply text-slate-900 bg-white;
+  @apply text-[#212121] bg-slate-50;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Custom Premium Scrollbar */
+/* Custom Professional Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -23,21 +27,17 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-200 rounded-full border-4 border-slate-50;
+  @apply bg-slate-300 rounded-full hover:bg-slate-400;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  @apply bg-slate-300;
+/* Professional Card Styling */
+.pro-card {
+  @apply bg-white border border-slate-100 rounded-xl shadow-sm hover:shadow-md transition-all duration-300;
 }
 
-/* Smooth Transitions */
-.page-transition {
-  @apply transition-all duration-500 ease-in-out;
-}
-
-/* Glassmorphism utility if needed */
-.glass {
-  @apply backdrop-blur-md bg-white/70 border border-white/20 shadow-xl;
+/* Information Tags */
+.discount-tag {
+  @apply bg-[#ff6f61] text-white text-[10px] font-bold px-2 py-0.5 rounded-sm;
 }
 
 @keyframes fadeIn {
@@ -46,10 +46,9 @@ body {
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.8s ease-out forwards;
+  animation: fadeIn 0.5s ease-out forwards;
 }
 
-/* Hide scrollbar for clean carousels */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
