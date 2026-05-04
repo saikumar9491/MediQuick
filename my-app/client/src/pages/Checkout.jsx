@@ -2,6 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  ShieldCheck, 
+  Truck, 
+  CreditCard, 
+  MapPin, 
+  ChevronRight, 
+  ChevronLeft, 
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  Package,
+  Zap
+} from 'lucide-react';
 import toast from 'react-hot-toast';
 import { API_BASE } from '../utils/apiConfig';
 
@@ -14,7 +28,7 @@ const Checkout = () => {
   const [activeStep, setActiveStep] = useState(1);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false); // Prevents double clicking
+  const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('');
   const [addressData, setAddressData] = useState({
     pincode: '',
@@ -27,21 +41,17 @@ const Checkout = () => {
   const directItem = location.state?.directItem;
   const activeCart = isDirectBuy && directItem ? [directItem] : cartItems || [];
 
-  const subtotal = activeCart.reduce(
-    (acc, item) => acc + item.price * (item.quantity || 1),
-    0
-  );
+  const subtotal = activeCart.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0);
   const discount = subtotal > 500 ? 100 : 0;
   const deliveryFee = subtotal > 1000 || subtotal === 0 ? 0 : 50;
   const total = subtotal + deliveryFee - discount;
 
-  // Redirect if cart is empty and no order was just placed
   useEffect(() => {
     if (activeCart.length === 0 && !orderPlaced) {
       navigate('/cart');
     }
     window.scrollTo(0, 0);
-  }, [activeCart, navigate, orderPlaced]);
+  }, [activeCart.length, navigate, orderPlaced]);
 
   const handleGetExactLocation = () => {
     setIsLocating(true);
@@ -54,11 +64,11 @@ const Checkout = () => {
             area: `GPS: ${pos.coords.latitude.toFixed(4)}, ${pos.coords.longitude.toFixed(4)}`,
           }));
           setIsLocating(false);
-          toast.success("Satellite Location Locked!");
+          toast.success("Location locked successfully");
         },
         () => {
           setIsLocating(false);
-          toast.error("GPS Access Denied");
+          toast.error("GPS access denied");
         },
         { enableHighAccuracy: true }
       );
@@ -101,228 +111,279 @@ const Checkout = () => {
         body: JSON.stringify(orderPayload),
       });
 
-      const data = await response.json();
-
       if (response.ok) {
         setOrderPlaced(true);
-        
-        /**
-         * PROTOCOL: WIPE HUB INVENTORY
-         * Only clear the cart if it wasn't a 'Buy Now' single item purchase
-         */
-        if (!isDirectBuy) {
-          clearCart(); 
-        }
-
-        toast.success("Transaction Authorized!");
-        
-        setTimeout(() => {
-          navigate('/my-orders');
-        }, 3000);
+        if (!isDirectBuy) clearCart();
+        toast.success("Order placed successfully!");
+        setTimeout(() => navigate('/my-orders'), 4000);
       } else {
-        toast.error(data.message || 'Hub Rejected Transaction');
+        const data = await response.json();
+        toast.error(data.message || 'Failed to place order');
       }
     } catch (error) {
-      console.error('Order process error:', error);
-      toast.error('Satellite Link Interrupted. Try again.');
+      toast.error('Network error. Please try again.');
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // Success Screen
   if (orderPlaced) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4 pt-24 pb-10 text-center sm:p-6 sm:pt-24">
-        <div className="mb-6 flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full bg-green-50 text-4xl sm:text-5xl text-green-500 shadow-sm animate-bounce">
-          ✓
-        </div>
-        <h1 className="text-2xl sm:text-3xl font-bold uppercase italic tracking-tight text-gray-900">
-          Order Confirmed
-        </h1>
-        <p className="mt-2 max-w-sm text-sm sm:text-base font-medium italic text-gray-500">
-          Your medical supplies are being prepared at the Amritsar Hub and will arrive shortly.
-        </p>
-        <button
-          onClick={() => navigate('/my-orders')}
-          className="mt-8 rounded-full bg-black px-6 sm:px-8 py-3 text-xs sm:text-sm font-bold uppercase tracking-widest text-white shadow-lg transition-all hover:bg-blue-600"
+      <div className="flex min-h-screen items-center justify-center bg-white px-4">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-md rounded-[3rem] bg-slate-50 p-12 text-center shadow-xl"
         >
-          Track My Order
-        </button>
+          <div className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-green-500 text-white shadow-lg shadow-green-100">
+            <CheckCircle2 size={48} />
+          </div>
+          <h1 className="text-3xl font-bold text-slate-900">Order Confirmed!</h1>
+          <p className="mt-4 text-sm font-medium text-slate-500">
+            Your medical supplies are being prepared at the Amritsar Hub and will arrive shortly.
+          </p>
+          <button
+            onClick={() => navigate('/my-orders')}
+            className="mt-10 w-full rounded-2xl bg-slate-900 py-4 text-sm font-bold text-white shadow-xl transition-all hover:bg-blue-600"
+          >
+            Track Order
+          </button>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#fcfcfd] pt-20 pb-14 sm:pt-24 sm:pb-20 selection:bg-blue-100">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <div className="min-h-screen bg-slate-50/50 pb-20 pt-10">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Step Indicator */}
-        <div className="mx-auto mb-8 sm:mb-12 flex max-w-2xl items-start justify-between gap-2 sm:gap-4">
+        <div className="mx-auto mb-16 flex max-w-2xl items-center justify-between relative">
+          <div className="absolute top-1/2 left-0 h-0.5 w-full bg-slate-200 -translate-y-1/2 z-0" />
           {[1, 2, 3].map((step) => (
-            <div key={step} className="relative flex flex-1 flex-col items-center">
+            <div key={step} className="relative z-10 flex flex-col items-center">
               <div
-                className={`z-10 flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-full text-xs sm:text-sm font-bold transition-all duration-500 ${
+                className={`flex h-12 w-12 items-center justify-center rounded-full text-sm font-bold transition-all duration-500 ${
                   activeStep >= step
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-200'
-                    : 'bg-gray-200 text-gray-500'
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-100'
+                    : 'bg-white text-slate-400 border-2 border-slate-200'
                 }`}
               >
-                {step}
+                {activeStep > step ? <CheckCircle2 size={20} /> : step}
               </div>
-              <p className={`mt-2 sm:mt-3 text-[8px] sm:text-[10px] font-bold uppercase tracking-widest text-center ${activeStep >= step ? 'font-black text-blue-600' : 'text-gray-400'}`}>
+              <span className={`mt-3 text-[10px] font-bold uppercase tracking-widest ${activeStep >= step ? 'text-blue-600' : 'text-slate-400'}`}>
                 {step === 1 ? 'Shipping' : step === 2 ? 'Review' : 'Payment'}
-              </p>
-              {step < 3 && (
-                <div className={`absolute top-4 sm:top-5 left-1/2 h-[2px] w-full transition-all duration-500 ${activeStep > step ? 'bg-blue-600' : 'bg-gray-200'}`}></div>
-              )}
+              </span>
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-12">
-          <div className="space-y-5 sm:space-y-6 lg:col-span-7">
+        <div className="flex flex-col lg:flex-row gap-12">
+          
+          <div className="flex-1 space-y-8">
             
-            {/* Step 1: Delivery */}
-            <div className={`rounded-2xl sm:rounded-3xl border border-gray-100 bg-white p-5 sm:p-8 shadow-sm transition-all duration-500 ${activeStep !== 1 && 'scale-[0.98] opacity-60 grayscale'}`}>
-              <h2 className="mb-5 sm:mb-6 flex items-center gap-2 text-lg sm:text-xl font-bold uppercase italic tracking-tighter text-gray-900">
-                <span className="h-5 w-2 sm:h-6 rounded-full bg-blue-600"></span>
-                Delivery Details
-              </h2>
+            {/* Shipping Details */}
+            <section className={`overflow-hidden rounded-[2.5rem] bg-white p-8 shadow-sm border border-slate-100 transition-all ${activeStep !== 1 && 'opacity-60 grayscale scale-95'}`}>
+              <div className="mb-8 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                  <MapPin size={20} />
+                </div>
+                <h2 className="text-xl font-bold text-slate-900">Shipping Details</h2>
+              </div>
+
               {activeStep === 1 ? (
-                <div className="space-y-4 animate-fadeIn">
-                  <button onClick={handleGetExactLocation} className="flex items-center gap-2 rounded-lg border border-blue-100 p-2 text-[10px] sm:text-xs font-bold uppercase italic text-blue-600 transition-all hover:bg-blue-50">
-                    {isLocating ? '📡 Accessing Satellite...' : '📍 Detect Current Exact Location'}
+                <div className="space-y-6">
+                  <button 
+                    onClick={handleGetExactLocation} 
+                    className="flex items-center gap-2 rounded-xl bg-blue-50 px-4 py-2 text-xs font-bold text-blue-600 hover:bg-blue-100 transition-colors"
+                  >
+                    {isLocating ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} className="fill-current" />}
+                    Detect Current Location
                   </button>
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div className="sm:col-span-1">
-                      <label className="ml-2 text-[9px] sm:text-[10px] font-black uppercase italic text-gray-400">Pincode</label>
-                      <input type="text" value={addressData.pincode} placeholder="143001" className="w-full rounded-2xl border-2 border-transparent bg-gray-50 p-3 sm:p-4 text-sm font-semibold uppercase outline-none transition-all focus:border-blue-100 focus:bg-white" onChange={(e) => setAddressData({ ...addressData, pincode: e.target.value })} />
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                      <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-slate-400">Pincode</label>
+                      <input 
+                        type="text" 
+                        value={addressData.pincode} 
+                        placeholder="143001" 
+                        className="w-full rounded-2xl bg-slate-50 p-4 text-sm font-bold outline-none border-2 border-transparent focus:border-blue-600 focus:bg-white transition-all"
+                        onChange={(e) => setAddressData({ ...addressData, pincode: e.target.value })} 
+                      />
                     </div>
-                    <div className="sm:col-span-1">
-                      <label className="ml-2 text-[9px] sm:text-[10px] font-black uppercase italic text-gray-400">Building/Flat</label>
-                      <input type="text" value={addressData.building} placeholder="H.No 123" className="w-full rounded-2xl border-2 border-transparent bg-gray-50 p-3 sm:p-4 text-sm font-semibold uppercase outline-none transition-all focus:border-blue-100 focus:bg-white" onChange={(e) => setAddressData({ ...addressData, building: e.target.value })} />
+                    <div>
+                      <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-slate-400">Building/Flat</label>
+                      <input 
+                        type="text" 
+                        value={addressData.building} 
+                        placeholder="e.g. House No. 123" 
+                        className="w-full rounded-2xl bg-slate-50 p-4 text-sm font-bold outline-none border-2 border-transparent focus:border-blue-600 focus:bg-white transition-all"
+                        onChange={(e) => setAddressData({ ...addressData, building: e.target.value })} 
+                      />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="ml-2 text-[9px] sm:text-[10px] font-black uppercase italic text-gray-400">Area / Locality / Road</label>
-                      <input type="text" value={addressData.area} placeholder="Street name, landmark..." className="w-full rounded-2xl border-2 border-transparent bg-gray-50 p-3 sm:p-4 text-sm font-semibold uppercase outline-none transition-all focus:border-blue-100 focus:bg-white" onChange={(e) => setAddressData({ ...addressData, area: e.target.value })} />
+                      <label className="mb-2 block text-[10px] font-bold uppercase tracking-widest text-slate-400">Area / Locality / Street</label>
+                      <input 
+                        type="text" 
+                        value={addressData.area} 
+                        placeholder="e.g. Mall Road, Near Golden Temple" 
+                        className="w-full rounded-2xl bg-slate-50 p-4 text-sm font-bold outline-none border-2 border-transparent focus:border-blue-600 focus:bg-white transition-all"
+                        onChange={(e) => setAddressData({ ...addressData, area: e.target.value })} 
+                      />
                     </div>
                   </div>
-                  <button onClick={() => setActiveStep(2)} disabled={!addressData.building} className="mt-4 w-full rounded-2xl bg-black py-3.5 sm:py-4 text-[10px] sm:text-xs font-black uppercase italic tracking-widest text-white transition-all active:scale-[0.99] disabled:bg-gray-200 hover:shadow-2xl">
+
+                  <button 
+                    onClick={() => setActiveStep(2)} 
+                    disabled={!addressData.building || !addressData.pincode}
+                    className="w-full rounded-2xl bg-slate-900 py-4 text-sm font-bold text-white shadow-xl transition-all hover:bg-blue-600 active:scale-95 disabled:bg-slate-200"
+                  >
                     Continue to Review
                   </button>
                 </div>
               ) : (
-                <div className="flex flex-col gap-3 rounded-2xl border border-gray-100 bg-gray-50 p-4 sm:flex-row sm:items-center sm:justify-between italic">
-                  <p className="text-sm font-medium uppercase tracking-tighter text-gray-600">
-                    {addressData.building}, {addressData.area}
-                  </p>
-                  <button onClick={() => setActiveStep(1)} className="text-left text-xs font-black uppercase text-blue-600 underline decoration-2 underline-offset-4">Change</button>
+                <div className="flex items-center justify-between rounded-2xl bg-slate-50 p-4">
+                  <div className="text-sm font-bold text-slate-600">
+                    {addressData.building}, {addressData.area} ({addressData.pincode})
+                  </div>
+                  <button onClick={() => setActiveStep(1)} className="text-xs font-bold text-blue-600 hover:underline">Change</button>
                 </div>
               )}
-            </div>
+            </section>
 
-            {/* Step 2: Review */}
-            <div className={`rounded-2xl sm:rounded-3xl border border-gray-100 bg-white p-5 sm:p-8 shadow-sm transition-all duration-500 ${activeStep !== 2 && 'opacity-60 grayscale'}`}>
-              <h2 className="mb-5 sm:mb-6 flex items-center gap-2 text-lg sm:text-xl font-bold uppercase italic tracking-tighter text-gray-900">
-                <span className="h-5 w-2 sm:h-6 rounded-full bg-blue-600"></span>
-                Review Order
-              </h2>
+            {/* Review Section */}
+            <section className={`overflow-hidden rounded-[2.5rem] bg-white p-8 shadow-sm border border-slate-100 transition-all ${activeStep !== 2 && 'opacity-60 grayscale scale-95'}`}>
+              <div className="mb-8 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+                  <Package size={20} />
+                </div>
+                <h2 className="text-xl font-bold text-slate-900">Review Order</h2>
+              </div>
+
               {activeStep === 2 && (
-                <div className="space-y-4 animate-fadeIn">
-                  <p className="text-[9px] sm:text-[10px] font-black uppercase italic tracking-[3px] text-gray-400">
-                    {isDirectBuy ? 'Processing Direct Hub Purchase Protocol' : `Verifying ${activeCart.length} Inventory Units`}
-                  </p>
-                  <button onClick={() => setActiveStep(3)} className="mt-4 w-full rounded-2xl bg-black py-3.5 sm:py-4 text-[10px] sm:text-xs font-black uppercase italic tracking-widest text-white shadow-xl active:scale-[0.99]">
+                <div className="space-y-6">
+                  <div className="rounded-2xl bg-slate-50 p-6">
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Selected Items ({activeCart.length})</p>
+                    <div className="mt-4 space-y-4">
+                      {activeCart.map(item => (
+                        <div key={item._id} className="flex items-center gap-4">
+                          <img src={item.image} className="h-10 w-10 rounded-lg bg-white p-1" alt="" />
+                          <div className="flex-1">
+                            <p className="text-sm font-bold text-slate-900 line-clamp-1">{item.name}</p>
+                            <p className="text-[10px] text-slate-400">Qty: {item.quantity || 1}</p>
+                          </div>
+                          <p className="text-sm font-bold text-slate-900">₹{item.price * (item.quantity || 1)}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setActiveStep(3)} 
+                    className="w-full rounded-2xl bg-slate-900 py-4 text-sm font-bold text-white shadow-xl transition-all hover:bg-blue-600 active:scale-95"
+                  >
                     Proceed to Payment
                   </button>
                 </div>
               )}
-            </div>
+            </section>
 
-            {/* Step 3: Payment */}
-            <div className={`rounded-2xl sm:rounded-3xl border border-gray-100 bg-white p-5 sm:p-8 shadow-sm transition-all duration-500 ${activeStep !== 3 && 'opacity-60 grayscale'}`}>
-              <h2 className="mb-5 sm:mb-6 flex items-center gap-2 text-lg sm:text-xl font-bold uppercase italic tracking-tighter text-gray-900">
-                <span className="h-5 w-2 sm:h-6 rounded-full bg-blue-600"></span>
-                Payment Method
-              </h2>
+            {/* Payment Section */}
+            <section className={`overflow-hidden rounded-[2.5rem] bg-white p-8 shadow-sm border border-slate-100 transition-all ${activeStep !== 3 && 'opacity-60 grayscale scale-95'}`}>
+              <div className="mb-8 flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-green-50 text-green-600">
+                  <CreditCard size={20} />
+                </div>
+                <h2 className="text-xl font-bold text-slate-900">Payment Method</h2>
+              </div>
+
               {activeStep === 3 && (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 animate-fadeIn">
-                  <div onClick={() => setPaymentMethod('UPI')} className={`flex cursor-pointer items-center justify-between rounded-2xl border-2 p-4 sm:p-6 transition-all ${paymentMethod === 'UPI' ? 'scale-[1.02] border-blue-600 bg-blue-50/50 shadow-md shadow-blue-50' : 'border-gray-50 bg-gray-50 hover:border-gray-200'}`}>
-                    <span className="text-sm font-black uppercase italic tracking-tighter text-gray-700">UPI / GPay / PhonePe</span>
-                    <div className={`h-5 w-5 rounded-full border-4 ${paymentMethod === 'UPI' ? 'border-white bg-blue-600 ring-2 ring-blue-600' : 'border-gray-200 bg-white'}`}></div>
+                <div className="space-y-4">
+                  <div 
+                    onClick={() => setPaymentMethod('UPI')}
+                    className={`cursor-pointer rounded-2xl border-2 p-6 flex items-center justify-between transition-all ${paymentMethod === 'UPI' ? 'border-blue-600 bg-blue-50' : 'border-slate-50 bg-slate-50 hover:border-slate-200'}`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center">
+                        <span className="font-bold text-blue-600">UPI</span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-slate-900">UPI Payments</p>
+                        <p className="text-[10px] text-slate-400">GPay, PhonePe, Paytm</p>
+                      </div>
+                    </div>
+                    <div className={`h-6 w-6 rounded-full border-2 ${paymentMethod === 'UPI' ? 'border-blue-600 bg-blue-600' : 'border-slate-200'}`} />
                   </div>
-                  <div onClick={() => setPaymentMethod('COD')} className={`flex cursor-pointer items-center justify-between rounded-2xl border-2 p-4 sm:p-6 transition-all ${paymentMethod === 'COD' ? 'scale-[1.02] border-blue-600 bg-blue-50/50 shadow-md shadow-blue-50' : 'border-gray-50 bg-gray-50 hover:border-gray-200'}`}>
-                    <span className="text-sm font-black uppercase italic tracking-tighter text-gray-700">Cash on Delivery</span>
-                    <div className={`h-5 w-5 rounded-full border-4 ${paymentMethod === 'COD' ? 'border-white bg-blue-600 ring-2 ring-blue-600' : 'border-gray-200 bg-white'}`}></div>
+
+                  <div 
+                    onClick={() => setPaymentMethod('COD')}
+                    className={`cursor-pointer rounded-2xl border-2 p-6 flex items-center justify-between transition-all ${paymentMethod === 'COD' ? 'border-blue-600 bg-blue-50' : 'border-slate-50 bg-slate-50 hover:border-slate-200'}`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center">
+                        <Truck size={20} className="text-slate-900" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-slate-900">Cash on Delivery</p>
+                        <p className="text-[10px] text-slate-400">Pay when your medicine arrives</p>
+                      </div>
+                    </div>
+                    <div className={`h-6 w-6 rounded-full border-2 ${paymentMethod === 'COD' ? 'border-blue-600 bg-blue-600' : 'border-slate-200'}`} />
                   </div>
-                  <button onClick={handlePlaceOrder} disabled={isProcessing} className="mt-2 md:col-span-2 w-full rounded-2xl bg-blue-600 py-4 sm:py-6 text-xs sm:text-sm font-black uppercase italic tracking-widest text-white shadow-2xl transition-all active:scale-95 disabled:bg-gray-400">
-                    {isProcessing ? 'AUTHORIZING HUB...' : `Authorize Transaction — ₹${total}`}
+
+                  <button 
+                    onClick={handlePlaceOrder} 
+                    disabled={isProcessing || !paymentMethod}
+                    className="mt-6 flex w-full items-center justify-center gap-3 rounded-2xl bg-blue-600 py-6 text-sm font-black uppercase tracking-widest text-white shadow-2xl transition-all hover:bg-slate-900 active:scale-95 disabled:bg-slate-200"
+                  >
+                    {isProcessing ? <Loader2 className="animate-spin" /> : <ShieldCheck size={20} />}
+                    {isProcessing ? 'AUTHORIZING...' : `Place Order — ₹${total}`}
                   </button>
                 </div>
               )}
-            </div>
+            </section>
           </div>
 
-          {/* RIGHT SUMMARY */}
-          <div className="lg:col-span-5">
-            <div className="lg:sticky lg:top-28">
-              <div className="relative overflow-hidden rounded-[28px] sm:rounded-[40px] border border-gray-100 bg-white p-5 sm:p-8 shadow-2xl">
-                <div className="absolute top-0 right-0 -mr-16 -mt-16 h-32 w-32 rounded-full bg-blue-50 opacity-40 blur-3xl"></div>
-                <h3 className="mb-6 sm:mb-8 flex items-center justify-between text-[9px] sm:text-[10px] font-black uppercase italic tracking-[4px] text-gray-400">
-                  <span>Hub Assessment</span>
-                  {isDirectBuy && <span className="rounded-full bg-blue-50 px-3 py-1 text-[8px] sm:text-[9px] text-blue-600 animate-pulse">Direct Buy</span>}
-                </h3>
-                <div className="scrollbar-hide mb-6 sm:mb-8 max-h-[320px] sm:max-h-[350px] space-y-4 overflow-y-auto pr-1 sm:pr-2">
-                  {activeCart.map((item) => (
-                    <div key={item._id || item.id} className="group flex items-center gap-3 sm:gap-4 rounded-[20px] sm:rounded-[24px] border border-gray-100 bg-gray-50/50 p-3 sm:p-4 transition-all hover:bg-white">
-                      <img src={item.image} className="h-12 w-12 sm:h-14 sm:w-14 rounded-2xl border border-gray-100 bg-white p-2 object-contain shadow-sm" alt={item.name} />
-                      <div className="flex-1">
-                        <p className="mb-1 line-clamp-1 text-[10px] sm:text-[11px] font-black uppercase italic tracking-tighter text-gray-800">{item.name}</p>
-                        <p className="text-[8px] sm:text-[9px] font-black uppercase italic tracking-widest text-gray-400">Units: {item.quantity || 1}</p>
-                      </div>
-                      <p className="text-xs sm:text-sm font-black italic tracking-tighter text-gray-900">₹{item.price * (item.quantity || 1)}</p>
-                    </div>
-                  ))}
+          {/* Right Summary Card */}
+          <aside className="w-full lg:w-96 shrink-0">
+            <div className="sticky top-28 overflow-hidden rounded-[2.5rem] bg-slate-900 p-8 text-white shadow-2xl">
+              <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-blue-600/20 blur-2xl" />
+              <h3 className="mb-8 text-sm font-bold uppercase tracking-widest text-slate-400">Assessment</h3>
+              
+              <div className="space-y-4">
+                <div className="flex justify-between text-sm font-medium">
+                  <span className="text-slate-400">Gross Value</span>
+                  <span>₹{subtotal}</span>
                 </div>
-                <div className="space-y-4 border-t border-gray-100 pt-6">
-                  <div className="flex justify-between text-xs font-bold uppercase italic text-gray-500"><span>Gross Valuation</span><span>₹{subtotal}</span></div>
-                  <div className="flex justify-between text-xs font-black uppercase italic text-green-500"><span>Hub Credit Subsidy</span><span>-₹{discount}</span></div>
-                  <div className="flex justify-between text-xs font-bold uppercase italic text-gray-500"><span>Logistics Charge</span><span>{deliveryFee === 0 ? 'GRATIS' : `₹${deliveryFee}`}</span></div>
-                  <div className="mt-4 flex items-center justify-between border-t-2 border-dashed border-gray-100 pt-5">
-                    <span className="text-xs sm:text-sm font-black uppercase italic tracking-widest text-gray-400">Net Payable</span>
-                    <span className="text-2xl sm:text-3xl font-black italic tracking-tighter text-blue-600">₹{total}</span>
+                <div className="flex justify-between text-sm font-medium">
+                  <span className="text-slate-400">Hub Subsidy</span>
+                  <span className="text-green-400">-₹{discount}</span>
+                </div>
+                <div className="flex justify-between text-sm font-medium">
+                  <span className="text-slate-400">Logistic Charge</span>
+                  <span className={deliveryFee === 0 ? 'text-green-400' : ''}>
+                    {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}
+                  </span>
+                </div>
+                
+                <div className="my-8 border-t border-white/10 pt-8">
+                  <div className="flex items-end justify-between">
+                    <span className="text-sm font-bold text-slate-400">Net Payable</span>
+                    <span className="text-4xl font-black text-blue-400 tracking-tight">₹{total}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Status Protocol Box */}
-              <div className="relative mt-5 sm:mt-6 overflow-hidden rounded-sm bg-[#0a0f18] p-5 sm:p-6 text-white shadow-xl">
-                <div className="absolute top-0 right-0 h-20 w-20 rounded-full bg-[#2874f0]/20 blur-2xl"></div>
-                <h4 className="mb-4 text-[9px] sm:text-[10px] font-black uppercase tracking-[3px] text-[#2874f0]">Logistics Protocol</h4>
+              <div className="mt-8 rounded-2xl bg-white/5 p-4 border border-white/10">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-lg font-black italic text-[#fb641b]">AS</div>
-                  <div>
-                    <p className="text-[9px] sm:text-[10px] font-black uppercase italic tracking-tighter">Fulfillment Node: Amritsar Hub-01</p>
-                    <p className="mt-1 text-[8px] font-bold uppercase tracking-widest text-gray-400">Status: Inventory Locked & Ready</p>
-                  </div>
-                </div>
-                <div className="mt-4 flex items-center justify-between border-t border-white/5 pt-4">
-                  <span className="text-[8px] font-black uppercase tracking-widest text-blue-400">Satellite Link Established</span>
-                  <div className="h-2 w-2 rounded-full bg-green-500 animate-ping"></div>
+                  <ShieldCheck className="text-blue-400 h-5 w-5" />
+                  <p className="text-[10px] font-medium text-slate-300">Certified secure terminal. All transactions are encrypted.</p>
                 </div>
               </div>
             </div>
-          </div>
+          </aside>
         </div>
       </div>
-
-      <style>{`
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-fadeIn { animation: fadeIn 0.5s ease-out forwards; }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-      `}</style>
     </div>
   );
 };

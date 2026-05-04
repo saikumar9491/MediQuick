@@ -35,6 +35,7 @@ import AdminFlashDeals from './pages/AdminFlashDeals';
 // Global Components
 import WhatsAppSupport from './components/common/WhatsAppSupport';
 import Navbar from './components/common/Navbar';
+import Footer from './components/common/Footer';
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -68,11 +69,13 @@ function AppLayout({ medicines, featured, loading }) {
   // 🛡️ Added /verify-otp to hidden routes to maintain focus
   const hideNavbarRoutes = ['/login', '/signup', '/forgot-password', '/verify-otp'];
   const hideWhatsAppRoutes = ['/login', '/signup', '/forgot-password', '/admin-dashboard', '/verify-otp'];
+  const hideFooterRoutes = ['/login', '/signup', '/forgot-password', '/admin-dashboard', '/verify-otp'];
 
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
   const shouldHideWhatsApp =
     hideWhatsAppRoutes.includes(location.pathname) ||
     location.pathname.startsWith('/admin');
+  const shouldHideFooter = hideFooterRoutes.includes(location.pathname) || location.pathname.startsWith('/admin');
 
   return (
     <>
@@ -86,46 +89,49 @@ function AppLayout({ medicines, featured, loading }) {
 
       {!shouldHideNavbar && <Navbar medicines={medicines} />}
 
-      <Routes>
-        <Route path="/" element={<Home medicines={medicines} featured={featured} loading={loading} />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/verify-otp" element={<VerifyOtp />} /> {/* 🛰️ NEW ROUTE ADDED */}
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/brand/:brandName" element={<BrandPage />} />
+      <main className={!shouldHideNavbar ? 'min-h-[80vh]' : ''}>
+        <Routes>
+          <Route path="/" element={<Home medicines={medicines} featured={featured} loading={loading} />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/verify-otp" element={<VerifyOtp />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/brand/:brandName" element={<BrandPage />} />
 
-        <Route path="/medicines" element={<MedicinesPage />} />
-        <Route path="/lab-tests" element={<LabTestsPage />} />
-        <Route path="/consult" element={<ConsultPage />} />
-        <Route path="/ayurveda" element={<AyurvedaPage />} />
-        <Route path="/care-plan" element={<CarePlanPage />} />
-        <Route path="/skin-care" element={<SkinCarePage />} />
-        <Route path="/offers" element={<div className="pt-24 p-4">Offers Page</div>} />
+          <Route path="/medicines" element={<MedicinesPage />} />
+          <Route path="/lab-tests" element={<LabTestsPage />} />
+          <Route path="/consult" element={<ConsultPage />} />
+          <Route path="/ayurveda" element={<AyurvedaPage />} />
+          <Route path="/care-plan" element={<CarePlanPage />} />
+          <Route path="/skin-care" element={<SkinCarePage />} />
+          <Route path="/offers" element={<div className="pt-24 p-4 text-center font-bold">Offers coming soon!</div>} />
 
-        <Route path="/product/:id" element={<MedicineDetails />} />
+          <Route path="/product/:id" element={<MedicineDetails />} />
 
-        <Route element={<ProtectedRoute />}>
-          <Route path="/cart" element={<Cart />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/my-orders" element={<MyOrders />} />
-          <Route path="/wishlist" element={<Wishlist />} />
-          <Route path="/profile" element={<Profile />} />
-        </Route>
+          <Route element={<ProtectedRoute />}>
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/my-orders" element={<MyOrders />} />
+            <Route path="/wishlist" element={<Wishlist />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
 
-        <Route element={<AdminRoute />}>
-          <Route
-            path="/admin-dashboard"
-            element={<AdminDashboard medicines={medicines} />}
-          />
-          <Route
-            path="/admin/flash-deals"
-            element={<AdminFlashDeals />}
-          />
-        </Route>
+          <Route element={<AdminRoute />}>
+            <Route
+              path="/admin-dashboard"
+              element={<AdminDashboard medicines={medicines} />}
+            />
+            <Route
+              path="/admin/flash-deals"
+              element={<AdminFlashDeals />}
+            />
+          </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
 
+      {!shouldHideFooter && <Footer />}
       {!shouldHideWhatsApp && <WhatsAppSupport />}
     </>
   );
