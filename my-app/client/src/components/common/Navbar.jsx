@@ -23,6 +23,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { API_BASE } from '../../utils/apiConfig';
 
 const Navbar = () => {
   const navigate = useNavigate();
