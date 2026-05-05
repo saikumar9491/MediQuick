@@ -362,8 +362,8 @@ const AdminDashboard = () => {
                 <div className="overflow-x-auto custom-scrollbar">
                   {activeTab === 'products' && (
                     <>
-                      <div className="border-b border-slate-100 bg-slate-50/30 px-6 py-4">
-                        <div className="flex flex-wrap gap-2">
+                      <div className="border-b border-slate-100 bg-white px-6 py-5">
+                        <div className="flex flex-wrap gap-3">
                           {[
                             'All',
                             'Health Resource Center',
@@ -380,10 +380,10 @@ const AdminDashboard = () => {
                             <button
                               key={cat}
                               onClick={() => setProductFilter(cat)}
-                              className={`rounded-full px-4 py-1.5 text-[11px] font-bold transition-all ${
+                              className={`rounded-xl px-5 py-2.5 text-[11px] font-black tracking-tight transition-all duration-200 ${
                                 productFilter === cat
-                                  ? 'bg-[#00a2a4] text-white shadow-md'
-                                  : 'bg-white text-slate-500 border border-slate-200 hover:border-[#00a2a4] hover:text-[#00a2a4]'
+                                  ? 'bg-[#00a2a4] text-white shadow-[0_4px_12px_rgba(0,162,164,0.3)] scale-[1.02]'
+                                  : 'bg-white text-slate-600 border border-slate-200 hover:border-[#00a2a4] hover:text-[#00a2a4] hover:shadow-sm'
                               }`}
                             >
                               {cat}
@@ -392,13 +392,13 @@ const AdminDashboard = () => {
                         </div>
                       </div>
                       <table className="w-full text-left">
-                        <thead className="bg-slate-50/50 border-b border-slate-100">
+                        <thead className="bg-slate-50/30 border-b border-slate-100">
                           <tr>
-                            <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Product Info</th>
-                            <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</th>
-                            <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Price</th>
-                            <th className="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+                            <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.05em]">Product Info</th>
+                            <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.05em]">Category</th>
+                            <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.05em]">Status</th>
+                            <th className="px-6 py-5 text-[11px] font-black text-slate-400 uppercase tracking-[0.05em]">Price</th>
+                            <th className="px-6 py-5 text-center text-[11px] font-black text-slate-400 uppercase tracking-[0.05em]">Actions</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 bg-white/50">

@@ -42,6 +42,26 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
     e.preventDefault();
     setLoading(true);
 
+  const categoryOptions = {
+    'Hair Care': ['Hair Oils', 'Shampoos & Conditioners', 'Hair Serums', 'Hair Creams & Masks', 'Hair Colour', 'Hair Growth Products', 'Essential Oils'],
+    'Fitness & Health': ['Vitamins', 'Proteins', 'Health Drinks', 'Gym Accessories'],
+    'Sexual Wellness': ['Condoms', 'Lubricants', 'Personal Wash', 'Performance'],
+    'Vitamins & Nutrition': ['Multivitamins', 'Minerals', 'Omega & Fish Oil', 'Biotin'],
+    'Supports & Braces': ['Knee Supports', 'Back Supports', 'Ankle Supports', 'Wrist Supports'],
+    'Immunity Boosters': ['Chyawanprash', 'Herbal Juices', 'Vitamin C', 'Zinc'],
+    'Homeopathy': ['Cough & Cold', 'Digestion', 'Skin Care', 'Hair Care'],
+    'Pet Care': ['Dog Food', 'Cat Food', 'Pet Grooming', 'Pet Medicines'],
+    'Diabetes': ['Insulin', 'Glucose Monitors', 'Diabetic Diet', 'Supplements'],
+    'Cardiac': ['Blood Pressure', 'Cholesterol', 'Heart Support', 'Aspirin'],
+    'Pain Relief': ['Body Pain', 'Joint Pain', 'Headache', 'Muscle Rubs'],
+    'Skin Care': ['Face Wash', 'Moisturizers', 'Sunscreen', 'Anti-Aging'],
+    'Ayurveda': ['Chyawanprash', 'Ashwagandha', 'Herbal Tea', 'Triphala']
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
     const url = initialData
       ? `${API_BASE}/api/medicines/${initialData._id}`
       : `${API_BASE}/api/medicines/add`;
@@ -82,9 +102,9 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-3 sm:p-4 backdrop-blur-sm animate-[fadeIn_0.25s_ease-out]">
-      <div className="w-full max-w-md sm:max-w-lg max-h-[92vh] overflow-y-auto rounded-xl bg-white shadow-2xl animate-[modalPop_0.28s_ease-out]">
+      <div className="w-full max-w-md sm:max-w-xl max-h-[92vh] overflow-y-auto rounded-xl bg-white shadow-2xl animate-[modalPop_0.28s_ease-out]">
         <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-gray-50 px-4 py-4 sm:px-6 sm:py-5">
-          <h2 className="pr-3 text-sm sm:text-base font-black uppercase italic tracking-tight text-gray-800">
+          <h2 className="pr-3 text-sm sm:text-base font-black uppercase italic tracking-tight text-slate-800">
             {initialData ? 'Edit Unit Protocol' : 'Register New Inventory'}
           </h2>
 
@@ -98,106 +118,105 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
 
         <form onSubmit={handleSubmit} className="space-y-4 px-4 py-4 sm:px-6 sm:py-6">
           <div className="space-y-1">
-            <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">
+            <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-slate-400">
               Medicine Name
             </label>
             <input
               type="text"
               value={formData.name}
               required
-              className="w-full rounded-md border p-3 text-sm font-bold uppercase italic tracking-tight outline-none transition focus:border-blue-500"
+              className="w-full rounded-md border border-slate-200 p-3 text-sm font-bold uppercase italic tracking-tight outline-none transition focus:border-[#00a2a4]"
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             />
           </div>
 
           <div className="flex flex-col gap-4 sm:flex-row">
             <div className="w-full sm:w-1/2 space-y-1">
-              <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">
+              <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-slate-400">
                 Price (₹)
               </label>
               <input
                 type="number"
                 value={formData.price}
                 required
-                className="w-full rounded-md border p-3 text-sm font-bold outline-none transition focus:border-blue-500"
+                className="w-full rounded-md border border-slate-200 p-3 text-sm font-bold outline-none transition focus:border-[#00a2a4]"
                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
               />
             </div>
 
             <div className="w-full sm:w-1/2 space-y-1">
-              <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">
+              <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-slate-400">
                 Brand
               </label>
               <input
                 type="text"
                 value={formData.brand}
                 required
-                className="w-full rounded-md border p-3 text-sm font-bold uppercase tracking-tight outline-none transition focus:border-blue-500"
+                className="w-full rounded-md border border-slate-200 p-3 text-sm font-bold uppercase tracking-tight outline-none transition focus:border-[#00a2a4]"
                 onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
               />
             </div>
           </div>
 
           <div className="space-y-1">
-            <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">
+            <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-slate-400">
               Category Classification
             </label>
             <select
-              className="w-full rounded-md border bg-white p-3 text-sm font-bold outline-none transition focus:border-blue-500"
+              className="w-full rounded-md border border-slate-200 bg-white p-3 text-sm font-bold outline-none transition focus:border-[#00a2a4] cursor-pointer"
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              onChange={(e) => {
+                const newCat = e.target.value;
+                setFormData({ 
+                  ...formData, 
+                  category: newCat, 
+                  subCategory: categoryOptions[newCat]?.[0] || '' 
+                });
+              }}
             >
-              <option value="Health Resource Center">Health Resource Center</option>
-              <option value="Hair Care">Hair Care</option>
-              <option value="Fitness & Health">Fitness & Health</option>
-              <option value="Sexual Wellness">Sexual Wellness</option>
-              <option value="Vitamins & Nutrition">Vitamins & Nutrition</option>
-              <option value="Supports & Braces">Supports & Braces</option>
-              <option value="Immunity Boosters">Immunity Boosters</option>
-              <option value="Homeopathy">Homeopathy</option>
-              <option value="Pet Care">Pet Care</option>
-              <option value="Diabetes">Diabetes</option>
-              <option value="Cardiac">Cardiac</option>
-              <option value="Pain Relief">Pain Relief</option>
-              <option value="Skin Care">Skin Care</option>
-              <option value="Ayurveda">Ayurveda</option>
+              {Object.keys(categoryOptions).map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
             </select>
           </div>
 
           <div className="space-y-1">
-            <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">
+            <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-slate-400">
               Sub-Category (Optional)
             </label>
-            <input
-              type="text"
+            <select
+              className="w-full rounded-md border border-slate-200 bg-white p-3 text-sm font-bold outline-none transition focus:border-[#00a2a4] cursor-pointer"
               value={formData.subCategory || ''}
-              placeholder="e.g. Hair Oils, Vitamins, etc."
-              className="w-full rounded-md border p-3 text-sm font-bold uppercase tracking-tight outline-none transition focus:border-blue-500"
               onChange={(e) => setFormData({ ...formData, subCategory: e.target.value })}
-            />
+            >
+              <option value="">Select Sub-Category</option>
+              {categoryOptions[formData.category]?.map(sub => (
+                <option key={sub} value={sub}>{sub}</option>
+              ))}
+            </select>
           </div>
 
           <div className="space-y-1">
-            <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">
+            <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-slate-400">
               Cloud Image Link
             </label>
             <input
               type="text"
               value={formData.image}
               placeholder="https://..."
-              className="w-full rounded-md border p-3 text-sm font-bold outline-none transition focus:border-blue-500"
+              className="w-full rounded-md border border-slate-200 p-3 text-sm font-bold outline-none transition focus:border-[#00a2a4]"
               onChange={(e) => setFormData({ ...formData, image: e.target.value })}
             />
           </div>
 
-          <label className="group flex cursor-pointer items-start gap-3 rounded-md border border-dashed bg-gray-50 p-3 transition-colors hover:bg-red-50">
+          <label className="group flex cursor-pointer items-start gap-3 rounded-md border border-dashed border-slate-300 bg-slate-50 p-3 transition-colors hover:bg-teal-50">
             <input
               type="checkbox"
               checked={formData.needsRx}
-              className="mt-0.5 h-4 w-4 shrink-0 accent-red-500"
+              className="mt-0.5 h-4 w-4 shrink-0 accent-[#00a2a4]"
               onChange={(e) => setFormData({ ...formData, needsRx: e.target.checked })}
             />
-            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-gray-500 transition-colors group-hover:text-red-600">
+            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-slate-500 transition-colors group-hover:text-[#00a2a4]">
               Requires Rx Protocol (Amritsar Hub Safety)
             </span>
           </label>
@@ -234,7 +253,7 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-md bg-[#fb641b] px-4 py-3.5 sm:py-4 text-xs sm:text-sm font-black uppercase italic tracking-[2px] text-white shadow-lg transition-all hover:bg-[#f05a18] hover:shadow-xl active:scale-[0.98] disabled:bg-gray-400"
+            className="w-full rounded-md bg-[#00a2a4] px-4 py-3.5 sm:py-4 text-xs sm:text-sm font-black uppercase italic tracking-[2px] text-white shadow-lg transition-all hover:bg-[#008284] hover:shadow-xl active:scale-[0.98] disabled:bg-gray-400"
           >
             {loading
               ? 'Establishing Hub Link...'
