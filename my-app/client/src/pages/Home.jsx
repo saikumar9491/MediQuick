@@ -291,9 +291,9 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
 
           <button 
             onClick={() => categoryScrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' })}
-            className="absolute -right-6 top-[45%] z-20 flex h-14 w-14 items-center justify-center rounded-full bg-white text-[#ef4444] shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all hover:scale-110 active:scale-95 border border-slate-50 opacity-0 group-hover:opacity-100"
+            className="absolute -right-3 top-[42%] z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#ef4444] shadow-[0_4px_15px_rgb(0,0,0,0.1)] transition-all hover:scale-110 active:scale-95 border border-slate-100 opacity-0 group-hover:opacity-100"
           >
-            <ChevronRight size={32} strokeWidth={2.5} />
+            <ChevronRight size={20} strokeWidth={3} />
           </button>
         </div>
       </section>
