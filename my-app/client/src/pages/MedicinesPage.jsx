@@ -12,10 +12,11 @@ import {
 import MedicineCard from '../components/medicine/MedicineCard';
 import { API_BASE } from '../utils/apiConfig';
 
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const MedicinesPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -197,7 +198,16 @@ const MedicinesPage = () => {
                   {categories.map((cat) => (
                     <button
                       key={cat}
-                      onClick={() => setFilter(cat)}
+                      onClick={() => {
+                        if (cat === 'All') {
+                          navigate('/medicines');
+                        } else if (cat === 'Flash Deals') {
+                          navigate('/medicines?filter=flash');
+                        } else {
+                          const slug = cat.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
+                          navigate(`/medicines?filter=${slug}`);
+                        }
+                      }}
                       className={`flex items-center justify-between rounded-lg px-4 py-2.5 text-xs font-bold transition-all ${
                         filter === cat
                           ? 'bg-blue-600 text-white shadow-md shadow-blue-100'
