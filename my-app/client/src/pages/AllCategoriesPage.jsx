@@ -47,14 +47,32 @@ const AllCategoriesPage = () => {
     <div className="min-h-screen bg-[#f8fafc] pb-20 pt-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
-        <div className="mb-10 flex flex-col items-center justify-center text-center">
-          <h1 className="text-2xl sm:text-3xl font-black uppercase italic tracking-tight text-slate-800">
-            Store Directory <span className="text-[#00a2a4]">Catalog</span>
-          </h1>
-          <p className="mt-2 text-xs font-bold uppercase tracking-widest text-slate-400">
-            Explore our complete inventory grouped by health department
-          </p>
-        </div>
+        {/* Catalog Banner */}
+        <section className="mb-12 overflow-hidden rounded-3xl bg-slate-900 shadow-2xl border border-white/10">
+          <div className="relative h-[200px] sm:h-[260px]">
+            <div className={`absolute inset-0 bg-gradient-to-br from-teal-600 to-teal-800 p-8 sm:p-12`}>
+              <div className="absolute right-10 top-1/2 -translate-y-1/2 text-[10rem] opacity-10 select-none hidden sm:block">
+                📑
+              </div>
+              
+              <div className="relative z-10 flex h-full flex-col justify-center">
+                <span className="mb-4 w-fit rounded-full bg-white/20 px-4 py-1.5 text-[10px] font-black uppercase tracking-[3px] text-white backdrop-blur-xl border border-white/10">
+                  DIRECTORY COLLECTION
+                </span>
+                <h1 className="max-w-2xl text-3xl font-black tracking-tight text-white sm:text-5xl uppercase italic leading-none">
+                  Health & <span className="text-teal-200">Wellness</span> Catalog
+                </h1>
+                <p className="mt-4 max-w-md text-xs font-bold text-white/70 sm:text-sm uppercase tracking-[2px] leading-relaxed">
+                  Premium verified selections across all specialized medical departments.
+                </p>
+              </div>
+            </div>
+            
+            {/* Decorative Elements */}
+            <div className="absolute -bottom-10 -right-10 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
+            <div className="absolute -top-10 -left-10 h-64 w-64 rounded-full bg-teal-400/10 blur-3xl" />
+          </div>
+        </section>
 
         {loading ? (
           <div className="space-y-12">
