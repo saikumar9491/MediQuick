@@ -250,7 +250,10 @@ const LabTestsPage = () => {
                   >
                     View Details
                   </button>
-                  <button className="flex-[1.5] rounded-xl bg-slate-900 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-xl shadow-slate-200 hover:bg-[#00a2a4] hover:shadow-teal-100 transition-all">
+                  <button 
+                    onClick={() => navigate(`/lab-test-details/${test.id}`)}
+                    className="flex-[1.5] rounded-xl bg-slate-900 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-xl shadow-slate-200 hover:bg-[#00a2a4] hover:shadow-teal-100 transition-all"
+                  >
                     Book Now
                   </button>
                 </div>

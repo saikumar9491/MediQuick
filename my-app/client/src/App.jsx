@@ -38,6 +38,7 @@ import LabTestDetailsPage from './pages/LabTestDetailsPage';
 import WhatsAppSupport from './components/common/WhatsAppSupport';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
+import ScrollToTop from './components/common/ScrollToTop';
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -191,6 +192,7 @@ function App() {
 
   return (
     <Router>
+      <ScrollToTop />
       <AppLayout 
         medicines={medicines} 
         featured={featured} 
