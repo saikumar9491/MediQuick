@@ -161,8 +161,8 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       <FeaturedBrands />
 
       {/* Quick Order with Prescription */}
-      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-[2rem] bg-white p-8 sm:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-8">
+      <section className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-[2rem] bg-white px-8 py-6 sm:px-12 sm:py-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="flex-1 text-center md:text-left">
               <div className="flex items-center justify-center md:justify-start gap-4 mb-4">
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-500 shadow-inner">
@@ -184,14 +184,14 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
             />
             <button 
               onClick={() => fileInputRef.current.click()}
-              className={`flex-1 md:flex-none flex items-center justify-center gap-2 rounded-2xl px-10 py-5 text-[11px] font-black uppercase tracking-widest border-2 transition-all ${selectedFile ? 'text-emerald-600 border-emerald-100 bg-emerald-50' : 'text-slate-900 border-slate-100 hover:bg-slate-50'}`}
+              className={`flex-1 md:flex-none flex items-center justify-center gap-2 rounded-2xl px-8 py-4 text-[11px] font-black uppercase tracking-widest border-2 transition-all ${selectedFile ? 'text-emerald-600 border-emerald-100 bg-emerald-50' : 'text-slate-900 border-slate-100 hover:bg-slate-50'}`}
             >
               {selectedFile ? 'READY' : 'SELECT FILE'}
             </button>
             <button 
               onClick={handleUpload}
               disabled={!selectedFile || isUploading}
-              className="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-12 py-5 text-[11px] font-black uppercase tracking-widest text-white shadow-xl hover:bg-slate-900 active:scale-95 disabled:bg-slate-200 transition-all shadow-blue-200"
+              className="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-10 py-4 text-[11px] font-black uppercase tracking-widest text-white shadow-xl hover:bg-slate-900 active:scale-95 disabled:bg-slate-200 transition-all shadow-blue-200"
             >
               {isUploading ? 'UPLOADING...' : 'ORDER NOW'}
             </button>
