@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight, ShoppingBag } from 'lucide-react';
+import { ChevronRight, ChevronLeft, ShoppingBag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import MedicineCard from '../components/medicine/MedicineCard';
 import { API_BASE } from '../utils/apiConfig';
@@ -9,6 +9,7 @@ const AllCategoriesPage = () => {
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const scrollRefs = useRef({});
 
   useEffect(() => {
     const fetchMedicines = async () => {
@@ -30,6 +31,17 @@ const AllCategoriesPage = () => {
     acc[med.category].push(med);
     return acc;
   }, {});
+
+  const scroll = (catName, direction) => {
+    const container = scrollRefs.current[catName];
+    if (container) {
+      const scrollAmount = 300;
+      container.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#f8fafc] pb-20 pt-28">
@@ -58,7 +70,7 @@ const AllCategoriesPage = () => {
         ) : (
           <div className="space-y-16">
             {Object.keys(groupedMedicines).map(catName => (
-              <section key={catName} className="animate-fadeIn">
+              <section key={catName} className="animate-fadeIn relative group">
                 <div className="mb-6 flex items-center justify-between border-b border-slate-100 pb-4">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-teal-50 text-[#00a2a4]">
@@ -82,7 +94,24 @@ const AllCategoriesPage = () => {
                   </button>
                 </div>
                 
-                <div className="custom-scrollbar flex gap-4 overflow-x-auto pb-6 scroll-smooth snap-x">
+                {/* Scroll Buttons */}
+                <button 
+                  onClick={() => scroll(catName, 'left')}
+                  className="absolute left-[-20px] top-[60%] z-10 hidden h-10 w-10 items-center justify-center rounded-full bg-white text-slate-800 shadow-xl border border-slate-100 transition-all hover:bg-[#00a2a4] hover:text-white md:flex group-hover:left-[-10px] opacity-0 group-hover:opacity-100"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <button 
+                  onClick={() => scroll(catName, 'right')}
+                  className="absolute right-[-20px] top-[60%] z-10 hidden h-10 w-10 items-center justify-center rounded-full bg-white text-slate-800 shadow-xl border border-slate-100 transition-all hover:bg-[#00a2a4] hover:text-white md:flex group-hover:right-[-10px] opacity-0 group-hover:opacity-100"
+                >
+                  <ChevronRight size={20} />
+                </button>
+
+                <div 
+                  ref={el => scrollRefs.current[catName] = el}
+                  className="custom-scrollbar-hidden flex gap-4 overflow-x-auto pb-4 scroll-smooth snap-x"
+                >
                   {groupedMedicines[catName].map((item) => (
                     <div key={item._id} className="min-w-[160px] max-w-[160px] sm:min-w-[200px] sm:max-w-[200px] snap-start">
                       <MedicineCard {...item} />
@@ -106,19 +135,12 @@ const AllCategoriesPage = () => {
       </div>
 
       <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          height: 5px;
+        .custom-scrollbar-hidden::-webkit-scrollbar {
+          display: none;
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #f1f5f9;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #cbd5e1;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #00a2a4;
+        .custom-scrollbar-hidden {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
       `}</style>
     </div>
