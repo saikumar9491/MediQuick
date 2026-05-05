@@ -41,7 +41,8 @@ const LabTestsPage = () => {
       mrp: 500,
       category: 'Blood Tests',
       parameters: 18,
-      time: '24 Hours'
+      time: '24 Hours',
+      image: '/cbc_blood_test_1777972073113.png'
     },
     {
       id: 'thyroid-profile',
@@ -51,7 +52,8 @@ const LabTestsPage = () => {
       mrp: 1200,
       category: 'Thyroid',
       parameters: 3,
-      time: '24 Hours'
+      time: '24 Hours',
+      image: '/thyroid_test_1777972088145.png'
     },
     {
       id: 'diabetes-screening',
@@ -61,7 +63,8 @@ const LabTestsPage = () => {
       mrp: 800,
       category: 'Diabetes',
       parameters: 2,
-      time: '12 Hours'
+      time: '12 Hours',
+      image: '/diabetes_test_1777972107432.png'
     },
     {
       id: 'vitamin-d-test',
@@ -71,7 +74,8 @@ const LabTestsPage = () => {
       mrp: 1500,
       category: 'Vitamin Tests',
       parameters: 1,
-      time: '36 Hours'
+      time: '36 Hours',
+      image: '/vitamin_test_1777972128381.png'
     },
     {
       id: 'full-body-plus',
@@ -81,7 +85,8 @@ const LabTestsPage = () => {
       mrp: 4500,
       category: 'Full Body Checkup',
       parameters: 92,
-      time: '48 Hours'
+      time: '48 Hours',
+      image: '/full_body_checkup_1777972142920.png'
     }
   ];
 
@@ -199,8 +204,12 @@ const LabTestsPage = () => {
                 className="group relative flex flex-col rounded-3xl border-2 border-slate-50 bg-white p-6 shadow-sm transition-all hover:border-[#00a2a4] hover:shadow-2xl hover:shadow-teal-100"
               >
                 <div className="mb-4 flex items-start justify-between">
-                  <div className="h-12 w-12 flex items-center justify-center rounded-2xl bg-teal-50 text-[#00a2a4]">
-                    <FlaskConical size={24} />
+                  <div className="h-20 w-24 overflow-hidden rounded-2xl bg-teal-50">
+                    <img 
+                      src={test.image} 
+                      alt={test.name} 
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                    />
                   </div>
                   <div className="flex flex-col items-end">
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{test.category}</span>
