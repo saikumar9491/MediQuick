@@ -131,7 +131,13 @@ const MedicinesPage = () => {
     'Ayurveda',
   ];
 
-  const filteredMedicines = medicines; // Filtering now happens at API level or useEffect level
+  const groupedMedicines = medicines.reduce((acc, med) => {
+    if (!acc[med.category]) acc[med.category] = [];
+    acc[med.category].push(med);
+    return acc;
+  }, {});
+
+  const filteredMedicines = medicines; 
 
   return (
     <div className="min-h-screen bg-[#f8fafc] pb-20 pt-6">
@@ -253,19 +259,46 @@ const MedicinesPage = () => {
             ) : filteredMedicines.length > 0 ? (
               <motion.div layout className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                 <AnimatePresence>
-                  {filteredMedicines.map((med) => (
-                    <motion.div
-                      key={med._id}
-                      layout
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                    >
-                      <MedicineCard {...med} />
-                    </motion.div>
+              filter === 'All' ? (
+                <div className="space-y-12">
+                  {Object.keys(groupedMedicines).map(catName => (
+                    <div key={catName} className="animate-fadeIn">
+                      <div className="mb-6 flex items-center justify-between border-b border-slate-100 pb-4">
+                        <h2 className="text-sm font-black uppercase tracking-[3px] text-slate-800">
+                          {catName} <span className="ml-2 text-[10px] font-bold text-slate-400">({groupedMedicines[catName].length} ITEMS)</span>
+                        </h2>
+                        <button 
+                          onClick={() => setFilter(catName)}
+                          className="text-[10px] font-black uppercase tracking-widest text-[#00a2a4] hover:underline"
+                        >
+                          View All
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:gap-6">
+                        {groupedMedicines[catName].slice(0, 4).map((item) => (
+                          <MedicineCard key={item._id} {...item} />
+                        ))}
+                      </div>
+                    </div>
                   ))}
-                </AnimatePresence>
-              </motion.div>
+                </div>
+              ) : (
+                <motion.div layout className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                  <AnimatePresence mode='popLayout'>
+                    {filteredMedicines.map((med) => (
+                      <motion.div
+                        key={med._id}
+                        layout
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                      >
+                        <MedicineCard {...med} />
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </motion.div>
+              )
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-slate-100">
                 <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 text-slate-300">
