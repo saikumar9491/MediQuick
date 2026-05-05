@@ -90,13 +90,15 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
     { title: 'Care Plan', icon: <ShieldCheck className="h-6 w-6" />, desc: 'Extra Savings', color: 'bg-red-50 text-red-600', path: '/care-plan' },
   ];
 
-  const concerns = [
-    { name: 'Stomach Care', icon: <Activity className="h-5 w-5" />, color: 'text-orange-500' },
-    { name: 'Diabetes', icon: <Dna className="h-5 w-5" />, color: 'text-blue-500' },
-    { name: 'Heart Health', icon: <Heart className="h-5 w-5" />, color: 'text-red-500' },
-    { name: 'Baby Care', icon: <Baby className="h-5 w-5" />, color: 'text-pink-500' },
-    { name: 'Immunity', icon: <Sparkles className="h-5 w-5" />, color: 'text-purple-500' },
-    { name: 'Bone Care', icon: <Plus className="h-5 w-5" />, color: 'text-emerald-500' },
+  const mainCategories = [
+    { name: 'Skin Care', image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=400', bg: 'bg-yellow-100/50' },
+    { name: 'Hair Care', image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=400', bg: 'bg-emerald-100/50' },
+    { name: 'Sexual Wellness', image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=400', bg: 'bg-orange-100/50' },
+    { name: 'Oral Care', image: 'https://images.unsplash.com/photo-1559599141-3816a0b721e4?auto=format&fit=crop&q=80&w=400', bg: 'bg-rose-100/50' },
+    { name: 'Elderly Care', image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6958?auto=format&fit=crop&q=80&w=400', bg: 'bg-cyan-100/50' },
+    { name: 'Baby Care', image: 'https://images.unsplash.com/photo-1515488764276-3850404988c2?auto=format&fit=crop&q=80&w=400', bg: 'bg-indigo-100/50' },
+    { name: 'Women Care', image: 'https://images.unsplash.com/photo-1590650516494-0c8e4a4dd67e?auto=format&fit=crop&q=80&w=400', bg: 'bg-pink-100/50' },
+    { name: 'Men Grooming', image: 'https://images.unsplash.com/photo-1621607512214-68297480165e?auto=format&fit=crop&q=80&w=400', bg: 'bg-slate-100/50' }
   ];
 
   const handleUpload = async () => {
@@ -219,21 +221,33 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
         </div>
       </section>
 
-      {/* Shop by Health Concerns */}
+      {/* Shop by Categories */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-xl font-black text-slate-900 tracking-tight">Shop by Health Concerns</h2>
-          <button className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">View All</button>
+          <h2 className="text-xl font-black text-slate-900 tracking-tight">Shop by Categories</h2>
+          <button onClick={() => navigate('/all-categories')} className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">View All</button>
         </div>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-6">
-          {concerns.map((concern, idx) => (
-            <div key={idx} className="group cursor-pointer flex flex-col items-center gap-4">
-              <div className="h-24 w-24 rounded-full bg-white shadow-sm border border-slate-100 flex items-center justify-center transition-all group-hover:shadow-xl group-hover:border-blue-100 overflow-hidden relative">
-                <div className={`absolute inset-0 ${concern.color} opacity-5 group-hover:opacity-10 transition-opacity`} />
-                <div className={concern.color}>{concern.icon}</div>
+        
+        <div className="custom-scrollbar-hidden flex gap-4 overflow-x-auto pb-4 scroll-smooth">
+          {mainCategories.map((cat, idx) => (
+            <motion.div 
+              whileHover={{ scale: 1.02 }}
+              key={idx} 
+              onClick={() => navigate(`/medicines?category=${cat.name}`)}
+              className="group relative min-w-[140px] h-[140px] sm:min-w-[180px] sm:h-[180px] cursor-pointer overflow-hidden rounded-2xl border border-slate-100 shadow-sm transition-all hover:shadow-xl"
+            >
+              <img 
+                src={cat.image} 
+                alt={cat.name} 
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
+              />
+              <div className={`absolute inset-0 ${cat.bg} mix-blend-multiply opacity-60 group-hover:opacity-40 transition-opacity`} />
+              <div className="absolute inset-0 flex items-center justify-center p-4 text-center">
+                <h3 className="text-xs sm:text-sm font-black uppercase tracking-widest text-white drop-shadow-md">
+                  {cat.name}
+                </h3>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-600 group-hover:text-blue-600">{concern.name}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
