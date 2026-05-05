@@ -31,12 +31,12 @@ const FeaturedBrands = () => {
 
           <button
             onClick={() => navigate('/all-brands')}
-            className="flex items-center gap-1.5 text-[#ff6f61] font-medium text-[13px] px-3 py-1.5 rounded-lg border border-[#ff6f61] hover:bg-[#ff6f61]/5 transition-all"
+            className="flex items-center gap-1.5 text-[#ff6f61] font-medium text-[13px] px-4 py-1.5 rounded-lg border border-[#ff6f61] hover:bg-[#ff6f61]/5 transition-all"
           >
             See all <ChevronRight size={14} />
           </button>
         </div>
-        <div className="w-[120px] h-[2px] bg-[#ff6f61] mb-8"></div>
+        <div className="w-[140px] h-[2.5px] bg-[#ff6f61] mb-8"></div>
 
         <div className="relative group">
           <div 
@@ -47,14 +47,14 @@ const FeaturedBrands = () => {
               <div
                 key={idx}
                 onClick={() => navigate(`/brand/${encodeURIComponent(brand.name)}`)}
-                className="min-w-[120px] max-w-[120px] cursor-pointer"
+                className="min-w-[125px] max-w-[125px] cursor-pointer"
               >
-                <div className="aspect-square bg-white border border-slate-100 rounded-lg flex items-center justify-center p-2.5">
-                  <div className="w-full h-full rounded-full flex items-center justify-center bg-white shadow-[0_4px_15px_rgba(0,0,0,0.08)] border border-slate-50 transition-all duration-300 hover:shadow-[0_8px_25px_rgba(0,0,0,0.12)]">
+                <div className="aspect-square bg-white border border-slate-100 rounded-lg flex items-center justify-center p-1.5">
+                  <div className="w-full h-full rounded-full flex items-center justify-center bg-white shadow-[0_3px_12px_rgba(0,0,0,0.08)] border border-slate-50 transition-all duration-300 hover:shadow-[0_6px_20px_rgba(0,0,0,0.12)]">
                     <img
                       src={brand.logo}
                       alt={brand.name}
-                      className="w-[75%] h-[75%] object-contain"
+                      className="w-[78%] h-[78%] object-contain"
                     />
                   </div>
                 </div>
