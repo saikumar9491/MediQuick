@@ -103,7 +103,7 @@ function AppLayout({ medicines, featured, loading }) {
           <Route path="/brand/:brandName" element={<BrandPage />} />
 
           <Route path="/medicines" element={<MedicinesPage />} />
-          <Route path="/all-medicines" element={<AllCategoriesPage />} />
+          <Route path="/categories" element={<AllCategoriesPage />} />
           <Route path="/lab-tests" element={<LabTestsPage />} />
           <Route path="/lab-test-details/:id" element={<LabTestDetailsPage />} />
           <Route path="/consult" element={<ConsultPage />} />

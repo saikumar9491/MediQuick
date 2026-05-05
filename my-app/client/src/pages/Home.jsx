@@ -231,7 +231,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
         
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-xl font-black text-slate-900 tracking-tight">Shop by Categories</h2>
-          <button onClick={() => navigate('/all-categories')} className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">View All</button>
+          <button onClick={() => navigate('/categories')} className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">View All</button>
         </div>
         
         <div className="relative group">
