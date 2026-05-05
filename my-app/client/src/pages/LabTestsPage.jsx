@@ -254,7 +254,8 @@ const LabTestsPage = () => {
                     Book Now
                   </button>
                 </div>
-              </motion.div>
+              </div>
+            </motion.div>
             ))}
           </div>
         </section>
