@@ -60,6 +60,21 @@ const FeaturedBrands = () => {
               </div>
             ))}
           </div>
+
+          {/* Navigation Buttons */}
+          <button 
+            onClick={() => scrollRef.current?.scrollBy({ left: -400, behavior: 'smooth' })}
+            className="absolute -left-3 top-[35%] z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#ef4444] shadow-[0_4px_15px_rgb(0,0,0,0.1)] transition-all hover:scale-110 active:scale-95 border border-slate-100 opacity-0 group-hover:opacity-100"
+          >
+            <ChevronRight size={20} strokeWidth={3} className="rotate-180" />
+          </button>
+
+          <button 
+            onClick={() => scrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' })}
+            className="absolute -right-3 top-[35%] z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#ef4444] shadow-[0_4px_15px_rgb(0,0,0,0.1)] transition-all hover:scale-110 active:scale-95 border border-slate-100 opacity-0 group-hover:opacity-100"
+          >
+            <ChevronRight size={20} strokeWidth={3} />
+          </button>
           
           <style>{`
             .custom-scrollbar-hidden::-webkit-scrollbar { display: none; }
