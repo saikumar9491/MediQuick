@@ -58,7 +58,13 @@ const MedicinesPage = () => {
     'immunity': 'Immunity Boosters',
     'homeopathy': 'Homeopathy',
     'pet-care': 'Pet Care',
-    'flash': 'Flash Deals'
+    'flash': 'Flash Deals',
+    'skin-care': 'Skin Care',
+    'oral-care': 'Oral Care',
+    'elderly-care': 'Elderly Care',
+    'baby-care': 'Baby Care',
+    'women-care': 'Women Care',
+    'men-grooming': 'Men Grooming'
   };
 
   useEffect(() => {
@@ -129,6 +135,11 @@ const MedicinesPage = () => {
     'Cardiac',
     'Pain Relief',
     'Skin Care',
+    'Oral Care',
+    'Elderly Care',
+    'Baby Care',
+    'Women Care',
+    'Men Grooming',
     'Ayurveda',
   ];
 
