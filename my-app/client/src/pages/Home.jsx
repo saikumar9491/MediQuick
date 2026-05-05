@@ -252,31 +252,19 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 10px 8px;
             position: relative;
             overflow: hidden;
             transition: all 0.4s ease;
           }
-          .category-title {
-            color: white;
-            font-size: 12.5px;
-            font-weight: 800;
-            text-align: center;
-            z-index: 10;
-            line-height: 1.1;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-          }
           .category-image {
             width: 100%;
-            height: 85px;
-            object-fit: contain;
-            margin-top: auto;
+            height: 100%;
+            object-fit: cover;
             z-index: 5;
             transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
           }
           .category-card:hover .category-image {
-            transform: scale(1.05) translateY(-2px);
+            transform: scale(1.1);
           }
         `}</style>
         
@@ -295,7 +283,6 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
                 className="category-card"
               >
                 <div className="category-inner" style={{ backgroundColor: cat.bgColor }}>
-                  <h3 className="category-title">{cat.name}</h3>
                   <img src={cat.image} className="category-image" alt={cat.name} />
                 </div>
               </motion.div>
