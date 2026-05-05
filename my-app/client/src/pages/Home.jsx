@@ -91,14 +91,14 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   ];
 
   const mainCategories = [
-    { name: 'Skin Care', image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=400', bg: 'bg-yellow-100/50' },
-    { name: 'Hair Care', image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=400', bg: 'bg-emerald-100/50' },
-    { name: 'Sexual Wellness', image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=400', bg: 'bg-orange-100/50' },
-    { name: 'Oral Care', image: 'https://images.unsplash.com/photo-1559599141-3816a0b721e4?auto=format&fit=crop&q=80&w=400', bg: 'bg-rose-100/50' },
-    { name: 'Elderly Care', image: 'https://images.unsplash.com/photo-1581578731548-c64695cc6958?auto=format&fit=crop&q=80&w=400', bg: 'bg-cyan-100/50' },
-    { name: 'Baby Care', image: 'https://images.unsplash.com/photo-1515488764276-3850404988c2?auto=format&fit=crop&q=80&w=400', bg: 'bg-indigo-100/50' },
-    { name: 'Women Care', image: 'https://images.unsplash.com/photo-1590650516494-0c8e4a4dd67e?auto=format&fit=crop&q=80&w=400', bg: 'bg-pink-100/50' },
-    { name: 'Men Grooming', image: 'https://images.unsplash.com/photo-1621607512214-68297480165e?auto=format&fit=crop&q=80&w=400', bg: 'bg-slate-100/50' }
+    { name: 'Skin Care', image: 'https://i.pinimg.com/1200x/8c/9f/a7/8c9fa7dbc6e87d9a2d83c5bf0acf7874.jpg', bg: 'bg-yellow-100/50' },
+    { name: 'Hair Care', image: 'https://i.pinimg.com/1200x/33/5d/60/335d60b4559e4623f2406bc3b0e30ffd.jpg', bg: 'bg-emerald-100/50' },
+    { name: 'Sexual Wellness', image: 'https://i.pinimg.com/736x/bf/31/97/bf3197b411beb6ba42a4388bb3d748e8.jpg', bg: 'bg-orange-100/50' },
+    { name: 'Oral Care', image: 'https://i.pinimg.com/1200x/fb/9c/41/fb9c41e93cfea49347d0b3185ef22dfa.jpg', bg: 'bg-rose-100/50' },
+    { name: 'Elderly Care', image: 'https://i.pinimg.com/736x/af/0d/c1/af0dc1cc90a563d04dada004faa08fc9.jpg', bg: 'bg-cyan-100/50' },
+    { name: 'Baby Care', image: 'https://i.pinimg.com/1200x/8b/e2/e9/8be2e9392f247ba5023e358f5e680e07.jpg', bg: 'bg-indigo-100/50' },
+    { name: 'Women Care', image: 'https://i.pinimg.com/736x/af/5a/48/af5a48eee0368a39893111da34873dcc.jpg', bg: 'bg-pink-100/50' },
+    { name: 'Men Grooming', image: 'https://i.pinimg.com/736x/92/4e/62/924e627a91885b5a0ff6067af986f6b4.jpg', bg: 'bg-slate-100/50' }
   ];
 
   const handleUpload = async () => {
