@@ -164,20 +164,20 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       </section>
 
       {/* Service Hub Grid */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
+      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-5 gap-2 sm:gap-4">
           {services.map((service, idx) => (
             <motion.div
               whileHover={{ y: -5 }}
               key={idx}
               onClick={() => navigate(service.path)}
-              className="flex cursor-pointer flex-col items-center justify-center rounded-2xl bg-white p-6 shadow-sm border border-slate-100 text-center transition-all hover:shadow-xl hover:border-blue-100"
+              className="flex cursor-pointer flex-col items-center justify-center rounded-xl bg-white p-2 sm:p-6 shadow-sm border border-slate-100 text-center transition-all hover:shadow-xl hover:border-blue-100"
             >
-              <div className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl ${service.color} shadow-inner`}>
-                {service.icon}
+              <div className={`mb-2 flex h-10 w-10 sm:h-14 sm:w-14 items-center justify-center rounded-xl sm:rounded-2xl ${service.color} shadow-inner`}>
+                {React.cloneElement(service.icon, { className: "h-5 w-5 sm:h-7 sm:w-7" })}
               </div>
-              <h3 className="text-xs font-black uppercase tracking-widest text-slate-900">{service.title}</h3>
-              <p className="mt-1 text-[9px] font-bold text-slate-400">{service.desc}</p>
+              <h3 className="text-[8px] sm:text-xs font-black uppercase tracking-tight sm:tracking-widest text-slate-900 leading-tight">{service.title}</h3>
+              <p className="hidden sm:block mt-1 text-[9px] font-bold text-slate-400">{service.desc}</p>
             </motion.div>
           ))}
         </div>

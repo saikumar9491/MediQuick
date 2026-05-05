@@ -239,19 +239,34 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-sm">
       <div className="border-b border-slate-100 bg-white px-4 py-2 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-[1440px] items-center gap-4 lg:gap-8">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 lg:gap-8">
           
           {/* Logo */}
           <Link to="/" className="flex shrink-0 items-center gap-2">
             <div className="flex h-7 w-7 items-center justify-center rounded bg-[#00a2a4] text-white">
               <ShoppingBag size={16} strokeWidth={3} />
             </div>
-            <span className="hidden text-lg font-black tracking-tighter text-slate-900 lg:block uppercase">
+            <span className="text-lg font-black tracking-tighter text-slate-900 uppercase">
               MEDI<span className="text-[#00a2a4]">QUICK</span>
             </span>
           </Link>
 
-          {/* Location Selector */}
+          {/* User & Cart (Mobile) */}
+          <div className="flex items-center gap-3 lg:hidden">
+            <Link to="/cart" className="relative text-slate-700">
+              <ShoppingCart size={22} />
+              {cartItems.length > 0 && (
+                <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#ff6f61] text-[9px] font-bold text-white shadow-sm">
+                  {cartItems.length}
+                </span>
+              )}
+            </Link>
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="rounded-lg p-1 text-slate-900">
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+
+          {/* Location Selector (Desktop Only) */}
           <div 
             onClick={handleDetectLocation}
             className="hidden lg:flex items-center gap-2 px-3 py-1.5 hover:bg-slate-50 transition-colors cursor-pointer group shrink-0 border-r border-slate-100 pr-6"
@@ -265,8 +280,8 @@ const Navbar = () => {
             <Crosshair size={14} className={`text-slate-400 ml-1 ${isDetecting ? 'animate-spin text-[#00a2a4]' : ''}`} />
           </div>
 
-          {/* Search Bar (Centered) */}
-          <div className="relative flex-1 group min-w-[300px]">
+          {/* Search Bar (Desktop) */}
+          <div className="hidden lg:block relative flex-1 group min-w-[300px]">
             <form onSubmit={handleSearch} className="relative w-full">
               <input
                 type="text"
@@ -327,7 +342,7 @@ const Navbar = () => {
             </AnimatePresence>
           </div>
 
-          {/* Promotion & Actions */}
+          {/* Desktop Actions */}
           <div className="hidden items-center gap-6 xl:flex shrink-0 relative">
             <div 
               onMouseEnter={() => setShowFlashDeals(true)}
@@ -339,7 +354,6 @@ const Navbar = () => {
               <ChevronDown size={14} className={`text-slate-400 transition-transform ${showFlashDeals ? 'rotate-180' : ''}`} />
             </div>
 
-            {/* Daily Deals Dropdown */}
             <AnimatePresence>
               {showFlashDeals && (
                 <motion.div
@@ -381,7 +395,7 @@ const Navbar = () => {
               )}
             </AnimatePresence>
 
-            {/* User & Cart */}
+            {/* User & Cart (Desktop) */}
             <div className="flex items-center gap-5 border-l border-slate-100 pl-6">
               {user ? (
                 <div 
@@ -441,15 +455,24 @@ const Navbar = () => {
               </Link>
             </div>
           </div>
+        </div>
 
-          {/* Mobile Menu Toggle */}
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="rounded-lg p-2 text-slate-900 xl:hidden">
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+        {/* Mobile Search Row (Tata 1mg Style) */}
+        <div className="mt-3 lg:hidden pb-2">
+          <form onSubmit={handleSearch} className="relative w-full">
+            <input
+              type="text"
+              placeholder="Search for Medicines, Health Products"
+              className="w-full rounded-xl bg-slate-50 border border-slate-100 px-10 py-3 text-[14px] font-medium outline-none transition-all focus:border-[#00a2a4] focus:bg-white"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          </form>
         </div>
       </div>
 
-      {/* Sub Row: Categories (Centered) */}
+      {/* Sub Row: Categories (Desktop Only) */}
       <nav className="hidden border-b border-slate-100 bg-white sm:block px-4 sm:px-6 lg:px-8 relative z-40">
         <div className="mx-auto flex max-w-[1440px] items-center justify-center gap-8 flex-nowrap">
           {categories.map((cat) => (
@@ -472,7 +495,6 @@ const Navbar = () => {
                 />
               </Link>
 
-              {/* Category Dropdown */}
               <AnimatePresence>
                 {hoveredCategory === cat.name && (
                   <motion.div
@@ -507,7 +529,8 @@ const Navbar = () => {
           ))}
         </div>
       </nav>
-      {/* Mobile Drawer Navigation */}
+
+      {/* Mobile Drawer */}
       <AnimatePresence>
         {isMenuOpen && (
           <>
@@ -605,13 +628,13 @@ const Navbar = () => {
       </AnimatePresence>
 
       {/* Mobile Bottom Navigation (Native App Feel) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-slate-100 bg-white/80 px-2 py-3 backdrop-blur-xl sm:hidden shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-slate-100 bg-white/95 px-2 py-3 backdrop-blur-xl lg:hidden shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
         {[
           { icon: <Home size={20} />, label: 'Home', path: '/' },
-          { icon: <LayoutGrid size={20} />, label: 'Categories', path: '/medicines' },
-          { icon: <ClipboardList size={20} />, label: 'Orders', path: '/my-orders' },
-          { icon: <Heart size={20} />, label: 'Wishlist', path: '/wishlist' },
-          { icon: <User size={20} />, label: 'Profile', path: '/profile' },
+          { icon: <ShoppingBag size={20} />, label: 'Medicines', path: '/all-medicines' },
+          { icon: <FlaskConical size={20} />, label: 'Lab Tests', path: '/lab-tests' },
+          { icon: <Stethoscope size={20} />, label: 'Consult', path: '/consult' },
+          { icon: <User size={20} />, label: 'Account', path: '/profile' },
         ].map((item) => (
           <Link
             key={item.label}
@@ -623,7 +646,7 @@ const Navbar = () => {
             <span className={`${location.pathname === item.path ? 'scale-110' : ''} transition-transform`}>
               {item.icon}
             </span>
-            <span className="text-[10px] font-bold uppercase tracking-widest">{item.label}</span>
+            <span className="text-[10px] font-black uppercase tracking-[1px]">{item.label}</span>
           </Link>
         ))}
       </nav>
