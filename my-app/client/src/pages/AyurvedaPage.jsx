@@ -108,7 +108,7 @@ const AyurvedaPage = () => {
         
         {/* Professional Banner */}
         <section className="mb-10 overflow-hidden rounded-[2.5rem] bg-slate-900 shadow-2xl border border-slate-100">
-          <div className="relative h-[200px] sm:h-[300px]">
+          <div className="relative h-[160px] sm:h-[220px]">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentBanner}
