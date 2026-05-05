@@ -27,6 +27,7 @@ import AddBrandModal from '../components/admin/AddBrandModal';
 import EmailUserModal from '../components/admin/EmailUserModal';
 import AdminSidebar from '../components/admin/AdminSidebar';
 import AdminFlashDealsSection from '../components/admin/AdminFlashDealsSection';
+import AdminCategoryManager from '../components/admin/AdminCategoryManager';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { API_BASE } from '../utils/apiConfig';
@@ -488,6 +489,15 @@ const AdminDashboard = () => {
                         banners={banners}
                         setBanners={setBanners}
                         token={token} 
+                      />
+                    </div>
+                  )}
+
+                  {activeTab === 'categories' && (
+                    <div className="p-1">
+                      <AdminCategoryManager 
+                        token={token} 
+                        API_BASE={API_BASE} 
                       />
                     </div>
                   )}

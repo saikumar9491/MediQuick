@@ -116,62 +116,94 @@ const Navbar = () => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
-  const categories = [
+  const initialCategories = [
     { 
       name: 'Health Resource Center', 
-      icon: <BookOpen className="h-4 w-4" />, 
+      iconName: 'BookOpen', 
       path: '/medicines',
       subOptions: ['All Medicines', 'Lab Tests', 'Health Care Products', 'Disease Info']
     },
     { 
       name: 'Hair Care', 
-      icon: <Scissors className="h-4 w-4" />, 
+      iconName: 'Scissors', 
       path: '/medicines?filter=hair-care',
       subOptions: ['Hair Oils', 'Shampoos & Conditioners', 'Hair Serums', 'Hair Creams & Masks', 'Hair Colour', 'Hair Growth Products', 'Essential Oils']
     },
     { 
       name: 'Fitness & Health', 
-      icon: <Dumbbell className="h-4 w-4" />, 
+      iconName: 'Dumbbell', 
       path: '/medicines?filter=fitness',
       subOptions: ['Vitamins', 'Proteins', 'Health Drinks', 'Gym Accessories']
     },
     { 
       name: 'Sexual Wellness', 
-      icon: <HeartPulse className="h-4 w-4" />, 
+      iconName: 'HeartPulse', 
       path: '/medicines?filter=sexual-wellness',
       subOptions: ['Condoms', 'Lubricants', 'Personal Wash', 'Performance']
     },
     { 
       name: 'Vitamins & Nutrition', 
-      icon: <Sparkles className="h-4 w-4" />, 
+      iconName: 'Sparkles', 
       path: '/medicines?filter=vitamins',
       subOptions: ['Multivitamins', 'Minerals', 'Omega & Fish Oil', 'Biotin']
     },
     { 
       name: 'Supports & Braces', 
-      icon: <Activity className="h-4 w-4" />, 
+      iconName: 'Activity', 
       path: '/medicines?filter=supports',
       subOptions: ['Knee Supports', 'Back Supports', 'Ankle Supports', 'Wrist Supports']
     },
     { 
       name: 'Immunity Boosters', 
-      icon: <Shield className="h-4 w-4" />, 
+      iconName: 'Shield', 
       path: '/medicines?filter=immunity',
       subOptions: ['Chyawanprash', 'Herbal Juices', 'Vitamin C', 'Zinc']
     },
     { 
       name: 'Homeopathy', 
-      icon: <Leaf className="h-4 w-4" />, 
+      iconName: 'Leaf', 
       path: '/medicines?filter=homeopathy',
       subOptions: ['Cough & Cold', 'Digestion', 'Skin Care', 'Hair Care']
     },
     { 
       name: 'Pet Care', 
-      icon: <Dog className="h-4 w-4" />, 
+      iconName: 'Dog', 
       path: '/medicines?filter=pet-care',
       subOptions: ['Dog Food', 'Cat Food', 'Pet Grooming', 'Pet Medicines']
     },
   ];
+
+  const [categories, setCategories] = useState(initialCategories);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/categories`);
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          setCategories(data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch categories', err);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  const getCategoryIcon = (iconName) => {
+    switch (iconName) {
+      case 'BookOpen': return <BookOpen className="h-4 w-4" />;
+      case 'Scissors': return <Scissors className="h-4 w-4" />;
+      case 'Dumbbell': return <Dumbbell className="h-4 w-4" />;
+      case 'HeartPulse': return <HeartPulse className="h-4 w-4" />;
+      case 'Sparkles': return <Sparkles className="h-4 w-4" />;
+      case 'Activity': return <Activity className="h-4 w-4" />;
+      case 'Shield': return <Shield className="h-4 w-4" />;
+      case 'Leaf': return <Leaf className="h-4 w-4" />;
+      case 'Dog': return <Dog className="h-4 w-4" />;
+      default: return <LayoutGrid className="h-4 w-4" />;
+    }
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -413,8 +445,8 @@ const Navbar = () => {
       </div>
 
       {/* Sub Row: Categories (Centered) */}
-      <nav className="hidden border-b border-slate-100 bg-white sm:block px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-[1440px] items-center justify-center gap-8 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex-nowrap">
+      <nav className="hidden border-b border-slate-100 bg-white sm:block px-4 sm:px-6 lg:px-8 relative z-40">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-center gap-8 flex-nowrap">
           {categories.map((cat) => (
             <div
               key={cat.name}
@@ -498,6 +530,7 @@ const Navbar = () => {
                         className="flex w-full items-center justify-between p-4 text-sm font-bold text-slate-600 hover:text-[#00a2a4] transition-all"
                       >
                         <div className="flex items-center gap-3">
+                          {getCategoryIcon(cat.iconName)}
                           <span>{cat.name}</span>
                         </div>
                         <ChevronDown 
