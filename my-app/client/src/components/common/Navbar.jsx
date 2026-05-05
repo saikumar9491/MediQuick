@@ -47,6 +47,8 @@ const Navbar = () => {
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [locationName, setLocationName] = useState('New Delhi');
   const [isDetecting, setIsDetecting] = useState(false);
+  const [hoveredCategory, setHoveredCategory] = useState(null);
+  const [mobileOpenCategory, setMobileOpenCategory] = useState(null);
 
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
@@ -115,15 +117,60 @@ const Navbar = () => {
   }, []);
 
   const categories = [
-    { name: 'Health Resource Center', icon: <BookOpen className="h-4 w-4" />, path: '/medicines' },
-    { name: 'Hair Care', icon: <Scissors className="h-4 w-4" />, path: '/medicines?filter=hair-care' },
-    { name: 'Fitness & Health', icon: <Dumbbell className="h-4 w-4" />, path: '/medicines?filter=fitness' },
-    { name: 'Sexual Wellness', icon: <HeartPulse className="h-4 w-4" />, path: '/medicines?filter=sexual-wellness' },
-    { name: 'Vitamins & Nutrition', icon: <Sparkles className="h-4 w-4" />, path: '/medicines?filter=vitamins' },
-    { name: 'Supports & Braces', icon: <Activity className="h-4 w-4" />, path: '/medicines?filter=supports' },
-    { name: 'Immunity Boosters', icon: <Shield className="h-4 w-4" />, path: '/medicines?filter=immunity' },
-    { name: 'Homeopathy', icon: <Leaf className="h-4 w-4" />, path: '/medicines?filter=homeopathy' },
-    { name: 'Pet Care', icon: <Dog className="h-4 w-4" />, path: '/medicines?filter=pet-care' },
+    { 
+      name: 'Health Resource Center', 
+      icon: <BookOpen className="h-4 w-4" />, 
+      path: '/medicines',
+      subOptions: ['All Medicines', 'Lab Tests', 'Health Care Products', 'Disease Info']
+    },
+    { 
+      name: 'Hair Care', 
+      icon: <Scissors className="h-4 w-4" />, 
+      path: '/medicines?filter=hair-care',
+      subOptions: ['Hair Oils', 'Shampoos & Conditioners', 'Hair Serums', 'Hair Creams & Masks', 'Hair Colour', 'Hair Growth Products', 'Essential Oils']
+    },
+    { 
+      name: 'Fitness & Health', 
+      icon: <Dumbbell className="h-4 w-4" />, 
+      path: '/medicines?filter=fitness',
+      subOptions: ['Vitamins', 'Proteins', 'Health Drinks', 'Gym Accessories']
+    },
+    { 
+      name: 'Sexual Wellness', 
+      icon: <HeartPulse className="h-4 w-4" />, 
+      path: '/medicines?filter=sexual-wellness',
+      subOptions: ['Condoms', 'Lubricants', 'Personal Wash', 'Performance']
+    },
+    { 
+      name: 'Vitamins & Nutrition', 
+      icon: <Sparkles className="h-4 w-4" />, 
+      path: '/medicines?filter=vitamins',
+      subOptions: ['Multivitamins', 'Minerals', 'Omega & Fish Oil', 'Biotin']
+    },
+    { 
+      name: 'Supports & Braces', 
+      icon: <Activity className="h-4 w-4" />, 
+      path: '/medicines?filter=supports',
+      subOptions: ['Knee Supports', 'Back Supports', 'Ankle Supports', 'Wrist Supports']
+    },
+    { 
+      name: 'Immunity Boosters', 
+      icon: <Shield className="h-4 w-4" />, 
+      path: '/medicines?filter=immunity',
+      subOptions: ['Chyawanprash', 'Herbal Juices', 'Vitamin C', 'Zinc']
+    },
+    { 
+      name: 'Homeopathy', 
+      icon: <Leaf className="h-4 w-4" />, 
+      path: '/medicines?filter=homeopathy',
+      subOptions: ['Cough & Cold', 'Digestion', 'Skin Care', 'Hair Care']
+    },
+    { 
+      name: 'Pet Care', 
+      icon: <Dog className="h-4 w-4" />, 
+      path: '/medicines?filter=pet-care',
+      subOptions: ['Dog Food', 'Cat Food', 'Pet Grooming', 'Pet Medicines']
+    },
   ];
 
   const handleSearch = (e) => {
@@ -367,16 +414,51 @@ const Navbar = () => {
 
       {/* Sub Row: Categories (Centered) */}
       <nav className="hidden border-b border-slate-100 bg-white sm:block px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-[1440px] items-center justify-center gap-8 py-3 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex-nowrap">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-center gap-8 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden flex-nowrap">
           {categories.map((cat) => (
-            <Link
+            <div
               key={cat.name}
-              to={cat.path}
-              className="group flex items-center gap-1 text-[13px] font-normal text-slate-700 transition-all hover:text-[#00a2a4] whitespace-nowrap"
+              className="relative py-3"
+              onMouseEnter={() => setHoveredCategory(cat.name)}
+              onMouseLeave={() => setHoveredCategory(null)}
             >
-              <span>{cat.name}</span>
-              <ChevronDown size={12} className="text-slate-400 transition-transform group-hover:translate-y-0.5 group-hover:text-[#00a2a4]" />
-            </Link>
+              <Link
+                to={cat.path}
+                className="group flex items-center gap-1 text-[13px] font-normal text-slate-700 transition-all hover:text-[#00a2a4] whitespace-nowrap"
+              >
+                <span>{cat.name}</span>
+                <ChevronDown 
+                  size={12} 
+                  className={`text-slate-400 transition-transform ${
+                    hoveredCategory === cat.name ? 'rotate-180 text-[#00a2a4]' : ''
+                  }`} 
+                />
+              </Link>
+
+              {/* Category Dropdown */}
+              <AnimatePresence>
+                {hoveredCategory === cat.name && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute left-0 top-full z-[100] mt-0 w-64 rounded-b-xl bg-white p-2 shadow-2xl border border-slate-100 border-t-0"
+                  >
+                    <div className="space-y-1">
+                      {cat.subOptions.map((option) => (
+                        <Link
+                          key={option}
+                          to={`${cat.path}${cat.path.includes('?') ? '&' : '?'}sub=${option.toLowerCase().replace(/ /g, '-')}`}
+                          className="block rounded-lg px-4 py-2.5 text-[12px] font-bold text-slate-700 hover:bg-slate-50 hover:text-[#00a2a4] transition-colors"
+                        >
+                          {option}
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           ))}
         </div>
       </nav>
@@ -410,17 +492,52 @@ const Navbar = () => {
 
                 <div className="space-y-1">
                   {categories.map((cat) => (
-                    <Link
-                      key={cat.name}
-                      to={cat.path}
-                      onClick={() => setIsMenuOpen(false)}
-                      className="flex items-center justify-between rounded-xl p-4 text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-[#00a2a4] transition-all"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span>{cat.name}</span>
-                      </div>
-                      <ChevronRight size={16} />
-                    </Link>
+                    <div key={cat.name} className="border-b border-slate-50 last:border-0">
+                      <button
+                        onClick={() => setMobileOpenCategory(mobileOpenCategory === cat.name ? null : cat.name)}
+                        className="flex w-full items-center justify-between p-4 text-sm font-bold text-slate-600 hover:text-[#00a2a4] transition-all"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span>{cat.name}</span>
+                        </div>
+                        <ChevronDown 
+                          size={16} 
+                          className={`transition-transform ${mobileOpenCategory === cat.name ? 'rotate-180 text-[#00a2a4]' : ''}`} 
+                        />
+                      </button>
+                      
+                      <AnimatePresence>
+                        {mobileOpenCategory === cat.name && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            className="overflow-hidden bg-slate-50/50"
+                          >
+                            <div className="grid grid-cols-1 gap-1 px-4 pb-4 pt-2">
+                              {cat.subOptions.map((option) => (
+                                <Link
+                                  key={option}
+                                  to={`${cat.path}${cat.path.includes('?') ? '&' : '?'}sub=${option.toLowerCase().replace(/ /g, '-')}`}
+                                  onClick={() => setIsMenuOpen(false)}
+                                  className="flex items-center justify-between rounded-lg px-4 py-3 text-[12px] font-bold text-slate-500 hover:bg-white hover:text-[#00a2a4] transition-all"
+                                >
+                                  {option}
+                                  <ChevronRight size={14} className="opacity-40" />
+                                </Link>
+                              ))}
+                              <Link
+                                to={cat.path}
+                                onClick={() => setIsMenuOpen(false)}
+                                className="mt-2 flex items-center justify-center rounded-lg bg-[#00a2a4] py-3 text-[11px] font-bold text-white shadow-sm"
+                              >
+                                View All {cat.name}
+                              </Link>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   ))}
                 </div>
 
