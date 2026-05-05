@@ -100,8 +100,8 @@ const AdminDashboard = () => {
     });
 
     toast.promise(savePromise, {
-      loading: isEdit ? 'Updating Unit...' : 'Uploading to Hub...',
-      success: 'Database Synced!',
+      loading: isEdit ? 'Updating Protocol...' : 'Establishing Hub Entry...',
+      success: isEdit ? 'Unit Updated Successfully!' : 'New Unit Added to Hub!',
       error: (err) => `❌ ${err.message}`,
     });
 

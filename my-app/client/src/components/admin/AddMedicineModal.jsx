@@ -57,45 +57,10 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showSubCategoryDropdown, setShowSubCategoryDropdown] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    toast.dismiss(); // Clear any previous error/success messages
-    setLoading(true);
-
-    const url = initialData
-      ? `${API_BASE}/api/medicines/${initialData._id}`
-      : `${API_BASE}/api/medicines/add`;
-
-    const method = initialData ? 'PUT' : 'POST';
-
-    const savePromise = fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(formData),
-    }).then(async (response) => {
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Hub sync failed');
-      return data;
-    });
-
-    toast.promise(savePromise, {
-      loading: initialData ? 'Updating Unit...' : 'Uploading to Hub...',
-      success: initialData ? 'Unit Updated Successfully!' : 'New Unit Added to Hub!',
-      error: (err) => `❌ ${err.message}`,
-    });
-
-    try {
-      const data = await savePromise;
-      onAdd(data);
-      onClose();
-    } catch (err) {
-      console.error('Medicine Save Error:', err);
-    } finally {
-      setLoading(false);
-    }
+    onAdd(formData);
+    onClose();
   };
 
   if (!isOpen) return null;
