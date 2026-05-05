@@ -25,6 +25,8 @@ import MedicineCard from '../components/medicine/MedicineCard';
 import { API_BASE } from '../utils/apiConfig';
 import toast from 'react-hot-toast';
 
+import FeaturedBrands from '../components/common/FeaturedBrands';
+
 const Home = ({ medicines = [], featured = [], loading = true }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -82,14 +84,6 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
     }, 6000);
     return () => clearInterval(timer);
   }, [activeBanners.length]);
-
-  const services = [
-    { title: 'Medicines', icon: <ShoppingBag className="h-6 w-6" />, desc: 'Flat 25% Off', color: 'bg-orange-50 text-orange-600', path: '/categories' },
-    { title: 'Lab Tests', icon: <FlaskConical className="h-6 w-6" />, desc: 'Up to 70% Off', color: 'bg-blue-50 text-blue-600', path: '/lab-tests' },
-    { title: 'Consult', icon: <Stethoscope className="h-6 w-6" />, desc: 'Online Chat', color: 'bg-teal-50 text-teal-600', path: '/consult' },
-    { title: 'Ayurveda', icon: <LayoutGrid className="h-6 w-6" />, desc: 'Pure Herbal', color: 'bg-green-50 text-green-600', path: '/ayurveda' },
-    { title: 'Care Plan', icon: <ShieldCheck className="h-6 w-6" />, desc: 'Extra Savings', color: 'bg-red-50 text-red-600', path: '/care-plan' },
-  ];
 
   const mainCategories = [
     { name: 'Skin care', path: '/medicines?filter=skin-care', image: 'https://onemg.gumlet.io/diagnostics%2F2023-11%2F1699443647_skinn.webp?format=auto', bgColor: '#ccd1a1' },
@@ -163,27 +157,10 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
         </div>
       </section>
 
-      {/* Service Hub Grid */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-5 gap-3 sm:gap-6">
-          {services.map((service, idx) => (
-            <motion.div
-              whileHover={{ y: -5 }}
-              key={idx}
-              onClick={() => navigate(service.path)}
-              className="flex cursor-pointer flex-col items-center justify-center rounded-2xl bg-white p-4 sm:p-7 shadow-sm border border-slate-100/50 text-center transition-all hover:shadow-xl hover:border-blue-100"
-            >
-              <div className={`mb-3 flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-2xl ${service.color} shadow-inner`}>
-                {React.cloneElement(service.icon, { className: "h-6 w-6 sm:h-8 sm:w-8" })}
-              </div>
-              <h3 className="text-[9px] sm:text-[13px] font-black uppercase tracking-widest text-slate-900 leading-tight">{service.title}</h3>
-              <p className="hidden sm:block mt-2 text-[10px] font-bold text-slate-400">{service.desc}</p>
-            </motion.div>
-          ))}
-        </div>
-      </section>
+      {/* Featured Brands Section - Replaced Service Hub */}
+      <FeaturedBrands />
 
-      {/* Quick Order with Prescription - Refined Light Version */}
+      {/* Quick Order with Prescription */}
       <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-[2rem] bg-white p-8 sm:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="flex-1 text-center md:text-left">
@@ -222,7 +199,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
         </div>
       </section>
 
-      {/* Shop by Categories - Redesigned to match screenshot */}
+      {/* Shop by Categories */}
       <section className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-10 flex items-center justify-between px-2">
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-none">Shop by <span className="text-blue-600">Categories</span></h2>
@@ -318,21 +295,6 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
             ))}
           </div>
         )}
-      </section>
-
-      {/* Featured Brands */}
-      <section className="bg-slate-50/50 py-16 border-t border-slate-100">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-10 text-center">
-            <h2 className="text-2xl font-black text-slate-900 tracking-tight">Trusted Global Brands</h2>
-            <p className="mt-2 text-sm font-medium text-slate-400">Collaborating with the leaders in healthcare</p>
-          </div>
-          <div className="flex flex-wrap items-center justify-center gap-12 grayscale opacity-40">
-            {['Himalaya', 'Cipla', 'Dabur', 'Abbott', 'GSK', 'Glenmark'].map(brand => (
-              <span key={brand} className="text-2xl font-black tracking-tighter uppercase italic">{brand}</span>
-            ))}
-          </div>
-        </div>
       </section>
     </div>
   );

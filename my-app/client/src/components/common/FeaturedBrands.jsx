@@ -1,58 +1,67 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
 
 const FeaturedBrands = () => {
   const navigate = useNavigate();
+  const scrollRef = useRef(null);
 
   const brands = [
-    { name: "Fhzer", logo: "https://www.watsons.com.sg/medias/04-Brand-Story-Banner-750x530px-01-IL-01.jpg?context=bWFzdGVyfHJvb3R8NjAxNjF8aW1hZ2UvanBlZ3xoZmMvaGU1LzkwNzMyOTQyNDU5MTguanBnfGQ5ZWI3NGQyMTJkOTU5MzA5YTkzNGNjOWM2NjVhZDBiMjFkZjdkZDQzNDNhNjBhNTUwYjBiZjk3OWQyZGEwMTI" },
-    { name: "Dr. Morepen", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/6ec7a4f5-9377-4959-992e-360e676104bc.png" },
-    { name: "Miduty", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/8b46e9df-9884-482d-8007-881b212f0290.png" },
+    { name: "Horlicks", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/720d6f46-4a1e-4537-83f1-0a6d0800b652.png" },
     { name: "Omron", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/72574e4c-1e81-432d-82d2-83b53c713b1d.png" },
-    { name: "PentaSure", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/43773177-3e2b-435f-846c-2f941198642a.png" },
-    { name: "Optimum Nutrition", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/d6f4661a-283e-4d4b-97e3-0c460d3d5f57.png" },
-    { name: "Prohance", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/80d07525-412f-48e0-a430-671c08007323.png" },
+    { name: "Moov", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/351600c5-555e-4361-8255-0a9960761e3f.png" },
+    { name: "Dr. Morepen", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/6ec7a4f5-9377-4959-992e-360e676104bc.png" },
+    { name: "Bare Anatomy", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/8b46e9df-9884-482d-8007-881b212f0290.png" },
+    { name: "Dabur", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/d6f4661a-283e-4d4b-97e3-0c460d3d5f57.png" },
+    { name: "Chemist at Play", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/43773177-3e2b-435f-846c-2f941198642a.png" },
+    { name: "Tata 1mg", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/80d07525-412f-48e0-a430-671c08007323.png" },
     { name: "Tejasya", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/273d6118-977a-426b-967b-232506e76315.png" }
   ];
 
   return (
-    <section className="bg-white py-6">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4">
-        <div className="flex items-center justify-between mb-5 border-b border-gray-100 pb-2">
-          <h2 className="text-base sm:text-xl font-bold text-[#212121]">
+    <section className="bg-white py-8">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-black text-slate-900 tracking-tight">
             Featured brands
           </h2>
 
           <button
             onClick={() => navigate('/all-brands')}
-            className="text-[#ff6f61] font-bold text-[10px] sm:text-xs uppercase border border-[#ff6f61] px-2 py-1 sm:px-3 rounded hover:bg-[#ff6f61] hover:text-white transition-all"
+            className="flex items-center gap-1 text-[#ff6f61] font-bold text-xs uppercase tracking-wider px-3 py-1.5 rounded-lg border border-[#ff6f61]/20 hover:bg-[#ff6f61] hover:text-white transition-all shadow-sm"
           >
-            See All
+            See all <ChevronRight size={14} />
           </button>
         </div>
 
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2 sm:gap-4">
-          {brands.map((brand, idx) => (
-            <div
-              key={idx}
-              onClick={() => navigate(`/brand/${encodeURIComponent(brand.name)}`)}
-              className="group cursor-pointer flex flex-col items-center"
-            >
-              <div className="w-full aspect-square bg-white border border-gray-100 rounded-lg flex items-center justify-center p-1.5 sm:p-3 hover:shadow-md transition-shadow">
-                <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center shadow-inner bg-white">
-                  <img
-                    src={brand.logo}
-                    alt={brand.name}
-                    className="w-[78%] h-[78%] sm:w-[80%] sm:h-[80%] object-contain group-hover:scale-110 transition-transform duration-300"
-                  />
+        <div className="relative group">
+          <div 
+            ref={scrollRef}
+            className="custom-scrollbar-hidden flex gap-4 overflow-x-auto pb-4 scroll-smooth"
+          >
+            {brands.map((brand, idx) => (
+              <div
+                key={idx}
+                onClick={() => navigate(`/brand/${encodeURIComponent(brand.name)}`)}
+                className="min-w-[120px] max-w-[120px] sm:min-w-[140px] sm:max-w-[140px] cursor-pointer group"
+              >
+                <div className="aspect-square bg-white border border-slate-100 rounded-2xl flex items-center justify-center p-4 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-blue-100">
+                  <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-white shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)] border border-slate-50">
+                    <img
+                      src={brand.logo}
+                      alt={brand.name}
+                      className="w-[85%] h-[85%] object-contain group-hover:scale-110 transition-transform duration-500"
+                    />
+                  </div>
                 </div>
               </div>
-
-              <span className="mt-1.5 sm:mt-2 text-[7px] sm:text-[10px] font-bold text-gray-600 text-center uppercase tracking-tight leading-tight line-clamp-2 min-h-[20px] sm:min-h-[28px]">
-                {brand.name}
-              </span>
-            </div>
-          ))}
+            ))}
+          </div>
+          
+          <style>{`
+            .custom-scrollbar-hidden::-webkit-scrollbar { display: none; }
+            .custom-scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
+          `}</style>
         </div>
       </div>
     </section>
