@@ -203,6 +203,8 @@ const MedicinesPage = () => {
                           navigate('/medicines');
                         } else if (cat === 'Flash Deals') {
                           navigate('/medicines?filter=flash');
+                        } else if (cat === 'Ayurveda') {
+                          navigate('/ayurveda');
                         } else {
                           const slug = cat.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
                           navigate(`/medicines?filter=${slug}`);
