@@ -47,6 +47,7 @@ const AdminDashboard = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [productFilter, setProductFilter] = useState('All');
 
   const { user, token } = useAuth();
 
@@ -360,19 +361,51 @@ const AdminDashboard = () => {
               >
                 <div className="overflow-x-auto custom-scrollbar">
                   {activeTab === 'products' && (
-                    <table className="w-full text-left">
-                      <thead className="bg-slate-50/50 border-b border-slate-100">
-                        <tr>
-                          <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Product Info</th>
-                          <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</th>
-                          <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                          <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Price</th>
-                          <th className="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-100 bg-white/50">
-                        {inventory.map((med) => (
-                          <tr key={med._id} className="group hover:bg-slate-50 transition-colors">
+                    <>
+                      <div className="border-b border-slate-100 bg-slate-50/30 px-6 py-4">
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            'All',
+                            'Health Resource Center',
+                            'Hair Care',
+                            'Fitness & Health',
+                            'Sexual Wellness',
+                            'Vitamins & Nutrition',
+                            'Diabetes',
+                            'Cardiac',
+                            'Pain Relief',
+                            'Skin Care',
+                            'Ayurveda',
+                          ].map((cat) => (
+                            <button
+                              key={cat}
+                              onClick={() => setProductFilter(cat)}
+                              className={`rounded-full px-4 py-1.5 text-[11px] font-bold transition-all ${
+                                productFilter === cat
+                                  ? 'bg-[#00a2a4] text-white shadow-md'
+                                  : 'bg-white text-slate-500 border border-slate-200 hover:border-[#00a2a4] hover:text-[#00a2a4]'
+                              }`}
+                            >
+                              {cat}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <table className="w-full text-left">
+                        <thead className="bg-slate-50/50 border-b border-slate-100">
+                          <tr>
+                            <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Product Info</th>
+                            <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Category</th>
+                            <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Price</th>
+                            <th className="px-6 py-4 text-center text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 bg-white/50">
+                          {inventory
+                            .filter(med => productFilter === 'All' || med.category === productFilter)
+                            .map((med) => (
+                              <tr key={med._id} className="group hover:bg-slate-50 transition-colors">
                             <td className="p-4 sm:px-6">
                               <div className="flex items-center gap-4">
                                 <div className="h-12 w-12 rounded-xl border border-slate-100 bg-white p-2 shadow-sm">
@@ -411,6 +444,7 @@ const AdminDashboard = () => {
                         ))}
                       </tbody>
                     </table>
+                  </>
                   )}
 
                   {activeTab === 'users' && (
