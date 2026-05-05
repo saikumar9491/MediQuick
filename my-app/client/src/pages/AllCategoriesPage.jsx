@@ -82,9 +82,11 @@ const AllCategoriesPage = () => {
                   </button>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 xl:gap-4">
+                <div className="custom-scrollbar flex gap-4 overflow-x-auto pb-6 scroll-smooth snap-x">
                   {groupedMedicines[catName].map((item) => (
-                    <MedicineCard key={item._id} {...item} />
+                    <div key={item._id} className="min-w-[160px] max-w-[160px] sm:min-w-[200px] sm:max-w-[200px] snap-start">
+                      <MedicineCard {...item} />
+                    </div>
                   ))}
                 </div>
               </section>
@@ -102,6 +104,23 @@ const AllCategoriesPage = () => {
           </div>
         )}
       </div>
+
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          height: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #f1f5f9;
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #cbd5e1;
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #00a2a4;
+        }
+      `}</style>
     </div>
   );
 };
