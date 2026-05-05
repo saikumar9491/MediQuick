@@ -232,34 +232,34 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
           .custom-scrollbar-hidden::-webkit-scrollbar { display: none; }
           .custom-scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
           .category-card {
-            min-width: 170px;
+            min-width: 150px;
             background: white;
             border: 1px solid #eef2f6;
             border-radius: 16px;
-            padding: 10px;
+            padding: 8px;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 2px 10px rgba(0,0,0,0.02);
           }
           .category-card:hover {
             box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.08);
-            transform: translateY(-6px);
+            transform: translateY(-4px);
             border-color: #cbd5e1;
           }
           .category-inner {
-            height: 180px;
+            height: 140px;
             border-radius: 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 18px 10px;
+            padding: 10px 8px;
             position: relative;
             overflow: hidden;
             transition: all 0.4s ease;
           }
           .category-title {
             color: white;
-            font-size: 15px;
+            font-size: 12.5px;
             font-weight: 800;
             text-align: center;
             z-index: 10;
@@ -267,8 +267,8 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
             text-shadow: 0 1px 2px rgba(0,0,0,0.1);
           }
           .category-image {
-            width: 110%;
-            height: 120px;
+            width: 100%;
+            height: 85px;
             object-fit: contain;
             margin-top: auto;
             z-index: 5;
@@ -276,7 +276,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
           }
           .category-card:hover .category-image {
-            transform: scale(1.15) translateY(-5px);
+            transform: scale(1.05) translateY(-2px);
           }
         `}</style>
         
