@@ -212,6 +212,7 @@ const LabTestsPage = () => {
                   />
                 </div>
 
+                {/* Content Section */}
                 <div className="flex flex-col p-6 flex-1">
                   <div className="mb-4 flex items-start justify-between">
                     <div className="flex flex-col">
@@ -222,43 +223,43 @@ const LabTestsPage = () => {
                     </div>
                   </div>
 
-                <h3 className="mb-2 text-lg font-black uppercase italic tracking-tight text-slate-800 group-hover:text-[#00a2a4]">
-                  {test.name}
-                </h3>
-                <p className="mb-6 text-[11px] font-bold leading-relaxed text-slate-400 line-clamp-2">
-                  {test.desc}
-                </p>
+                  <h3 className="mb-2 text-lg font-black uppercase italic tracking-tight text-slate-800 group-hover:text-[#00a2a4]">
+                    {test.name}
+                  </h3>
+                  <p className="mb-6 text-[11px] font-bold leading-relaxed text-slate-400 line-clamp-2">
+                    {test.desc}
+                  </p>
 
-                <div className="mb-6 flex items-center gap-4 border-y border-slate-50 py-4">
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Price</span>
-                    <div className="flex items-end gap-2">
-                      <span className="text-xl font-black text-slate-800">₹{test.price}</span>
-                      <span className="mb-0.5 text-xs font-bold text-slate-300 line-through">₹{test.mrp}</span>
+                  <div className="mb-6 flex items-center gap-4 border-y border-slate-50 py-4">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Price</span>
+                      <div className="flex items-end gap-2">
+                        <span className="text-xl font-black text-slate-800">₹{test.price}</span>
+                        <span className="mb-0.5 text-xs font-bold text-slate-300 line-through">₹{test.mrp}</span>
+                      </div>
+                    </div>
+                    <div className="ml-auto flex flex-col items-end">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Parameters</span>
+                      <span className="text-sm font-black text-[#00a2a4]">{test.parameters} Included</span>
                     </div>
                   </div>
-                  <div className="ml-auto flex flex-col items-end">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Parameters</span>
-                    <span className="text-sm font-black text-[#00a2a4]">{test.parameters} Included</span>
+
+                  <div className="mt-auto flex items-center gap-3">
+                    <button 
+                      onClick={() => navigate(`/lab-test-details/${test.id}`)}
+                      className="flex-1 rounded-xl bg-slate-50 py-3 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-[#00a2a4] hover:text-white transition-all"
+                    >
+                      View Details
+                    </button>
+                    <button 
+                      onClick={() => navigate(`/lab-test-details/${test.id}`)}
+                      className="flex-[1.5] rounded-xl bg-slate-900 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-xl shadow-slate-200 hover:bg-[#00a2a4] hover:shadow-teal-100 transition-all"
+                    >
+                      Book Now
+                    </button>
                   </div>
                 </div>
-
-                <div className="mt-auto flex items-center gap-3">
-                  <button 
-                    onClick={() => navigate(`/lab-test-details/${test.id}`)}
-                    className="flex-1 rounded-xl bg-slate-50 py-3 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-[#00a2a4] hover:text-white transition-all"
-                  >
-                    View Details
-                  </button>
-                  <button 
-                    onClick={() => navigate(`/lab-test-details/${test.id}`)}
-                    className="flex-[1.5] rounded-xl bg-slate-900 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-xl shadow-slate-200 hover:bg-[#00a2a4] hover:shadow-teal-100 transition-all"
-                  >
-                    Book Now
-                  </button>
-                </div>
-              </div>
-            </motion.div>
+              </motion.div>
             ))}
           </div>
         </section>
