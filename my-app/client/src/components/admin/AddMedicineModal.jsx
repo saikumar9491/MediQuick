@@ -54,6 +54,9 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
     }
   }, [initialData, isOpen]);
 
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [showSubCategoryDropdown, setShowSubCategoryDropdown] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -98,8 +101,8 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
 
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 p-3 sm:p-4 backdrop-blur-sm animate-[fadeIn_0.25s_ease-out]">
-      <div className="w-full max-w-md sm:max-w-xl max-h-[92vh] overflow-y-auto rounded-xl bg-white shadow-2xl animate-[modalPop_0.28s_ease-out]">
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b bg-gray-50 px-4 py-4 sm:px-6 sm:py-5">
+      <div className="w-full max-w-md sm:max-w-xl max-h-[92vh] overflow-y-auto rounded-xl bg-white shadow-2xl animate-[modalPop_0.28s_ease-out] relative">
+        <div className="sticky top-0 z-[210] flex items-center justify-between border-b bg-gray-50 px-4 py-4 sm:px-6 sm:py-5">
           <h2 className="pr-3 text-sm sm:text-base font-black uppercase italic tracking-tight text-slate-800">
             {initialData ? 'Edit Unit Protocol' : 'Register New Inventory'}
           </h2>
@@ -154,42 +157,87 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
             </div>
           </div>
 
-          <div className="space-y-1">
+          {/* Custom Category Dropdown */}
+          <div className="space-y-1 relative">
             <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-slate-400">
               Category Classification
             </label>
-            <select
-              className="w-full rounded-md border border-slate-200 bg-white p-3 text-sm font-bold outline-none transition focus:border-[#00a2a4] cursor-pointer"
-              value={formData.category}
-              onChange={(e) => {
-                const newCat = e.target.value;
-                setFormData({ 
-                  ...formData, 
-                  category: newCat, 
-                  subCategory: categoryOptions[newCat]?.[0] || '' 
-                });
+            <div 
+              className="w-full rounded-md border border-slate-200 bg-white p-3 text-sm font-bold outline-none transition cursor-pointer flex items-center justify-between hover:border-[#00a2a4]"
+              onClick={() => {
+                setShowCategoryDropdown(!showCategoryDropdown);
+                setShowSubCategoryDropdown(false);
               }}
             >
-              {Object.keys(categoryOptions).map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
+              <span className="text-slate-700">{formData.category}</span>
+              <span className={`transition-transform duration-200 ${showCategoryDropdown ? 'rotate-180' : ''}`}>▼</span>
+            </div>
+            
+            {showCategoryDropdown && (
+              <div className="absolute top-full left-0 right-0 z-[220] mt-1 max-h-60 overflow-y-auto rounded-md bg-white shadow-xl border border-slate-100 py-1 animate-fadeIn">
+                {Object.keys(categoryOptions).map(cat => (
+                  <div
+                    key={cat}
+                    className="px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-teal-50 hover:text-[#00a2a4] cursor-pointer transition-colors"
+                    onClick={() => {
+                      setFormData({ 
+                        ...formData, 
+                        category: cat, 
+                        subCategory: categoryOptions[cat]?.[0] || '' 
+                      });
+                      setShowCategoryDropdown(false);
+                    }}
+                  >
+                    {cat}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          <div className="space-y-1">
+          {/* Custom Sub-Category Dropdown */}
+          <div className="space-y-1 relative">
             <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-slate-400">
               Sub-Category (Optional)
             </label>
-            <select
-              className="w-full rounded-md border border-slate-200 bg-white p-3 text-sm font-bold outline-none transition focus:border-[#00a2a4] cursor-pointer"
-              value={formData.subCategory || ''}
-              onChange={(e) => setFormData({ ...formData, subCategory: e.target.value })}
+            <div 
+              className="w-full rounded-md border border-slate-200 bg-white p-3 text-sm font-bold outline-none transition cursor-pointer flex items-center justify-between hover:border-[#00a2a4]"
+              onClick={() => {
+                setShowSubCategoryDropdown(!showSubCategoryDropdown);
+                setShowCategoryDropdown(false);
+              }}
             >
-              <option value="">Select Sub-Category</option>
-              {categoryOptions[formData.category]?.map(sub => (
-                <option key={sub} value={sub}>{sub}</option>
-              ))}
-            </select>
+              <span className={formData.subCategory ? "text-slate-700" : "text-slate-400"}>
+                {formData.subCategory || 'Select Sub-Category'}
+              </span>
+              <span className={`transition-transform duration-200 ${showSubCategoryDropdown ? 'rotate-180' : ''}`}>▼</span>
+            </div>
+
+            {showSubCategoryDropdown && (
+              <div className="absolute top-full left-0 right-0 z-[220] mt-1 max-h-60 overflow-y-auto rounded-md bg-white shadow-xl border border-slate-100 py-1 animate-fadeIn">
+                <div
+                  className="px-4 py-2.5 text-sm font-bold text-slate-400 italic hover:bg-slate-50 cursor-pointer"
+                  onClick={() => {
+                    setFormData({ ...formData, subCategory: '' });
+                    setShowSubCategoryDropdown(false);
+                  }}
+                >
+                  None / Select Sub-Category
+                </div>
+                {categoryOptions[formData.category]?.map(sub => (
+                  <div
+                    key={sub}
+                    className="px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-teal-50 hover:text-[#00a2a4] cursor-pointer transition-colors"
+                    onClick={() => {
+                      setFormData({ ...formData, subCategory: sub });
+                      setShowSubCategoryDropdown(false);
+                    }}
+                  >
+                    {sub}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="space-y-1">
@@ -258,6 +306,7 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
               : 'Authorize New Entry'}
           </button>
         </form>
+        <div className="h-20"></div> {/* Extra space at bottom to ensure dropdown space */}
       </div>
 
       <style>{`
