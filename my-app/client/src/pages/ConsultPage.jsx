@@ -117,9 +117,23 @@ const ConsultPage = () => {
   }, [banners.length]);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pb-20 pt-6">
+    <div className="min-h-screen bg-[#f8fafc] pb-20 pt-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
+        {/* 1. Header Section */}
+        <section className="mb-12 text-center">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-3xl font-black uppercase italic tracking-tight text-slate-800 sm:text-5xl"
+          >
+            Consult <span className="text-[#00a2a4]">Doctors Online</span>
+          </motion.h1>
+          <p className="mx-auto mt-4 max-w-2xl text-sm font-bold uppercase tracking-widest text-slate-400">
+            Get expert advice from certified doctors from the comfort of your home.
+          </p>
+        </section>
+
         {/* Professional Banner */}
         <section className="mb-10 overflow-hidden rounded-[2.5rem] bg-slate-900 shadow-2xl border border-slate-100">
           <div className="relative h-[160px] sm:h-[220px]">
@@ -162,35 +176,6 @@ const ConsultPage = () => {
                   }`}
                 />
               ))}
-            </div>
-          </div>
-        </section>
-
-        {/* 1. Header Section */}
-        <section className="mb-12 text-center">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-black uppercase italic tracking-tight text-slate-800 sm:text-5xl"
-          >
-            Consult <span className="text-[#00a2a4]">Doctors Online</span>
-          </motion.h1>
-          <p className="mx-auto mt-4 max-w-2xl text-sm font-bold uppercase tracking-widest text-slate-400">
-            Get expert advice from certified doctors from the comfort of your home.
-          </p>
-
-          <div className="mx-auto mt-10 max-w-2xl">
-            <div className="relative group">
-              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#00a2a4] transition-colors">
-                <Search size={20} />
-              </div>
-              <input
-                type="text"
-                placeholder="Search by symptom or doctor name..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="block w-full rounded-2xl border-none bg-white py-5 pl-14 pr-5 text-sm font-bold shadow-xl shadow-slate-200/50 outline-none ring-1 ring-slate-100 focus:ring-2 focus:ring-[#00a2a4] transition-all"
-              />
             </div>
           </div>
         </section>

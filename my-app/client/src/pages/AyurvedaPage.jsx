@@ -103,55 +103,9 @@ const AyurvedaPage = () => {
   }, [banners.length]);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pb-20 pt-6">
+    <div className="min-h-screen bg-[#f8fafc] pb-20 pt-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
-        {/* Professional Banner */}
-        <section className="mb-10 overflow-hidden rounded-[2.5rem] bg-slate-900 shadow-2xl border border-slate-100">
-          <div className="relative h-[160px] sm:h-[220px]">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentBanner}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                className={`absolute inset-0 bg-gradient-to-br ${banners[currentBanner].bg} p-8 sm:p-16`}
-              >
-                <div className="absolute right-10 top-1/2 -translate-y-1/2 text-[10rem] opacity-10 select-none">
-                  {banners[currentBanner].icon}
-                </div>
-                
-                <div className="relative z-10 flex h-full flex-col justify-center">
-                  <span className="mb-4 w-fit rounded-full bg-white/20 px-4 py-1 text-[10px] font-black uppercase tracking-widest text-white backdrop-blur-md border border-white/10">
-                    {banners[currentBanner].tag} SPECIAL
-                  </span>
-                  <h2 className="max-w-2xl text-3xl font-black italic tracking-tighter text-white sm:text-5xl uppercase">
-                    {banners[currentBanner].title}
-                  </h2>
-                  <p className="mt-4 max-w-md text-xs font-bold text-white/80 sm:text-base uppercase tracking-widest">
-                    {banners[currentBanner].desc}
-                  </p>
-                  <button className="mt-8 w-fit rounded-xl bg-white px-8 py-3 text-[10px] font-black uppercase tracking-widest text-slate-900 shadow-xl hover:bg-[#00a2a4] hover:text-white transition-all">
-                    Shop Now
-                  </button>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-
-            <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-3">
-              {banners.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentBanner(i)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    currentBanner === i ? 'w-10 bg-white' : 'w-3 bg-white/30'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-
         {/* Header Section */}
         <div className="mb-16 flex flex-col items-center justify-center text-center">
           <motion.div
@@ -168,6 +122,10 @@ const AyurvedaPage = () => {
             Explore traditional remedies grouped by specialized categories
           </p>
         </div>
+
+        {/* Professional Banner */}
+        <section className="mb-10 overflow-hidden rounded-[2.5rem] bg-slate-900 shadow-2xl border border-slate-100">
+          <div className="relative h-[160px] sm:h-[220px]">
 
         {loading ? (
           <div className="space-y-12">
