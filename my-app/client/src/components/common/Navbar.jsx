@@ -120,8 +120,13 @@ const Navbar = () => {
     { 
       name: 'Health Resource Center', 
       iconName: 'BookOpen', 
-      path: '/medicines',
-      subOptions: ['All Medicines', 'Lab Tests', 'Health Care Products', 'Disease Info']
+      path: '/all-medicines',
+      subOptions: [
+        { name: 'All Medicines', path: '/all-medicines' },
+        { name: 'Lab Tests', path: '/lab-tests' },
+        { name: 'Consult Top Doctors', path: '/consult' },
+        { name: 'Care Plan', path: '/care-plan' }
+      ]
     },
     { 
       name: 'Hair Care', 
@@ -477,15 +482,23 @@ const Navbar = () => {
                     className="absolute left-0 top-full z-[100] mt-0 w-64 rounded-b-xl bg-white p-2 shadow-2xl border border-slate-100 border-t-0"
                   >
                     <div className="space-y-1">
-                      {cat.subOptions.map((option) => (
-                        <Link
-                          key={option}
-                          to={`${cat.path}${cat.path.includes('?') ? '&' : '?'}sub=${option.toLowerCase().replace(/ /g, '-')}`}
-                          className="block rounded-lg px-4 py-2.5 text-[12px] font-bold text-slate-700 hover:bg-slate-50 hover:text-[#00a2a4] transition-colors"
-                        >
-                          {option}
-                        </Link>
-                      ))}
+                      {cat.subOptions.map((option) => {
+                        const isObject = typeof option === 'object';
+                        const name = isObject ? option.name : option;
+                        const linkTo = isObject 
+                          ? option.path 
+                          : `${cat.path}${cat.path.includes('?') ? '&' : '?'}sub=${option.toLowerCase().replace(/ /g, '-')}`;
+                        
+                        return (
+                          <Link
+                            key={name}
+                            to={linkTo}
+                            className="block rounded-lg px-4 py-2.5 text-[12px] font-bold text-slate-700 hover:bg-slate-50 hover:text-[#00a2a4] transition-colors"
+                          >
+                            {name}
+                          </Link>
+                        );
+                      })}
                     </div>
                   </motion.div>
                 )}
