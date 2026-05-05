@@ -30,6 +30,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   const { addToCart } = useCart();
   const { token, user } = useAuth();
   const fileInputRef = useRef(null);
+  const categoryScrollRef = useRef(null);
 
   const [selectedFile, setSelectedFile] = useState(null);
   const defaultBanners = [
@@ -223,32 +224,56 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
 
       {/* Shop by Categories */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <style>{`
+          .custom-scrollbar-hidden::-webkit-scrollbar { display: none; }
+          .custom-scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
+        `}</style>
+        
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-xl font-black text-slate-900 tracking-tight">Shop by Categories</h2>
           <button onClick={() => navigate('/all-categories')} className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">View All</button>
         </div>
         
-        <div className="custom-scrollbar-hidden flex gap-4 overflow-x-auto pb-4 scroll-smooth">
-          {mainCategories.map((cat, idx) => (
-            <motion.div 
-              whileHover={{ scale: 1.02 }}
-              key={idx} 
-              onClick={() => navigate(cat.path)}
-              className="group relative min-w-[150px] h-[150px] sm:min-w-[200px] sm:h-[200px] cursor-pointer overflow-hidden rounded-[1.5rem] border border-slate-100 shadow-sm transition-all hover:shadow-xl"
-            >
-              <img 
-                src={cat.image} 
-                alt={cat.name} 
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
-              />
-              <div className={`absolute inset-0 ${cat.bg} mix-blend-multiply opacity-50 group-hover:opacity-30 transition-opacity`} />
-              <div className="absolute inset-0 flex items-center justify-center p-4 text-center bg-black/10 group-hover:bg-transparent transition-all">
-                <h3 className="text-base sm:text-xl font-black uppercase tracking-tighter text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
-                  {cat.name}
-                </h3>
-              </div>
-            </motion.div>
-          ))}
+        <div className="relative group">
+          {/* Scroll Buttons */}
+          <button 
+            onClick={() => categoryScrollRef.current?.scrollBy({ left: -400, behavior: 'smooth' })}
+            className="absolute -left-4 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white/90 p-3 text-slate-900 shadow-xl transition-all hover:scale-110 hover:bg-white sm:flex"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <button 
+            onClick={() => categoryScrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' })}
+            className="absolute -right-4 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white/90 p-3 text-slate-900 shadow-xl transition-all hover:scale-110 hover:bg-white sm:flex"
+          >
+            <ChevronRight size={20} />
+          </button>
+
+          <div 
+            ref={categoryScrollRef}
+            className="custom-scrollbar-hidden flex gap-4 overflow-x-auto pb-2 scroll-smooth"
+          >
+            {mainCategories.map((cat, idx) => (
+              <motion.div 
+                whileHover={{ scale: 1.02 }}
+                key={idx} 
+                onClick={() => navigate(cat.path)}
+                className="group relative min-w-[150px] h-[150px] sm:min-w-[200px] sm:h-[200px] cursor-pointer overflow-hidden rounded-[1.5rem] border border-slate-100 shadow-sm transition-all hover:shadow-xl"
+              >
+                <img 
+                  src={cat.image} 
+                  alt={cat.name} 
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                />
+                <div className={`absolute inset-0 ${cat.bg} mix-blend-multiply opacity-50 group-hover:opacity-30 transition-opacity`} />
+                <div className="absolute inset-0 flex items-center justify-center p-4 text-center bg-black/10 group-hover:bg-transparent transition-all">
+                  <h3 className="text-base sm:text-xl font-black uppercase tracking-tighter text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
+                    {cat.name}
+                  </h3>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
