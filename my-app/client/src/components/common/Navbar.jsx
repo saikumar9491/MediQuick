@@ -120,9 +120,9 @@ const Navbar = () => {
     { 
       name: 'Health Resource Center', 
       iconName: 'BookOpen', 
-      path: '/all-medicines',
+      path: '/categories',
       subOptions: [
-        { name: 'All Medicines', path: '/all-medicines' },
+        { name: 'All Medicines', path: '/categories' },
         { name: 'Lab Tests', path: '/lab-tests' },
         { name: 'Ayurveda', path: '/ayurveda' },
         { name: 'Consult Top Doctors', path: '/consult' },
