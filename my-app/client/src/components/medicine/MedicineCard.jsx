@@ -21,10 +21,10 @@ const MedicineCard = ({ _id, name, brand, price, image, discountPrice, isFlashDe
 
   return (
     <motion.div
-      whileHover={{ y: -6, scale: 1.01 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+      whileHover={{ y: -10, scale: 1.02 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       onClick={() => navigate(`/product/${_id}`)}
-      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border-2 border-slate-100 bg-white p-3 transition-all duration-300 hover:border-[#00a2a4] hover:shadow-[0_20px_40px_rgba(0,162,164,0.1)]"
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border-2 border-slate-100 bg-white p-3 transition-all duration-500 hover:border-[#00a2a4] hover:shadow-[0_25px_50px_-12px_rgba(0,162,164,0.25)]"
     >
       {/* Discount Tag */}
       {discountPercent > 0 && (
