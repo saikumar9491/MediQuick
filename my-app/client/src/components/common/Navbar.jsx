@@ -124,6 +124,7 @@ const Navbar = () => {
       subOptions: [
         { name: 'All Medicines', path: '/all-medicines' },
         { name: 'Lab Tests', path: '/lab-tests' },
+        { name: 'Ayurveda', path: '/ayurveda' },
         { name: 'Consult Top Doctors', path: '/consult' },
         { name: 'Care Plan', path: '/care-plan' }
       ]
@@ -584,17 +585,25 @@ const Navbar = () => {
                             className="overflow-hidden bg-slate-50/50"
                           >
                             <div className="grid grid-cols-1 gap-1 px-4 pb-4 pt-2">
-                              {cat.subOptions.map((option) => (
-                                <Link
-                                  key={option}
-                                  to={`${cat.path}${cat.path.includes('?') ? '&' : '?'}sub=${option.toLowerCase().replace(/ /g, '-')}`}
-                                  onClick={() => setIsMenuOpen(false)}
-                                  className="flex items-center justify-between rounded-lg px-4 py-3 text-[12px] font-bold text-slate-500 hover:bg-white hover:text-[#00a2a4] transition-all"
-                                >
-                                  {option}
-                                  <ChevronRight size={14} className="opacity-40" />
-                                </Link>
-                              ))}
+                              {cat.subOptions.map((option) => {
+                                const isObject = typeof option === 'object';
+                                const name = isObject ? option.name : option;
+                                const linkTo = isObject 
+                                  ? option.path 
+                                  : `${cat.path}${cat.path.includes('?') ? '&' : '?'}sub=${option.toLowerCase().replace(/ /g, '-')}`;
+                                
+                                return (
+                                  <Link
+                                    key={name}
+                                    to={linkTo}
+                                    onClick={() => setIsMenuOpen(false)}
+                                    className="flex items-center justify-between rounded-lg px-4 py-3 text-[12px] font-bold text-slate-500 hover:bg-white hover:text-[#00a2a4] transition-all"
+                                  >
+                                    {name}
+                                    <ChevronRight size={14} className="opacity-40" />
+                                  </Link>
+                                );
+                              })}
                               <Link
                                 to={cat.path}
                                 onClick={() => setIsMenuOpen(false)}
