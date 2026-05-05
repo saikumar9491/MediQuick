@@ -92,14 +92,14 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   ];
 
   const mainCategories = [
-    { name: 'Skin Care', path: '/medicines?filter=skin-care', image: 'https://i.pinimg.com/1200x/8c/9f/a7/8c9fa7dbc6e87d9a2d83c5bf0acf7874.jpg', bg: 'bg-yellow-100/50' },
-    { name: 'Hair Care', path: '/medicines?filter=hair-care', image: 'https://i.pinimg.com/1200x/33/5d/60/335d60b4559e4623f2406bc3b0e30ffd.jpg', bg: 'bg-emerald-100/50' },
-    { name: 'Sexual Wellness', path: '/medicines?filter=sexual-wellness', image: 'https://i.pinimg.com/736x/bf/31/97/bf3197b411beb6ba42a4388bb3d748e8.jpg', bg: 'bg-orange-100/50' },
-    { name: 'Oral Care', path: '/medicines?filter=oral-care', image: 'https://i.pinimg.com/1200x/fb/9c/41/fb9c41e93cfea49347d0b3185ef22dfa.jpg', bg: 'bg-rose-100/50' },
-    { name: 'Elderly Care', path: '/medicines?filter=elderly-care', image: 'https://i.pinimg.com/736x/af/0d/c1/af0dc1cc90a563d04dada004faa08fc9.jpg', bg: 'bg-cyan-100/50' },
-    { name: 'Baby Care', path: '/medicines?filter=baby-care', image: 'https://i.pinimg.com/1200x/8b/e2/e9/8be2e9392f247ba5023e358f5e680e07.jpg', bg: 'bg-indigo-100/50' },
-    { name: 'Women Care', path: '/medicines?filter=women-care', image: 'https://i.pinimg.com/736x/af/5a/48/af5a48eee0368a39893111da34873dcc.jpg', bg: 'bg-pink-100/50' },
-    { name: 'Men Grooming', path: '/medicines?filter=men-grooming', image: 'https://i.pinimg.com/736x/92/4e/62/924e627a91885b5a0ff6067af986f6b4.jpg', bg: 'bg-slate-100/50' }
+    { name: 'Skin care', path: '/medicines?filter=skin-care', image: 'https://onemg.gumlet.io/diagnostics%2F2023-11%2F1699443647_skinn.webp?format=auto', bgColor: '#ccd1a1' },
+    { name: 'Hair Care', path: '/medicines?filter=hair-care', image: 'https://onemg.gumlet.io/diagnostics%2F2023-11%2F1699443670_hairr.webp?format=auto', bgColor: '#8ecda6' },
+    { name: 'Sexual Wellness', path: '/medicines?filter=sexual-wellness', image: 'https://onemg.gumlet.io/diagnostics%2F2023-11%2F1699443681_sexuall.webp?format=auto', bgColor: '#fbb381' },
+    { name: 'Oral Care', path: '/medicines?filter=oral-care', image: 'https://onemg.gumlet.io/diagnostics%2F2023-11%2F1699443695_orall.webp?format=auto', bgColor: '#e3b1ac' },
+    { name: 'Elderly Care', path: '/medicines?filter=elderly-care', image: 'https://onemg.gumlet.io/diagnostics%2F2023-11%2F1699443705_elderly.webp?format=auto', bgColor: '#4ec9cc' },
+    { name: 'Baby Care', path: '/medicines?filter=baby-care', image: 'https://onemg.gumlet.io/diagnostics%2F2023-11%2F1699443714_baby.webp?format=auto', bgColor: '#afb6e6' },
+    { name: 'Women Care', path: '/medicines?filter=women-care', image: 'https://onemg.gumlet.io/diagnostics%2F2023-11%2F1699443722_womenn.webp?format=auto', bgColor: '#ff9ec2' },
+    { name: 'Men Grooming', path: '/medicines?filter=men-grooming', image: 'https://onemg.gumlet.io/diagnostics%2F2023-11%2F1699443735_menn.webp?format=auto', bgColor: '#94b2c5' }
   ];
 
   const handleUpload = async () => {
@@ -222,50 +222,87 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
         </div>
       </section>
 
-      {/* Shop by Categories */}
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      {/* Shop by Categories - Redesigned to match screenshot */}
+      <section className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8">
         <style>{`
           .custom-scrollbar-hidden::-webkit-scrollbar { display: none; }
           .custom-scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
+          .category-card {
+            min-width: 170px;
+            background: white;
+            border: 1px solid #eef2f6;
+            border-radius: 16px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+          }
+          .category-card:hover {
+            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.08);
+            transform: translateY(-6px);
+            border-color: #cbd5e1;
+          }
+          .category-inner {
+            height: 180px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 18px 10px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+          }
+          .category-title {
+            color: white;
+            font-size: 15px;
+            font-weight: 800;
+            text-align: center;
+            z-index: 10;
+            line-height: 1.1;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+          }
+          .category-image {
+            width: 110%;
+            height: 120px;
+            object-fit: contain;
+            margin-top: auto;
+            z-index: 5;
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
+          }
+          .category-card:hover .category-image {
+            transform: scale(1.15) translateY(-5px);
+          }
         `}</style>
         
-        <div className="mb-10 flex items-center justify-between">
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-none">Shop by <span className="text-blue-600">Categories</span></h2>
-          <button onClick={() => navigate('/categories')} className="text-[11px] font-black text-blue-600 uppercase tracking-[2px] hover:underline">View All</button>
-        </div>
-        
         <div className="relative group">
-          <button 
-            onClick={() => categoryScrollRef.current?.scrollBy({ left: -400, behavior: 'smooth' })}
-            className="absolute -left-5 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white p-4 text-slate-900 shadow-xl transition-all hover:scale-110 sm:flex border border-slate-50"
-          >
-            <ChevronLeft size={22} />
-          </button>
-          
           <div 
             ref={categoryScrollRef}
-            className="custom-scrollbar-hidden flex gap-5 overflow-x-auto pb-4 scroll-smooth"
+            className="custom-scrollbar-hidden flex gap-5 overflow-x-auto pb-8 scroll-smooth px-2"
           >
             {mainCategories.map((cat, idx) => (
               <motion.div
-                whileHover={{ y: -8 }}
                 key={idx}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: idx * 0.05 }}
                 onClick={() => navigate(cat.path)}
-                className="relative min-w-[150px] sm:min-w-[180px] cursor-pointer"
+                className="category-card"
               >
-                <div className={`aspect-square overflow-hidden rounded-[2.5rem] ${cat.bg} border border-slate-100 transition-all hover:shadow-2xl hover:border-blue-100`}>
-                  <img src={cat.image} className="h-full w-full object-cover transition-transform duration-700 hover:scale-110" alt={cat.name} />
+                <div className="category-inner" style={{ backgroundColor: cat.bgColor }}>
+                  <h3 className="category-title">{cat.name}</h3>
+                  <img src={cat.image} className="category-image" alt={cat.name} />
                 </div>
-                <h3 className="mt-5 text-center text-[11px] sm:text-[13px] font-black uppercase tracking-widest text-slate-800">{cat.name}</h3>
               </motion.div>
             ))}
           </div>
 
           <button 
             onClick={() => categoryScrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' })}
-            className="absolute -right-5 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white p-4 text-slate-900 shadow-xl transition-all hover:scale-110 sm:flex border border-slate-50"
+            className="absolute -right-6 top-[45%] z-20 flex h-14 w-14 items-center justify-center rounded-full bg-white text-[#ef4444] shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all hover:scale-110 active:scale-95 border border-slate-50 opacity-0 group-hover:opacity-100"
           >
-            <ChevronRight size={22} />
+            <ChevronRight size={32} strokeWidth={2.5} />
           </button>
         </div>
       </section>
