@@ -1,284 +1,294 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Search, 
+  ChevronRight, 
+  ShieldCheck, 
+  Clock, 
+  MapPin, 
+  Truck, 
+  FlaskConical, 
+  Stethoscope, 
+  BadgeCheck,
+  PhoneCall,
+  ShoppingBag,
+  ArrowRight,
+  Filter
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const LabTestsPage = () => {
-  const [activeFilter, setActiveFilter] = useState('All');
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
 
-  const hubBanners = [
-    {
-      title: "Reports in 24 Hours",
-      desc: "Fastest digital report delivery in Amritsar Hub.",
-      icon: "⚡",
-      bg: "from-blue-600 to-indigo-700",
-      accent: "bg-blue-400"
-    },
-    {
-      title: "100% Safe Home Pickup",
-      desc: "Vaccinated phlebotomists with sterilized kits.",
-      icon: "🛡️",
-      bg: "from-emerald-600 to-teal-700",
-      accent: "bg-emerald-400"
-    },
-    {
-      title: "NABL Certified Labs",
-      desc: "Precision diagnostics with international standards.",
-      icon: "🔬",
-      bg: "from-slate-800 to-slate-900",
-      accent: "bg-slate-600"
-    }
+  const categories = [
+    { name: 'All', icon: <FlaskConical size={18} /> },
+    { name: 'Full Body Checkup', icon: <Stethoscope size={18} /> },
+    { name: 'Blood Tests', icon: <Activity size={18} /> },
+    { name: 'Diabetes', icon: <ShieldCheck size={18} /> },
+    { name: 'Thyroid', icon: <Activity size={18} /> },
+    { name: 'Vitamin Tests', icon: <ShieldCheck size={18} /> }
   ];
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev === hubBanners.length - 1 ? 0 : prev + 1));
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [hubBanners.length]);
-
-  const filters = [
-    { name: 'All', icon: '📋' },
-    { name: 'Full Body', icon: '👤' },
-    { name: 'Diabetes', icon: '🩸' },
-    { name: 'Heart', icon: '🫀' },
-    { name: 'Immunity', icon: '🛡️' },
-  ];
-
-  const packages = [
+  const popularTests = [
     {
-      id: 1,
-      name: "Comprehensive Hub Checkup",
-      tests: "85+ Tests (Includes CBC, Liver, Kidney, Thyroid, Vitamins)",
-      price: 1499,
-      mrp: 3999,
-      tag: "Best Value",
-      category: "Full Body",
-      color: "from-blue-600 to-indigo-600",
-      isPremium: true
+      id: 'cbc-test',
+      name: 'CBC Test (Complete Blood Count)',
+      desc: 'Measures red & white cells and platelets. Essential for overall health check.',
+      price: 299,
+      mrp: 500,
+      category: 'Blood Tests',
+      parameters: 18,
+      time: '24 Hours'
     },
     {
-      id: 2,
-      name: "Sugar Control Profile",
-      tests: "HbA1c, Fasting Blood Sugar, Insulin Resistance",
-      price: 699,
+      id: 'thyroid-profile',
+      name: 'Thyroid Profile (Total T3, T4, TSH)',
+      desc: 'Checks how well your thyroid gland is working and helps diagnose thyroid disorders.',
+      price: 499,
+      mrp: 1200,
+      category: 'Thyroid',
+      parameters: 3,
+      time: '24 Hours'
+    },
+    {
+      id: 'diabetes-screening',
+      name: 'Diabetes Screening (HbA1c & Sugar)',
+      desc: 'Monitor blood sugar levels over 3 months and daily fasting sugar.',
+      price: 399,
+      mrp: 800,
+      category: 'Diabetes',
+      parameters: 2,
+      time: '12 Hours'
+    },
+    {
+      id: 'vitamin-d-test',
+      name: 'Vitamin D (25-Hydroxy)',
+      desc: 'Checks for vitamin D deficiency which can cause bone and muscle pain.',
+      price: 899,
       mrp: 1500,
-      tag: "Specialist",
-      category: "Diabetes",
-      color: "from-orange-500 to-red-500",
-      isPremium: false
+      category: 'Vitamin Tests',
+      parameters: 1,
+      time: '36 Hours'
     },
     {
-      id: 3,
-      name: "Vital Heart Screen",
-      tests: "Lipid Profile, Cardiac Risk Markers, Homocysteine",
-      price: 1199,
-      mrp: 2800,
-      tag: "Life Saver",
-      category: "Heart",
-      color: "from-rose-500 to-pink-600",
-      isPremium: false
+      id: 'full-body-plus',
+      name: 'Full Body Checkup - Platinum',
+      desc: 'Comprehensive 90+ tests including heart, liver, kidney, vitamins and minerals.',
+      price: 1999,
+      mrp: 4500,
+      category: 'Full Body Checkup',
+      parameters: 92,
+      time: '48 Hours'
     }
   ];
 
-  const filteredPackages =
-    activeFilter === 'All'
-      ? packages
-      : packages.filter((pkg) => pkg.category === activeFilter);
+  const trustPoints = [
+    { title: 'Certified Labs', desc: 'ISO & NABL Accredited Diagnostics', icon: <BadgeCheck className="text-[#00a2a4]" /> },
+    { title: 'Home Sample Collection', desc: 'Free collection from your doorstep', icon: <Truck className="text-[#00a2a4]" /> },
+    { title: 'Fast Reports', desc: 'Digital reports delivered within 24-48h', icon: <Clock className="text-[#00a2a4]" /> },
+    { title: 'Affordable Prices', desc: 'Save up to 70% compared to hospitals', icon: <ShieldCheck className="text-[#00a2a4]" /> }
+  ];
+
+  const filteredTests = popularTests.filter(test => {
+    const matchesCategory = activeCategory === 'All' || test.category === activeCategory;
+    const matchesSearch = test.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4  pb-14 font-sans text-slate-900 sm:pt-24 sm:pb-20">
-      <div className="mx-auto max-w-7xl">
-        {/* 1. UNIQUE SMART-SLIDE BANNER */}
-        <div className="group relative mb-10 sm:mb-12 md:mb-16">
-          <div
-            className={`relative h-[220px] sm:h-[260px] md:h-[350px] overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] md:rounded-[3rem] bg-gradient-to-br text-white shadow-2xl transition-all duration-1000 ${hubBanners[currentSlide].bg}`}
+    <div className="min-h-screen bg-[#f8fafc] pb-20 pt-28">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        
+        {/* 1. Header Section */}
+        <section className="mb-12 text-center">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-3xl font-black uppercase italic tracking-tight text-slate-800 sm:text-5xl"
           >
-            <div className="pointer-events-none absolute top-0 right-0 p-6 sm:p-8 md:p-12 text-[7rem] sm:text-[10rem] md:text-[15rem] lg:text-[20rem] opacity-10 transition-transform duration-1000 group-hover:scale-110">
-              {hubBanners[currentSlide].icon}
-            </div>
+            Book Lab Tests & <span className="text-[#00a2a4]">Health Checkups</span>
+          </motion.h1>
+          <p className="mx-auto mt-4 max-w-2xl text-sm font-bold uppercase tracking-widest text-slate-400">
+            Certified home sample collection in 60 minutes. Get digital reports within 24 hours.
+          </p>
 
-            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-6 px-5 sm:px-8 md:flex-row md:justify-between md:px-12 lg:px-16">
-              <div className="max-w-xl text-center md:text-left">
-                <span
-                  className={`mb-3 inline-block rounded-full px-3 sm:px-4 py-1 text-[8px] sm:text-[10px] font-black uppercase tracking-[0.25em] sm:tracking-[0.35em] md:tracking-[0.4em] text-white backdrop-blur-md ${hubBanners[currentSlide].accent}`}
-                >
-                  Amritsar Hub Diagnostics
+          <div className="mx-auto mt-10 max-w-2xl">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#00a2a4] transition-colors">
+                <Search size={20} />
+              </div>
+              <input
+                type="text"
+                placeholder="Search tests like Blood Test, Thyroid, Sugar..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="block w-full rounded-2xl border-none bg-white py-5 pl-14 pr-5 text-sm font-bold shadow-xl shadow-slate-200/50 outline-none ring-1 ring-slate-100 focus:ring-2 focus:ring-[#00a2a4] transition-all"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* 7. Offers Section */}
+        <section className="mb-16">
+          <div className="rounded-[2rem] bg-gradient-to-r from-[#00a2a4] to-teal-700 p-8 text-white shadow-2xl relative overflow-hidden">
+            <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
+            <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-black/10 blur-3xl" />
+            
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+              <div>
+                <span className="mb-2 inline-block rounded-full bg-white/20 px-4 py-1 text-[10px] font-black uppercase tracking-widest backdrop-blur-md">
+                  Limited Time Offer
                 </span>
-
-                <h1 className="animate-fadeIn mb-3 sm:mb-4 text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-black uppercase italic tracking-tighter leading-none">
-                  {hubBanners[currentSlide].title}
-                </h1>
-
-                <p className="mb-5 sm:mb-6 text-sm sm:text-base md:text-xl font-bold italic opacity-80">
-                  {hubBanners[currentSlide].desc}
+                <h2 className="text-3xl font-black uppercase italic tracking-tighter sm:text-4xl">
+                  Flat 20% Off on Full Body Checkups
+                </h2>
+                <p className="mt-2 text-sm font-bold text-teal-50 opacity-90 uppercase tracking-widest">
+                  Use Code: <span className="rounded bg-white px-2 py-0.5 text-teal-800">HEALTH20</span>
                 </p>
-
-                <button className="rounded-2xl bg-white px-5 sm:px-6 md:px-8 py-3 text-[10px] sm:text-xs font-black uppercase tracking-[0.15em] sm:tracking-widest text-slate-900 shadow-xl transition-transform hover:scale-105">
-                  Book A Slot Now
-                </button>
               </div>
+              <button className="rounded-xl bg-white px-8 py-4 text-xs font-black uppercase tracking-widest text-[#00a2a4] shadow-xl hover:bg-teal-50 transition-colors">
+                Redeem Offer
+              </button>
+            </div>
+          </div>
+        </section>
 
-              <div className="hidden lg:flex w-72 flex-col rounded-[2rem] border border-white/20 bg-white/10 p-6 shadow-2xl backdrop-blur-xl animate-pulse">
-                <div className="mb-4 flex items-center justify-between">
-                  <div className="h-3 w-20 rounded-full bg-white/30" />
-                  <div className="h-3 w-10 rounded-full bg-emerald-400" />
-                </div>
-                <div className="space-y-3">
-                  <div className="h-2 w-full rounded-full bg-white/20" />
-                  <div className="h-2 w-3/4 rounded-full bg-white/20" />
-                  <div className="mt-4 flex h-10 w-full items-center rounded-xl border border-white/5 bg-white/10 px-4">
-                    <div className="mr-2 h-2 w-8 rounded-full bg-emerald-400" />
-                    <div className="h-2 w-16 rounded-full bg-white/30" />
+        {/* 2. Categories (Filter Section) */}
+        <section className="mb-12">
+          <div className="flex items-center gap-2 mb-6">
+            <Filter size={18} className="text-[#00a2a4]" />
+            <h3 className="text-xs font-black uppercase tracking-widest text-slate-800">Browse by Category</h3>
+          </div>
+          <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar-hidden">
+            {categories.map((cat) => (
+              <button
+                key={cat.name}
+                onClick={() => setActiveCategory(cat.name)}
+                className={`flex shrink-0 items-center gap-3 rounded-2xl px-6 py-4 text-xs font-black uppercase tracking-widest transition-all ${
+                  activeCategory === cat.name
+                    ? 'bg-[#00a2a4] text-white shadow-xl shadow-teal-100'
+                    : 'bg-white text-slate-500 border border-slate-100 hover:border-[#00a2a4] hover:text-[#00a2a4]'
+                }`}
+              >
+                {cat.icon}
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* 3. Popular Tests Section */}
+        <section className="mb-20">
+          <div className="mb-8 flex items-center justify-between">
+            <h2 className="text-xl font-black uppercase italic tracking-tight text-slate-800">
+              Popular <span className="text-[#00a2a4]">Diagnostic Tests</span>
+            </h2>
+            <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              {filteredTests.length} Tests Available
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {filteredTests.map((test) => (
+              <motion.div
+                layout
+                key={test.id}
+                className="group relative flex flex-col rounded-3xl border-2 border-slate-50 bg-white p-6 shadow-sm transition-all hover:border-[#00a2a4] hover:shadow-2xl hover:shadow-teal-100"
+              >
+                <div className="mb-4 flex items-start justify-between">
+                  <div className="h-12 w-12 flex items-center justify-center rounded-2xl bg-teal-50 text-[#00a2a4]">
+                    <FlaskConical size={24} />
+                  </div>
+                  <div className="flex flex-col items-end">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{test.category}</span>
+                    <span className="mt-1 flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
+                      <Clock size={10} /> {test.time}
+                    </span>
                   </div>
                 </div>
-                <p className="mt-6 text-center text-[8px] font-black uppercase tracking-widest text-white/50">
-                  Digital Report Sample
-                </p>
-              </div>
-            </div>
 
-            <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 gap-2 md:left-8 md:translate-x-0 lg:left-16">
-              {hubBanners.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentSlide(i)}
-                  className={`h-1.5 rounded-full transition-all duration-500 ${
-                    currentSlide === i ? 'w-10 sm:w-12 bg-white' : 'w-3 bg-white/30'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* 2. CATEGORY SELECTOR */}
-        <div className="scrollbar-hide mb-10 sm:mb-12 flex gap-3 sm:gap-4 overflow-x-auto pb-4 sm:pb-6">
-          {filters.map((f) => (
-            <button
-              key={f.name}
-              onClick={() => setActiveFilter(f.name)}
-              className={`whitespace-nowrap rounded-2xl sm:rounded-3xl border px-5 sm:px-6 md:px-8 py-3 sm:py-4 text-[10px] sm:text-xs font-black uppercase tracking-[0.12em] sm:tracking-widest shadow-sm transition-all ${
-                activeFilter === f.name
-                  ? 'scale-105 border-slate-900 bg-slate-900 text-white'
-                  : 'border-slate-100 bg-white text-slate-400 hover:border-blue-200 hover:text-blue-600'
-              } flex items-center gap-2 sm:gap-3`}
-            >
-              <span>{f.icon}</span>
-              {f.name}
-            </button>
-          ))}
-        </div>
-
-        {/* 3. STEP-BY-STEP STRIP */}
-        <div className="mb-10 sm:mb-12 md:mb-16 flex flex-col items-start gap-5 sm:gap-6 md:flex-row md:items-center md:justify-between rounded-[2rem] sm:rounded-[2.5rem] md:rounded-[3rem] border border-white/60 bg-white/40 p-5 sm:p-6 md:p-8 shadow-xl shadow-slate-200/50 backdrop-blur-md">
-          <div className="flex items-center gap-4">
-            <div className="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-blue-600 text-lg sm:text-xl font-black italic text-white shadow-lg shadow-blue-200">
-              01
-            </div>
-            <div>
-              <h4 className="text-xs font-black uppercase tracking-tight">Book Test</h4>
-              <p className="text-[10px] font-bold uppercase text-slate-400">Select Hub Package</p>
-            </div>
-          </div>
-
-          <div className="hidden h-px flex-grow bg-slate-200 md:block" />
-
-          <div className="flex items-center gap-4">
-            <div className="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-slate-900 text-lg sm:text-xl font-black italic text-white">
-              02
-            </div>
-            <div>
-              <h4 className="text-xs font-black uppercase tracking-tight">Sample Pickup</h4>
-              <p className="text-[10px] font-bold uppercase text-slate-400">Home Collection</p>
-            </div>
-          </div>
-
-          <div className="hidden h-px flex-grow bg-slate-200 md:block" />
-
-          <div className="flex items-center gap-4">
-            <div className="flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-emerald-500 text-lg sm:text-xl font-black italic text-white shadow-lg shadow-emerald-100">
-              03
-            </div>
-            <div>
-              <h4 className="text-xs font-black uppercase tracking-tight">Digital Report</h4>
-              <p className="text-[10px] font-bold uppercase text-slate-400">Within 24 Hours</p>
-            </div>
-          </div>
-        </div>
-
-        {/* 4. PACKAGE GRID */}
-        <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8">
-          {filteredPackages.map((pkg) => (
-            <div
-              key={pkg.id}
-              className={`group relative flex flex-col overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] md:rounded-[3rem] border border-slate-100 bg-white transition-all duration-500 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] ${
-                pkg.isPremium ? 'z-10 border-blue-100 shadow-2xl shadow-blue-100 lg:scale-105' : ''
-              }`}
-            >
-              <div className={`h-3 bg-gradient-to-r ${pkg.color}`} />
-
-              <div className="flex flex-grow flex-col p-6 sm:p-8 md:p-10">
-                <div className="mb-5 sm:mb-6 flex items-center justify-between">
-                  <span
-                    className={`rounded-full border px-3 sm:px-4 py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-widest ${
-                      pkg.isPremium
-                        ? 'border-blue-600 bg-blue-600 text-white'
-                        : 'border-slate-100 bg-slate-50 text-slate-400'
-                    }`}
-                  >
-                    {pkg.tag}
-                  </span>
-                  {pkg.isPremium && <span className="text-lg sm:text-xl">⭐</span>}
-                </div>
-
-                <h3 className="mb-4 text-2xl sm:text-3xl font-black uppercase italic tracking-tighter leading-none text-slate-800 transition-colors group-hover:text-blue-600">
-                  {pkg.name}
+                <h3 className="mb-2 text-lg font-black uppercase italic tracking-tight text-slate-800 group-hover:text-[#00a2a4]">
+                  {test.name}
                 </h3>
-
-                <p className="mb-6 sm:mb-8 text-[10px] sm:text-[11px] font-bold uppercase tracking-wide leading-relaxed text-slate-400">
-                  {pkg.tests}
+                <p className="mb-6 text-[11px] font-bold leading-relaxed text-slate-400 line-clamp-2">
+                  {test.desc}
                 </p>
 
-                <div className="mt-auto">
-                  <div className="mb-6 sm:mb-8 flex flex-wrap items-end gap-2 sm:gap-3">
-                    <div className="text-3xl sm:text-4xl font-black italic tracking-tighter text-slate-900">
-                      ₹{pkg.price}
-                    </div>
-                    <div className="mb-1 text-sm sm:text-base font-bold text-slate-300 line-through">
-                      ₹{pkg.mrp}
-                    </div>
-                    <div className="mb-1 rounded-lg bg-emerald-50 px-2.5 sm:px-3 py-1 text-[10px] sm:text-xs font-black text-emerald-600">
-                      {Math.round(((pkg.mrp - pkg.price) / pkg.mrp) * 100)}% OFF
+                <div className="mb-6 flex items-center gap-4 border-y border-slate-50 py-4">
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Price</span>
+                    <div className="flex items-end gap-2">
+                      <span className="text-xl font-black text-slate-800">₹{test.price}</span>
+                      <span className="mb-0.5 text-xs font-bold text-slate-300 line-through">₹{test.mrp}</span>
                     </div>
                   </div>
+                  <div className="ml-auto flex flex-col items-end">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Parameters</span>
+                    <span className="text-sm font-black text-[#00a2a4]">{test.parameters} Included</span>
+                  </div>
+                </div>
 
-                  <button
-                    className={`w-full rounded-2xl py-4 sm:py-5 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] shadow-xl transition-all active:scale-95 ${
-                      pkg.isPremium
-                        ? 'bg-blue-600 text-white shadow-blue-200 hover:bg-blue-700'
-                        : 'bg-slate-900 text-white shadow-slate-200 hover:bg-blue-600'
-                    }`}
+                <div className="mt-auto flex items-center gap-3">
+                  <button 
+                    onClick={() => navigate(`/lab-test-details/${test.id}`)}
+                    className="flex-1 rounded-xl bg-slate-50 py-3 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-[#00a2a4] hover:text-white transition-all"
                   >
-                    Schedule Appointment
+                    View Details
+                  </button>
+                  <button className="flex-[1.5] rounded-xl bg-slate-900 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-xl shadow-slate-200 hover:bg-[#00a2a4] hover:shadow-teal-100 transition-all">
+                    Book Now
                   </button>
                 </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* 6. Why Choose Us Section */}
+        <section className="mb-20 rounded-[3rem] bg-white p-10 shadow-xl shadow-slate-200/50 border border-slate-100">
+          <div className="mb-12 text-center">
+            <h2 className="text-2xl font-black uppercase italic tracking-tight text-slate-800">
+              Why Choose <span className="text-[#00a2a4]">MediQuick Diagnostics?</span>
+            </h2>
+            <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-400">Your health is our top priority</p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+            {trustPoints.map((point) => (
+              <div key={point.title} className="text-center group">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-teal-50 text-[#00a2a4] group-hover:scale-110 group-hover:rotate-3 transition-transform">
+                  {point.icon}
+                </div>
+                <h4 className="mb-1 text-sm font-black uppercase tracking-widest text-slate-800">{point.title}</h4>
+                <p className="text-[10px] font-bold text-slate-400 uppercase leading-relaxed">{point.desc}</p>
               </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Support Section */}
+        <section className="text-center">
+          <div className="inline-flex items-center gap-4 rounded-3xl bg-[#00a2a4]/5 px-8 py-6 border border-[#00a2a4]/10">
+            <div className="h-12 w-12 flex items-center justify-center rounded-2xl bg-[#00a2a4] text-white shadow-lg">
+              <PhoneCall size={24} />
             </div>
-          ))}
-        </div>
+            <div className="text-left">
+              <h4 className="text-xs font-black uppercase tracking-widest text-slate-800">Need Help Booking?</h4>
+              <p className="text-[10px] font-bold text-slate-400">Call our health experts at +91 800 123 4567</p>
+            </div>
+            <ArrowRight className="ml-4 text-[#00a2a4] animate-pulse" />
+          </div>
+        </section>
+
       </div>
 
       <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.8s ease-out forwards;
-        }
-        .scrollbar-hide::-webkit-scrollbar {
+        .custom-scrollbar-hidden::-webkit-scrollbar {
           display: none;
         }
-        .scrollbar-hide {
+        .custom-scrollbar-hidden {
           -ms-overflow-style: none;
           scrollbar-width: none;
         }
