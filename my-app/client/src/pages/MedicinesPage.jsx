@@ -76,7 +76,10 @@ const MedicinesPage = () => {
       
       let displaySub = '';
       if (rawSub) {
-        displaySub = rawSub.charAt(0).toUpperCase() + rawSub.slice(1).replace(/-/g, ' ');
+        displaySub = rawSub
+          .split('-')
+          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
       }
       setSubFilter(displaySub);
 
