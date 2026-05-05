@@ -110,7 +110,7 @@ const AllCategoriesPage = () => {
 
                 <div 
                   ref={el => scrollRefs.current[catName] = el}
-                  className="custom-scrollbar-hidden flex gap-4 overflow-x-auto pb-4 scroll-smooth snap-x"
+                  className="custom-scrollbar-hidden flex gap-4 overflow-x-auto pt-4 pb-6 scroll-smooth snap-x"
                 >
                   {groupedMedicines[catName].map((item) => (
                     <div key={item._id} className="min-w-[160px] max-w-[160px] sm:min-w-[200px] sm:max-w-[200px] snap-start">
