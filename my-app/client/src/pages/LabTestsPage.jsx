@@ -13,7 +13,8 @@ import {
   PhoneCall,
   ShoppingBag,
   ArrowRight,
-  Filter
+  Filter,
+  Activity
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
