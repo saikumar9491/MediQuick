@@ -113,7 +113,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
     <div className="min-h-screen bg-[#f8fafc] pb-12">
       {/* Hero Section */}
       <section className="bg-white px-4 py-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
+        <div className="mx-auto max-w-[1400px]">
           <div className="relative h-[160px] overflow-hidden rounded-2xl bg-slate-900 sm:h-[320px]">
             <AnimatePresence mode="wait">
               {activeBanners.length > 0 ? (
@@ -276,7 +276,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       </section>
 
       {/* Trending Products */}
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8">
         <div className="mb-10 flex items-center justify-between">
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-none">Trending <span className="text-blue-600">Products</span></h2>
           <button onClick={() => navigate('/all-medicines')} className="text-[11px] font-black text-blue-600 uppercase tracking-[2px] hover:underline">See All</button>

@@ -19,7 +19,7 @@ const FeaturedBrands = () => {
 
   return (
     <section className="bg-white py-8">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-[1400px] mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-black text-slate-900 tracking-tight">
             Featured brands
