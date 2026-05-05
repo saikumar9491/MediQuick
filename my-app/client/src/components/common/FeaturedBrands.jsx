@@ -24,18 +24,19 @@ const FeaturedBrands = () => {
   return (
     <section className="bg-white py-8">
       <div className="max-w-[1400px] mx-auto px-4">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-black text-slate-900 tracking-tight">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-xl font-bold text-slate-800">
             Featured brands
           </h2>
 
           <button
             onClick={() => navigate('/all-brands')}
-            className="flex items-center gap-1.5 text-[#ff6f61] font-black text-[10px] tracking-wider px-2.5 py-1.5 rounded border border-[#ff6f61]/10 hover:bg-[#ff6f61]/5 transition-all"
+            className="flex items-center gap-1.5 text-[#ff6f61] font-medium text-[13px] px-3 py-1.5 rounded-lg border border-[#ff6f61] hover:bg-[#ff6f61]/5 transition-all"
           >
-            SEE ALL <ChevronRight size={12} strokeWidth={3} />
+            See all <ChevronRight size={14} />
           </button>
         </div>
+        <div className="w-[120px] h-[2px] bg-[#ff6f61] mb-8"></div>
 
         <div className="relative group">
           <div 
@@ -46,16 +47,17 @@ const FeaturedBrands = () => {
               <div
                 key={idx}
                 onClick={() => navigate(`/brand/${encodeURIComponent(brand.name)}`)}
-                className="flex flex-col items-center gap-2 cursor-pointer group"
+                className="min-w-[120px] max-w-[120px] cursor-pointer"
               >
-                <div className="w-[90px] h-[90px] sm:w-[110px] sm:h-[110px] rounded-full flex items-center justify-center bg-white shadow-[0_4px_20px_rgba(0,0,0,0.08)] transition-all duration-300 group-hover:shadow-[0_8px_35px_rgba(0,0,0,0.12)] group-hover:-translate-y-1">
-                  <img
-                    src={brand.logo}
-                    alt={brand.name}
-                    className="w-[75%] h-[75%] object-contain"
-                  />
+                <div className="aspect-square bg-white border border-slate-100 rounded-lg flex items-center justify-center p-2.5">
+                  <div className="w-full h-full rounded-full flex items-center justify-center bg-white shadow-[0_4px_15px_rgba(0,0,0,0.08)] border border-slate-50 transition-all duration-300 hover:shadow-[0_8px_25px_rgba(0,0,0,0.12)]">
+                    <img
+                      src={brand.logo}
+                      alt={brand.name}
+                      className="w-[75%] h-[75%] object-contain"
+                    />
+                  </div>
                 </div>
-                <span className="text-[11px] font-bold text-slate-600 group-hover:text-[#ff6f61] transition-colors">{brand.name}</span>
               </div>
             ))}
           </div>
