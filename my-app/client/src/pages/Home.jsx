@@ -116,120 +116,156 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pb-12">
-      {/* Hero Section */}
-      <section className="bg-white px-4 py-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white pb-32">
+      {/* Hero Section - 2-Hour Express Delivery */}
+      <section className="px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
-          <div className="relative h-[160px] overflow-hidden rounded-2xl bg-slate-900 sm:h-[320px]">
-            <AnimatePresence mode="wait">
-              {activeBanners.length > 0 ? (
-                <motion.div
-                  key={currentBanner}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.8 }}
-                  className="absolute inset-0 cursor-pointer"
-                  onClick={() => navigate('/medicines')}
-                >
-                  <img 
-                    src={activeBanners[currentBanner].image} 
-                    className="h-full w-full object-cover opacity-80" 
-                    alt="banner" 
-                  />
-                  <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-16">
-                    <motion.h1 
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      className="text-xl font-black tracking-tight text-white sm:text-5xl"
-                    >
-                      {activeBanners[currentBanner].title}
-                    </motion.h1>
-                    <p className="mt-2 max-w-md text-[10px] font-bold text-slate-200 uppercase tracking-widest sm:text-sm">
-                      {activeBanners[currentBanner].desc || "Healthcare delivered to your doorstep."}
-                    </p>
-                    <button className="mt-6 flex w-fit items-center gap-2 rounded-full bg-blue-600 px-6 py-2.5 text-[10px] font-black text-white shadow-xl hover:bg-white hover:text-slate-900 sm:px-10 sm:py-4 sm:text-xs">
-                      SHOP NOW <ArrowRight size={14} />
-                    </button>
-                  </div>
-                </motion.div>
-              ) : (
-                <div className="flex h-full items-center justify-center bg-slate-100">
-                  <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
-                </div>
-              )}
-            </AnimatePresence>
+          <div className="relative h-[180px] sm:h-[300px] overflow-hidden rounded-3xl bg-blue-600 p-8 sm:p-16 flex flex-col justify-center shadow-xl shadow-blue-100">
+            <motion.div
+              initial={{ x: -50, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.6 }}
+            >
+              <h1 className="text-3xl sm:text-6xl font-[1000] italic uppercase tracking-tighter text-white leading-none">
+                2-HOUR EXPRESS <br /> DELIVERY
+              </h1>
+              <p className="mt-4 text-xs sm:text-xl font-bold italic text-blue-100 uppercase tracking-widest">
+                Fastest pharmacy delivery in Amritsar.
+              </p>
+            </motion.div>
+            
+            {/* Decorative Pill Background */}
+            <div className="absolute right-0 top-0 h-full w-1/3 opacity-10 pointer-events-none">
+              <ShoppingBag className="h-full w-full rotate-12" />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Service Hub Grid */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-5 gap-3 sm:gap-6">
-          {services.map((service, idx) => (
-            <motion.div
-              whileHover={{ y: -8, scale: 1.02 }}
-              key={idx}
-              onClick={() => navigate(service.path)}
-              className="group flex cursor-pointer flex-col items-center justify-center rounded-2xl bg-white p-3 sm:p-7 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] border border-slate-100/50 text-center transition-all hover:shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)] hover:border-blue-200"
-            >
-              <div className={`mb-3 flex h-11 w-11 sm:h-16 sm:w-16 items-center justify-center rounded-2xl ${service.color} shadow-sm group-hover:scale-110 transition-transform duration-300`}>
-                {React.cloneElement(service.icon, { className: "h-5 w-5 sm:h-8 sm:w-8 stroke-[2.5px]" })}
+      {/* Quick Services Carousel */}
+      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="rounded-[2.5rem] bg-blue-50/50 p-8 sm:p-10 border border-blue-100/50">
+          <div className="mb-8 flex items-center justify-between">
+            <h2 className="text-xl font-black italic uppercase tracking-tight text-slate-800">Quick Services</h2>
+            <div className="flex gap-2">
+              <button className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-400 shadow-sm border border-slate-100">
+                <ChevronLeft size={20} />
+              </button>
+              <button className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-600 shadow-md border border-slate-100">
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          </div>
+          
+          <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar-hidden">
+            {[
+              { title: 'Medicines', icon: '💊', desc: 'Flat 25% Off', color: 'text-rose-500' },
+              { title: 'Lab Tests', icon: '🔬', desc: 'Up to 70% Off', color: 'text-blue-500' },
+              { title: 'Doctor', icon: '👨‍⚕️', desc: 'Online Chat', color: 'text-emerald-500' },
+              { title: 'Ayurveda', icon: '🌿', desc: 'Pure Herbal', color: 'text-green-500' },
+              { title: 'Care Plan', icon: '🛡️', desc: 'Extra Savings', color: 'text-red-500' },
+            ].map((s, i) => (
+              <div key={i} className="min-w-[140px] sm:min-w-[220px] flex flex-col items-center justify-center rounded-[2rem] bg-white p-6 shadow-sm border border-slate-50 text-center transition-transform hover:scale-105">
+                <div className="mb-4 text-4xl sm:text-5xl">{s.icon}</div>
+                <h3 className="text-xs sm:text-sm font-black uppercase tracking-tight text-slate-900">{s.title}</h3>
+                <p className={`mt-1 text-[9px] sm:text-[11px] font-black ${s.color} uppercase tracking-tighter`}>{s.desc}</p>
               </div>
-              <h3 className="text-[9px] sm:text-[13px] font-bold uppercase tracking-wider text-slate-800 leading-tight">{service.title}</h3>
-              <p className="hidden sm:block mt-2 text-[10px] font-semibold text-slate-400 uppercase tracking-tighter">{service.desc}</p>
-            </motion.div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Prescription Quick Order - Premium Redesign */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-slate-900 to-slate-800 p-8 sm:p-12 shadow-2xl border border-white/5">
-          {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 rounded-full bg-blue-500/10 blur-[80px]" />
-          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-64 w-64 rounded-full bg-teal-500/10 blur-[80px]" />
-          
-          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
-            <div className="text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 mb-4 rounded-full bg-blue-500/10 px-4 py-1.5 border border-blue-500/20">
-                <ShieldCheck size={14} className="text-blue-400" />
-                <span className="text-[10px] font-black uppercase tracking-[2px] text-blue-400">100% Genuine Medicines</span>
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-none mb-4">
-                Quick Order with <span className="text-blue-400">Prescription</span>
+      {/* Order with Prescription - Orange Card */}
+      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="rounded-[2.5rem] bg-[#fff3e0] p-8 sm:p-12 border border-orange-100">
+          <div className="flex flex-col sm:flex-row items-center gap-6 mb-8 text-center sm:text-left">
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-orange-100 text-orange-500">
+              <ClipboardList size={32} />
+            </div>
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-[1000] italic uppercase tracking-tighter text-[#9a6a38]">
+                Order with Prescription
               </h2>
-              <p className="text-sm sm:text-base font-medium text-slate-400 max-w-xl mx-auto lg:mx-0">
-                Don't waste time searching. Just upload your doctor's note and we'll handle the rest with doorstep delivery.
+              <p className="text-[10px] sm:text-xs font-black uppercase tracking-[1px] text-[#9a6a38]/60">
+                Verified Pharmacists will review your order
               </p>
             </div>
-
-            <div className="flex w-full lg:w-auto items-center gap-4 bg-white/5 p-3 rounded-[2rem] backdrop-blur-md border border-white/10">
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                className="hidden" 
-                onChange={(e) => setSelectedFile(e.target.files[0])}
-              />
-              <button 
-                onClick={() => fileInputRef.current.click()}
-                className={`flex-1 lg:flex-none flex items-center justify-center gap-3 rounded-2xl px-8 py-5 text-[11px] font-black uppercase tracking-[2px] transition-all border-2 ${selectedFile ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-white/5 border-white/10 text-white hover:bg-white/10'}`}
-              >
-                {selectedFile ? 'FILE READY' : 'SELECT FILE'}
-                {selectedFile && <CheckCircle2 size={16} />}
-              </button>
-              <button 
-                onClick={handleUpload}
-                disabled={!selectedFile || isUploading}
-                className="flex-1 lg:flex-none flex items-center justify-center gap-3 rounded-2xl bg-blue-600 px-10 py-5 text-[11px] font-black uppercase tracking-[2px] text-white shadow-[0_10px_30px_-10px_rgba(37,99,235,0.5)] hover:bg-blue-500 active:scale-95 disabled:bg-slate-700 disabled:text-slate-500 disabled:shadow-none transition-all"
-              >
-                {isUploading ? 'PROCESSING...' : 'ORDER NOW'}
-                <ArrowRight size={16} />
-              </button>
-            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <button 
+              onClick={() => fileInputRef.current.click()}
+              className="flex items-center justify-center rounded-2xl border-2 border-orange-400 bg-white py-5 text-[11px] font-[1000] uppercase tracking-[2px] text-orange-500 hover:bg-orange-50 transition-all"
+            >
+              Select Prescription
+            </button>
+            <button 
+              className="flex items-center justify-center rounded-2xl bg-slate-300 py-5 text-[11px] font-[1000] uppercase tracking-[2px] text-white hover:bg-slate-400 transition-all"
+            >
+              Upload Now
+            </button>
           </div>
         </div>
       </section>
+
+      {/* Daily Deals / Flash Sale Banner */}
+      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-r from-red-500 to-orange-500 p-8 sm:p-12 shadow-xl shadow-orange-100">
+          <div className="relative z-10">
+            <span className="text-[10px] font-black italic uppercase tracking-[3px] text-white/80">Daily Deals</span>
+            <h2 className="mt-2 text-4xl sm:text-6xl font-[1000] italic uppercase tracking-tighter text-white leading-none">
+              Flash Sale
+            </h2>
+            <p className="mt-4 text-xs sm:text-base font-bold italic text-white uppercase tracking-widest">
+              Best offers on top medicines and wellness products
+            </p>
+          </div>
+          
+          {/* Slanted Background Effect */}
+          <div className="absolute top-0 right-0 h-full w-1/2 bg-white/10 -skew-x-12 translate-x-20" />
+        </div>
+      </section>
+
+      {/* Shop by Categories */}
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <style>{`
+          .custom-scrollbar-hidden::-webkit-scrollbar { display: none; }
+          .custom-scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
+        `}</style>
+        
+        <div className="mb-8 flex items-center justify-between">
+          <h2 className="text-xl font-black italic uppercase tracking-tight text-slate-900">Shop by Categories</h2>
+          <button onClick={() => navigate('/all-medicines')} className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">View All</button>
+        </div>
+        
+        <div className="relative group">
+          <div 
+            ref={categoryScrollRef}
+            className="custom-scrollbar-hidden flex gap-4 overflow-x-auto pb-4"
+          >
+            {mainCategories.map((cat, idx) => (
+              <div 
+                key={idx}
+                onClick={() => navigate(cat.path)}
+                className="flex min-w-[140px] cursor-pointer flex-col overflow-hidden rounded-3xl bg-white shadow-sm border border-slate-100 group/card transition-all hover:shadow-xl sm:min-w-[180px]"
+              >
+                <div className={`relative aspect-square overflow-hidden ${cat.bg}`}>
+                  <img src={cat.image} alt={cat.name} className="h-full w-full object-cover transition-transform duration-500 group-hover/card:scale-110" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity" />
+                </div>
+                <div className="p-4 text-center">
+                  <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-800 truncate">{cat.name}</h3>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Home;
 
       {/* Shop by Categories */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
