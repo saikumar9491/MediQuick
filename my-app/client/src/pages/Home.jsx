@@ -168,65 +168,56 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
         <div className="grid grid-cols-5 gap-3 sm:gap-6">
           {services.map((service, idx) => (
             <motion.div
-              whileHover={{ y: -8, scale: 1.02 }}
+              whileHover={{ y: -5 }}
               key={idx}
               onClick={() => navigate(service.path)}
-              className="group flex cursor-pointer flex-col items-center justify-center rounded-2xl bg-white p-3 sm:p-7 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] border border-slate-100/50 text-center transition-all hover:shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)] hover:border-blue-200"
+              className="flex cursor-pointer flex-col items-center justify-center rounded-2xl bg-white p-4 sm:p-7 shadow-sm border border-slate-100/50 text-center transition-all hover:shadow-xl hover:border-blue-100"
             >
-              <div className={`mb-3 flex h-11 w-11 sm:h-16 sm:w-16 items-center justify-center rounded-2xl ${service.color} shadow-sm group-hover:scale-110 transition-transform duration-300`}>
-                {React.cloneElement(service.icon, { className: "h-5 w-5 sm:h-8 sm:w-8 stroke-[2.5px]" })}
+              <div className={`mb-3 flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-2xl ${service.color} shadow-inner`}>
+                {React.cloneElement(service.icon, { className: "h-6 w-6 sm:h-8 sm:w-8" })}
               </div>
-              <h3 className="text-[9px] sm:text-[13px] font-bold uppercase tracking-wider text-slate-800 leading-tight">{service.title}</h3>
-              <p className="hidden sm:block mt-2 text-[10px] font-semibold text-slate-400 uppercase tracking-tighter">{service.desc}</p>
+              <h3 className="text-[9px] sm:text-[13px] font-black uppercase tracking-widest text-slate-900 leading-tight">{service.title}</h3>
+              <p className="hidden sm:block mt-2 text-[10px] font-bold text-slate-400">{service.desc}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* Prescription Quick Order - Premium Redesign */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-slate-900 to-slate-800 p-8 sm:p-12 shadow-2xl border border-white/5">
-          {/* Decorative background elements */}
-          <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 rounded-full bg-blue-500/10 blur-[80px]" />
-          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-64 w-64 rounded-full bg-teal-500/10 blur-[80px]" />
-          
-          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
-            <div className="text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 mb-4 rounded-full bg-blue-500/10 px-4 py-1.5 border border-blue-500/20">
-                <ShieldCheck size={14} className="text-blue-400" />
-                <span className="text-[10px] font-black uppercase tracking-[2px] text-blue-400">100% Genuine Medicines</span>
+      {/* Quick Order with Prescription - Refined Light Version */}
+      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-[2rem] bg-white p-8 sm:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="flex-1 text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start gap-4 mb-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-500 shadow-inner">
+                  <Upload size={24} />
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Quick Order with Prescription</h2>
               </div>
-              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-none mb-4">
-                Quick Order with <span className="text-blue-400">Prescription</span>
-              </h2>
-              <p className="text-sm sm:text-base font-medium text-slate-400 max-w-xl mx-auto lg:mx-0">
-                Don't waste time searching. Just upload your doctor's note and we'll handle the rest with doorstep delivery.
+              <p className="text-sm sm:text-base font-medium text-slate-500 max-w-md mx-auto md:mx-0 leading-relaxed">
+                Upload your prescription and our experts will fulfill your order with 100% genuine medicines.
               </p>
             </div>
 
-            <div className="flex w-full lg:w-auto items-center gap-4 bg-white/5 p-3 rounded-[2rem] backdrop-blur-md border border-white/10">
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                className="hidden" 
-                onChange={(e) => setSelectedFile(e.target.files[0])}
-              />
-              <button 
-                onClick={() => fileInputRef.current.click()}
-                className={`flex-1 lg:flex-none flex items-center justify-center gap-3 rounded-2xl px-8 py-5 text-[11px] font-black uppercase tracking-[2px] transition-all border-2 ${selectedFile ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-white/5 border-white/10 text-white hover:bg-white/10'}`}
-              >
-                {selectedFile ? 'FILE READY' : 'SELECT FILE'}
-                {selectedFile && <CheckCircle2 size={16} />}
-              </button>
-              <button 
-                onClick={handleUpload}
-                disabled={!selectedFile || isUploading}
-                className="flex-1 lg:flex-none flex items-center justify-center gap-3 rounded-2xl bg-blue-600 px-10 py-5 text-[11px] font-black uppercase tracking-[2px] text-white shadow-[0_10px_30px_-10px_rgba(37,99,235,0.5)] hover:bg-blue-500 active:scale-95 disabled:bg-slate-700 disabled:text-slate-500 disabled:shadow-none transition-all"
-              >
-                {isUploading ? 'PROCESSING...' : 'ORDER NOW'}
-                <ArrowRight size={16} />
-              </button>
-            </div>
+          <div className="flex w-full md:w-auto items-center gap-4">
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              className="hidden" 
+              onChange={(e) => setSelectedFile(e.target.files[0])}
+            />
+            <button 
+              onClick={() => fileInputRef.current.click()}
+              className={`flex-1 md:flex-none flex items-center justify-center gap-2 rounded-2xl px-10 py-5 text-[11px] font-black uppercase tracking-widest border-2 transition-all ${selectedFile ? 'text-emerald-600 border-emerald-100 bg-emerald-50' : 'text-slate-900 border-slate-100 hover:bg-slate-50'}`}
+            >
+              {selectedFile ? 'READY' : 'SELECT FILE'}
+            </button>
+            <button 
+              onClick={handleUpload}
+              disabled={!selectedFile || isUploading}
+              className="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-12 py-5 text-[11px] font-black uppercase tracking-widest text-white shadow-xl hover:bg-slate-900 active:scale-95 disabled:bg-slate-200 transition-all shadow-blue-200"
+            >
+              {isUploading ? 'UPLOADING...' : 'ORDER NOW'}
+            </button>
           </div>
         </div>
       </section>
@@ -238,75 +229,71 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
           .custom-scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
         `}</style>
         
-        <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-xl font-black text-slate-900 tracking-tight">Shop by Categories</h2>
-          <button onClick={() => navigate('/all-medicines')} className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">View All</button>
+        <div className="mb-10 flex items-center justify-between">
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-none">Shop by <span className="text-blue-600">Categories</span></h2>
+          <button onClick={() => navigate('/categories')} className="text-[11px] font-black text-blue-600 uppercase tracking-[2px] hover:underline">View All</button>
         </div>
         
         <div className="relative group">
-          {/* Scroll Buttons */}
           <button 
             onClick={() => categoryScrollRef.current?.scrollBy({ left: -400, behavior: 'smooth' })}
-            className="absolute -left-4 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white/90 p-3 text-slate-900 shadow-xl transition-all hover:scale-110 hover:bg-white sm:flex"
+            className="absolute -left-5 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white p-4 text-slate-900 shadow-xl transition-all hover:scale-110 sm:flex border border-slate-50"
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft size={22} />
           </button>
-          <button 
-            onClick={() => categoryScrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' })}
-            className="absolute -right-4 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white/90 p-3 text-slate-900 shadow-xl transition-all hover:scale-110 hover:bg-white sm:flex"
-          >
-            <ChevronRight size={20} />
-          </button>
-
+          
           <div 
             ref={categoryScrollRef}
-            className="custom-scrollbar-hidden flex gap-4 overflow-x-auto pb-2 scroll-smooth"
+            className="custom-scrollbar-hidden flex gap-5 overflow-x-auto pb-4 scroll-smooth"
           >
             {mainCategories.map((cat, idx) => (
-              <motion.div 
-                whileHover={{ scale: 1.02 }}
-                key={idx} 
+              <motion.div
+                whileHover={{ y: -8 }}
+                key={idx}
                 onClick={() => navigate(cat.path)}
-                className="group relative min-w-[150px] h-[150px] sm:min-w-[200px] sm:h-[200px] cursor-pointer overflow-hidden rounded-[1.5rem] border border-slate-100 shadow-sm transition-all hover:shadow-xl"
+                className="relative min-w-[150px] sm:min-w-[180px] cursor-pointer"
               >
-                <img 
-                  src={cat.image} 
-                  alt={cat.name} 
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                />
-                <div className={`absolute inset-0 ${cat.bg} mix-blend-multiply opacity-50 group-hover:opacity-30 transition-opacity`} />
-                <div className="absolute inset-0 flex items-center justify-center p-4 text-center bg-black/10 group-hover:bg-transparent transition-all">
-                  <h3 className="text-base sm:text-xl font-black uppercase tracking-tighter text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
-                    {cat.name}
-                  </h3>
+                <div className={`aspect-square overflow-hidden rounded-[2.5rem] ${cat.bg} border border-slate-100 transition-all hover:shadow-2xl hover:border-blue-100`}>
+                  <img src={cat.image} className="h-full w-full object-cover transition-transform duration-700 hover:scale-110" alt={cat.name} />
                 </div>
+                <h3 className="mt-5 text-center text-[11px] sm:text-[13px] font-black uppercase tracking-widest text-slate-800">{cat.name}</h3>
               </motion.div>
             ))}
           </div>
+
+          <button 
+            onClick={() => categoryScrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' })}
+            className="absolute -right-5 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-center rounded-full bg-white p-4 text-slate-900 shadow-xl transition-all hover:scale-110 sm:flex border border-slate-50"
+          >
+            <ChevronRight size={22} />
+          </button>
         </div>
       </section>
 
       {/* Trending Products */}
       <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-black text-slate-900 tracking-tight">Trending Near You</h2>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Amritsar Hub Selection</p>
-          </div>
-          <button onClick={() => navigate('/all-medicines')} className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">See All</button>
+        <div className="mb-10 flex items-center justify-between">
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-none">Trending <span className="text-blue-600">Products</span></h2>
+          <button onClick={() => navigate('/all-medicines')} className="text-[11px] font-black text-blue-600 uppercase tracking-[2px] hover:underline">See All</button>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-          {loading ? (
-            [1, 2, 3, 4, 5, 6].map(i => <div key={i} className="aspect-[4/5] animate-pulse rounded-2xl bg-white border border-slate-100" />)
-          ) : (
-            medicines.slice(0, 6).map(med => <MedicineCard key={med._id} {...med} />)
-          )}
-        </div>
+        {loading ? (
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 lg:grid-cols-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-72 animate-pulse rounded-[2rem] bg-slate-100" />
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 lg:grid-cols-6">
+            {medicines.slice(0, 6).map((med) => (
+              <MedicineCard key={med._id} {...med} />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Featured Brands */}
-      <section className="bg-white py-16">
+      <section className="bg-slate-50/50 py-16 border-t border-slate-100">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 text-center">
             <h2 className="text-2xl font-black text-slate-900 tracking-tight">Trusted Global Brands</h2>
