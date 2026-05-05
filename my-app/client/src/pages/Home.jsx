@@ -164,60 +164,69 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       </section>
 
       {/* Service Hub Grid */}
-      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-5 gap-2 sm:gap-4">
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-5 gap-3 sm:gap-6">
           {services.map((service, idx) => (
             <motion.div
-              whileHover={{ y: -5 }}
+              whileHover={{ y: -8, scale: 1.02 }}
               key={idx}
               onClick={() => navigate(service.path)}
-              className="flex cursor-pointer flex-col items-center justify-center rounded-xl bg-white p-2 sm:p-6 shadow-sm border border-slate-100 text-center transition-all hover:shadow-xl hover:border-blue-100"
+              className="group flex cursor-pointer flex-col items-center justify-center rounded-2xl bg-white p-3 sm:p-7 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] border border-slate-100/50 text-center transition-all hover:shadow-[0_20px_25px_-5px_rgba(0,0,0,0.1)] hover:border-blue-200"
             >
-              <div className={`mb-2 flex h-10 w-10 sm:h-14 sm:w-14 items-center justify-center rounded-xl sm:rounded-2xl ${service.color} shadow-inner`}>
-                {React.cloneElement(service.icon, { className: "h-5 w-5 sm:h-7 sm:w-7" })}
+              <div className={`mb-3 flex h-11 w-11 sm:h-16 sm:w-16 items-center justify-center rounded-2xl ${service.color} shadow-sm group-hover:scale-110 transition-transform duration-300`}>
+                {React.cloneElement(service.icon, { className: "h-5 w-5 sm:h-8 sm:w-8 stroke-[2.5px]" })}
               </div>
-              <h3 className="text-[8px] sm:text-xs font-black uppercase tracking-tight sm:tracking-widest text-slate-900 leading-tight">{service.title}</h3>
-              <p className="hidden sm:block mt-1 text-[9px] font-bold text-slate-400">{service.desc}</p>
+              <h3 className="text-[9px] sm:text-[13px] font-bold uppercase tracking-wider text-slate-800 leading-tight">{service.title}</h3>
+              <p className="hidden sm:block mt-2 text-[10px] font-semibold text-slate-400 uppercase tracking-tighter">{service.desc}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* Prescription Quick Order */}
-      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl bg-white p-8 shadow-sm border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
-                <Upload size={20} />
+      {/* Prescription Quick Order - Premium Redesign */}
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-slate-900 to-slate-800 p-8 sm:p-12 shadow-2xl border border-white/5">
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 rounded-full bg-blue-500/10 blur-[80px]" />
+          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-64 w-64 rounded-full bg-teal-500/10 blur-[80px]" />
+          
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-10">
+            <div className="text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 mb-4 rounded-full bg-blue-500/10 px-4 py-1.5 border border-blue-500/20">
+                <ShieldCheck size={14} className="text-blue-400" />
+                <span className="text-[10px] font-black uppercase tracking-[2px] text-blue-400">100% Genuine Medicines</span>
               </div>
-              <h2 className="text-xl font-black text-slate-900 tracking-tight">Quick Order with Prescription</h2>
+              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-none mb-4">
+                Quick Order with <span className="text-blue-400">Prescription</span>
+              </h2>
+              <p className="text-sm sm:text-base font-medium text-slate-400 max-w-xl mx-auto lg:mx-0">
+                Don't waste time searching. Just upload your doctor's note and we'll handle the rest with doorstep delivery.
+              </p>
             </div>
-            <p className="text-sm font-medium text-slate-500 max-w-md">
-              Upload your prescription and we'll fulfill your order with genuine medicines.
-            </p>
-          </div>
 
-          <div className="flex w-full md:w-auto items-center gap-4">
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              className="hidden" 
-              onChange={(e) => setSelectedFile(e.target.files[0])}
-            />
-            <button 
-              onClick={() => fileInputRef.current.click()}
-              className={`flex-1 md:flex-none flex items-center justify-center gap-2 rounded-xl px-8 py-4 text-xs font-black uppercase tracking-widest border-2 border-slate-100 hover:bg-slate-50 transition-all ${selectedFile ? 'text-green-600 border-green-100 bg-green-50' : 'text-slate-900'}`}
-            >
-              {selectedFile ? 'FILE SELECTED' : 'SELECT FILE'}
-            </button>
-            <button 
-              onClick={handleUpload}
-              disabled={!selectedFile || isUploading}
-              className="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-10 py-4 text-xs font-black uppercase tracking-widest text-white shadow-xl hover:bg-slate-900 active:scale-95 disabled:bg-slate-200 transition-all"
-            >
-              {isUploading ? 'UPLOADING...' : 'ORDER NOW'}
-            </button>
+            <div className="flex w-full lg:w-auto items-center gap-4 bg-white/5 p-3 rounded-[2rem] backdrop-blur-md border border-white/10">
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                className="hidden" 
+                onChange={(e) => setSelectedFile(e.target.files[0])}
+              />
+              <button 
+                onClick={() => fileInputRef.current.click()}
+                className={`flex-1 lg:flex-none flex items-center justify-center gap-3 rounded-2xl px-8 py-5 text-[11px] font-black uppercase tracking-[2px] transition-all border-2 ${selectedFile ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' : 'bg-white/5 border-white/10 text-white hover:bg-white/10'}`}
+              >
+                {selectedFile ? 'FILE READY' : 'SELECT FILE'}
+                {selectedFile && <CheckCircle2 size={16} />}
+              </button>
+              <button 
+                onClick={handleUpload}
+                disabled={!selectedFile || isUploading}
+                className="flex-1 lg:flex-none flex items-center justify-center gap-3 rounded-2xl bg-blue-600 px-10 py-5 text-[11px] font-black uppercase tracking-[2px] text-white shadow-[0_10px_30px_-10px_rgba(37,99,235,0.5)] hover:bg-blue-500 active:scale-95 disabled:bg-slate-700 disabled:text-slate-500 disabled:shadow-none transition-all"
+              >
+                {isUploading ? 'PROCESSING...' : 'ORDER NOW'}
+                <ArrowRight size={16} />
+              </button>
+            </div>
           </div>
         </div>
       </section>
