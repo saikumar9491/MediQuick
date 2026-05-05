@@ -102,7 +102,7 @@ function AppLayout({ medicines, featured, loading }) {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/brand/:brandName" element={<BrandPage />} />
 
-          <Route path="/medicines" element={<MedicinesPage />} />
+          <Route path="/all-medicines" element={<MedicinesPage />} />
           <Route path="/categories" element={<AllCategoriesPage />} />
           <Route path="/lab-tests" element={<LabTestsPage />} />
           <Route path="/lab-test-details/:id" element={<LabTestDetailsPage />} />

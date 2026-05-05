@@ -284,7 +284,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
             <h2 className="text-xl font-black text-slate-900 tracking-tight">Trending Near You</h2>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Amritsar Hub Selection</p>
           </div>
-          <button onClick={() => navigate('/medicines')} className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">See All</button>
+          <button onClick={() => navigate('/all-medicines')} className="text-xs font-black text-blue-600 uppercase tracking-widest hover:underline">See All</button>
         </div>
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
