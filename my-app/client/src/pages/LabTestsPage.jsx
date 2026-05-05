@@ -42,7 +42,7 @@ const LabTestsPage = () => {
       category: 'Blood Tests',
       parameters: 18,
       time: '24 Hours',
-      image: '/cbc_blood_test_1777972073113.png'
+      image: 'https://images.unsplash.com/photo-1579152276532-83951f808b4c?auto=format&fit=crop&q=80&w=400'
     },
     {
       id: 'thyroid-profile',
@@ -53,7 +53,7 @@ const LabTestsPage = () => {
       category: 'Thyroid',
       parameters: 3,
       time: '24 Hours',
-      image: '/thyroid_test_1777972088145.png'
+      image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=400'
     },
     {
       id: 'diabetes-screening',
@@ -64,7 +64,7 @@ const LabTestsPage = () => {
       category: 'Diabetes',
       parameters: 2,
       time: '12 Hours',
-      image: '/diabetes_test_1777972107432.png'
+      image: 'https://images.unsplash.com/photo-1508847154043-be120754b521?auto=format&fit=crop&q=80&w=400'
     },
     {
       id: 'vitamin-d-test',
@@ -75,7 +75,7 @@ const LabTestsPage = () => {
       category: 'Vitamin Tests',
       parameters: 1,
       time: '36 Hours',
-      image: '/vitamin_test_1777972128381.png'
+      image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=400'
     },
     {
       id: 'full-body-plus',
@@ -86,7 +86,7 @@ const LabTestsPage = () => {
       category: 'Full Body Checkup',
       parameters: 92,
       time: '48 Hours',
-      image: '/full_body_checkup_1777972142920.png'
+      image: 'https://images.unsplash.com/photo-1576091160550-2173bdd99625?auto=format&fit=crop&q=80&w=400'
     }
   ];
 
