@@ -126,6 +126,48 @@ const AyurvedaPage = () => {
         {/* Professional Banner */}
         <section className="mb-10 overflow-hidden rounded-[2.5rem] bg-slate-900 shadow-2xl border border-slate-100">
           <div className="relative h-[160px] sm:h-[220px]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentBanner}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className={`absolute inset-0 bg-gradient-to-br ${banners[currentBanner].bg} p-8 sm:p-12`}
+              >
+                <div className="absolute right-10 top-1/2 -translate-y-1/2 text-[8rem] opacity-10 select-none">
+                  {banners[currentBanner].icon}
+                </div>
+                
+                <div className="relative z-10 flex h-full flex-col justify-center">
+                  <span className="mb-3 w-fit rounded-full bg-white/20 px-3 py-0.5 text-[9px] font-black uppercase tracking-widest text-white backdrop-blur-md border border-white/10">
+                    {banners[currentBanner].tag} SPECIAL
+                  </span>
+                  <h2 className="max-w-xl text-xl font-black italic tracking-tighter text-white sm:text-3xl uppercase">
+                    {banners[currentBanner].title}
+                  </h2>
+                  <p className="mt-2 max-w-md text-[10px] font-bold text-white/80 sm:text-sm uppercase tracking-widest">
+                    {banners[currentBanner].desc}
+                  </p>
+                  <button className="mt-6 w-fit rounded-xl bg-white px-6 py-2 text-[10px] font-black uppercase tracking-widest text-slate-900 shadow-xl hover:bg-[#00a2a4] hover:text-white transition-all">
+                    Shop Now
+                  </button>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+
+            <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
+              {banners.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentBanner(i)}
+                  className={`h-1 rounded-full transition-all duration-300 ${
+                    currentBanner === i ? 'w-8 bg-white' : 'w-2 bg-white/30'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
 
         {loading ? (
           <div className="space-y-12">
