@@ -16,6 +16,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { API_BASE } from '../utils/apiConfig';
+import MedicineCard from '../components/medicine/MedicineCard';
 
 const AyurvedaPage = () => {
   const navigate = useNavigate();
@@ -153,47 +154,12 @@ const AyurvedaPage = () => {
                   className="custom-scrollbar-hidden flex gap-6 overflow-x-auto pt-4 pb-8 scroll-smooth snap-x"
                 >
                   {groupedProducts[subName].map((prod) => (
-                    <motion.div 
+                    <div 
                       key={prod._id} 
-                      className="min-w-[240px] max-w-[240px] snap-start group/card"
-                      whileHover={{ y: -10 }}
+                      className="min-w-[160px] max-w-[160px] sm:min-w-[200px] sm:max-w-[200px] snap-start"
                     >
-                      <div className="relative overflow-hidden rounded-[2rem] border border-slate-50 bg-white shadow-sm transition-all hover:shadow-2xl hover:shadow-teal-100/50">
-                        <div className="relative h-48 w-full overflow-hidden bg-slate-50">
-                          <img src={prod.image} alt={prod.name} className="h-full w-full object-cover transition-transform duration-500 group-hover/card:scale-110" />
-                          <div className="absolute top-3 left-3">
-                            <span className="rounded-full bg-white/90 px-2 py-0.5 text-[8px] font-black uppercase tracking-widest text-emerald-600 backdrop-blur-sm shadow-sm">
-                              {prod.needsRx ? 'Rx Required' : 'Over the Counter'}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="p-5">
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-[#00a2a4]">{prod.brand}</span>
-                            <div className="flex items-center gap-1 text-[9px] font-black text-amber-500">
-                              <Star size={10} className="fill-current" /> 4.5
-                            </div>
-                          </div>
-                          <h3 className="mb-4 text-sm font-black uppercase italic tracking-tight text-slate-800 line-clamp-1">
-                            {prod.name}
-                          </h3>
-                          <div className="flex items-center justify-between">
-                            <div className="flex flex-col">
-                              <span className="text-[11px] font-black text-slate-800">₹{prod.price}</span>
-                              {prod.discountPrice && (
-                                <span className="text-[9px] font-bold text-slate-300 line-through">₹{prod.discountPrice}</span>
-                              )}
-                            </div>
-                            <button 
-                              onClick={() => addToCart(prod.name)}
-                              className="h-10 w-10 flex items-center justify-center rounded-xl bg-slate-900 text-white shadow-lg hover:bg-[#00a2a4] transition-all"
-                            >
-                              <ShoppingBag size={16} />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </motion.div>
+                      <MedicineCard {...prod} />
+                    </div>
                   ))}
                 </div>
               </section>
