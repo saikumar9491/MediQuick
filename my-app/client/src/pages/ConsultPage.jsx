@@ -1,107 +1,289 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Search, 
+  User, 
+  Star, 
+  Clock, 
+  MapPin, 
+  Stethoscope, 
+  Video, 
+  MessageSquare, 
+  Phone, 
+  ChevronRight,
+  Filter,
+  ShieldCheck,
+  Award,
+  ArrowRight
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-/**
- * @description Consult Doctor Page
- * Features: Specialist categories, "How it Works" section, and premium action buttons.
- */
 const ConsultPage = () => {
-  const specialists = [
-    { id: 1, role: "General Physician", img: "👨‍⚕️", fee: 299, desc: "Fever, Cold, Cough & Infections" },
-    { id: 2, role: "Dermatologist", img: "👩‍⚕️", fee: 499, desc: "Skin, Hair & Nail concerns" },
-    { id: 3, role: "Pediatrician", img: "👶", fee: 399, desc: "Child health and vaccinations" },
-    { id: 4, role: "Dietitian", img: "🥗", fee: 199, desc: "Weight loss & Nutrition plans" }
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
+
+  const categories = [
+    { name: 'All', icon: <Stethoscope size={18} /> },
+    { name: 'General Physician', icon: <User size={18} /> },
+    { name: 'Dermatologist', icon: <Award size={18} /> },
+    { name: 'Pediatrician', icon: <ShieldCheck size={18} /> },
+    { name: 'Gynecologist', icon: <User size={18} /> },
+    { name: 'Cardiologist', icon: <Award size={18} /> }
   ];
 
+  const doctors = [
+    {
+      id: 'dr-sharma',
+      name: 'Dr. Amit Sharma',
+      specialty: 'General Physician',
+      rating: 4.8,
+      reviews: 120,
+      fee: 499,
+      experience: '12 Years',
+      time: '10:00 AM - 04:00 PM',
+      image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=400',
+      languages: ['English', 'Hindi']
+    },
+    {
+      id: 'dr-verma',
+      name: 'Dr. Priya Verma',
+      specialty: 'Dermatologist',
+      rating: 4.9,
+      reviews: 250,
+      fee: 699,
+      experience: '8 Years',
+      time: '11:30 AM - 06:00 PM',
+      image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=400',
+      languages: ['English', 'Hindi', 'Punjabi']
+    },
+    {
+      id: 'dr-gupta',
+      name: 'Dr. Rajesh Gupta',
+      specialty: 'Cardiologist',
+      rating: 4.7,
+      reviews: 95,
+      fee: 999,
+      experience: '15 Years',
+      time: '09:00 AM - 01:00 PM',
+      image: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=400',
+      languages: ['English', 'Hindi']
+    },
+    {
+      id: 'dr-reddy',
+      name: 'Dr. S. Reddy',
+      specialty: 'Pediatrician',
+      rating: 4.8,
+      reviews: 180,
+      fee: 599,
+      experience: '10 Years',
+      time: '04:00 PM - 08:00 PM',
+      image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=400',
+      languages: ['English', 'Hindi', 'Telugu']
+    }
+  ];
+
+  const filteredDoctors = doctors.filter(doc => {
+    const matchesCategory = activeCategory === 'All' || doc.specialty === activeCategory;
+    const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                         doc.specialty.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
   return (
-    <div className="min-h-screen bg-slate-50/50 px-4 pb-12  sm:pt-24 sm:pb-14">
-      <div className="mx-auto max-w-7xl">
-        {/* Hero Section */}
-        <div className="relative mb-10 sm:mb-12 overflow-hidden rounded-[2rem] sm:rounded-[2.5rem] md:rounded-[3rem] bg-gradient-to-br from-teal-500 to-teal-700 p-6 sm:p-10 md:p-16 text-white shadow-xl shadow-teal-100">
-          <div className="absolute top-0 right-0 translate-x-10 sm:translate-x-16 md:translate-x-20 -translate-y-6 sm:-translate-y-8 md:-translate-y-10 text-[7rem] sm:text-[10rem] md:text-[15rem] opacity-10">
-            👨‍⚕️
+    <div className="min-h-screen bg-[#f8fafc] pb-20 pt-28">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        
+        {/* 1. Header Section */}
+        <section className="mb-12 text-center">
+          <motion.h1 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-3xl font-black uppercase italic tracking-tight text-slate-800 sm:text-5xl"
+          >
+            Consult <span className="text-[#00a2a4]">Doctors Online</span>
+          </motion.h1>
+          <p className="mx-auto mt-4 max-w-2xl text-sm font-bold uppercase tracking-widest text-slate-400">
+            Get expert advice from certified doctors from the comfort of your home.
+          </p>
+
+          <div className="mx-auto mt-10 max-w-2xl">
+            <div className="relative group">
+              <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none text-slate-400 group-focus-within:text-[#00a2a4] transition-colors">
+                <Search size={20} />
+              </div>
+              <input
+                type="text"
+                placeholder="Search by symptom or doctor name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="block w-full rounded-2xl border-none bg-white py-5 pl-14 pr-5 text-sm font-bold shadow-xl shadow-slate-200/50 outline-none ring-1 ring-slate-100 focus:ring-2 focus:ring-[#00a2a4] transition-all"
+              />
+            </div>
           </div>
+        </section>
 
-          <div className="relative z-10 max-w-2xl">
-            <h1 className="mb-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black italic uppercase tracking-tighter leading-none">
-              Consult Top <span className="text-teal-200">Doctors Online</span>
-            </h1>
-
-            <p className="mb-6 sm:mb-8 max-w-xl text-sm sm:text-base md:text-lg font-bold italic opacity-90">
-              Private video & chat consultations with verified specialists within 10 minutes.
-            </p>
-
-            <div className="flex flex-wrap gap-3 sm:gap-4">
-              <button className="rounded-2xl bg-white px-5 sm:px-8 py-3 sm:py-4 text-[10px] sm:text-xs font-black uppercase tracking-[0.15em] sm:tracking-widest text-teal-700 shadow-lg transition-transform hover:scale-105">
-                Start Consultation Now
+        {/* 2. Doctor Categories (Filter Section) */}
+        <section className="mb-12">
+          <div className="flex items-center gap-2 mb-6">
+            <Filter size={18} className="text-[#00a2a4]" />
+            <h3 className="text-xs font-black uppercase tracking-widest text-slate-800">Choose Specialty</h3>
+          </div>
+          <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar-hidden">
+            {categories.map((cat) => (
+              <button
+                key={cat.name}
+                onClick={() => setActiveCategory(cat.name)}
+                className={`flex shrink-0 items-center gap-3 rounded-2xl px-6 py-4 text-xs font-black uppercase tracking-widest transition-all ${
+                  activeCategory === cat.name
+                    ? 'bg-[#00a2a4] text-white shadow-xl shadow-teal-100'
+                    : 'bg-white text-slate-500 border border-slate-100 hover:border-[#00a2a4] hover:text-[#00a2a4]'
+                }`}
+              >
+                {cat.icon}
+                {cat.name}
               </button>
+            ))}
+          </div>
+        </section>
+
+        {/* 3. Doctor Listing Section */}
+        <section className="mb-20">
+          <div className="mb-8 flex items-center justify-between">
+            <h2 className="text-xl font-black uppercase italic tracking-tight text-slate-800">
+              Expert <span className="text-[#00a2a4]">Medical Specialists</span>
+            </h2>
+            <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              {filteredDoctors.length} Doctors Available Now
             </div>
           </div>
-        </div>
 
-        {/* Specialists Grid */}
-        <h2 className="mb-6 sm:mb-8 px-2 text-xl sm:text-2xl font-black italic uppercase tracking-tighter text-slate-800">
-          Pick a <span className="text-teal-600">Speciality</span>
-        </h2>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {filteredDoctors.map((doc) => (
+              <motion.div
+                layout
+                key={doc.id}
+                className="group relative flex flex-col overflow-hidden rounded-[2.5rem] border-2 border-slate-50 bg-white shadow-sm transition-all hover:border-[#00a2a4] hover:shadow-2xl hover:shadow-teal-100"
+              >
+                {/* Doctor Image & Quick Info */}
+                <div className="relative h-64 w-full overflow-hidden bg-slate-100">
+                  <img 
+                    src={doc.image} 
+                    alt={doc.name} 
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                  />
+                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 backdrop-blur-md">
+                      <Star size={14} className="fill-amber-400 text-amber-400" />
+                      <span className="text-[10px] font-black text-slate-800">{doc.rating} ({doc.reviews})</span>
+                    </div>
+                    <div className="rounded-full bg-[#00a2a4] px-3 py-1.5 text-[10px] font-black text-white">
+                      {doc.experience} Exp.
+                    </div>
+                  </div>
+                </div>
 
-        <div className="mb-14 sm:mb-16 grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {specialists.map((doc) => (
-            <div
-              key={doc.id}
-              className="group flex flex-col items-center rounded-[2rem] sm:rounded-[2.5rem] border border-slate-100 bg-white p-6 sm:p-8 text-center transition-all duration-500 hover:shadow-2xl"
-            >
-              <div className="mb-5 sm:mb-6 text-5xl sm:text-6xl transition-transform group-hover:scale-125 group-hover:-rotate-6">
-                {doc.img}
-              </div>
+                <div className="flex flex-col p-8 flex-1">
+                  <div className="mb-6 flex flex-col">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[#00a2a4]">{doc.specialty}</span>
+                    <h3 className="mt-1 text-2xl font-black uppercase italic tracking-tight text-slate-800 group-hover:text-[#00a2a4] transition-colors">
+                      {doc.name}
+                    </h3>
+                  </div>
 
-              <h3 className="mb-2 text-base sm:text-lg font-black uppercase tracking-tight text-slate-800">
-                {doc.role}
-              </h3>
+                  <div className="mb-8 space-y-3 border-y border-slate-50 py-6">
+                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
+                      <span>Consultation Fee</span>
+                      <span className="text-sm text-slate-800 font-black">₹{doc.fee}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
+                      <span>Available Time</span>
+                      <span className="text-sm text-emerald-600 font-black flex items-center gap-1">
+                        <Clock size={14} /> {doc.time}
+                      </span>
+                    </div>
+                  </div>
 
-              <p className="mb-5 sm:mb-6 text-[11px] sm:text-xs font-bold leading-relaxed text-slate-400">
-                {doc.desc}
+                  <div className="mt-auto flex items-center gap-3">
+                    <button 
+                      onClick={() => navigate(`/doctor-details/${doc.id}`)}
+                      className="flex-1 rounded-2xl bg-slate-50 py-4 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-[#00a2a4] hover:text-white transition-all"
+                    >
+                      View Profile
+                    </button>
+                    <button 
+                      onClick={() => navigate(`/doctor-details/${doc.id}?book=true`)}
+                      className="flex-[1.5] rounded-2xl bg-slate-900 py-4 text-[10px] font-black uppercase tracking-widest text-white shadow-xl shadow-slate-200 hover:bg-[#00a2a4] hover:shadow-teal-100 transition-all"
+                    >
+                      Consult Now
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* Why Consult Online? */}
+        <section className="mb-20 rounded-[3rem] bg-slate-900 p-12 text-white shadow-2xl relative overflow-hidden">
+          <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-[#00a2a4]/20 to-transparent" />
+          
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 items-center gap-12">
+            <div>
+              <h2 className="text-4xl font-black uppercase italic tracking-tighter sm:text-5xl">
+                Ready to talk to a <span className="text-[#00a2a4]">Specialist?</span>
+              </h2>
+              <p className="mt-6 text-sm font-bold text-slate-400 uppercase leading-relaxed tracking-widest">
+                Our doctors are available 24/7. Connect within 10 minutes for an online consultation.
               </p>
-
-              <div className="mt-auto">
-                <p className="mb-4 text-[10px] sm:text-xs font-black italic text-teal-600">
-                  FEE STARTS @ ₹{doc.fee}
-                </p>
-
-                <button className="rounded-xl bg-slate-900 px-5 sm:px-6 py-2.5 sm:py-3 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.15em] sm:tracking-widest text-white shadow-lg shadow-slate-100 transition-colors hover:bg-teal-600">
-                  Consult Now
-                </button>
+              <div className="mt-10 flex flex-wrap gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 flex items-center justify-center rounded-2xl bg-[#00a2a4]/20 text-[#00a2a4]">
+                    <Video size={24} />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest">Video Call</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 flex items-center justify-center rounded-2xl bg-[#00a2a4]/20 text-[#00a2a4]">
+                    <Phone size={24} />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest">Audio Call</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 flex items-center justify-center rounded-2xl bg-[#00a2a4]/20 text-[#00a2a4]">
+                    <MessageSquare size={24} />
+                  </div>
+                  <span className="text-[10px] font-black uppercase tracking-widest">Chat Support</span>
+                </div>
               </div>
             </div>
-          ))}
-        </div>
-
-        {/* Trust Section */}
-        <div className="flex flex-col items-center justify-around gap-6 sm:gap-8 rounded-[1.5rem] sm:rounded-[2rem] border border-slate-100 bg-white p-6 sm:p-8 text-center md:flex-row">
-          <div>
-            <h4 className="text-2xl sm:text-3xl font-black leading-none text-slate-900">100%</h4>
-            <p className="mt-1 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Private & Secure
-            </p>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-3xl bg-white/5 p-6 backdrop-blur-md border border-white/10">
+                <ShieldCheck className="mb-3 text-[#00a2a4]" size={32} />
+                <h4 className="text-[10px] font-black uppercase tracking-widest">Secure & Private</h4>
+                <p className="mt-2 text-[9px] font-bold text-slate-500 uppercase">100% encrypted consultations</p>
+              </div>
+              <div className="rounded-3xl bg-white/5 p-6 backdrop-blur-md border border-white/10 mt-8">
+                <Award className="mb-3 text-[#00a2a4]" size={32} />
+                <h4 className="text-[10px] font-black uppercase tracking-widest">Verified Doctors</h4>
+                <p className="mt-2 text-[9px] font-bold text-slate-500 uppercase">Certified medical professionals</p>
+              </div>
+            </div>
           </div>
+        </section>
 
-          <div className="hidden h-12 w-px bg-slate-100 md:block" />
-
-          <div>
-            <h4 className="text-2xl sm:text-3xl font-black leading-none text-slate-900">500+</h4>
-            <p className="mt-1 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Verified Doctors
-            </p>
-          </div>
-
-          <div className="hidden h-12 w-px bg-slate-100 md:block" />
-
-          <div>
-            <h4 className="text-2xl sm:text-3xl font-black leading-none text-slate-900">24/7</h4>
-            <p className="mt-1 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Available Always
-            </p>
-          </div>
-        </div>
       </div>
+
+      <style>{`
+        .custom-scrollbar-hidden::-webkit-scrollbar {
+          display: none;
+        }
+        .custom-scrollbar-hidden {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 };

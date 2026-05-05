@@ -33,6 +33,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminFlashDeals from './pages/AdminFlashDeals';
 import AllCategoriesPage from './pages/AllCategoriesPage';
 import LabTestDetailsPage from './pages/LabTestDetailsPage';
+import DoctorDetailsPage from './pages/DoctorDetailsPage';
 
 // Global Components
 import WhatsAppSupport from './components/common/WhatsAppSupport';
@@ -106,6 +107,7 @@ function AppLayout({ medicines, featured, loading }) {
           <Route path="/lab-tests" element={<LabTestsPage />} />
           <Route path="/lab-test-details/:id" element={<LabTestDetailsPage />} />
           <Route path="/consult" element={<ConsultPage />} />
+          <Route path="/doctor-details/:id" element={<DoctorDetailsPage />} />
           <Route path="/ayurveda" element={<AyurvedaPage />} />
           <Route path="/care-plan" element={<CarePlanPage />} />
           <Route path="/skin-care" element={<SkinCarePage />} />
