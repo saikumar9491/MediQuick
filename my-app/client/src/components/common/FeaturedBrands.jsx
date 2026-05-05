@@ -7,15 +7,14 @@ const FeaturedBrands = () => {
   const scrollRef = useRef(null);
 
   const brands = [
-    { name: "Horlicks", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/720d6f46-4a1e-4537-83f1-0a6d0800b652.png" },
-    { name: "Omron", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/72574e4c-1e81-432d-82d2-83b53c713b1d.png" },
-    { name: "Moov", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/351600c5-555e-4361-8255-0a9960761e3f.png" },
-    { name: "Dr. Morepen", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/6ec7a4f5-9377-4959-992e-360e676104bc.png" },
-    { name: "Bare Anatomy", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/8b46e9df-9884-482d-8007-881b212f0290.png" },
-    { name: "Dabur", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/d6f4661a-283e-4d4b-97e3-0c460d3d5f57.png" },
-    { name: "Chemist at Play", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/43773177-3e2b-435f-846c-2f941198642a.png" },
-    { name: "Tata 1mg", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/80d07525-412f-48e0-a430-671c08007323.png" },
-    { name: "Tejasya", logo: "https://onemg.gumlet.io/a_ignore,w_150,h_150,c_fit,q_auto,f_auto/273d6118-977a-426b-967b-232506e76315.png" }
+    { name: "Horlicks", logo: "https://onemg.gumlet.io/2026-05%2F1777961506_Horlicks.png?format=auto" },
+    { name: "Omron", logo: "https://onemg.gumlet.io/2026-05%2F1777961524_Omron.png?format=auto" },
+    { name: "Moov", logo: "https://onemg.gumlet.io/2026-05%2F1777961541_Moov.png?format=auto" },
+    { name: "Dr. Morepen", logo: "https://onemg.gumlet.io/2026-05%2F1777961564_Morepen.png?format=auto" },
+    { name: "Bare Anatomy", logo: "https://onemg.gumlet.io/2026-05%2F1777961589_Bare+Anatomy-1.png?format=auto" },
+    { name: "Dabur", logo: "https://onemg.gumlet.io/2026-05%2F1777961622_Dabur.png?format=auto" },
+    { name: "Chemist at Play", logo: "https://onemg.gumlet.io/2026-05%2F1777961631_Chemist+at+play-1.png?format=auto" },
+    { name: "Tata 1mg", logo: "https://onemg.gumlet.io/diagnostics%2F2024-06%2F1719206984_Tata+1mg.png?format=auto" }
   ];
 
   return (
@@ -28,9 +27,9 @@ const FeaturedBrands = () => {
 
           <button
             onClick={() => navigate('/all-brands')}
-            className="flex items-center gap-1 text-[#ff6f61] font-bold text-xs uppercase tracking-wider px-3 py-1.5 rounded-lg border border-[#ff6f61]/20 hover:bg-[#ff6f61] hover:text-white transition-all shadow-sm"
+            className="flex items-center gap-1.5 text-[#ff6f61] font-black text-[10px] tracking-wider px-2.5 py-1.5 rounded border border-[#ff6f61]/10 hover:bg-[#ff6f61]/5 transition-all"
           >
-            See all <ChevronRight size={14} />
+            SEE ALL <ChevronRight size={12} strokeWidth={3} />
           </button>
         </div>
 
