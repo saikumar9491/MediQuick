@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Leaf, 
@@ -10,96 +10,55 @@ import {
   Zap,
   Heart,
   Droplets,
-  Star
+  Star,
+  Activity
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { API_BASE } from '../utils/apiConfig';
 
 const AyurvedaPage = () => {
   const navigate = useNavigate();
   const scrollRefs = useRef({});
+  const [medicines, setMedicines] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const products = [
-    {
-      id: 'chyawanprash',
-      name: 'Pure Herbal Chyawanprash',
-      brand: 'Dabur',
-      desc: 'Boosts immunity and improves respiratory health.',
-      price: 349,
-      mrp: 450,
-      rating: 4.8,
-      category: 'Immunity',
-      image: 'https://images.unsplash.com/photo-1615485240384-552e40df19c1?auto=format&fit=crop&q=80&w=400'
-    },
-    {
-      id: 'giloy',
-      name: 'Giloy Ghan Vati',
-      brand: 'Patanjali',
-      desc: 'Natural immune system booster and fever reducer.',
-      price: 120,
-      mrp: 150,
-      rating: 4.7,
-      category: 'Immunity',
-      image: 'https://images.unsplash.com/photo-1512290923902-8a9f81dc2069?auto=format&fit=crop&q=80&w=400'
-    },
-    {
-      id: 'ashwagandha',
-      name: 'Ashwagandha Stress Relief',
-      brand: 'Himalaya',
-      desc: 'Natural adaptogen to reduce stress and anxiety.',
-      price: 199,
-      mrp: 250,
-      rating: 4.9,
-      category: 'Stress Relief',
-      image: 'https://images.unsplash.com/photo-1512290923902-8a9f81dc2069?auto=format&fit=crop&q=80&w=400'
-    },
-    {
-      id: 'triphala',
-      name: 'Triphala Digestive Care',
-      brand: 'Baidyanath',
-      desc: 'Supports healthy digestion and detoxifies body.',
-      price: 149,
-      mrp: 200,
-      rating: 4.7,
-      category: 'Digestion',
-      image: 'https://images.unsplash.com/photo-1540439867361-137d03a4cf13?auto=format&fit=crop&q=80&w=400'
-    },
-    {
-      id: 'aloe-vera',
-      name: 'Pure Aloe Vera Gel',
-      brand: 'Patanjali',
-      desc: 'Natural hydration for healthy skin and hair.',
-      price: 99,
-      mrp: 120,
-      rating: 4.6,
-      category: 'Skin Care',
-      image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&q=80&w=400'
-    },
-    {
-      id: 'kumkumadi',
-      name: 'Kumkumadi Face Oil',
-      brand: 'Kama Ayurveda',
-      desc: 'Miraculous beauty fluid for glowing skin.',
-      price: 2495,
-      mrp: 2995,
-      rating: 4.9,
-      category: 'Skin Care',
-      image: 'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?auto=format&fit=crop&q=80&w=400'
-    }
-  ];
+  useEffect(() => {
+    const fetchAyurveda = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/medicines`);
+        const data = await res.json();
+        // Filter only Ayurvedic products
+        const ayurvedaItems = (Array.isArray(data) ? data : []).filter(
+          item => item.category === 'Ayurveda'
+        );
+        setMedicines(ayurvedaItems);
+      } catch (err) {
+        console.error("Ayurveda sync error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAyurveda();
+  }, []);
 
-  const categories = [
-    { name: 'Immunity', icon: <ShieldCheck size={20} /> },
-    { name: 'Skin Care', icon: <Sparkles size={20} /> },
-    { name: 'Digestion', icon: <Zap size={20} /> },
-    { name: 'Stress Relief', icon: <Heart size={20} /> }
-  ];
-
-  const groupedProducts = products.reduce((acc, prod) => {
-    if (!acc[prod.category]) acc[prod.category] = [];
-    acc[prod.category].push(prod);
+  // Group by subCategory for the catalog view
+  const groupedProducts = medicines.reduce((acc, prod) => {
+    const sub = prod.subCategory || 'General Wellness';
+    if (!acc[sub]) acc[sub] = [];
+    acc[sub].push(prod);
     return acc;
   }, {});
+
+  const getIcon = (sub) => {
+    switch(sub.toLowerCase()) {
+      case 'chyawanprash': return <ShieldCheck size={20} />;
+      case 'ashwagandha': return <Heart size={20} />;
+      case 'triphala': return <Zap size={20} />;
+      case 'herbal tea': return <Droplets size={20} />;
+      default: return <Leaf size={20} />;
+    }
+  };
 
   const scroll = (catName, direction) => {
     const container = scrollRefs.current[catName];
@@ -133,59 +92,69 @@ const AyurvedaPage = () => {
             Ayurvedic <span className="text-[#00a2a4]">Wellness Directory</span>
           </h1>
           <p className="mt-4 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-slate-400">
-            Explore traditional remedies grouped by health department
+            Explore traditional remedies grouped by specialized categories
           </p>
         </div>
 
-        {/* Categories Section */}
-        <div className="space-y-16">
-          {categories.map((cat) => (
-            groupedProducts[cat.name] && (
-              <section key={cat.name} className="animate-fadeIn relative group">
+        {loading ? (
+          <div className="space-y-12">
+            {[1, 2].map(i => (
+              <div key={i} className="animate-pulse">
+                <div className="h-8 w-48 bg-slate-200 rounded mb-6" />
+                <div className="flex gap-4 overflow-hidden">
+                  {[1, 2, 3, 4].map(j => <div key={j} className="h-64 min-w-[240px] bg-white rounded-[2rem] border border-slate-100" />)}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : medicines.length > 0 ? (
+          <div className="space-y-16">
+            {Object.keys(groupedProducts).map((subName) => (
+              <section key={subName} className="animate-fadeIn relative group">
                 <div className="mb-8 flex items-center justify-between border-b border-slate-100 pb-4">
                   <div className="flex items-center gap-4">
                     <div className="h-12 w-12 flex items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 shadow-sm shadow-emerald-100">
-                      {cat.icon}
+                      {getIcon(subName)}
                     </div>
                     <div>
                       <h2 className="text-base sm:text-lg font-black uppercase tracking-[2px] text-slate-800">
-                        {cat.name}
+                        {subName}
                       </h2>
                       <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                        {groupedProducts[cat.name].length} NATURAL REMEDIES
+                        {groupedProducts[subName].length} VERIFIED PRODUCTS
                       </span>
                     </div>
                   </div>
                   <button 
-                    onClick={() => navigate(`/medicines?filter=${cat.name.toLowerCase().replace(/ /g, '-')}`)}
+                    onClick={() => navigate(`/medicines?filter=ayurveda`)}
                     className="flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-slate-500 border border-slate-200 hover:border-[#00a2a4] hover:text-[#00a2a4] transition-all shadow-sm"
                   >
-                    View All
+                    Enter Hub
                     <ChevronRight size={14} />
                   </button>
                 </div>
                 
                 {/* Scroll Buttons */}
                 <button 
-                  onClick={() => scroll(cat.name, 'left')}
+                  onClick={() => scroll(subName, 'left')}
                   className="absolute left-[-20px] top-[60%] z-10 hidden h-12 w-12 items-center justify-center rounded-full bg-white text-slate-800 shadow-xl border border-slate-100 transition-all hover:bg-[#00a2a4] hover:text-white md:flex group-hover:left-[-10px] opacity-0 group-hover:opacity-100"
                 >
                   <ChevronLeft size={24} />
                 </button>
                 <button 
-                  onClick={() => scroll(cat.name, 'right')}
+                  onClick={() => scroll(subName, 'right')}
                   className="absolute right-[-20px] top-[60%] z-10 hidden h-12 w-12 items-center justify-center rounded-full bg-white text-slate-800 shadow-xl border border-slate-100 transition-all hover:bg-[#00a2a4] hover:text-white md:flex group-hover:right-[-10px] opacity-0 group-hover:opacity-100"
                 >
                   <ChevronRight size={24} />
                 </button>
 
                 <div 
-                  ref={el => scrollRefs.current[cat.name] = el}
+                  ref={el => scrollRefs.current[subName] = el}
                   className="custom-scrollbar-hidden flex gap-6 overflow-x-auto pt-4 pb-8 scroll-smooth snap-x"
                 >
-                  {groupedProducts[cat.name].map((prod) => (
+                  {groupedProducts[subName].map((prod) => (
                     <motion.div 
-                      key={prod.id} 
+                      key={prod._id} 
                       className="min-w-[240px] max-w-[240px] snap-start group/card"
                       whileHover={{ y: -10 }}
                     >
@@ -194,7 +163,7 @@ const AyurvedaPage = () => {
                           <img src={prod.image} alt={prod.name} className="h-full w-full object-cover transition-transform duration-500 group-hover/card:scale-110" />
                           <div className="absolute top-3 left-3">
                             <span className="rounded-full bg-white/90 px-2 py-0.5 text-[8px] font-black uppercase tracking-widest text-emerald-600 backdrop-blur-sm shadow-sm">
-                              Pure Herb
+                              {prod.needsRx ? 'Rx Required' : 'Over the Counter'}
                             </span>
                           </div>
                         </div>
@@ -202,7 +171,7 @@ const AyurvedaPage = () => {
                           <div className="flex items-center justify-between mb-1">
                             <span className="text-[9px] font-black uppercase tracking-widest text-[#00a2a4]">{prod.brand}</span>
                             <div className="flex items-center gap-1 text-[9px] font-black text-amber-500">
-                              <Star size={10} className="fill-current" /> {prod.rating}
+                              <Star size={10} className="fill-current" /> 4.5
                             </div>
                           </div>
                           <h3 className="mb-4 text-sm font-black uppercase italic tracking-tight text-slate-800 line-clamp-1">
@@ -211,7 +180,9 @@ const AyurvedaPage = () => {
                           <div className="flex items-center justify-between">
                             <div className="flex flex-col">
                               <span className="text-[11px] font-black text-slate-800">₹{prod.price}</span>
-                              <span className="text-[9px] font-bold text-slate-300 line-through">₹{prod.mrp}</span>
+                              {prod.discountPrice && (
+                                <span className="text-[9px] font-bold text-slate-300 line-through">₹{prod.discountPrice}</span>
+                              )}
                             </div>
                             <button 
                               onClick={() => addToCart(prod.name)}
@@ -226,9 +197,17 @@ const AyurvedaPage = () => {
                   ))}
                 </div>
               </section>
-            )
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <div className="mb-6 h-20 w-20 flex items-center justify-center rounded-full bg-slate-50 text-slate-300">
+               <Activity size={40} />
+            </div>
+            <h3 className="text-lg font-black uppercase tracking-widest text-slate-800">No Ayurvedic Products Yet</h3>
+            <p className="mt-2 text-sm font-bold text-slate-400">Add products with 'Ayurveda' category in Admin to see them here.</p>
+          </div>
+        )}
 
       </div>
 
