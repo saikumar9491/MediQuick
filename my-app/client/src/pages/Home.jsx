@@ -11,6 +11,7 @@ import {
   ChevronLeft,
   ArrowRight,
   ClipboardList,
+  Zap,
   User,
   Shield
 } from 'lucide-react';
