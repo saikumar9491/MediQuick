@@ -224,6 +224,10 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
 
       {/* Shop by Categories - Redesigned to match screenshot */}
       <section className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mb-10 flex items-center justify-between px-2">
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-none">Shop by <span className="text-blue-600">Categories</span></h2>
+          <button onClick={() => navigate('/categories')} className="text-[11px] font-black text-blue-600 uppercase tracking-[2px] hover:underline">View All</button>
+        </div>
         <style>{`
           .custom-scrollbar-hidden::-webkit-scrollbar { display: none; }
           .custom-scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
