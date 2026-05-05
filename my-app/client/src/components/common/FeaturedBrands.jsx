@@ -46,14 +46,14 @@ const FeaturedBrands = () => {
               <div
                 key={idx}
                 onClick={() => navigate(`/brand/${encodeURIComponent(brand.name)}`)}
-                className="min-w-[120px] max-w-[120px] sm:min-w-[140px] sm:max-w-[140px] cursor-pointer group"
+                className="min-w-[110px] max-w-[110px] sm:min-w-[130px] sm:max-w-[130px] cursor-pointer group"
               >
-                <div className="aspect-square bg-white border border-slate-100 rounded-2xl flex items-center justify-center p-4 transition-all duration-300 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-blue-100">
-                  <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-white shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)] border border-slate-50">
+                <div className="aspect-square bg-white border border-slate-50 rounded-2xl flex items-center justify-center p-2 transition-all duration-300">
+                  <div className="w-full h-full rounded-full overflow-hidden flex items-center justify-center bg-white shadow-[0_4px_15px_rgba(0,0,0,0.08)] border border-slate-100/50 group-hover:shadow-[0_8px_25px_rgba(0,0,0,0.12)] transition-all duration-300">
                     <img
                       src={brand.logo}
                       alt={brand.name}
-                      className="w-[85%] h-[85%] object-contain group-hover:scale-110 transition-transform duration-500"
+                      className="w-[75%] h-[75%] object-contain group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
                 </div>
