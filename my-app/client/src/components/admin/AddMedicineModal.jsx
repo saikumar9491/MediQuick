@@ -59,6 +59,7 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    toast.dismiss(); // Clear any previous error/success messages
     setLoading(true);
 
     const url = initialData
