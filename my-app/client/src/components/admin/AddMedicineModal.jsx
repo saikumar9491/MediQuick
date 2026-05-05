@@ -3,6 +3,22 @@ import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import { API_BASE } from '../../utils/apiConfig';
 
+const categoryOptions = {
+  'Hair Care': ['Hair Oils', 'Shampoos & Conditioners', 'Hair Serums', 'Hair Creams & Masks', 'Hair Colour', 'Hair Growth Products', 'Essential Oils'],
+  'Fitness & Health': ['Vitamins', 'Proteins', 'Health Drinks', 'Gym Accessories'],
+  'Sexual Wellness': ['Condoms', 'Lubricants', 'Personal Wash', 'Performance'],
+  'Vitamins & Nutrition': ['Multivitamins', 'Minerals', 'Omega & Fish Oil', 'Biotin'],
+  'Supports & Braces': ['Knee Supports', 'Back Supports', 'Ankle Supports', 'Wrist Supports'],
+  'Immunity Boosters': ['Chyawanprash', 'Herbal Juices', 'Vitamin C', 'Zinc'],
+  'Homeopathy': ['Cough & Cold', 'Digestion', 'Skin Care', 'Hair Care'],
+  'Pet Care': ['Dog Food', 'Cat Food', 'Pet Grooming', 'Pet Medicines'],
+  'Diabetes': ['Insulin', 'Glucose Monitors', 'Diabetic Diet', 'Supplements'],
+  'Cardiac': ['Blood Pressure', 'Cholesterol', 'Heart Support', 'Aspirin'],
+  'Pain Relief': ['Body Pain', 'Joint Pain', 'Headache', 'Muscle Rubs'],
+  'Skin Care': ['Face Wash', 'Moisturizers', 'Sunscreen', 'Anti-Aging'],
+  'Ayurveda': ['Chyawanprash', 'Ashwagandha', 'Herbal Tea', 'Triphala']
+};
+
 const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
   const [formData, setFormData] = useState({
     name: '',
@@ -37,26 +53,6 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
       });
     }
   }, [initialData, isOpen]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-  const categoryOptions = {
-    'Hair Care': ['Hair Oils', 'Shampoos & Conditioners', 'Hair Serums', 'Hair Creams & Masks', 'Hair Colour', 'Hair Growth Products', 'Essential Oils'],
-    'Fitness & Health': ['Vitamins', 'Proteins', 'Health Drinks', 'Gym Accessories'],
-    'Sexual Wellness': ['Condoms', 'Lubricants', 'Personal Wash', 'Performance'],
-    'Vitamins & Nutrition': ['Multivitamins', 'Minerals', 'Omega & Fish Oil', 'Biotin'],
-    'Supports & Braces': ['Knee Supports', 'Back Supports', 'Ankle Supports', 'Wrist Supports'],
-    'Immunity Boosters': ['Chyawanprash', 'Herbal Juices', 'Vitamin C', 'Zinc'],
-    'Homeopathy': ['Cough & Cold', 'Digestion', 'Skin Care', 'Hair Care'],
-    'Pet Care': ['Dog Food', 'Cat Food', 'Pet Grooming', 'Pet Medicines'],
-    'Diabetes': ['Insulin', 'Glucose Monitors', 'Diabetic Diet', 'Supplements'],
-    'Cardiac': ['Blood Pressure', 'Cholesterol', 'Heart Support', 'Aspirin'],
-    'Pain Relief': ['Body Pain', 'Joint Pain', 'Headache', 'Muscle Rubs'],
-    'Skin Care': ['Face Wash', 'Moisturizers', 'Sunscreen', 'Anti-Aging'],
-    'Ayurveda': ['Chyawanprash', 'Ashwagandha', 'Herbal Tea', 'Triphala']
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
