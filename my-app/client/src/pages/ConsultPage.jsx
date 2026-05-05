@@ -42,7 +42,7 @@ const ConsultPage = () => {
       fee: 499,
       experience: '12 Years',
       time: '10:00 AM - 04:00 PM',
-      image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=400',
+      image: 'https://i.pinimg.com/736x/29/d5/ce/29d5ce8189c51040fc2441eb6ed092d5.jpg',
       languages: ['English', 'Hindi']
     },
     {
@@ -54,7 +54,7 @@ const ConsultPage = () => {
       fee: 699,
       experience: '8 Years',
       time: '11:30 AM - 06:00 PM',
-      image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=400',
+      image: 'https://i.pinimg.com/736x/29/d5/ce/29d5ce8189c51040fc2441eb6ed092d5.jpg',
       languages: ['English', 'Hindi', 'Punjabi']
     },
     {
@@ -66,7 +66,7 @@ const ConsultPage = () => {
       fee: 999,
       experience: '15 Years',
       time: '09:00 AM - 01:00 PM',
-      image: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&q=80&w=400',
+      image: 'https://i.pinimg.com/736x/29/d5/ce/29d5ce8189c51040fc2441eb6ed092d5.jpg',
       languages: ['English', 'Hindi']
     },
     {
@@ -78,7 +78,7 @@ const ConsultPage = () => {
       fee: 599,
       experience: '10 Years',
       time: '04:00 PM - 08:00 PM',
-      image: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=400',
+      image: 'https://i.pinimg.com/736x/29/d5/ce/29d5ce8189c51040fc2441eb6ed092d5.jpg',
       languages: ['English', 'Hindi', 'Telugu']
     }
   ];

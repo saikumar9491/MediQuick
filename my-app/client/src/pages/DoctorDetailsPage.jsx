@@ -35,7 +35,7 @@ const DoctorDetailsPage = () => {
     experience: '12 Years',
     qualification: 'MBBS, MD (Internal Medicine)',
     languages: ['English', 'Hindi', 'Punjabi'],
-    image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=400',
+    image: 'https://i.pinimg.com/736x/29/d5/ce/29d5ce8189c51040fc2441eb6ed092d5.jpg',
     about: 'Dr. Amit Sharma is a highly experienced General Physician with over 12 years of practice. He specializes in chronic disease management, preventive care, and infectious diseases. He is known for his patient-centric approach and thorough diagnostic skills.',
     slots: ['09:00 AM', '10:30 AM', '02:00 PM', '04:30 PM', '06:00 PM']
   };
