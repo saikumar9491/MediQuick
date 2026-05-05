@@ -14,7 +14,11 @@ const FeaturedBrands = () => {
     { name: "Bare Anatomy", logo: "https://onemg.gumlet.io/2026-05%2F1777961589_Bare+Anatomy-1.png?format=auto" },
     { name: "Dabur", logo: "https://onemg.gumlet.io/2026-05%2F1777961622_Dabur.png?format=auto" },
     { name: "Chemist at Play", logo: "https://onemg.gumlet.io/2026-05%2F1777961631_Chemist+at+play-1.png?format=auto" },
-    { name: "Tata 1mg", logo: "https://onemg.gumlet.io/diagnostics%2F2024-06%2F1719206984_Tata+1mg.png?format=auto" }
+    { name: "Tata 1mg", logo: "https://onemg.gumlet.io/diagnostics%2F2024-06%2F1719206984_Tata+1mg.png?format=auto" },
+    { name: "Dettol", logo: "https://onemg.gumlet.io/image/upload/v1656659229/zlcmvzplbaluaazvlkiu.jpg?format=auto" },
+    { name: "Nivea", logo: "https://onemg.gumlet.io/image/upload/v1624530813/l9zrxgedssc3xd1frcgp.png?format=auto" },
+    { name: "Protinex", logo: "https://onemg.gumlet.io/f0a50706-bd6a-4f15-a064-d0963020b267.png?format=auto" },
+    { name: "Cetaphil", logo: "https://onemg.gumlet.io/image/upload/v1659957347/nkhdsambctewwzcgoydk.png?format=auto" }
   ];
 
   return (
