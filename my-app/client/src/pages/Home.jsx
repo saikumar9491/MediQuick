@@ -91,14 +91,14 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   ];
 
   const mainCategories = [
-    { name: 'Skin Care', image: 'https://i.pinimg.com/1200x/8c/9f/a7/8c9fa7dbc6e87d9a2d83c5bf0acf7874.jpg', bg: 'bg-yellow-100/50' },
-    { name: 'Hair Care', image: 'https://i.pinimg.com/1200x/33/5d/60/335d60b4559e4623f2406bc3b0e30ffd.jpg', bg: 'bg-emerald-100/50' },
-    { name: 'Sexual Wellness', image: 'https://i.pinimg.com/736x/bf/31/97/bf3197b411beb6ba42a4388bb3d748e8.jpg', bg: 'bg-orange-100/50' },
-    { name: 'Oral Care', image: 'https://i.pinimg.com/1200x/fb/9c/41/fb9c41e93cfea49347d0b3185ef22dfa.jpg', bg: 'bg-rose-100/50' },
-    { name: 'Elderly Care', image: 'https://i.pinimg.com/736x/af/0d/c1/af0dc1cc90a563d04dada004faa08fc9.jpg', bg: 'bg-cyan-100/50' },
-    { name: 'Baby Care', image: 'https://i.pinimg.com/1200x/8b/e2/e9/8be2e9392f247ba5023e358f5e680e07.jpg', bg: 'bg-indigo-100/50' },
-    { name: 'Women Care', image: 'https://i.pinimg.com/736x/af/5a/48/af5a48eee0368a39893111da34873dcc.jpg', bg: 'bg-pink-100/50' },
-    { name: 'Men Grooming', image: 'https://i.pinimg.com/736x/92/4e/62/924e627a91885b5a0ff6067af986f6b4.jpg', bg: 'bg-slate-100/50' }
+    { name: 'Skin Care', path: '/skin-care', image: 'https://i.pinimg.com/1200x/8c/9f/a7/8c9fa7dbc6e87d9a2d83c5bf0acf7874.jpg', bg: 'bg-yellow-100/50' },
+    { name: 'Hair Care', path: '/medicines?category=Hair Care', image: 'https://i.pinimg.com/1200x/33/5d/60/335d60b4559e4623f2406bc3b0e30ffd.jpg', bg: 'bg-emerald-100/50' },
+    { name: 'Sexual Wellness', path: '/medicines?category=Sexual Wellness', image: 'https://i.pinimg.com/736x/bf/31/97/bf3197b411beb6ba42a4388bb3d748e8.jpg', bg: 'bg-orange-100/50' },
+    { name: 'Oral Care', path: '/medicines?category=Oral Care', image: 'https://i.pinimg.com/1200x/fb/9c/41/fb9c41e93cfea49347d0b3185ef22dfa.jpg', bg: 'bg-rose-100/50' },
+    { name: 'Elderly Care', path: '/medicines?category=Elderly Care', image: 'https://i.pinimg.com/736x/af/0d/c1/af0dc1cc90a563d04dada004faa08fc9.jpg', bg: 'bg-cyan-100/50' },
+    { name: 'Baby Care', path: '/medicines?category=Baby Care', image: 'https://i.pinimg.com/1200x/8b/e2/e9/8be2e9392f247ba5023e358f5e680e07.jpg', bg: 'bg-indigo-100/50' },
+    { name: 'Women Care', path: '/medicines?category=Women Care', image: 'https://i.pinimg.com/736x/af/5a/48/af5a48eee0368a39893111da34873dcc.jpg', bg: 'bg-pink-100/50' },
+    { name: 'Men Grooming', path: '/medicines?category=Men Grooming', image: 'https://i.pinimg.com/736x/92/4e/62/924e627a91885b5a0ff6067af986f6b4.jpg', bg: 'bg-slate-100/50' }
   ];
 
   const handleUpload = async () => {
@@ -233,17 +233,17 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
             <motion.div 
               whileHover={{ scale: 1.02 }}
               key={idx} 
-              onClick={() => navigate(`/medicines?category=${cat.name}`)}
-              className="group relative min-w-[140px] h-[140px] sm:min-w-[180px] sm:h-[180px] cursor-pointer overflow-hidden rounded-2xl border border-slate-100 shadow-sm transition-all hover:shadow-xl"
+              onClick={() => navigate(cat.path)}
+              className="group relative min-w-[150px] h-[150px] sm:min-w-[200px] sm:h-[200px] cursor-pointer overflow-hidden rounded-[1.5rem] border border-slate-100 shadow-sm transition-all hover:shadow-xl"
             >
               <img 
                 src={cat.image} 
                 alt={cat.name} 
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
               />
-              <div className={`absolute inset-0 ${cat.bg} mix-blend-multiply opacity-60 group-hover:opacity-40 transition-opacity`} />
-              <div className="absolute inset-0 flex items-center justify-center p-4 text-center">
-                <h3 className="text-xs sm:text-sm font-black uppercase tracking-widest text-white drop-shadow-md">
+              <div className={`absolute inset-0 ${cat.bg} mix-blend-multiply opacity-50 group-hover:opacity-30 transition-opacity`} />
+              <div className="absolute inset-0 flex items-center justify-center p-4 text-center bg-black/10 group-hover:bg-transparent transition-all">
+                <h3 className="text-base sm:text-xl font-black uppercase tracking-tighter text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
                   {cat.name}
                 </h3>
               </div>
