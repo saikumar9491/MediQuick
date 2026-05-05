@@ -4,11 +4,15 @@ import Medicine from '../models/Medicine.js';
 // @route   GET /api/medicines
 export const getMedicines = async (req, res) => {
   try {
-    const { category, search } = req.query;
+    const { category, search, subCategory } = req.query;
     let query = {};
 
     if (category && category !== 'All') {
       query.category = category;
+    }
+
+    if (subCategory) {
+      query.subCategory = subCategory;
     }
 
     if (search) {

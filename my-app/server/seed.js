@@ -492,6 +492,39 @@ const medicines = [
   countInStock: 45,
   image: "https://tse2.mm.bing.net/th/id/OIP.QQtr0YimWxkfAQtZ3PBHZwHaHa?rs=1&pid=ImgDetMain&o=7&rm=3",
   needsPrescription: false
+},
+{
+  name: "Indulekha Bringha Oil",
+  brand: "Indulekha",
+  category: "Hair Care",
+  subCategory: "Hair Oils",
+  description: "Ayurvedic medicine for hair fall and hair growth.",
+  price: 430,
+  countInStock: 40,
+  image: "https://m.media-amazon.com/images/I/618xM9v6u8L._SL1000_.jpg",
+  needsPrescription: false
+},
+{
+  name: "L'Oreal Professional Shampoo",
+  brand: "L'Oreal",
+  category: "Hair Care",
+  subCategory: "Shampoos & Conditioners",
+  description: "Expert hair care for smooth and shiny hair.",
+  price: 650,
+  countInStock: 25,
+  image: "https://m.media-amazon.com/images/I/51p8I3vP6EL._SL1000_.jpg",
+  needsPrescription: false
+},
+{
+  name: "MuscleBlaze Whey Protein",
+  brand: "MuscleBlaze",
+  category: "Fitness & Health",
+  subCategory: "Proteins",
+  description: "High quality whey protein for muscle building.",
+  price: 1800,
+  countInStock: 20,
+  image: "https://m.media-amazon.com/images/I/61m1vX2T+qL._SL1100_.jpg",
+  needsPrescription: false
 }
 ];
 

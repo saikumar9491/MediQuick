@@ -20,6 +20,7 @@ const medicineSchema = mongoose.Schema({
   needsPrescription: { type: Boolean, default: false },
   isFlashDeal: { type: Boolean, default: false },
   discountPrice: { type: Number },
+  subCategory: { type: String },
 }, { timestamps: true });
 
 export default mongoose.model('Medicine', medicineSchema);

@@ -16,17 +16,11 @@ import { useLocation } from 'react-router-dom';
 
 const MedicinesPage = () => {
   const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const rawFilter = queryParams.get('filter');
   
-  // Dynamic filter initialization
-  let initialFilter = 'All';
-  if (rawFilter === 'flash') initialFilter = 'Flash Deals';
-  else if (rawFilter) initialFilter = rawFilter.charAt(0).toUpperCase() + rawFilter.slice(1);
-
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState(initialFilter);
+  const [filter, setFilter] = useState('All');
+  const [subFilter, setSubFilter] = useState('');
   const [currentBanner, setCurrentBanner] = useState(0);
 
   const banners = useMemo(() => [
@@ -53,11 +47,54 @@ const MedicinesPage = () => {
     },
   ], []);
 
+  // Map slugs to readable names
+  const categoryMap = {
+    'hair-care': 'Hair Care',
+    'fitness': 'Fitness & Health',
+    'sexual-wellness': 'Sexual Wellness',
+    'vitamins': 'Vitamins & Nutrition',
+    'supports': 'Supports & Braces',
+    'immunity': 'Immunity Boosters',
+    'homeopathy': 'Homeopathy',
+    'pet-care': 'Pet Care',
+    'flash': 'Flash Deals'
+  };
+
   useEffect(() => {
     const fetchMedicines = async () => {
+      setLoading(true);
+      const queryParams = new URLSearchParams(location.search);
+      const rawFilter = queryParams.get('filter');
+      const rawSub = queryParams.get('sub');
+
+      // Update state for UI
+      let displayFilter = 'All';
+      if (rawFilter) {
+        displayFilter = categoryMap[rawFilter] || rawFilter.charAt(0).toUpperCase() + rawFilter.slice(1).replace(/-/g, ' ');
+      }
+      setFilter(displayFilter);
+      
+      let displaySub = '';
+      if (rawSub) {
+        displaySub = rawSub.charAt(0).toUpperCase() + rawSub.slice(1).replace(/-/g, ' ');
+      }
+      setSubFilter(displaySub);
+
       try {
-        const res = await fetch(`${API_BASE}/api/medicines`);
-        const data = await res.json();
+        let url = `${API_BASE}/api/medicines`;
+        const params = new URLSearchParams();
+        if (rawFilter && rawFilter !== 'flash') params.append('category', displayFilter);
+        if (rawSub) params.append('subCategory', displaySub);
+        
+        if (params.toString()) url += `?${params.toString()}`;
+
+        const res = await fetch(url);
+        let data = await res.json();
+        
+        if (rawFilter === 'flash') {
+          data = data.filter(m => m.isFlashDeal);
+        }
+        
         setMedicines(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Fetch failed", err);
@@ -67,7 +104,9 @@ const MedicinesPage = () => {
     };
 
     fetchMedicines();
+  }, [location.search]);
 
+  useEffect(() => {
     const timer = setInterval(() => {
       setCurrentBanner((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
     }, 6000);
@@ -78,19 +117,18 @@ const MedicinesPage = () => {
   const categories = [
     'All',
     'Flash Deals',
+    'Hair Care',
+    'Fitness & Health',
+    'Sexual Wellness',
+    'Vitamins & Nutrition',
     'Diabetes',
     'Cardiac',
     'Pain Relief',
-    'Vitamins',
     'Skin Care',
     'Ayurveda',
   ];
 
-  const filteredMedicines = useMemo(() => {
-    if (filter === 'All') return medicines;
-    if (filter === 'Flash Deals') return medicines.filter(m => m.isFlashDeal);
-    return medicines.filter((m) => m.category?.toLowerCase() === filter.toLowerCase());
-  }, [filter, medicines]);
+  const filteredMedicines = medicines; // Filtering now happens at API level or useEffect level
 
   return (
     <div className="min-h-screen bg-[#f8fafc] pb-20 pt-6">
@@ -188,7 +226,7 @@ const MedicinesPage = () => {
             <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">
-                  {filter} <span className="text-blue-600">Items</span>
+                  {filter} {subFilter && <span className="text-blue-600">› {subFilter}</span>} <span className="text-blue-600">Items</span>
                 </h2>
                 <p className="mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
                   Showing {filteredMedicines.length} verified products

@@ -85,7 +85,7 @@ const AdminDashboard = () => {
 
   const handleSaveProduct = async (productData) => {
     const isEdit = !!editingProduct;
-    const url = isEdit ? `${API_BASE}/api/medicines/${editingProduct._id}` : `${API_BASE}/api/medicines`;
+    const url = isEdit ? `${API_BASE}/api/medicines/${editingProduct._id}` : `${API_BASE}/api/medicines/add`;
     const method = isEdit ? 'PUT' : 'POST';
 
     const savePromise = fetch(url, {

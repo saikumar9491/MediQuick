@@ -8,7 +8,8 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
     name: '',
     price: '',
     brand: '',
-    category: 'Wellness',
+    category: 'Hair Care',
+    subCategory: '',
     image: '',
     needsRx: false,
     isFlashDeal: false,
@@ -27,7 +28,8 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
         name: '',
         price: '',
         brand: '',
-        category: 'Wellness',
+        category: 'Hair Care',
+        subCategory: '',
         image: '',
         needsRx: false,
         isFlashDeal: false,
@@ -42,7 +44,7 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
 
     const url = initialData
       ? `${API_BASE}/api/medicines/${initialData._id}`
-      : `${API_BASE}/api/medicines`;
+      : `${API_BASE}/api/medicines/add`;
 
     const method = initialData ? 'PUT' : 'POST';
 
@@ -145,13 +147,34 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
             >
-              <option value="Wellness">Wellness</option>
+              <option value="Health Resource Center">Health Resource Center</option>
+              <option value="Hair Care">Hair Care</option>
+              <option value="Fitness & Health">Fitness & Health</option>
+              <option value="Sexual Wellness">Sexual Wellness</option>
+              <option value="Vitamins & Nutrition">Vitamins & Nutrition</option>
+              <option value="Supports & Braces">Supports & Braces</option>
+              <option value="Immunity Boosters">Immunity Boosters</option>
+              <option value="Homeopathy">Homeopathy</option>
+              <option value="Pet Care">Pet Care</option>
+              <option value="Diabetes">Diabetes</option>
+              <option value="Cardiac">Cardiac</option>
               <option value="Pain Relief">Pain Relief</option>
               <option value="Skin Care">Skin Care</option>
-              <option value="Vitamins">Vitamins</option>
-              <option value="Energy Drinks">Energy Drinks</option>
               <option value="Ayurveda">Ayurveda</option>
             </select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="ml-1 text-[10px] font-black uppercase tracking-widest text-gray-400">
+              Sub-Category (Optional)
+            </label>
+            <input
+              type="text"
+              value={formData.subCategory || ''}
+              placeholder="e.g. Hair Oils, Vitamins, etc."
+              className="w-full rounded-md border p-3 text-sm font-bold uppercase tracking-tight outline-none transition focus:border-blue-500"
+              onChange={(e) => setFormData({ ...formData, subCategory: e.target.value })}
+            />
           </div>
 
           <div className="space-y-1">
