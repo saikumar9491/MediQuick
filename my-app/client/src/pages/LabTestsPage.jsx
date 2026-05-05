@@ -42,7 +42,7 @@ const LabTestsPage = () => {
       category: 'Blood Tests',
       parameters: 18,
       time: '24 Hours',
-      image: 'https://images.unsplash.com/photo-1579152276532-83951f808b4c?auto=format&fit=crop&q=80&w=400'
+      image: 'https://i.pinimg.com/1200x/2a/25/0a/2a250a52241e895241cc1ec5f4bf4b4f.jpg'
     },
     {
       id: 'thyroid-profile',
@@ -53,7 +53,7 @@ const LabTestsPage = () => {
       category: 'Thyroid',
       parameters: 3,
       time: '24 Hours',
-      image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=400'
+      image: 'https://i.pinimg.com/1200x/2a/25/0a/2a250a52241e895241cc1ec5f4bf4b4f.jpg'
     },
     {
       id: 'diabetes-screening',
@@ -64,7 +64,7 @@ const LabTestsPage = () => {
       category: 'Diabetes',
       parameters: 2,
       time: '12 Hours',
-      image: 'https://images.unsplash.com/photo-1508847154043-be120754b521?auto=format&fit=crop&q=80&w=400'
+      image: 'https://i.pinimg.com/1200x/2a/25/0a/2a250a52241e895241cc1ec5f4bf4b4f.jpg'
     },
     {
       id: 'vitamin-d-test',
@@ -75,7 +75,7 @@ const LabTestsPage = () => {
       category: 'Vitamin Tests',
       parameters: 1,
       time: '36 Hours',
-      image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&q=80&w=400'
+      image: 'https://i.pinimg.com/1200x/2a/25/0a/2a250a52241e895241cc1ec5f4bf4b4f.jpg'
     },
     {
       id: 'full-body-plus',
@@ -86,7 +86,7 @@ const LabTestsPage = () => {
       category: 'Full Body Checkup',
       parameters: 92,
       time: '48 Hours',
-      image: 'https://images.unsplash.com/photo-1576091160550-2173bdd99625?auto=format&fit=crop&q=80&w=400'
+      image: 'https://i.pinimg.com/1200x/2a/25/0a/2a250a52241e895241cc1ec5f4bf4b4f.jpg'
     }
   ];
 
@@ -201,23 +201,26 @@ const LabTestsPage = () => {
               <motion.div
                 layout
                 key={test.id}
-                className="group relative flex flex-col rounded-3xl border-2 border-slate-50 bg-white p-6 shadow-sm transition-all hover:border-[#00a2a4] hover:shadow-2xl hover:shadow-teal-100"
+                className="group relative flex flex-col overflow-hidden rounded-3xl border-2 border-slate-50 bg-white shadow-sm transition-all hover:border-[#00a2a4] hover:shadow-2xl hover:shadow-teal-100"
               >
-                <div className="mb-4 flex items-start justify-between">
-                  <div className="h-20 w-24 overflow-hidden rounded-2xl bg-teal-50">
-                    <img 
-                      src={test.image} 
-                      alt={test.name} 
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
-                    />
-                  </div>
-                  <div className="flex flex-col items-end">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">{test.category}</span>
-                    <span className="mt-1 flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">
-                      <Clock size={10} /> {test.time}
-                    </span>
-                  </div>
+                {/* Image Header */}
+                <div className="h-48 w-full overflow-hidden bg-teal-50">
+                  <img 
+                    src={test.image} 
+                    alt={test.name} 
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                  />
                 </div>
+
+                <div className="flex flex-col p-6 flex-1">
+                  <div className="mb-4 flex items-start justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-[#00a2a4]">{test.category}</span>
+                      <span className="mt-1 flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded w-fit">
+                        <Clock size={10} /> {test.time}
+                      </span>
+                    </div>
+                  </div>
 
                 <h3 className="mb-2 text-lg font-black uppercase italic tracking-tight text-slate-800 group-hover:text-[#00a2a4]">
                   {test.name}
