@@ -200,96 +200,104 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       </section>
 
       {/* Shop by Categories */}
-      <section className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mb-10 flex items-center justify-between px-2">
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-none">Shop by <span className="text-blue-600">Categories</span></h2>
-          <button onClick={() => navigate('/categories')} className="text-[11px] font-black text-blue-600 uppercase tracking-[2px] hover:underline">View All</button>
-        </div>
-        <style>{`
-          .custom-scrollbar-hidden::-webkit-scrollbar { display: none; }
-          .custom-scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
-          .category-card {
-            min-width: 150px;
-            background: white;
-            border: 1px solid #eef2f6;
-            border-radius: 16px;
-            padding: 8px;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-          }
-          .category-card:hover {
-            box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.08);
-            transform: translateY(-4px);
-            border-color: #cbd5e1;
-          }
-          .category-inner {
-            height: 140px;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s ease;
-          }
-          .category-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 5;
-            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-          }
-          .category-card:hover .category-image {
-            transform: scale(1.1);
-          }
-        `}</style>
-        
-        <div className="relative group">
-          <div 
-            ref={categoryScrollRef}
-            className="custom-scrollbar-hidden flex gap-5 overflow-x-auto pb-8 scroll-smooth px-2"
-          >
-            {mainCategories.map((cat, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: idx * 0.05 }}
-                onClick={() => navigate(cat.path)}
-                className="category-card"
-              >
-                <div className="category-inner" style={{ backgroundColor: cat.bgColor }}>
-                  <img src={cat.image} className="category-image" alt={cat.name} />
-                </div>
-              </motion.div>
-            ))}
+      <section className="bg-white py-10">
+        <div className="mx-auto max-w-[1400px] px-5">
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-[22px] font-semibold text-[#212121] tracking-tight">
+              Shop by categories
+            </h2>
           </div>
 
-          <button 
-            onClick={() => categoryScrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' })}
-            className="absolute -right-3 top-[42%] z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#ef4444] shadow-[0_4px_15px_rgb(0,0,0,0.1)] transition-all hover:scale-110 active:scale-95 border border-slate-100 opacity-0 group-hover:opacity-100"
-          >
-            <ChevronRight size={20} strokeWidth={3} />
-          </button>
+          {/* Gradient Underline */}
+          <div className="w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
+
+          <style>{`
+            .custom-scrollbar-hidden::-webkit-scrollbar { display: none; }
+            .custom-scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
+            .category-frame {
+              min-width: 165px;
+              width: 165px;
+              aspect-ratio: 1/1;
+              background: white;
+              border: 1px solid #f1f4f6;
+              border-radius: 6px;
+              padding: 12px;
+              cursor: pointer;
+              transition: all 0.3s ease;
+            }
+            .category-frame:hover {
+              box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+              border-color: #e2e8f0;
+            }
+            .category-inner {
+              width: 100%;
+              height: 100%;
+              border-radius: 8px;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              position: relative;
+              overflow: hidden;
+              transition: all 0.4s ease;
+            }
+            .category-image {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              z-index: 5;
+              transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            }
+            .category-frame:hover .category-image {
+              transform: scale(1.1);
+            }
+          `}</style>
+          
+          <div className="relative group">
+            <div 
+              ref={categoryScrollRef}
+              className="custom-scrollbar-hidden flex gap-5 overflow-x-auto pb-8 scroll-smooth px-2"
+            >
+              {mainCategories.map((cat, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: idx * 0.05 }}
+                  onClick={() => navigate(cat.path)}
+                  className="category-frame group/item"
+                >
+                  <div className="category-inner" style={{ backgroundColor: cat.bgColor }}>
+                    <img src={cat.image} className="category-image" alt={cat.name} />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            <button 
+              onClick={() => categoryScrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' })}
+              className="absolute -right-4 top-[40%] -translate-y-1/2 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-400 shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ff6f61]"
+            >
+              <ChevronRight size={24} />
+            </button>
+          </div>
         </div>
       </section>
 
       {/* Trending Products */}
-      <section className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8">
-        <div className="mb-10 flex items-center justify-between">
+      <section className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8 ">
+        <div className="mb-10 flex items-center justify-between ">
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-none">Trending <span className="text-blue-600">Products</span></h2>
           <button onClick={() => navigate('/all-medicines')} className="text-[11px] font-black text-blue-600 uppercase tracking-[2px] hover:underline">See All</button>
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 lg:grid-cols-6 ">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="h-72 animate-pulse rounded-[2rem] bg-slate-100" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 lg:grid-cols-6 ">
             {medicines.slice(0, 6).map((med) => (
               <MedicineCard key={med._id} {...med} />
             ))}
