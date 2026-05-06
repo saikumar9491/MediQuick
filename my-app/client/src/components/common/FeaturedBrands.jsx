@@ -18,7 +18,7 @@ const FeaturedBrands = () => {
    
     { name: "Nivea", logo: "https://cdn.freebiesupply.com/logos/large/2x/nivea-2-logo-png-transparent.png" },
     { name: "Protinex", logo: "https://www.protinex.com/wp-content/themes/protinex/assets/images/logo.svg" },
-    { name: "Cetaphil", logo: "https://farmaciaisis.com.pe/api/scrooge/file/FL-4E8EBB6B?v=-1" }
+    { name: "Cetaphil", logo: "https://i.pinimg.com/1200x/4b/c7/1b/4bc71be1e103635a2f5d1ca0299e42a8.jpg" }
   ];
 
   const scroll = (direction) => {
