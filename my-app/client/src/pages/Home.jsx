@@ -33,6 +33,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   const { token, user } = useAuth();
   const fileInputRef = useRef(null);
   const categoryScrollRef = useRef(null);
+  const trendingScrollRef = useRef(null);
 
   const [selectedFile, setSelectedFile] = useState(null);
   const defaultBanners = [
@@ -284,25 +285,53 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       </section>
 
       {/* Trending Products */}
-      <section className="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8 ">
-        <div className="mb-10 flex items-center justify-between ">
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-none">Trending <span className="text-blue-600">Products</span></h2>
-          <button onClick={() => navigate('/all-medicines')} className="text-[11px] font-black text-blue-600 uppercase tracking-[2px] hover:underline">See All</button>
-        </div>
+      <section className="bg-white py-10">
+        <div className="mx-auto max-w-[1400px] px-5">
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-[22px] font-semibold text-[#212121] tracking-tight">
+              Trending products
+            </h2>
+            <button 
+              onClick={() => navigate('/all-medicines')} 
+              className="flex items-center gap-1 text-[#ff6f61] font-medium text-[14px] px-3.5 py-1.5 rounded-[4px] border border-[#ff6f61] hover:bg-[#ff6f61] hover:text-white transition-all duration-200"
+            >
+              See all <ChevronRight size={16} />
+            </button>
+          </div>
 
-        {loading ? (
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 lg:grid-cols-6 ">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-72 animate-pulse rounded-[2rem] bg-slate-100" />
-            ))}
+          {/* Gradient Underline */}
+          <div className="w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
+
+          <div className="relative group">
+            {loading ? (
+              <div className="flex gap-6 overflow-hidden">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="min-w-[200px] h-72 animate-pulse rounded-xl bg-slate-100" />
+                ))}
+              </div>
+            ) : (
+              <div 
+                ref={trendingScrollRef}
+                className="custom-scrollbar-hidden flex items-stretch gap-6 overflow-x-auto pb-8 scroll-smooth px-2"
+              >
+                {medicines.slice(0, 10).map((med) => (
+                  <div key={med._id} className="min-w-[220px] max-w-[220px] flex">
+                    <MedicineCard {...med} />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!loading && (
+              <button 
+                onClick={() => trendingScrollRef.current?.scrollBy({ left: 440, behavior: 'smooth' })}
+                className="absolute -right-4 top-[40%] -translate-y-1/2 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-400 shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ff6f61]"
+              >
+                <ChevronRight size={24} />
+              </button>
+            )}
           </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 lg:grid-cols-6 ">
-            {medicines.slice(0, 6).map((med) => (
-              <MedicineCard key={med._id} {...med} />
-            ))}
-          </div>
-        )}
+        </div>
       </section>
     </div>
   );

@@ -21,10 +21,10 @@ const MedicineCard = ({ _id, name, brand, price, image, discountPrice, isFlashDe
 
   return (
     <motion.div
-      whileHover={{ y: -10, scale: 1.02 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+      whileHover={{ scale: 1.01 }}
+      transition={{ duration: 0.3 }}
       onClick={() => navigate(`/product/${_id}`)}
-      className="group relative flex h-full flex-col overflow-hidden rounded-2xl border-2 border-slate-100 bg-white p-3 transition-all duration-500 hover:border-[#00a2a4] hover:shadow-[0_25px_50px_-12px_rgba(0,162,164,0.25)]"
+      className="group relative flex w-full h-full flex-col overflow-hidden rounded-xl border border-slate-100 bg-white p-3 transition-all duration-300 hover:border-blue-200 hover:shadow-[0_8px_20px_rgba(0,0,0,0.06)]"
     >
       {/* Discount Tag */}
       {discountPercent > 0 && (
@@ -57,7 +57,7 @@ const MedicineCard = ({ _id, name, brand, price, image, discountPrice, isFlashDe
           <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Verified Hub</span>
         </div>
         
-        <h3 className="mb-1 line-clamp-2 min-h-[36px] text-xs font-bold leading-tight text-slate-900 group-hover:text-[#00a2a4]">
+        <h3 className="mb-1 line-clamp-2 min-h-[40px] text-xs font-bold leading-tight text-slate-900 group-hover:text-blue-600">
           {name}
         </h3>
         
