@@ -21,68 +21,89 @@ const FeaturedBrands = () => {
     { name: "Cetaphil", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Cetaphil_Logo.svg/1024px-Cetaphil_Logo.svg.png" }
   ];
 
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const scrollAmount = 400;
+      scrollRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
-    <section className="bg-white py-8">
-      <div className="max-w-[1400px] mx-auto px-4">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-xl font-bold text-slate-800">
+    <section className="bg-white py-10">
+      <div className="max-w-[1400px] mx-auto px-5">
+        {/* Header Section */}
+        <div className="flex items-center justify-between mb-1">
+          <h2 className="text-[22px] font-semibold text-[#212121] tracking-tight">
             Featured brands
           </h2>
 
           <button
             onClick={() => navigate('/all-brands')}
-            className="flex items-center gap-1.5 text-[#ff6f61] font-medium text-[13px] px-4 py-1.5 rounded-lg border border-[#ff6f61] hover:bg-[#ff6f61]/5 transition-all"
+            className="flex items-center gap-1 text-[#ff6f61] font-medium text-[14px] px-3.5 py-1.5 rounded-[4px] border border-[#ff6f61] hover:bg-[#ff6f61] hover:text-white transition-all duration-200"
           >
-            See all <ChevronRight size={14} />
+            See all <ChevronRight size={16} />
           </button>
         </div>
-        <div className="w-[140px] h-[2.5px] bg-[#ff6f61] mb-8"></div>
 
+        {/* Gradient Underline */}
+        <div className="w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
+
+        {/* Carousel Container */}
         <div className="relative group">
           <div 
             ref={scrollRef}
-            className="custom-scrollbar-hidden flex gap-4 overflow-x-auto pb-4 scroll-smooth"
+            className="flex gap-5 overflow-x-auto pb-6 scroll-smooth no-scrollbar"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {brands.map((brand, idx) => (
               <div
                 key={idx}
                 onClick={() => navigate(`/brand/${encodeURIComponent(brand.name)}`)}
-                className="min-w-[125px] max-w-[125px] cursor-pointer"
+                className="flex-none w-[165px] group/item cursor-pointer"
               >
-                <div className="aspect-square bg-white border border-slate-100 rounded-lg flex items-center justify-center p-1.5">
-                  <div className="w-full h-full rounded-full flex items-center justify-center bg-white shadow-[0_3px_12px_rgba(0,0,0,0.08)] border border-slate-50 transition-all duration-300 hover:shadow-[0_6px_20px_rgba(0,0,0,0.12)]">
+                {/* Square outer border */}
+                <div className="aspect-square bg-white border border-[#f1f4f6] rounded-md flex items-center justify-center p-3 hover:shadow-sm transition-shadow">
+                  {/* Circular inner shadow container */}
+                  <div className="w-full h-full rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.06)] border border-[#f1f4f6] flex items-center justify-center p-4 transition-transform duration-300 group-hover/item:scale-105">
                     <img
                       src={brand.logo}
                       alt={brand.name}
-                      className="w-[78%] h-[78%] object-contain"
+                      className="max-w-full max-h-full object-contain"
                     />
                   </div>
                 </div>
+                <p className="text-center mt-3 text-[13px] text-[#212121] font-normal truncate">
+                  {brand.name}
+                </p>
               </div>
             ))}
           </div>
 
-          {/* Navigation Buttons */}
+          {/* Navigation Arrows */}
           <button 
-            onClick={() => scrollRef.current?.scrollBy({ left: -400, behavior: 'smooth' })}
-            className="absolute -left-3 top-[35%] z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#ef4444] shadow-[0_4px_15px_rgb(0,0,0,0.1)] transition-all hover:scale-110 active:scale-95 border border-slate-100 opacity-0 group-hover:opacity-100"
+            onClick={() => scroll('left')}
+            className="absolute -left-4 top-[40%] -translate-y-1/2 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-400 shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ff6f61]"
           >
-            <ChevronRight size={20} strokeWidth={3} className="rotate-180" />
+            <ChevronRight size={24} className="rotate-180" />
           </button>
 
           <button 
-            onClick={() => scrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' })}
-            className="absolute -right-3 top-[35%] z-20 flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#ef4444] shadow-[0_4px_15px_rgb(0,0,0,0.1)] transition-all hover:scale-110 active:scale-95 border border-slate-100 opacity-0 group-hover:opacity-100"
+            onClick={() => scroll('right')}
+            className="absolute -right-4 top-[40%] -translate-y-1/2 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-400 shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ff6f61]"
           >
-            <ChevronRight size={20} strokeWidth={3} />
+            <ChevronRight size={24} />
           </button>
-          
-          <style>{`
-            .custom-scrollbar-hidden::-webkit-scrollbar { display: none; }
-            .custom-scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
-          `}</style>
         </div>
       </div>
+
+      <style jsx>{`
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </section>
   );
 };
