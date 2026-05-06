@@ -55,7 +55,7 @@ const FeaturedBrands = () => {
         <div className="relative group">
           <div 
             ref={scrollRef}
-            className="flex gap-5 overflow-x-auto pb-6 scroll-smooth no-scrollbar"
+            className="flex gap-5 overflow-x-auto pt-4 pb-6 scroll-smooth no-scrollbar"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {brands.map((brand, idx) => (

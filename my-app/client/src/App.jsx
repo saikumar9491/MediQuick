@@ -31,6 +31,7 @@ import CarePlanPage from './pages/CarePlanPage';
 import SkinCarePage from './pages/SkinCarePage';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminFlashDeals from './pages/AdminFlashDeals';
+import AdminTrendingProducts from './pages/AdminTrendingProducts';
 import AllCategoriesPage from './pages/AllCategoriesPage';
 import LabTestDetailsPage from './pages/LabTestDetailsPage';
 import DoctorDetailsPage from './pages/DoctorDetailsPage';
@@ -131,6 +132,10 @@ function AppLayout({ medicines, featured, loading }) {
             <Route
               path="/admin/flash-deals"
               element={<AdminFlashDeals />}
+            />
+            <Route
+              path="/admin/trending"
+              element={<AdminTrendingProducts />}
             />
           </Route>
 

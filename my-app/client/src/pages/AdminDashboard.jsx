@@ -27,6 +27,7 @@ import AddBrandModal from '../components/admin/AddBrandModal';
 import EmailUserModal from '../components/admin/EmailUserModal';
 import AdminSidebar from '../components/admin/AdminSidebar';
 import AdminFlashDealsSection from '../components/admin/AdminFlashDealsSection';
+import AdminTrendingSection from '../components/admin/AdminTrendingSection';
 import AdminCategoryManager from '../components/admin/AdminCategoryManager';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -209,13 +210,22 @@ const AdminDashboard = () => {
             {activeTab !== 'overview' && (
               <div className="flex items-center gap-4">
                 {activeTab === 'products' && (
-                  <Link
-                    to="/admin/flash-deals"
-                    className="group relative flex items-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-orange-500 to-rose-500 px-5 py-3 text-sm font-semibold text-white transition-all hover:shadow-lg hover:shadow-orange-500/25 hover:-translate-y-0.5 active:scale-95"
-                  >
-                    <Zap className="h-4 w-4" />
-                    <span>Flash Deals</span>
-                  </Link>
+                  <>
+                    <Link
+                      to="/admin/flash-deals"
+                      className="group relative flex items-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-orange-500 to-rose-500 px-5 py-3 text-sm font-semibold text-white transition-all hover:shadow-lg hover:shadow-orange-500/25 hover:-translate-y-0.5 active:scale-95"
+                    >
+                      <Zap className="h-4 w-4" />
+                      <span>Flash Deals</span>
+                    </Link>
+                    <Link
+                      to="/admin/trending"
+                      className="group relative flex items-center gap-2 overflow-hidden rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 px-5 py-3 text-sm font-semibold text-white transition-all hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5 active:scale-95"
+                    >
+                      <TrendingUp className="h-4 w-4" />
+                      <span>Trending</span>
+                    </Link>
+                  </>
                 )}
                 {['products', 'brands'].includes(activeTab) && (
                   <motion.button
@@ -281,6 +291,10 @@ const AdminDashboard = () => {
                       <div>
                         <span className="block text-white/60 text-[10px] mb-0.5">Flash Deals</span>
                         <span>{inventory.filter(m => m.isFlashDeal).length} Active</span>
+                      </div>
+                      <div>
+                        <span className="block text-white/60 text-[10px] mb-0.5">Trending</span>
+                        <span>{inventory.filter(m => m.isTrending).length} Active</span>
                       </div>
                       <div>
                         <span className="block text-white/60 text-[10px] mb-0.5">Banners</span>
@@ -522,6 +536,16 @@ const AdminDashboard = () => {
                         setInventory={setInventory} 
                         banners={banners}
                         setBanners={setBanners}
+                        token={token} 
+                      />
+                    </div>
+                  )}
+
+                  {activeTab === 'trending' && (
+                    <div className="p-1">
+                      <AdminTrendingSection 
+                        inventory={inventory} 
+                        setInventory={setInventory} 
                         token={token} 
                       />
                     </div>

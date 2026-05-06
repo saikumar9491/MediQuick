@@ -256,7 +256,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
           <div className="relative group">
             <div 
               ref={categoryScrollRef}
-              className="custom-scrollbar-hidden flex gap-5 overflow-x-auto pb-8 scroll-smooth px-2"
+              className="custom-scrollbar-hidden flex gap-5 overflow-x-auto pt-4 pb-8 scroll-smooth px-2"
             >
               {mainCategories.map((cat, idx) => (
                 <motion.div
@@ -312,13 +312,22 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
             ) : (
               <div 
                 ref={trendingScrollRef}
-                className="custom-scrollbar-hidden flex items-stretch gap-6 overflow-x-auto pb-8 scroll-smooth px-2"
+                className="custom-scrollbar-hidden flex items-stretch gap-6 overflow-x-auto pt-4 pb-8 scroll-smooth px-2"
               >
-                {medicines.slice(0, 10).map((med) => (
-                  <div key={med._id} className="min-w-[220px] max-w-[220px] flex">
-                    <MedicineCard {...med} />
-                  </div>
-                ))}
+                {medicines.filter(m => m.isTrending).length > 0 ? (
+                  medicines.filter(m => m.isTrending).map((med) => (
+                    <div key={med._id} className="min-w-[220px] max-w-[220px] flex">
+                      <MedicineCard {...med} />
+                    </div>
+                  ))
+                ) : (
+                  // Fallback to first 10 if none marked as trending (optional, but good for initial state)
+                  medicines.slice(0, 10).map((med) => (
+                    <div key={med._id} className="min-w-[220px] max-w-[220px] flex">
+                      <MedicineCard {...med} />
+                    </div>
+                  ))
+                )}
               </div>
             )}
 

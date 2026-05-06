@@ -23,6 +23,7 @@ const AdminSidebar = ({ activeTab, setActiveTab }) => {
     { id: 'banners', label: 'Banners', icon: ImageIcon },
     { id: 'categories', label: 'Categories', icon: Activity },
     { id: 'flash', label: 'Flash Deals', icon: Zap },
+    { id: 'trending', label: 'Trending', icon: TrendingUp },
     { id: 'brands', label: 'Brands', icon: Award },
     { id: 'orders', label: 'Orders', icon: TrendingUp },
     { id: 'settings', label: 'Settings', icon: Settings },

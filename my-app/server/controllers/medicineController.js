@@ -1,10 +1,10 @@
 import Medicine from '../models/Medicine.js';
 
-// @desc    Get all medicines (supports Search & Category)
+// @desc    Get all medicines (supports Search, Category & Trending)
 // @route   GET /api/medicines
 export const getMedicines = async (req, res) => {
   try {
-    const { category, search, subCategory } = req.query;
+    const { category, search, subCategory, trending } = req.query;
     let query = {};
 
     if (category && category !== 'All') {
@@ -13,6 +13,10 @@ export const getMedicines = async (req, res) => {
 
     if (subCategory) {
       query.subCategory = subCategory;
+    }
+
+    if (trending === 'true') {
+      query.isTrending = true;
     }
 
     if (search) {
@@ -150,6 +154,25 @@ export const toggleFlashDeal = async (req, res) => {
     res.status(200).json(updatedMedicine);
   } catch (error) {
     res.status(400).json({ message: 'Failed to update flash deal status', error: error.message });
+  }
+};
+
+// @desc    Toggle Trending status
+// @route   PATCH /api/medicines/:id/trending
+export const toggleTrending = async (req, res) => {
+  try {
+    const { isTrending } = req.body;
+    const medicine = await Medicine.findById(req.params.id);
+
+    if (!medicine) {
+      return res.status(404).json({ message: 'Medicine not found' });
+    }
+
+    medicine.isTrending = isTrending !== undefined ? isTrending : !medicine.isTrending;
+    const updatedMedicine = await medicine.save();
+    res.status(200).json(updatedMedicine);
+  } catch (error) {
+    res.status(400).json({ message: 'Failed to update trending status', error: error.message });
   }
 };
 

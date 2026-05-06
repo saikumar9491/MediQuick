@@ -8,7 +8,8 @@ import {
   deleteMedicine,
   createMedicineReview,
   getRelatedMedicines,
-  toggleFlashDeal
+  toggleFlashDeal,
+  toggleTrending
 } from '../controllers/medicineController.js';
 import { verifyToken, isAdmin } from '../middleware/authMiddleware.js';
 
@@ -60,5 +61,8 @@ router.delete('/:id', verifyToken, isAdmin, deleteMedicine);
 
 // Toggle Flash Deal status (Daily Flash Deals management)
 router.patch('/:id/flash-deal', verifyToken, isAdmin, toggleFlashDeal);
+
+// Toggle Trending status
+router.patch('/:id/trending', verifyToken, isAdmin, toggleTrending);
 
 export default router;

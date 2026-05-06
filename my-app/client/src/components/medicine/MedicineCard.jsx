@@ -24,7 +24,7 @@ const MedicineCard = ({ _id, name, brand, price, image, discountPrice, isFlashDe
       whileHover={{ scale: 1.01 }}
       transition={{ duration: 0.3 }}
       onClick={() => navigate(`/product/${_id}`)}
-      className="group relative flex w-full h-full flex-col overflow-hidden rounded-xl border border-slate-100 bg-white p-3 transition-all duration-300 hover:border-blue-200 hover:shadow-[0_8px_20px_rgba(0,0,0,0.06)]"
+      className="group relative flex w-full h-full flex-col rounded-xl border border-slate-100 bg-white p-3 transition-all duration-300 hover:border-blue-400 hover:shadow-[0_8px_20px_rgba(0,0,0,0.06)]"
     >
       {/* Discount Tag */}
       {discountPercent > 0 && (

@@ -19,6 +19,7 @@ const medicineSchema = mongoose.Schema({
   numReviews: { type: Number, default: 0 },
   needsRx: { type: Boolean, default: false },
   isFlashDeal: { type: Boolean, default: false },
+  isTrending: { type: Boolean, default: false },
   discountPrice: { type: Number },
   subCategory: { type: String },
 }, { timestamps: true });
