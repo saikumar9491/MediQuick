@@ -3,23 +3,21 @@ import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import { API_BASE } from '../../utils/apiConfig';
 
-const categoryOptions = {
-  'Hair Care': ['Hair Oils', 'Shampoos & Conditioners', 'Hair Serums', 'Hair Creams & Masks', 'Hair Colour', 'Hair Growth Products', 'Essential Oils'],
-  'Fitness & Health': ['Vitamins', 'Proteins', 'Health Drinks', 'Gym Accessories'],
-  'Sexual Wellness': ['Condoms', 'Lubricants', 'Personal Wash', 'Performance'],
-  'Vitamins & Nutrition': ['Multivitamins', 'Minerals', 'Omega & Fish Oil', 'Biotin'],
-  'Supports & Braces': ['Knee Supports', 'Back Supports', 'Ankle Supports', 'Wrist Supports'],
-  'Immunity Boosters': ['Chyawanprash', 'Herbal Juices', 'Vitamin C', 'Zinc'],
-  'Homeopathy': ['Cough & Cold', 'Digestion', 'Skin Care', 'Hair Care'],
-  'Pet Care': ['Dog Food', 'Cat Food', 'Pet Grooming', 'Pet Medicines'],
-  'Diabetes': ['Insulin', 'Glucose Monitors', 'Diabetic Diet', 'Supplements'],
-  'Cardiac': ['Blood Pressure', 'Cholesterol', 'Heart Support', 'Aspirin'],
-  'Pain Relief': ['Body Pain', 'Joint Pain', 'Headache', 'Muscle Rubs'],
-  'Skin Care': ['Face Wash', 'Moisturizers', 'Sunscreen', 'Anti-Aging'],
-  'Ayurveda': ['Chyawanprash', 'Ashwagandha', 'Herbal Tea', 'Triphala']
-};
-
 const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
+  const [categories, setCategories] = useState([
+    { name: 'Hair Care', subOptions: ['Hair Oils', 'Shampoos & Conditioners', 'Hair Serums', 'Hair Creams & Masks', 'Hair Colour', 'Hair Growth Products', 'Essential Oils'] },
+    { name: 'Fitness & Health', subOptions: ['Vitamins', 'Proteins', 'Health Drinks', 'Gym Accessories'] },
+    { name: 'Sexual Wellness', subOptions: ['Condoms', 'Lubricants', 'Personal Wash', 'Performance'] },
+    { name: 'Vitamins & Nutrition', subOptions: ['Multivitamins', 'Minerals', 'Omega & Fish Oil', 'Biotin'] },
+    { name: 'Supports & Braces', subOptions: ['Knee Supports', 'Back Supports', 'Ankle Supports', 'Wrist Supports'] },
+    { name: 'Immunity Boosters', subOptions: ['Chyawanprash', 'Herbal Juices', 'Vitamin C', 'Zinc'] },
+    { name: 'Skin Care', subOptions: ['Face Wash', 'Moisturizers', 'Sunscreen', 'Anti-Aging'] },
+    { name: 'Diabetes', subOptions: ['Insulin', 'Glucose Monitors', 'Diabetic Diet', 'Supplements'] },
+    { name: 'Cardiac', subOptions: ['Blood Pressure', 'Cholesterol', 'Heart Support', 'Aspirin'] },
+    { name: 'Ayurveda', subOptions: ['Chyawanprash', 'Ashwagandha', 'Herbal Tea', 'Triphala'] },
+    { name: 'Pet Care', subOptions: ['Dog Food', 'Cat Food', 'Pet Grooming', 'Pet Medicines'] }
+  ]);
+
   const [formData, setFormData] = useState({
     name: '',
     price: '',
@@ -33,9 +31,27 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
   });
 
   const [loading, setLoading] = useState(false);
-
   const { token } = useAuth();
 
+  // Fetch dynamic categories from the database
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/categories`);
+        if (!res.ok) throw new Error('API Error');
+        const data = await res.json();
+        // Only update if we actually got data from the database
+        if (Array.isArray(data) && data.length > 0) {
+          setCategories(data);
+        }
+      } catch (err) {
+        console.error('Database Categories Fetch failed, using fallback list:', err);
+      }
+    };
+    if (isOpen) fetchCategories();
+  }, [isOpen]);
+
+  // Handle Initial Data or Reset
   useEffect(() => {
     if (initialData) {
       setFormData(initialData);
@@ -44,7 +60,7 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
         name: '',
         price: '',
         brand: '',
-        category: 'Hair Care',
+        category: categories.length > 0 ? categories[0].name : '',
         subCategory: '',
         image: '',
         needsRx: false,
@@ -52,7 +68,7 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
         discountPrice: '',
       });
     }
-  }, [initialData, isOpen]);
+  }, [initialData, isOpen, categories]);
 
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showSubCategoryDropdown, setShowSubCategoryDropdown] = useState(false);
@@ -140,26 +156,26 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
                 setShowSubCategoryDropdown(false);
               }}
             >
-              <span className="text-slate-700">{formData.category}</span>
+              <span className="text-slate-700">{formData.category || 'Select Category'}</span>
               <span className={`transition-transform duration-200 ${showCategoryDropdown ? 'rotate-180' : ''}`}>▼</span>
             </div>
             
             {showCategoryDropdown && (
               <div className="absolute top-full left-0 right-0 z-[220] mt-1 max-h-60 overflow-y-auto rounded-md bg-white shadow-xl border border-slate-100 py-1 animate-fadeIn">
-                {Object.keys(categoryOptions).map(cat => (
+                {categories.map(catObj => (
                   <div
-                    key={cat}
+                    key={catObj._id}
                     className="px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-teal-50 hover:text-[#00a2a4] cursor-pointer transition-colors"
                     onClick={() => {
                       setFormData({ 
                         ...formData, 
-                        category: cat, 
-                        subCategory: categoryOptions[cat]?.[0] || '' 
+                        category: catObj.name, 
+                        subCategory: '' // Don't auto-select the first sub-option
                       });
                       setShowCategoryDropdown(false);
                     }}
                   >
-                    {cat}
+                    {catObj.name}
                   </div>
                 ))}
               </div>
@@ -186,16 +202,21 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
 
             {showSubCategoryDropdown && (
               <div className="absolute top-full left-0 right-0 z-[220] mt-1 max-h-60 overflow-y-auto rounded-md bg-white shadow-xl border border-slate-100 py-1 animate-fadeIn">
+                {!formData.category && (
+                  <div className="px-4 py-2 text-[10px] font-black text-red-500 uppercase tracking-widest bg-red-50/50">
+                    Select Category Classification First
+                  </div>
+                )}
                 <div
-                  className="px-4 py-2.5 text-sm font-bold text-slate-400 italic hover:bg-slate-50 cursor-pointer"
+                  className="px-4 py-2.5 text-sm font-bold text-slate-400 italic hover:bg-slate-50 cursor-pointer border-b border-slate-50"
                   onClick={() => {
                     setFormData({ ...formData, subCategory: '' });
                     setShowSubCategoryDropdown(false);
                   }}
                 >
-                  None / Select Sub-Category
+                  None / General (No Sub-Category)
                 </div>
-                {categoryOptions[formData.category]?.map(sub => (
+                {categories.find(c => c.name === formData.category)?.subOptions?.map(sub => (
                   <div
                     key={sub}
                     className="px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-teal-50 hover:text-[#00a2a4] cursor-pointer transition-colors"

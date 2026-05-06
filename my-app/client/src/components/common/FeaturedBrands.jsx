@@ -7,14 +7,16 @@ const FeaturedBrands = () => {
   const scrollRef = useRef(null);
 
   const brands = [
+    { name: "Himalaya", logo: "https://i.pinimg.com/1200x/b2/16/ae/b216aeadcf434aff0f744cd316441109.jpg" },
     { name: "Horlicks", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYGZBK5fqq4DOF1ncMX9x8j5buAtfyvXl6Eg&s" },
     { name: "Omron", logo: "https://logowik.com/content/uploads/images/omron5779.jpg" },
+    
     { name: "Moov", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzbV10OmJFxQiUVwIPUFjflSmVHaZyRxQFGA&s" },
     { name: "Dr. Morepen", logo: "https://media.licdn.com/dms/image/v2/C4E0BAQFj9xmjoi9Ccg/company-logo_200_200/company-logo_200_200/0/1630643946445?e=2147483647&v=beta&t=EGJjuMhTrRnMXN4MN74ZpN6nj5f0jjjOPC1NphqvgfE" },
     { name: "Bare Anatomy", logo: "https://i0.wp.com/www.hamroshringar.com/wp-content/uploads/2022/03/bare-anatomy-logo.webp?fit=600%2C400&ssl=1" },
     { name: "Dabur", logo: "https://static.wikia.nocookie.net/logopedia/images/6/62/Dabur_new.jpg/revision/latest?cb=20200323060319" },
     { name: "Chemist at Play", logo: "https://m.media-amazon.com/images/I/31VHGbtF85L.jpg" },
-    { name: "Tata 1mg", logo: "https://cloudfront.stockifyfintech.co.in/wp-content/uploads/2024/05/Tata-1mg.png" },
+    
    
     { name: "Nivea", logo: "https://cdn.freebiesupply.com/logos/large/2x/nivea-2-logo-png-transparent.png" },
     { name: "Protinex", logo: "https://www.protinex.com/wp-content/themes/protinex/assets/images/logo.svg" },
@@ -37,7 +39,7 @@ const FeaturedBrands = () => {
         {/* Header Section */}
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-[22px] font-semibold text-[#212121] tracking-tight">
-            Featured brands
+            Featured Brands
           </h2>
 
           <button

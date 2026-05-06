@@ -8,11 +8,12 @@ export const getMedicines = async (req, res) => {
     let query = {};
 
     if (category && category !== 'All') {
-      query.category = category;
+      query.category = { $regex: new RegExp(`^${category.trim()}$`, 'i') };
     }
 
     if (subCategory) {
-      query.subCategory = subCategory;
+      // Using partial match for subCategory to be more lenient (e.g., "Shampoos" matches "Shampoos & Conditioners")
+      query.subCategory = { $regex: new RegExp(subCategory.trim(), 'i') };
     }
 
     if (brand) {

@@ -494,38 +494,71 @@ const medicines = [
   needsPrescription: false
 },
 {
-  name: "Indulekha Bringha Oil",
-  brand: "Indulekha",
-  category: "Hair Care",
-  subCategory: "Hair Oils",
-  description: "Ayurvedic medicine for hair fall and hair growth.",
-  price: 430,
-  countInStock: 40,
-  image: "https://m.media-amazon.com/images/I/618xM9v6u8L._SL1000_.jpg",
-  needsPrescription: false
-},
-{
-  name: "L'Oreal Professional Shampoo",
-  brand: "L'Oreal",
-  category: "Hair Care",
-  subCategory: "Shampoos & Conditioners",
-  description: "Expert hair care for smooth and shiny hair.",
-  price: 650,
-  countInStock: 25,
-  image: "https://m.media-amazon.com/images/I/51p8I3vP6EL._SL1000_.jpg",
-  needsPrescription: false
-},
-{
-  name: "MuscleBlaze Whey Protein",
-  brand: "MuscleBlaze",
-  category: "Fitness & Health",
-  subCategory: "Proteins",
-  description: "High quality whey protein for muscle building.",
-  price: 1800,
-  countInStock: 20,
-  image: "https://m.media-amazon.com/images/I/61m1vX2T+qL._SL1100_.jpg",
-  needsPrescription: false
-}
+    name: "Indulekha Bringha Oil",
+    brand: "Indulekha",
+    category: "Hair Care",
+    subCategory: "Hair Oils",
+    description: "Ayurvedic medicine for hair fall and hair growth.",
+    price: 430,
+    countInStock: 40,
+    image: "https://m.media-amazon.com/images/I/618xM9v6u8L._SL1000_.jpg",
+    needsPrescription: false
+  },
+  {
+    name: "L'Oreal Professional Shampoo",
+    brand: "L'Oreal",
+    category: "Hair Care",
+    subCategory: "Shampoos & Conditioners",
+    description: "Expert hair care for smooth and shiny hair.",
+    price: 650,
+    countInStock: 25,
+    image: "https://m.media-amazon.com/images/I/51p8I3vP6EL._SL1000_.jpg",
+    needsPrescription: false
+  },
+  {
+    name: "Mamaearth Onion Hair Serum",
+    brand: "Mamaearth",
+    category: "Hair Care",
+    subCategory: "Hair Serums",
+    description: "Reduces hair frizz and provides a healthy glow.",
+    price: 299,
+    countInStock: 50,
+    image: "https://m.media-amazon.com/images/I/51-mOQ+fHIL._SL1200_.jpg",
+    needsPrescription: false
+  },
+  {
+    name: "L'Oreal Paris Casting Creme Gloss",
+    brand: "L'Oreal",
+    category: "Hair Care",
+    subCategory: "Hair Colour",
+    description: "Ammonia-free hair colour for natural looking shine.",
+    price: 550,
+    countInStock: 30,
+    image: "https://m.media-amazon.com/images/I/81E+nI-oZ8L._SL1500_.jpg",
+    needsPrescription: false
+  },
+  {
+    name: "Himalaya Anti-Hair Fall Cream",
+    brand: "Himalaya",
+    category: "Hair Care",
+    subCategory: "Hair Creams & Masks",
+    description: "Nourishes hair roots and reduces hair fall.",
+    price: 150,
+    countInStock: 60,
+    image: "https://m.media-amazon.com/images/I/51TjB2Y8DYL._SL1000_.jpg",
+    needsPrescription: false
+  },
+  {
+    name: "MuscleBlaze Whey Protein",
+    brand: "MuscleBlaze",
+    category: "Fitness & Health",
+    subCategory: "Proteins",
+    description: "High quality whey protein for muscle building.",
+    price: 1800,
+    countInStock: 20,
+    image: "https://m.media-amazon.com/images/I/61m1vX2T+qL._SL1100_.jpg",
+    needsPrescription: false
+  }
 ];
 
 const seedDatabase = async () => {

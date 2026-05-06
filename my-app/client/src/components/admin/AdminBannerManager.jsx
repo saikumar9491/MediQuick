@@ -125,6 +125,7 @@ const AdminBannerManager = ({ banners, setBanners, token, API_BASE, handleDelete
               >
                 <option value="main">Main Carousel</option>
                 <option value="flash">Flash Deals</option>
+                <option value="ayurveda-promo">Ayurveda Promo (Home)</option>
                 <option value="brand">Brand Page</option>
               </select>
             </div>

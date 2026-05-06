@@ -34,26 +34,11 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   const fileInputRef = useRef(null);
   const categoryScrollRef = useRef(null);
   const trendingScrollRef = useRef(null);
+  const skinCareScrollRef = useRef(null);
+  const ayurScrollRef = useRef(null);
 
   const [selectedFile, setSelectedFile] = useState(null);
-  const defaultBanners = [
-    {
-      _id: 'default1',
-      title: 'Genuine Medicines. Guaranteed.',
-      desc: 'Sourced from verified manufacturers and stored at optimal temperatures.',
-      image: 'https://images.unsplash.com/photo-1587854692152-cbe660dbbb88?auto=format&fit=crop&q=80&w=2000',
-      category: 'general'
-    },
-    {
-      _id: 'default2',
-      title: 'Flat 25% Off on First Order',
-      desc: 'Use code MEDI25 at checkout. Rapid delivery to your doorstep.',
-      image: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&q=80&w=2000',
-      category: 'general'
-    }
-  ];
-
-  const [dbBanners, setDbBanners] = useState(defaultBanners);
+  const [dbBanners, setDbBanners] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isBannerLoading, setIsBannerLoading] = useState(true);
   const [currentBanner, setCurrentBanner] = useState(0);
@@ -76,7 +61,8 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
     fetchBanners();
   }, []);
 
-  const activeBanners = dbBanners.filter(b => b.category !== 'flash');
+  const activeBanners = dbBanners.filter(b => b.category === 'main');
+  const ayurBanner = dbBanners.find(b => b.category === 'ayurveda-promo');
 
   useEffect(() => {
     if (activeBanners.length === 0) return;
@@ -113,41 +99,57 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   return (
     <div className="min-h-screen bg-[#f8fafc] pb-12">
       {/* Hero Section */}
-      <section className="bg-white px-4 py-4 sm:px-6 lg:px-8">
+      {(activeBanners.length > 0 || isBannerLoading) && (
+        <section className="bg-white px-4 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-[1400px]">
           <div className="relative h-[160px] overflow-hidden rounded-2xl bg-slate-900 sm:h-[320px]">
             <AnimatePresence mode="wait">
               {activeBanners.length > 0 ? (
-                <motion.div
-                  key={currentBanner}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.8 }}
-                  className="absolute inset-0 cursor-pointer"
-                  onClick={() => navigate('/medicines')}
-                >
-                  <img 
-                    src={activeBanners[currentBanner].image} 
-                    className="h-full w-full object-cover opacity-80" 
-                    alt="banner" 
-                  />
-                  <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-16">
-                    <motion.h1 
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      className="text-xl font-black tracking-tight text-white sm:text-5xl"
-                    >
-                      {activeBanners[currentBanner].title}
-                    </motion.h1>
-                    <p className="mt-2 max-w-md text-[10px] font-bold text-slate-200 uppercase tracking-widest sm:text-sm">
-                      {activeBanners[currentBanner].desc || "Healthcare delivered to your doorstep."}
-                    </p>
-                    <button className="mt-6 flex w-fit items-center gap-2 rounded-full bg-blue-600 px-6 py-2.5 text-[10px] font-black text-white shadow-xl hover:bg-white hover:text-slate-900 sm:px-10 sm:py-4 sm:text-xs">
-                      SHOP NOW <ArrowRight size={14} />
-                    </button>
+                  <div className={`absolute inset-0 flex items-center transition-colors duration-500 ${activeBanners[currentBanner].bg || 'bg-gradient-to-r from-[#6b21a8] to-[#9333ea]'}`}>
+                    {/* Right Side Image with Premium Curve - Increased Width */}
+                    <div className="absolute right-0 h-full w-[75%] overflow-hidden lg:w-[65%]">
+                      <motion.img 
+                        key={currentBanner + 'img'}
+                        initial={{ x: 100, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.8, ease: "easeOut" }}
+                        src={activeBanners[currentBanner].image} 
+                        className="h-full w-full object-cover rounded-l-[150px] sm:rounded-l-[350px] border-l-4 sm:border-l-8 border-white/20 shadow-[-20px_0_40px_rgba(0,0,0,0.3)]" 
+                        alt="banner" 
+                      />
+                    </div>
+
+                    {/* Left Side Content */}
+                    <div className="relative z-10 w-full px-6 sm:w-[40%] sm:px-16">
+                      <motion.h1 
+                        key={currentBanner + 'h1'}
+                        initial={{ x: -50, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 0.2 }}
+                        className="text-2xl font-black italic tracking-tighter text-white sm:text-6xl uppercase"
+                      >
+                        {activeBanners[currentBanner].title}
+                      </motion.h1>
+                      <motion.p 
+                        key={currentBanner + 'p'}
+                        initial={{ x: -50, opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
+                        className="mt-2 max-w-md text-[10px] font-bold text-purple-100 uppercase tracking-[0.2em] sm:text-sm"
+                      >
+                        {activeBanners[currentBanner].desc || "Healthcare delivered to your doorstep."}
+                      </motion.p>
+                      <motion.button 
+                        key={currentBanner + 'btn'}
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 0.4 }}
+                        className="mt-6 flex w-fit items-center gap-2 rounded-full bg-blue-600 px-6 py-2.5 text-[10px] font-black text-white shadow-xl hover:bg-white hover:text-[#6b21a8] sm:mt-10 sm:px-12 sm:py-4 sm:text-xs transition-all active:scale-95"
+                      >
+                        SHOP NOW <ArrowRight size={14} />
+                      </motion.button>
+                    </div>
                   </div>
-                </motion.div>
               ) : (
                 <div className="flex h-full items-center justify-center bg-slate-100">
                   <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
@@ -157,6 +159,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Featured Brands Section - Replaced Service Hub */}
       <FeaturedBrands />
@@ -334,6 +337,150 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
             {!loading && (
               <button 
                 onClick={() => trendingScrollRef.current?.scrollBy({ left: 440, behavior: 'smooth' })}
+                className="absolute -right-4 top-[40%] -translate-y-1/2 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-400 shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ff6f61]"
+              >
+                <ChevronRight size={24} />
+              </button>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Skin Care Products */}
+      <section className="bg-white py-10">
+        <div className="mx-auto max-w-[1400px] px-5">
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-[22px] font-semibold text-[#212121] tracking-tight">
+              Skin Care
+            </h2>
+            <button 
+              onClick={() => navigate('/medicines?filter=skin-care')} 
+              className="flex items-center gap-1 text-[#ff6f61] font-medium text-[14px] px-3.5 py-1.5 rounded-[4px] border border-[#ff6f61] hover:bg-[#ff6f61] hover:text-white transition-all duration-200"
+            >
+              See all <ChevronRight size={16} />
+            </button>
+          </div>
+
+          {/* Gradient Underline */}
+          <div className="w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
+
+          <div className="relative group">
+            {loading ? (
+              <div className="flex gap-6 overflow-hidden">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="min-w-[200px] h-72 animate-pulse rounded-xl bg-slate-100" />
+                ))}
+              </div>
+            ) : (
+              <div 
+                ref={skinCareScrollRef}
+                className="custom-scrollbar-hidden flex items-stretch gap-6 overflow-x-auto pt-4 pb-8 scroll-smooth px-2"
+              >
+                {medicines.filter(m => m.category === 'Skin Care').length > 0 ? (
+                  medicines.filter(m => m.category === 'Skin Care').map((med) => (
+                    <div key={med._id} className="min-w-[220px] max-w-[220px] flex">
+                      <MedicineCard {...med} />
+                    </div>
+                  ))
+                ) : (
+                   <div className="w-full py-10 text-center">
+                     <p className="text-sm font-medium text-slate-400">No Skin Care products available currently.</p>
+                   </div>
+                )}
+              </div>
+            )}
+
+            {!loading && medicines.filter(m => m.category === 'Skin Care').length > 0 && (
+              <button 
+                onClick={() => skinCareScrollRef.current?.scrollBy({ left: 440, behavior: 'smooth' })}
+                className="absolute -right-4 top-[40%] -translate-y-1/2 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-400 shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ff6f61]"
+              >
+                <ChevronRight size={24} />
+              </button>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* Middle Banner (Ayurveda Promo) */}
+      {ayurBanner && (
+        <section className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
+          <div 
+            onClick={() => ayurBanner.link && navigate(ayurBanner.link)}
+            className={`group relative flex h-[140px] sm:h-[220px] w-full cursor-pointer overflow-hidden rounded-[2rem] shadow-xl transition-all hover:scale-[1.01] active:scale-95 ${ayurBanner.bg || 'bg-slate-900'}`}
+          >
+            <div className="relative z-10 flex w-full flex-col justify-center px-8 sm:px-16 sm:w-1/2">
+              <span className="mb-2 w-fit rounded-full bg-white/20 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-white backdrop-blur-md">
+                SPECIAL OFFER
+              </span>
+              <h2 className="text-2xl font-black italic tracking-tight text-white sm:text-4xl uppercase line-clamp-1">
+                {ayurBanner.title}
+              </h2>
+              {ayurBanner.desc && (
+                <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-white/80 sm:text-sm line-clamp-2">
+                  {ayurBanner.desc}
+                </p>
+              )}
+            </div>
+            
+            <div className="absolute right-0 h-full w-full overflow-hidden sm:w-[60%]">
+              <img 
+                src={ayurBanner.image} 
+                alt="Ayurveda Promo" 
+                className="h-full w-full object-cover rounded-l-[100px] sm:rounded-l-[200px] border-l-4 sm:border-l-8 border-white/20 shadow-[-20px_0_40px_rgba(0,0,0,0.3)]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent sm:from-transparent" />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Ayurveda Products */}
+      <section className="bg-white py-10">
+        <div className="mx-auto max-w-[1400px] px-5">
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-[22px] font-semibold text-[#212121] tracking-tight">
+              Ayurveda
+            </h2>
+            <button 
+              onClick={() => navigate('/ayurveda')} 
+              className="flex items-center gap-1 text-[#ff6f61] font-medium text-[14px] px-3.5 py-1.5 rounded-[4px] border border-[#ff6f61] hover:bg-[#ff6f61] hover:text-white transition-all duration-200"
+            >
+              See all <ChevronRight size={16} />
+            </button>
+          </div>
+
+          <div className="w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
+
+          <div className="relative group">
+            {loading ? (
+              <div className="flex gap-6 overflow-hidden">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="min-w-[200px] h-72 animate-pulse rounded-xl bg-slate-100" />
+                ))}
+              </div>
+            ) : (
+              <div 
+                ref={ayurScrollRef}
+                className="custom-scrollbar-hidden flex items-stretch gap-6 overflow-x-auto pt-4 pb-8 scroll-smooth px-2"
+              >
+                {medicines.filter(m => m.category === 'Ayurveda').length > 0 ? (
+                  medicines.filter(m => m.category === 'Ayurveda').map((med) => (
+                    <div key={med._id} className="min-w-[220px] max-w-[220px] flex">
+                      <MedicineCard {...med} />
+                    </div>
+                  ))
+                ) : (
+                   <div className="w-full py-10 text-center">
+                     <p className="text-sm font-medium text-slate-400">No Ayurveda products available currently.</p>
+                   </div>
+                )}
+              </div>
+            )}
+
+            {!loading && medicines.filter(m => m.category === 'Ayurveda').length > 0 && (
+              <button 
+                onClick={() => ayurScrollRef.current?.scrollBy({ left: 440, behavior: 'smooth' })}
                 className="absolute -right-4 top-[40%] -translate-y-1/2 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-400 shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ff6f61]"
               >
                 <ChevronRight size={24} />

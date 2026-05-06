@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MedicineCard from '../components/medicine/MedicineCard';
-import { ChevronRight, Filter, Star, Info, ShieldCheck } from 'lucide-react';
+import { ChevronRight, Filter, Star, Info, ShieldCheck, ShoppingBag } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { API_BASE } from '../utils/apiConfig';
 
@@ -141,18 +141,23 @@ const BrandPage = () => {
           <section className="mb-6">
             <div className="relative overflow-hidden rounded-lg bg-white border border-slate-100">
               {brandBanner ? (
-                <div className={`w-full aspect-[4/1] flex items-center justify-center relative ${brandBanner.bg}`}>
-                  <img 
-                    src={brandBanner.image} 
-                    alt={brandBanner.title} 
-                    className="absolute right-0 h-full w-1/2 object-cover rounded-l-[100px] border-l-4 border-white/20 shadow-[-10px_0_20px_rgba(0,0,0,0.1)]" 
-                  />
-                  <div className="absolute inset-0 flex flex-col justify-center px-12 text-white z-10">
-                    <h2 className="text-3xl font-black uppercase italic tracking-tighter mb-2 drop-shadow-md">
+                <div className={`w-full aspect-[4/1] flex items-center relative overflow-hidden transition-colors duration-500 ${brandBanner.bg || 'bg-gradient-to-r from-[#6b21a8] to-[#9333ea]'}`}>
+                  {/* Right Side Image with Premium Curve */}
+                  <div className="absolute right-0 h-full w-[70%] overflow-hidden lg:w-[60%]">
+                    <img 
+                      src={brandBanner.image} 
+                      alt={brandBanner.title} 
+                      className="h-full w-full object-cover rounded-l-[120px] sm:rounded-l-[300px] border-l-4 sm:border-l-8 border-white/20 shadow-[-20px_0_40px_rgba(0,0,0,0.3)]" 
+                    />
+                  </div>
+                  
+                  {/* Left Side Content */}
+                  <div className="relative z-10 w-full px-8 sm:w-[45%] sm:px-16 text-white">
+                    <h2 className="text-xl sm:text-4xl font-black uppercase italic tracking-tighter mb-1 drop-shadow-md">
                       {brandBanner.title}
                     </h2>
                     {brandBanner.desc && (
-                      <p className="text-sm font-black uppercase tracking-widest opacity-90 drop-shadow-md">
+                      <p className="text-[10px] sm:text-sm font-bold uppercase tracking-widest opacity-90 drop-shadow-sm">
                         {brandBanner.desc}
                       </p>
                     )}
@@ -160,15 +165,17 @@ const BrandPage = () => {
                 </div>
               ) : (
                 /* Fallback Banner */
-                <div className="w-full aspect-[4/1] bg-slate-900 flex items-center justify-center relative">
-                  <img 
-                    src="https://media.licdn.com/dms/image/v2/C4E12AQH8_mZf-8_0WA/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1624864402633?e=2147483647&v=beta&t=9xVf3WjWvFfG_uUuG_o_g_u_g_u_g_u_g_u_g_u_g_u" 
-                    alt="Default Banner" 
-                    className="w-full h-full object-cover opacity-80" 
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex flex-col justify-center px-12 text-white">
-                    <h2 className="text-2xl font-black uppercase tracking-tighter mb-2">{brandName} Collection</h2>
-                    <p className="text-sm font-bold opacity-90">Explore the full range of<br/><span className="text-2xl font-black">Pharmaceutical Solutions</span></p>
+                <div className="w-full aspect-[4/1] bg-slate-900 flex items-center relative overflow-hidden">
+                  <div className="absolute right-0 h-full w-[70%] lg:w-[60%] overflow-hidden">
+                    <img 
+                      src="https://media.licdn.com/dms/image/v2/C4E12AQH8_mZf-8_0WA/article-cover_image-shrink_720_1280/article-cover_image-shrink_720_1280/0/1624864402633?e=2147483647&v=beta&t=9xVf3WjWvFfG_uUuG_o_g_u_g_u_g_u_g_u_g_u_g_u" 
+                      alt="Default Banner" 
+                      className="w-full h-full object-cover rounded-l-[120px] sm:rounded-l-[300px] border-l-4 sm:border-l-8 border-white/20 opacity-80" 
+                    />
+                  </div>
+                  <div className="relative z-10 w-full px-8 sm:w-[45%] sm:px-16 text-white">
+                    <h2 className="text-xl sm:text-3xl font-black uppercase tracking-tighter mb-1">{brandName} Collection</h2>
+                    <p className="text-[10px] sm:text-sm font-bold opacity-90 tracking-widest uppercase">Premium Pharmaceutical Solutions</p>
                   </div>
                 </div>
               )}
@@ -228,8 +235,8 @@ const BrandPage = () => {
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 text-slate-300">
                 <ShoppingBag size={32} />
               </div>
-              <h3 className="mt-6 text-sm font-black uppercase tracking-widest text-slate-900">No products for {brandName}</h3>
-              <p className="mt-1 text-[10px] font-bold text-slate-400">We haven't added any products for this brand to the Hub yet.</p>
+              <h3 className="mt-6 text-sm font-black uppercase tracking-widest text-slate-900">Products are currently not available</h3>
+              <p className="mt-1 text-[10px] font-bold text-slate-400">We haven't added any products for {brandName} to our database yet.</p>
               <button 
                 onClick={() => navigate('/medicines')}
                 className="mt-8 rounded-lg bg-[#ff6f61] px-8 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg active:scale-95 transition-all"

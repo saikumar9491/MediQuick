@@ -510,7 +510,7 @@ const Navbar = () => {
                         const name = isObject ? option.name : option;
                         const linkTo = isObject 
                           ? option.path 
-                          : `${cat.path}${cat.path.includes('?') ? '&' : '?'}sub=${option.toLowerCase().replace(/ /g, '-')}`;
+                          : `${cat.path}${cat.path.includes('?') ? '&' : '?'}sub=${encodeURIComponent(option.toLowerCase().replace(/ /g, '-'))}`;
                         
                         return (
                           <Link
@@ -590,7 +590,7 @@ const Navbar = () => {
                                 const name = isObject ? option.name : option;
                                 const linkTo = isObject 
                                   ? option.path 
-                                  : `${cat.path}${cat.path.includes('?') ? '&' : '?'}sub=${option.toLowerCase().replace(/ /g, '-')}`;
+                                  : `${cat.path}${cat.path.includes('?') ? '&' : '?'}sub=${encodeURIComponent(option.toLowerCase().replace(/ /g, '-'))}`;
                                 
                                 return (
                                   <Link
