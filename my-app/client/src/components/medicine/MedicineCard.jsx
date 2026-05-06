@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Star, ShieldCheck, Plus } from 'lucide-react';
+import { Star, ShieldCheck, Plus } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import toast from 'react-hot-toast';
 
-const MedicineCard = ({ _id, name, brand, price, image, discountPrice, isFlashDeal, category }) => {
+const MedicineCard = ({ _id, name, brand, price, image, discountPrice, isFlashDeal, category, rating = 4.3, numReviews = 1240 }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
 
@@ -21,67 +21,62 @@ const MedicineCard = ({ _id, name, brand, price, image, discountPrice, isFlashDe
 
   return (
     <motion.div
-      whileHover={{ scale: 1.01 }}
-      transition={{ duration: 0.3 }}
       onClick={() => navigate(`/product/${_id}`)}
-      className="group relative flex w-full h-full flex-col rounded-xl border border-slate-100 bg-white p-3 transition-all duration-300 hover:border-blue-400 hover:shadow-[0_8px_20px_rgba(0,0,0,0.06)]"
+      className="group relative flex w-full h-full flex-col bg-white transition-all duration-300"
     >
-      {/* Discount Tag */}
-      {discountPercent > 0 && (
-        <div className="absolute top-2 left-2 z-10 flex items-center gap-1 rounded-sm bg-[#ff6f61] px-1.5 py-0.5 text-[9px] font-extrabold text-white">
-          <span>{discountPercent}% OFF</span>
+      {/* Bestseller Tag */}
+      {rating >= 4.5 && (
+        <div className="absolute top-0 left-0 z-10 bg-[#ffecd1] px-2 py-0.5 text-[10px] font-bold text-[#ca8a04] flex items-center gap-0.5">
+          Bestseller <span className="text-[12px]">+</span>
         </div>
       )}
 
       {/* Image Container */}
-      <div className="relative mb-3 flex aspect-square w-full items-center justify-center bg-white p-2">
+      <div className="relative mb-4 flex aspect-square w-full items-center justify-center bg-white p-4">
         <img
           src={image || 'https://placehold.co/300x300?text=Medicine'}
           alt={name}
-          className="h-full w-full object-contain mix-blend-multiply transition-transform duration-500 group-hover:scale-110"
+          className="h-full w-full object-contain mix-blend-multiply"
         />
-        
-        {/* Quick Add Overlay (Mobile Friendly) */}
-        <button 
-          onClick={handleAdd}
-          className="absolute bottom-1 right-1 flex h-8 w-8 items-center justify-center rounded-lg bg-white text-slate-900 shadow-lg border border-slate-100 hover:bg-slate-900 hover:text-white transition-all active:scale-90 sm:hidden"
-        >
-          <Plus size={16} strokeWidth={3} />
-        </button>
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 flex-col">
-        <div className="mb-1 flex items-center gap-1">
-          <ShieldCheck className="h-3 w-3 text-blue-500" />
-          <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">Verified Hub</span>
-        </div>
-        
-        <h3 className="mb-1 line-clamp-2 min-h-[40px] text-xs font-bold leading-tight text-slate-900 group-hover:text-blue-600">
+      <div className="flex flex-1 flex-col px-1">
+        <p className="mb-0.5 text-[10px] font-black uppercase tracking-widest text-[#00a2a4]">
+          {brand}
+        </p>
+        <h3 className="mb-1 line-clamp-2 min-h-[34px] text-[13px] font-medium leading-tight text-slate-900 group-hover:text-[#ff6f61]">
           {name}
         </h3>
         
-        <p className="mb-2 text-[10px] font-medium text-slate-400 truncate">
-          {brand}
+        <p className="mb-2 text-[11px] text-slate-500">
+          10 capsules
         </p>
 
-        <div className="mt-auto">
-          <div className="flex items-center gap-1 text-[10px] text-slate-400">
-            <span className="line-through">MRP ₹{mrp}</span>
+        {/* Rating Section */}
+        <div className="flex items-center gap-1.5 mb-2">
+          <div className="flex items-center gap-0.5">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} size={12} className={i < 4 ? "fill-teal-500 text-teal-500" : "text-slate-200"} />
+            ))}
+          </div>
+          <span className="text-[11px] text-teal-600 font-bold">{rating}</span>
+          <span className="text-[11px] text-slate-400 font-medium">({numReviews})</span>
+        </div>
+
+        <div className="mt-auto space-y-3">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[14px] font-bold text-slate-900">₹{finalPrice}</span>
+            <span className="text-[12px] text-slate-400 line-through">₹{mrp}</span>
+            <span className="text-[12px] font-bold text-teal-600">{discountPercent}% off</span>
           </div>
           
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <span className="text-sm font-black text-slate-900">₹{finalPrice}</span>
-            </div>
-            
-            <button
-              onClick={handleAdd}
-              className="hidden sm:flex items-center gap-1.5 rounded-lg border border-blue-100 bg-blue-50/50 px-3 py-1.5 text-[10px] font-bold text-blue-600 transition-all hover:bg-blue-600 hover:text-white"
-            >
-              ADD <Plus size={12} strokeWidth={3} />
-            </button>
-          </div>
+          <button
+            onClick={handleAdd}
+            className="w-full flex items-center justify-center rounded border border-[#ff6f61] bg-white py-1.5 text-[12px] font-bold text-[#ff6f61] transition-all hover:bg-[#ff6f61] hover:text-white"
+          >
+            ADD
+          </button>
         </div>
       </div>
     </motion.div>

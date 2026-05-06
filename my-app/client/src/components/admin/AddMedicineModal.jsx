@@ -59,7 +59,12 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onAdd(formData);
+    const cleanData = {
+      ...formData,
+      brand: formData.brand.trim(),
+      name: formData.name.trim()
+    };
+    onAdd(cleanData);
     onClose();
   };
 

@@ -8,7 +8,8 @@ const bannerSchema = new mongoose.Schema(
     bg: { type: String, default: 'bg-gradient-to-r from-blue-500 to-blue-700' },
     link: { type: String },
     isActive: { type: Boolean, default: true },
-    category: { type: String, enum: ['main', 'flash'], default: 'main' },
+    category: { type: String, enum: ['main', 'flash', 'brand'], default: 'main' },
+    brand: { type: String },
   },
   { timestamps: true }
 );

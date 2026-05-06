@@ -20,25 +20,45 @@ const THEME_COLORS = [
 const AdminBannerManager = ({ banners, setBanners, token, API_BASE, handleDeleteBanner }) => {
   const fileInputRef = useRef(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   
   const [formData, setFormData] = useState({
     title: '',
     desc: '',
     image: '',
     bg: THEME_COLORS[0],
-    link: ''
+    link: '',
+    category: 'main',
+    brand: ''
   });
 
   const handleImageSelect = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
-    // Read file as Base64 Data URL
     const reader = new FileReader();
     reader.onloadend = () => {
       setFormData(prev => ({ ...prev, image: reader.result }));
     };
     reader.readAsDataURL(file);
+  };
+
+  const startEdit = (banner) => {
+    setEditingId(banner._id);
+    setFormData({
+      title: banner.title || '',
+      desc: banner.desc || '',
+      image: banner.image || '',
+      bg: banner.bg || THEME_COLORS[0],
+      link: banner.link || '',
+      category: banner.category || 'main',
+      brand: banner.brand || ''
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setFormData({ title: '', desc: '', image: '', bg: THEME_COLORS[0], link: '', category: 'main', brand: '' });
   };
 
   const handleSubmit = async (e) => {
@@ -50,8 +70,11 @@ const AdminBannerManager = ({ banners, setBanners, token, API_BASE, handleDelete
 
     setIsUploading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/banners`, {
-        method: 'POST',
+      const url = editingId ? `${API_BASE}/api/banners/${editingId}` : `${API_BASE}/api/banners`;
+      const method = editingId ? 'PUT' : 'POST';
+
+      const res = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
@@ -60,14 +83,18 @@ const AdminBannerManager = ({ banners, setBanners, token, API_BASE, handleDelete
       });
       const data = await res.json();
       if (res.ok) {
-        toast.success('Banner successfully deployed!');
-        setBanners([...banners, data]);
-        setFormData({ title: '', desc: '', image: '', bg: THEME_COLORS[0], link: '' });
+        toast.success(editingId ? 'Banner updated!' : 'Banner deployed!');
+        if (editingId) {
+          setBanners(banners.map(b => b._id === editingId ? data : b));
+        } else {
+          setBanners([...banners, data]);
+        }
+        cancelEdit();
       } else {
-        toast.error(data.message || 'Failed to create banner');
+        toast.error(data.message || 'Action failed');
       }
     } catch (err) {
-      toast.error('Network error while deploying banner');
+      toast.error('Network error');
     } finally {
       setIsUploading(false);
     }
@@ -77,9 +104,44 @@ const AdminBannerManager = ({ banners, setBanners, token, API_BASE, handleDelete
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* LEFT COLUMN: BANNER BUILDER */}
       <div className="rounded-3xl border border-slate-200 bg-white shadow-sm p-6 sm:p-8">
-        <h2 className="text-sm font-black uppercase tracking-widest text-slate-400 mb-6">Banner Builder</h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-sm font-black uppercase tracking-widest text-slate-400">
+            {editingId ? 'Edit Banner' : 'Banner Builder'}
+          </h2>
+          {editingId && (
+            <button onClick={cancelEdit} className="text-[10px] font-black uppercase text-red-500 hover:underline">Cancel Edit</button>
+          )}
+        </div>
         
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Category & Brand */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Placement</label>
+              <select 
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-800 focus:bg-white transition-all"
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              >
+                <option value="main">Main Carousel</option>
+                <option value="flash">Flash Deals</option>
+                <option value="brand">Brand Page</option>
+              </select>
+            </div>
+            {formData.category === 'brand' && (
+              <div>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Target Brand</label>
+                <input
+                  type="text"
+                  placeholder="e.g., Horlicks"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold text-slate-800 focus:bg-white transition-all"
+                  value={formData.brand}
+                  onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                />
+              </div>
+            )}
+          </div>
+
           {/* Banner Details */}
           <div className="space-y-4">
             <div>
@@ -179,26 +241,31 @@ const AdminBannerManager = ({ banners, setBanners, token, API_BASE, handleDelete
             disabled={isUploading}
             className="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-4 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-blue-500/30 hover:bg-blue-700 hover:shadow-blue-500/40 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isUploading ? 'Deploying...' : 'Deploy Custom Banner'}
+            {isUploading ? 'Processing...' : editingId ? 'Update Banner' : 'Deploy Custom Banner'}
           </button>
         </form>
       </div>
 
-      {/* RIGHT COLUMN: LIVE PREVIEWS */}
+      {/* RIGHT COLUMN: LIVE DEPLOYMENTS */}
       <div className="space-y-6">
         <h2 className="text-sm font-black uppercase tracking-widest text-slate-400">Live Deployments</h2>
         
-        {banners.filter(b => b.category !== 'flash').length === 0 ? (
+        {banners.length === 0 ? (
           <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-slate-50 py-20 text-slate-400">
             <ImageIcon className="h-12 w-12 mb-4 opacity-50" />
             <p className="text-sm font-bold">No active banners found.</p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {banners.filter(b => b.category !== 'flash').map(banner => (
-              <div key={banner._id} className={`group relative flex h-32 w-full overflow-hidden rounded-full shadow-md transition-transform hover:scale-[1.02] ${banner.bg || 'bg-slate-800'}`}>
+          <div className="space-y-4 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
+            {banners.map(banner => (
+              <div key={banner._id} className={`group relative flex h-32 w-full overflow-hidden rounded-full shadow-md transition-transform hover:scale-[1.01] ${banner.bg || 'bg-slate-800'}`}>
                 {/* Left side text content */}
                 <div className="flex w-2/3 flex-col justify-center pl-8 pr-4 z-10">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="px-2 py-0.5 rounded-full bg-white/20 text-[8px] font-black uppercase tracking-widest text-white">
+                      {banner.category} {banner.brand && `• ${banner.brand}`}
+                    </span>
+                  </div>
                   <h3 className="text-lg font-black uppercase italic tracking-tight text-white leading-tight line-clamp-1 drop-shadow-md">
                     {banner.title}
                   </h3>
@@ -212,8 +279,11 @@ const AdminBannerManager = ({ banners, setBanners, token, API_BASE, handleDelete
                 {/* Right side image */}
                 <div className="relative w-1/3 h-full rounded-l-[40px] overflow-hidden border-l-4 border-white/20 shadow-[-10px_0_15px_rgba(0,0,0,0.1)]">
                   <img src={banner.image} alt="Banner" className="h-full w-full object-cover" />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 backdrop-blur-[1px]">
-                    <button onClick={() => handleDeleteBanner(banner._id)} className="rounded-full bg-white/90 p-2 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-lg hover:scale-110">
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3 backdrop-blur-[2px]">
+                    <button onClick={() => startEdit(banner)} className="rounded-full bg-white p-2 text-blue-600 hover:scale-110 transition-all shadow-lg">
+                      <Edit3 className="h-4 w-4" />
+                    </button>
+                    <button onClick={() => handleDeleteBanner(banner._id)} className="rounded-full bg-white p-2 text-red-500 hover:scale-110 transition-all shadow-lg">
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>

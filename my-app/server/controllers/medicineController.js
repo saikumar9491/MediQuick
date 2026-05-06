@@ -4,7 +4,7 @@ import Medicine from '../models/Medicine.js';
 // @route   GET /api/medicines
 export const getMedicines = async (req, res) => {
   try {
-    const { category, search, subCategory, trending } = req.query;
+    const { category, search, subCategory, trending, brand } = req.query;
     let query = {};
 
     if (category && category !== 'All') {
@@ -13,6 +13,11 @@ export const getMedicines = async (req, res) => {
 
     if (subCategory) {
       query.subCategory = subCategory;
+    }
+
+    if (brand) {
+      // Use case-insensitive exact match or regex
+      query.brand = { $regex: new RegExp(`^${brand.trim()}$`, 'i') };
     }
 
     if (trending === 'true') {

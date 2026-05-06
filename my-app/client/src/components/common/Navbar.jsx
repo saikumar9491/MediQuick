@@ -640,7 +640,7 @@ const Navbar = () => {
       <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-slate-100 bg-white/95 px-2 py-3 backdrop-blur-xl lg:hidden shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
         {[
           { icon: <Home size={20} />, label: 'Home', path: '/' },
-          { icon: <ShoppingBag size={20} />, label: 'Medicines', path: '/all-medicines' },
+          { icon: <ShoppingBag size={20} />, label: 'Medicines', path: '/medicines' },
           { icon: <FlaskConical size={20} />, label: 'Lab Tests', path: '/lab-tests' },
           { icon: <Stethoscope size={20} />, label: 'Consult', path: '/consult' },
           { icon: <User size={20} />, label: 'Account', path: '/profile' },

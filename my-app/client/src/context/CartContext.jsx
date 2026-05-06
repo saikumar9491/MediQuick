@@ -105,7 +105,6 @@ export const CartProvider = ({ children }) => {
 
   // --- ACTIONS ---
   const addToCart = (product) => {
-    if (!user) return;
     blockSave.current = false; // Enable saving for this user action
     setCart(prev => {
       const exists = prev.find(item => item._id === product._id);
