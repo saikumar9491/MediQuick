@@ -64,10 +64,10 @@ const FeaturedBrands = () => {
                 onClick={() => navigate(`/brand/${encodeURIComponent(brand.name)}`)}
                 className="flex-none w-[165px] group/item cursor-pointer"
               >
-                {/* Square outer container with softer shadow and more rounding */}
-                <div className="aspect-square bg-white shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-slate-50/50 rounded-[1.25rem] flex items-center justify-center p-3.5 hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300">
-                  {/* Circular inner container - no border, subtle shadow */}
-                  <div className="w-full h-full rounded-full bg-white shadow-[0_2px_10px_rgba(0,0,0,0.04)] flex items-center justify-center p-4 transition-transform duration-500 group-hover/item:scale-110">
+                {/* Square outer border matching Image A */}
+                <div className="aspect-square bg-white border border-[#f1f4f6] rounded-md flex items-center justify-center p-3 hover:shadow-sm transition-all duration-300">
+                  {/* Circular inner container with shadow */}
+                  <div className="w-full h-full rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.06)] border border-[#f1f4f6]/50 flex items-center justify-center p-4 transition-transform duration-300 group-hover/item:scale-105">
                     <img
                       src={brand.logo}
                       alt={brand.name}
@@ -75,9 +75,6 @@ const FeaturedBrands = () => {
                     />
                   </div>
                 </div>
-                <p className="text-center mt-3 text-[13px] text-[#212121] font-normal truncate">
-                  {brand.name}
-                </p>
               </div>
             ))}
           </div>
