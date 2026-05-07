@@ -464,7 +464,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
         <section className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
           <div 
             onClick={() => ayurBanner.link && navigate(ayurBanner.link)}
-            className={`group relative flex h-[140px] sm:h-[220px] w-full cursor-pointer overflow-hidden rounded-[2rem] shadow-xl transition-all hover:scale-[1.01] active:scale-95 ${ayurBanner.bg || 'bg-slate-900'}`}
+            className={`group relative flex h-[180px] sm:h-[280px] w-full cursor-pointer overflow-hidden rounded-sm shadow-xl transition-all hover:scale-[1.01] active:scale-95 ${ayurBanner.bg || 'bg-slate-900'}`}
           >
             <div className="relative z-10 flex w-full flex-col justify-center px-8 sm:px-16 sm:w-1/2">
               <span className="mb-2 w-fit rounded-full bg-white/20 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-white backdrop-blur-md">
@@ -484,7 +484,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
               <img 
                 src={ayurBanner.image} 
                 alt="Ayurveda Promo" 
-                className="h-full w-full object-cover rounded-l-[100px] sm:rounded-l-[200px] border-l-4 sm:border-l-8 border-white/20 shadow-[-20px_0_40px_rgba(0,0,0,0.3)]"
+                className="h-full w-full object-cover rounded-l-md border-l-4 sm:border-l-8 border-white/20 shadow-[-20px_0_40px_rgba(0,0,0,0.3)]"
               />
               <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent sm:from-transparent" />
             </div>
