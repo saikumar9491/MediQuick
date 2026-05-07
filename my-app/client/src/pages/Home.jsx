@@ -214,21 +214,21 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       <FeaturedBrands />
 
       {/* Quick Order with Prescription */}
-      <section className="mx-auto max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-[2rem] bg-white px-8 py-6 sm:px-12 sm:py-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-8">
+      <section className="mx-auto max-w-[1400px] px-4 py-4 sm:px-6 lg:px-8">
+        <div className="relative overflow-hidden rounded-3xl bg-white px-6 py-4 sm:px-10 sm:py-5 shadow-[0_4px_25px_rgba(0,0,0,0.05)] border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex-1 text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-4 mb-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-50 text-orange-500 shadow-inner">
-                  <Upload size={24} />
+              <div className="flex items-center justify-center md:justify-start gap-4 mb-1">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ff6f61]/10 text-[#ff6f61]">
+                  <Upload size={20} />
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Quick Order with Prescription</h2>
+                <h2 className="text-xl sm:text-2xl font-black text-[#212121] tracking-tight">Quick Order with Prescription</h2>
               </div>
-              <p className="text-sm sm:text-base font-medium text-slate-500 max-w-md mx-auto md:mx-0 leading-relaxed">
+              <p className="text-[12px] sm:text-sm font-semibold text-slate-400 max-w-md mx-auto md:mx-0">
                 Upload your prescription and our experts will fulfill your order with 100% genuine medicines.
               </p>
             </div>
 
-          <div className="flex w-full md:w-auto items-center gap-4">
+          <div className="flex w-full md:w-auto items-center gap-3">
             <input 
               type="file" 
               ref={fileInputRef} 
@@ -237,14 +237,14 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
             />
             <button 
               onClick={() => fileInputRef.current.click()}
-              className={`flex-1 md:flex-none flex items-center justify-center gap-2 rounded-2xl px-8 py-4 text-[11px] font-black uppercase tracking-widest border-2 transition-all ${selectedFile ? 'text-emerald-600 border-emerald-100 bg-emerald-50' : 'text-slate-900 border-slate-100 hover:bg-slate-50'}`}
+              className={`flex-1 md:flex-none flex items-center justify-center gap-2 rounded-xl px-6 py-3.5 text-[11px] font-black uppercase tracking-widest transition-all ${selectedFile ? 'text-emerald-600 bg-emerald-50 border border-emerald-100' : 'text-[#ff6f61] bg-[#ff6f61]/5 border border-[#ff6f61]/10 hover:bg-[#ff6f61]/10'}`}
             >
               {selectedFile ? 'READY' : 'SELECT FILE'}
             </button>
             <button 
               onClick={handleUpload}
               disabled={!selectedFile || isUploading}
-              className="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-10 py-4 text-[11px] font-black uppercase tracking-widest text-white shadow-xl hover:bg-slate-900 active:scale-95 disabled:bg-slate-200 transition-all shadow-blue-200"
+              className="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-xl bg-[#ff6f61] px-8 py-3.5 text-[11px] font-black uppercase tracking-widest text-white shadow-lg shadow-orange-200 hover:bg-slate-900 active:scale-95 disabled:bg-slate-200 transition-all"
             >
               {isUploading ? 'UPLOADING...' : 'ORDER NOW'}
             </button>
