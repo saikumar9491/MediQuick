@@ -125,7 +125,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
           <div className="relative h-[150px] overflow-hidden rounded-2xl bg-slate-900 sm:h-[260px] group">
             <AnimatePresence mode="wait">
               <motion.div 
-                key={currentBanner}
+                key={`${currentBanner}-${displayBanners[currentBanner]?._id || 'default'}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -186,18 +186,18 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
                   e.stopPropagation();
                   setCurrentBanner(prev => (prev === 0 ? displayBanners.length - 1 : prev - 1));
                 }}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-md hover:bg-white hover:text-blue-600 transition-all shadow-lg"
+                className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-sm hover:bg-black/40 transition-all shadow-lg"
               >
-                <ChevronLeft size={24} />
+                <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
               </button>
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
                   setCurrentBanner(prev => (prev === displayBanners.length - 1 ? 0 : prev + 1));
                 }}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-md hover:bg-white hover:text-blue-600 transition-all shadow-lg"
+                className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-sm hover:bg-black/40 transition-all shadow-lg"
               >
-                <ChevronRight size={24} />
+                <ChevronRight size={20} className="sm:w-6 sm:h-6" />
               </button>
             </div>
 
