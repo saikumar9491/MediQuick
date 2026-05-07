@@ -61,6 +61,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [isBannerLoading, setIsBannerLoading] = useState(true);
   const [currentBanner, setCurrentBanner] = useState(0);
+  const [currentAyurBanner, setCurrentAyurBanner] = useState(0);
 
   useEffect(() => {
     const fetchBanners = async () => {
@@ -82,7 +83,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
 
   const activeBanners = dbBanners.filter(b => b.category === 'main');
   const displayBanners = activeBanners.length > 0 ? activeBanners : DEFAULT_BANNERS;
-  const ayurBanner = dbBanners.find(b => b.category === 'ayurveda-promo');
+  const ayurBanners = dbBanners.filter(b => b.category === 'ayurveda-promo');
 
   useEffect(() => {
     if (displayBanners.length === 0) return;
@@ -91,6 +92,14 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
     }, 6000);
     return () => clearInterval(timer);
   }, [displayBanners.length]);
+
+  useEffect(() => {
+    if (ayurBanners.length <= 1) return;
+    const timer = setInterval(() => {
+      setCurrentAyurBanner((prev) => (prev === ayurBanners.length - 1 ? 0 : prev + 1));
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [ayurBanners.length]);
 
   const mainCategories = [
     { name: 'Skin care', path: '/medicines?filter=skin-care', image: 'https://onemg.gumlet.io/diagnostics%2F2023-11%2F1699443647_skinn.webp?format=auto', bgColor: '#ccd1a1' },
@@ -122,7 +131,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       {/* Hero Section */}
       <section className="bg-white px-4 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-[1400px]">
-          <div className="relative h-[150px] overflow-hidden rounded-2xl bg-slate-900 sm:h-[260px] group">
+          <div className="relative h-[160px] overflow-hidden rounded-2xl bg-slate-900 sm:h-[320px] group">
             <AnimatePresence mode="wait">
               <motion.div 
                 key={`${currentBanner}-${displayBanners[currentBanner]?._id || 'default'}`}
@@ -171,7 +180,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.6, delay: 0.4 }}
                     onClick={() => navigate(displayBanners[currentBanner]?.link || '/medicines')}
-                    className="mt-4 flex w-fit items-center gap-2 rounded-full bg-blue-600 px-6 py-2.5 text-[10px] font-black text-white shadow-xl hover:bg-blue-700 sm:mt-6 sm:px-10 sm:py-3.5 sm:text-xs transition-all active:scale-95"
+                    className="mt-6 flex w-fit items-center gap-2 rounded-full bg-blue-600 px-6 py-2.5 text-[10px] font-black text-white shadow-xl hover:bg-white hover:text-blue-600 sm:mt-10 sm:px-12 sm:py-4 sm:text-xs transition-all active:scale-95"
                   >
                     SHOP NOW <ArrowRight size={14} />
                   </motion.button>
@@ -179,25 +188,25 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
               </motion.div>
             </AnimatePresence>
 
-            {/* Manual Navigation Controls - Always Visible */}
-            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-100 transition-opacity duration-300">
+            {/* Manual Navigation Controls */}
+            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
                   setCurrentBanner(prev => (prev === 0 ? displayBanners.length - 1 : prev - 1));
                 }}
-                className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-sm hover:bg-black/40 transition-all shadow-lg"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-md hover:bg-white hover:text-blue-600 transition-all shadow-lg"
               >
-                <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
+                <ChevronLeft size={24} />
               </button>
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
                   setCurrentBanner(prev => (prev === displayBanners.length - 1 ? 0 : prev + 1));
                 }}
-                className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-sm hover:bg-black/40 transition-all shadow-lg"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-md hover:bg-white hover:text-blue-600 transition-all shadow-lg"
               >
-                <ChevronRight size={20} className="sm:w-6 sm:h-6" />
+                <ChevronRight size={24} />
               </button>
             </div>
 
@@ -460,36 +469,67 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       </section>
 
       {/* Middle Banner (Ayurveda Promo) */}
-      {ayurBanner && (
+      {ayurBanners.length > 0 && (
         <section className="bg-white py-10">
           <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
-          <div 
-            onClick={() => ayurBanner.link && navigate(ayurBanner.link)}
-            className={`group relative flex h-[180px] sm:h-[280px] w-full cursor-pointer overflow-hidden rounded-sm shadow-xl transition-all hover:scale-[1.01] active:scale-95 ${ayurBanner.bg || 'bg-slate-900'}`}
-          >
-            <div className="relative z-10 flex w-full flex-col justify-center px-8 sm:px-16 sm:w-1/2">
-              <span className="mb-2 w-fit rounded-full bg-white/20 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-white backdrop-blur-md">
-                SPECIAL OFFER
-              </span>
-              <h2 className="text-2xl font-black italic tracking-tight text-white sm:text-4xl uppercase line-clamp-1">
-                {ayurBanner.title}
-              </h2>
-              {ayurBanner.desc && (
-                <p className="mt-2 text-[10px] font-bold uppercase tracking-widest text-white/80 sm:text-sm line-clamp-2">
-                  {ayurBanner.desc}
-                </p>
+            <div className="relative h-[150px] overflow-hidden rounded-2xl bg-slate-900 sm:h-[240px] group">
+              <AnimatePresence mode="wait">
+                <motion.div 
+                  key={`${currentAyurBanner}-${ayurBanners[currentAyurBanner]?._id}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className={`absolute inset-0 flex items-center transition-colors duration-500 ${ayurBanners[currentAyurBanner]?.bg || 'bg-gradient-to-r from-emerald-600 to-teal-700'}`}
+                >
+                  {/* Right Side Image */}
+                  <div className="absolute right-0 h-full w-[70%] overflow-hidden">
+                    <img 
+                      src={ayurBanners[currentAyurBanner]?.image} 
+                      alt="Ayurveda" 
+                      className="h-full w-full object-cover rounded-l-[150px] sm:rounded-l-[300px] border-l-4 sm:border-l-8 border-white/20 shadow-[-20px_0_40px_rgba(0,0,0,0.3)]"
+                    />
+                  </div>
+
+                  {/* Left Side Content */}
+                  <div className="relative z-10 w-full px-8 sm:w-1/2 sm:px-16">
+                    <span className="mb-2 inline-block rounded-full bg-white/20 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-white backdrop-blur-md">
+                      SPECIAL OFFER
+                    </span>
+                    <h2 className="text-2xl font-black italic tracking-tighter text-white sm:text-5xl uppercase line-clamp-1">
+                      {ayurBanners[currentAyurBanner]?.title}
+                    </h2>
+                    <p className="mt-2 max-w-md text-[10px] font-bold uppercase tracking-[0.2em] text-white/80 sm:text-sm line-clamp-2">
+                      {ayurBanners[currentAyurBanner]?.desc || "Redefine the way you live with Ayurveda."}
+                    </p>
+                    <button 
+                      onClick={() => navigate(ayurBanners[currentAyurBanner]?.link || '/ayurveda')}
+                      className="mt-4 flex items-center gap-2 rounded-full bg-blue-600 px-6 py-2.5 text-[10px] font-black text-white shadow-xl hover:bg-blue-700 transition-all active:scale-95 sm:mt-6 sm:px-10 sm:py-3.5 sm:text-xs"
+                    >
+                      SHOP NOW <ArrowRight size={14} />
+                    </button>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Slider Arrows - Always Visible */}
+              {ayurBanners.length > 1 && (
+                <div className="absolute inset-0 flex items-center justify-between px-4 z-20">
+                  <button 
+                    onClick={() => setCurrentAyurBanner(prev => (prev === 0 ? ayurBanners.length - 1 : prev - 1))}
+                    className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-sm hover:bg-black/40 transition-all shadow-lg"
+                  >
+                    <ChevronLeft size={20} className="sm:w-6 sm:h-6" />
+                  </button>
+                  <button 
+                    onClick={() => setCurrentAyurBanner(prev => (prev === ayurBanners.length - 1 ? 0 : prev + 1))}
+                    className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-sm hover:bg-black/40 transition-all shadow-lg"
+                  >
+                    <ChevronRight size={20} className="sm:w-6 sm:h-6" />
+                  </button>
+                </div>
               )}
             </div>
-            
-            <div className="absolute right-0 h-full w-full overflow-hidden sm:w-[60%]">
-              <img 
-                src={ayurBanner.image} 
-                alt="Ayurveda Promo" 
-                className="h-full w-full object-cover rounded-l-md border-l-4 sm:border-l-8 border-white/20 shadow-[-20px_0_40px_rgba(0,0,0,0.3)]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent sm:from-transparent" />
-            </div>
-          </div>
           </div>
         </section>
       )}
