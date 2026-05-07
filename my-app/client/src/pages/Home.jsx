@@ -244,7 +244,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
             <button 
               onClick={handleUpload}
               disabled={!selectedFile || isUploading}
-              className="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-xl bg-[#ff6f61] px-10 py-4 text-[11px] font-black uppercase tracking-widest text-white shadow-[0_10px_20px_rgba(255,111,97,0.3)] hover:bg-[#ee5e50] active:scale-95 disabled:bg-slate-200 transition-all"
+              className="flex-1 md:flex-none flex items-center justify-center gap-2 rounded-xl bg-[#ff6f61] px-10 py-4 text-[11px] font-black uppercase tracking-widest text-white hover:bg-[#ee5e50] active:scale-95 disabled:bg-slate-200 transition-all"
             >
               {isUploading ? 'UPLOADING...' : 'ORDER NOW'}
             </button>
