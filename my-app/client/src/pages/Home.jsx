@@ -122,7 +122,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       {/* Hero Section */}
       <section className="bg-white px-4 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-[1400px]">
-          <div className="relative h-[160px] overflow-hidden rounded-2xl bg-slate-900 sm:h-[320px] group">
+          <div className="relative h-[150px] overflow-hidden rounded-2xl bg-slate-900 sm:h-[260px] group">
             <AnimatePresence mode="wait">
               <motion.div 
                 key={currentBanner}
@@ -171,7 +171,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.6, delay: 0.4 }}
                     onClick={() => navigate(displayBanners[currentBanner]?.link || '/medicines')}
-                    className="mt-6 flex w-fit items-center gap-2 rounded-full bg-blue-600 px-6 py-2.5 text-[10px] font-black text-white shadow-xl hover:bg-white hover:text-[#6b21a8] sm:mt-10 sm:px-12 sm:py-4 sm:text-xs transition-all active:scale-95"
+                    className="mt-4 flex w-fit items-center gap-2 rounded-full bg-blue-600 px-6 py-2.5 text-[10px] font-black text-white shadow-xl hover:bg-blue-700 sm:mt-6 sm:px-10 sm:py-3.5 sm:text-xs transition-all active:scale-95"
                   >
                     SHOP NOW <ArrowRight size={14} />
                   </motion.button>
@@ -179,8 +179,8 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
               </motion.div>
             </AnimatePresence>
 
-            {/* Manual Navigation Controls */}
-            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            {/* Manual Navigation Controls - Always Visible */}
+            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-100 transition-opacity duration-300">
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
