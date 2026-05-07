@@ -461,7 +461,8 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
 
       {/* Middle Banner (Ayurveda Promo) */}
       {ayurBanner && (
-        <section className="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
+        <section className="bg-white py-10">
+          <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
           <div 
             onClick={() => ayurBanner.link && navigate(ayurBanner.link)}
             className={`group relative flex h-[180px] sm:h-[280px] w-full cursor-pointer overflow-hidden rounded-sm shadow-xl transition-all hover:scale-[1.01] active:scale-95 ${ayurBanner.bg || 'bg-slate-900'}`}
@@ -488,6 +489,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
               />
               <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent sm:from-transparent" />
             </div>
+          </div>
           </div>
         </section>
       )}
