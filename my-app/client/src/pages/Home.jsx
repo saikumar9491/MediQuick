@@ -27,24 +27,6 @@ import toast from 'react-hot-toast';
 
 import FeaturedBrands from '../components/common/FeaturedBrands';
 
-const DEFAULT_BANNERS = [
-  {
-    _id: 'default-1',
-    title: "Healthcare at Your Doorstep",
-    desc: "Get authentic medicines and healthcare products delivered fast.",
-    image: "https://onemg.gumlet.io/a_ignore,w_899,h_440,c_fit,q_auto,f_auto/70868f05-0218-4720-9192-34907a7e841b.png",
-    bg: "bg-gradient-to-r from-blue-900 to-blue-700",
-    category: "main"
-  },
-  {
-    _id: 'default-2',
-    title: "Premium Wellness Solutions",
-    desc: "Explore our curated range of health and wellness products.",
-    image: "https://onemg.gumlet.io/a_ignore,w_899,h_440,c_fit,q_auto,f_auto/02f8319f-7235-430c-8f43-2337d100c410.png",
-    bg: "bg-gradient-to-r from-purple-900 to-purple-700",
-    category: "main"
-  }
-];
 
 const Home = ({ medicines = [], featured = [], loading = true }) => {
   const navigate = useNavigate();
@@ -81,8 +63,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
     fetchBanners();
   }, []);
 
-  const activeBanners = dbBanners.filter(b => b.category === 'main');
-  const displayBanners = activeBanners.length > 0 ? activeBanners : DEFAULT_BANNERS;
+  const displayBanners = dbBanners.filter(b => b.category === 'main');
   const ayurBanners = dbBanners.filter(b => b.category === 'ayurveda-promo');
 
   useEffect(() => {
@@ -129,7 +110,8 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
     <div className="min-h-screen bg-[#f8fafc] pb-12">
       {/* Hero Section */}
       {/* Hero Section */}
-      <section className="bg-white px-4 py-4 sm:px-6 lg:px-8">
+      {displayBanners.length > 0 && (
+        <section className="bg-white px-4 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-[1400px]">
           <div className="relative h-[160px] overflow-hidden rounded-2xl bg-slate-900 sm:h-[320px] group">
             <AnimatePresence mode="wait">
@@ -226,6 +208,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Featured Brands Section - Replaced Service Hub */}
       <FeaturedBrands />
