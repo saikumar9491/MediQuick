@@ -27,6 +27,25 @@ import toast from 'react-hot-toast';
 
 import FeaturedBrands from '../components/common/FeaturedBrands';
 
+const DEFAULT_BANNERS = [
+  {
+    _id: 'default-1',
+    title: "Healthcare at Your Doorstep",
+    desc: "Get authentic medicines and healthcare products delivered fast.",
+    image: "https://onemg.gumlet.io/a_ignore,w_899,h_440,c_fit,q_auto,f_auto/70868f05-0218-4720-9192-34907a7e841b.png",
+    bg: "bg-gradient-to-r from-blue-900 to-blue-700",
+    category: "main"
+  },
+  {
+    _id: 'default-2',
+    title: "Premium Wellness Solutions",
+    desc: "Explore our curated range of health and wellness products.",
+    image: "https://onemg.gumlet.io/a_ignore,w_899,h_440,c_fit,q_auto,f_auto/02f8319f-7235-430c-8f43-2337d100c410.png",
+    bg: "bg-gradient-to-r from-purple-900 to-purple-700",
+    category: "main"
+  }
+];
+
 const Home = ({ medicines = [], featured = [], loading = true }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
@@ -62,15 +81,16 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   }, []);
 
   const activeBanners = dbBanners.filter(b => b.category === 'main');
+  const displayBanners = activeBanners.length > 0 ? activeBanners : DEFAULT_BANNERS;
   const ayurBanner = dbBanners.find(b => b.category === 'ayurveda-promo');
 
   useEffect(() => {
-    if (activeBanners.length === 0) return;
+    if (displayBanners.length === 0) return;
     const timer = setInterval(() => {
-      setCurrentBanner((prev) => (prev === activeBanners.length - 1 ? 0 : prev + 1));
+      setCurrentBanner((prev) => (prev === displayBanners.length - 1 ? 0 : prev + 1));
     }, 6000);
     return () => clearInterval(timer);
-  }, [activeBanners.length]);
+  }, [displayBanners.length]);
 
   const mainCategories = [
     { name: 'Skin care', path: '/medicines?filter=skin-care', image: 'https://onemg.gumlet.io/diagnostics%2F2023-11%2F1699443647_skinn.webp?format=auto', bgColor: '#ccd1a1' },
@@ -99,67 +119,97 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   return (
     <div className="min-h-screen bg-[#f8fafc] pb-12">
       {/* Hero Section */}
-      {(activeBanners.length > 0 || isBannerLoading) && (
-        <section className="bg-white px-4 py-4 sm:px-6 lg:px-8">
+      {/* Hero Section */}
+      <section className="bg-white px-4 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-[1400px]">
-          <div className="relative h-[160px] overflow-hidden rounded-2xl bg-slate-900 sm:h-[320px]">
+          <div className="relative h-[160px] overflow-hidden rounded-2xl bg-slate-900 sm:h-[320px] group">
             <AnimatePresence mode="wait">
-              {activeBanners.length > 0 ? (
-                  <div className={`absolute inset-0 flex items-center transition-colors duration-500 ${activeBanners[currentBanner].bg || 'bg-gradient-to-r from-[#6b21a8] to-[#9333ea]'}`}>
-                    {/* Right Side Image with Premium Curve - Increased Width */}
-                    <div className="absolute right-0 h-full w-[75%] overflow-hidden lg:w-[65%]">
-                      <motion.img 
-                        key={currentBanner + 'img'}
-                        initial={{ x: 100, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ duration: 0.8, ease: "easeOut" }}
-                        src={activeBanners[currentBanner].image} 
-                        className="h-full w-full object-cover rounded-l-[150px] sm:rounded-l-[350px] border-l-4 sm:border-l-8 border-white/20 shadow-[-20px_0_40px_rgba(0,0,0,0.3)]" 
-                        alt="banner" 
-                      />
-                    </div>
-
-                    {/* Left Side Content */}
-                    <div className="relative z-10 w-full px-6 sm:w-[40%] sm:px-16">
-                      <motion.h1 
-                        key={currentBanner + 'h1'}
-                        initial={{ x: -50, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                        className="text-2xl font-black italic tracking-tighter text-white sm:text-6xl uppercase"
-                      >
-                        {activeBanners[currentBanner].title}
-                      </motion.h1>
-                      <motion.p 
-                        key={currentBanner + 'p'}
-                        initial={{ x: -50, opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        transition={{ duration: 0.6, delay: 0.3 }}
-                        className="mt-2 max-w-md text-[10px] font-bold text-purple-100 uppercase tracking-[0.2em] sm:text-sm"
-                      >
-                        {activeBanners[currentBanner].desc || "Healthcare delivered to your doorstep."}
-                      </motion.p>
-                      <motion.button 
-                        key={currentBanner + 'btn'}
-                        initial={{ y: 20, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        transition={{ duration: 0.6, delay: 0.4 }}
-                        className="mt-6 flex w-fit items-center gap-2 rounded-full bg-blue-600 px-6 py-2.5 text-[10px] font-black text-white shadow-xl hover:bg-white hover:text-[#6b21a8] sm:mt-10 sm:px-12 sm:py-4 sm:text-xs transition-all active:scale-95"
-                      >
-                        SHOP NOW <ArrowRight size={14} />
-                      </motion.button>
-                    </div>
-                  </div>
-              ) : (
-                <div className="flex h-full items-center justify-center bg-slate-100">
-                  <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+              <div className={`absolute inset-0 flex items-center transition-colors duration-500 ${displayBanners[currentBanner]?.bg || 'bg-gradient-to-r from-[#6b21a8] to-[#9333ea]'}`}>
+                {/* Right Side Image with Premium Curve - Increased Width */}
+                <div className="absolute right-0 h-full w-[75%] overflow-hidden lg:w-[65%]">
+                  <motion.img 
+                    key={currentBanner + (displayBanners[currentBanner]?._id || 'img')}
+                    initial={{ x: 100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    src={displayBanners[currentBanner]?.image} 
+                    className="h-full w-full object-cover rounded-l-[150px] sm:rounded-l-[350px] border-l-4 sm:border-l-8 border-white/20 shadow-[-20px_0_40px_rgba(0,0,0,0.3)]" 
+                    alt="banner" 
+                  />
                 </div>
-              )}
+
+                {/* Left Side Content */}
+                <div className="relative z-10 w-full px-6 sm:w-[40%] sm:px-16">
+                  <motion.h1 
+                    key={currentBanner + (displayBanners[currentBanner]?._id || 'h1')}
+                    initial={{ x: -50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                    className="text-2xl font-black italic tracking-tighter text-white sm:text-6xl uppercase"
+                  >
+                    {displayBanners[currentBanner]?.title}
+                  </motion.h1>
+                  <motion.p 
+                    key={currentBanner + (displayBanners[currentBanner]?._id || 'p')}
+                    initial={{ x: -50, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                    className="mt-2 max-w-md text-[10px] font-bold text-purple-100 uppercase tracking-[0.2em] sm:text-sm"
+                  >
+                    {displayBanners[currentBanner]?.desc || "Healthcare delivered to your doorstep."}
+                  </motion.p>
+                  <motion.button 
+                    key={currentBanner + (displayBanners[currentBanner]?._id || 'btn')}
+                    initial={{ y: 20, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.6, delay: 0.4 }}
+                    onClick={() => navigate(displayBanners[currentBanner]?.link || '/medicines')}
+                    className="mt-6 flex w-fit items-center gap-2 rounded-full bg-blue-600 px-6 py-2.5 text-[10px] font-black text-white shadow-xl hover:bg-white hover:text-[#6b21a8] sm:mt-10 sm:px-12 sm:py-4 sm:text-xs transition-all active:scale-95"
+                  >
+                    SHOP NOW <ArrowRight size={14} />
+                  </motion.button>
+                </div>
+              </div>
             </AnimatePresence>
+
+            {/* Manual Navigation Controls */}
+            <div className="absolute inset-0 flex items-center justify-between px-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentBanner(prev => (prev === 0 ? displayBanners.length - 1 : prev - 1));
+                }}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-md hover:bg-white hover:text-blue-600 transition-all shadow-lg"
+              >
+                <ChevronLeft size={24} />
+              </button>
+              <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentBanner(prev => (prev === displayBanners.length - 1 ? 0 : prev + 1));
+                }}
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-md hover:bg-white hover:text-blue-600 transition-all shadow-lg"
+              >
+                <ChevronRight size={24} />
+              </button>
+            </div>
+
+            {/* Indicator Dots */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+              {displayBanners.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentBanner(idx);
+                  }}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${currentBanner === idx ? 'w-8 bg-white' : 'w-2 bg-white/40 hover:bg-white/60'}`}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
-      )}
 
       {/* Featured Brands Section - Replaced Service Hub */}
       <FeaturedBrands />
