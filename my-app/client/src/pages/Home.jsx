@@ -124,7 +124,14 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
         <div className="mx-auto max-w-[1400px]">
           <div className="relative h-[160px] overflow-hidden rounded-2xl bg-slate-900 sm:h-[320px] group">
             <AnimatePresence mode="wait">
-              <div className={`absolute inset-0 flex items-center transition-colors duration-500 ${displayBanners[currentBanner]?.bg || 'bg-gradient-to-r from-[#6b21a8] to-[#9333ea]'}`}>
+              <motion.div 
+                key={currentBanner}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                className={`absolute inset-0 flex items-center transition-colors duration-500 ${displayBanners[currentBanner]?.bg || 'bg-gradient-to-r from-[#6b21a8] to-[#9333ea]'}`}
+              >
                 {/* Right Side Image with Premium Curve - Increased Width */}
                 <div className="absolute right-0 h-full w-[75%] overflow-hidden lg:w-[65%]">
                   <motion.img 
@@ -169,7 +176,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
                     SHOP NOW <ArrowRight size={14} />
                   </motion.button>
                 </div>
-              </div>
+              </motion.div>
             </AnimatePresence>
 
             {/* Manual Navigation Controls */}
