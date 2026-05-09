@@ -265,6 +265,7 @@ export const updateUserProfile = async (req, res) => {
     if (!user) return res.status(404).json({ message: 'User not found' });
     user.name = req.body.name || user.name;
     user.phone = req.body.phone || user.phone;
+    user.image = req.body.image || user.image;
     const updatedUser = await user.save();
     return res.json({ 
       _id: updatedUser._id, 
@@ -272,8 +273,41 @@ export const updateUserProfile = async (req, res) => {
       email: updatedUser.email, 
       phone: updatedUser.phone, 
       isAdmin: updatedUser.isAdmin, 
-      image: updatedUser.image 
+      image: updatedUser.image,
+      addresses: updatedUser.addresses
     });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const addAddress = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    
+    const { type, address, phone, isDefault } = req.body;
+    
+    if (isDefault) {
+      user.addresses.forEach(a => a.isDefault = false);
+    }
+    
+    user.addresses.push({ type, address, phone, isDefault });
+    await user.save();
+    return res.status(200).json(user.addresses);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+export const removeAddress = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    
+    user.addresses = user.addresses.filter(a => a._id.toString() !== req.params.addressId);
+    await user.save();
+    return res.status(200).json(user.addresses);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

@@ -16,6 +16,8 @@ import {
   blockUser,
   deleteUser,
   sendAdminEmail,
+  addAddress,
+  removeAddress,
 } from '../controllers/authController.js'; // Ensure path is correct
 import { verifyToken } from '../middleware/authMiddleware.js';
 
@@ -46,6 +48,10 @@ router.put('/profile/update', verifyToken, updateUserProfile);
 router.post('/cart/update', verifyToken, updateCart);
 router.post('/wishlist/add', verifyToken, addToWishlist);
 router.post('/wishlist/remove', verifyToken, removeFromWishlist);
+
+// Address Management
+router.post('/address/add', verifyToken, addAddress);
+router.delete('/address/:addressId', verifyToken, removeAddress);
 
 // --- Admin Management Routes ---
 router.get('/', verifyToken, isAdmin, getAllUsers);

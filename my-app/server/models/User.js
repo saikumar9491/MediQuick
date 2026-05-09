@@ -29,6 +29,14 @@ const userSchema = new mongoose.Schema(
 
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Medicine' }],
     orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }],
+    addresses: [
+      {
+        type: { type: String, default: 'Home' },
+        address: { type: String, required: true },
+        phone: { type: String, required: true },
+        isDefault: { type: Boolean, default: false },
+      },
+    ],
   },
   { timestamps: true }
 );

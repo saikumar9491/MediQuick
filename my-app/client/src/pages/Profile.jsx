@@ -21,11 +21,19 @@ import {
   Bell,
   Stethoscope,
   ClipboardList,
-  Zap
+  Zap,
+  Trash2,
+  CheckCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { API_BASE } from '../utils/apiConfig';
 import { toast } from 'react-hot-toast';
+
+const Minus = ({ size = 24, ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
 
 const Profile = () => {
   const { user, token, logout, setUser, loading } = useAuth();
@@ -33,12 +41,36 @@ const Profile = () => {
 
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isEditing, setIsEditing] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     phone: '',
-    address: 'Amritsar Hub, Punjab',
+    address: '',
   });
+
+  // Fetch User Orders
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if (user && token) {
+        try {
+          const res = await fetch(`${API_BASE}/api/orders/user/${user._id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            setOrders(data);
+          }
+        } catch (error) {
+          console.error("Failed to fetch orders:", error);
+        } finally {
+          setOrdersLoading(false);
+        }
+      }
+    };
+    fetchOrders();
+  }, [user, token]);
 
   useEffect(() => {
     if (user) {
@@ -46,7 +78,7 @@ const Profile = () => {
         name: user.name || '',
         email: user.email || '',
         phone: user.phone || '',
-        address: user.address || 'Amritsar Hub, Punjab',
+        address: user.address || '',
       });
     }
   }, [user]);
@@ -69,13 +101,49 @@ const Profile = () => {
 
       if (res.ok) {
         const updatedUser = await res.json();
-        setUser(updatedUser);
+        setUser({ ...user, ...updatedUser }); // Maintain session while updating fields
         setIsEditing(false);
         toast.success('Medical Identity Updated ✅');
       }
     } catch (err) {
       console.error('Profile update failed:', err);
       toast.error('Update failed. Check connection.');
+    }
+  };
+
+  const handleAddAddress = async (addressData) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/users/address/add`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(addressData),
+      });
+      if (res.ok) {
+        const updatedAddresses = await res.json();
+        setUser({ ...user, addresses: updatedAddresses });
+        toast.success('Address Added Successfully 📍');
+      }
+    } catch (err) {
+      toast.error('Failed to add address');
+    }
+  };
+
+  const handleRemoveAddress = async (addressId) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/users/address/${addressId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const updatedAddresses = await res.json();
+        setUser({ ...user, addresses: updatedAddresses });
+        toast.success('Address Removed');
+      }
+    } catch (err) {
+      toast.error('Failed to remove address');
     }
   };
 
@@ -111,7 +179,7 @@ const Profile = () => {
                   <ShieldCheck size={16} fill="currentColor" fillOpacity={0.1} />
                 </div>
               </div>
-              <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter italic">
+              <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter italic text-center">
                 {user?.name || 'User Profile'}
               </h2>
               <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">
@@ -174,7 +242,7 @@ const Profile = () => {
               transition={{ duration: 0.3 }}
               className="space-y-8"
             >
-              {activeTab === 'dashboard' && <DashboardSection user={user} navigate={navigate} />}
+              {activeTab === 'dashboard' && <DashboardSection user={user} navigate={navigate} orders={orders} ordersLoading={ordersLoading} />}
               {activeTab === 'identity' && (
                 <IdentitySection 
                   isEditing={isEditing} 
@@ -184,7 +252,7 @@ const Profile = () => {
                   handleSave={handleSave} 
                 />
               )}
-              {activeTab === 'addresses' && <AddressesSection />}
+              {activeTab === 'addresses' && <AddressesSection addresses={user?.addresses || []} handleAddAddress={handleAddAddress} handleRemoveAddress={handleRemoveAddress} />}
               {activeTab === 'wallet' && <WalletSection />}
               {activeTab === 'settings' && <SettingsSection handleLogout={handleLogout} />}
             </motion.div>
@@ -197,13 +265,7 @@ const Profile = () => {
 
 // --- SUB-COMPONENTS ---
 
-const Minus = ({ size = 24, ...props }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <line x1="5" y1="12" x2="19" y2="12" />
-  </svg>
-);
-
-const DashboardSection = ({ user, navigate }) => (
+const DashboardSection = ({ user, navigate, orders, ordersLoading }) => (
   <div className="space-y-8">
     <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
@@ -230,9 +292,9 @@ const DashboardSection = ({ user, navigate }) => (
 
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       {[
-        { label: 'Total Orders', value: '12', icon: Package, color: 'teal', path: '/my-orders' },
+        { label: 'Total Orders', value: ordersLoading ? '...' : orders.length.toString(), icon: Package, color: 'teal', path: '/my-orders' },
         { label: 'Health Score', value: '850', icon: Activity, color: 'orange', path: '#' },
-        { label: 'Wishlist', value: '08', icon: Heart, color: 'pink', path: '/wishlist' },
+        { label: 'Wishlist', value: (user?.wishlist?.length || 0).toString().padStart(2, '0'), icon: Heart, color: 'pink', path: '/wishlist' },
       ].map((stat, i) => (
         <div 
           key={i} 
@@ -262,18 +324,20 @@ const DashboardSection = ({ user, navigate }) => (
           <button onClick={() => navigate('/my-orders')} className="text-[10px] font-black text-[#00a2a4] uppercase tracking-widest hover:underline">View All</button>
         </div>
         <div className="space-y-4">
-          {[1, 2].map((_, i) => (
-            <div key={i} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100 group">
+          {orders.length > 0 ? orders.slice(0, 3).map((order) => (
+            <div key={order._id} className="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-100 group cursor-pointer" onClick={() => navigate('/my-orders')}>
               <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-slate-400">
                 <Package size={20} />
               </div>
               <div className="flex-1">
-                <p className="text-xs font-bold text-slate-800">Order #MQ-892{i}</p>
-                <p className="text-[10px] text-slate-400 font-bold uppercase">Delivered • 2 days ago</p>
+                <p className="text-xs font-bold text-slate-800">Order #{order._id.slice(-6).toUpperCase()}</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase">{order.status || 'Processing'} • ₹{order.totalAmount}</p>
               </div>
               <ChevronRight size={16} className="text-slate-300 group-hover:text-[#00a2a4] transition-colors" />
             </div>
-          ))}
+          )) : (
+            <p className="text-center py-8 text-[10px] font-bold text-slate-400 uppercase tracking-widest">No recent orders found</p>
+          )}
         </div>
       </div>
 
@@ -382,7 +446,8 @@ const IdentitySection = ({ isEditing, setIsEditing, formData, setFormData, handl
                 {isEditing ? (
                   <input
                     type={field.type}
-                    className="w-full bg-slate-50 border-2 border-transparent focus:border-[#00a2a4] rounded-2xl px-6 py-4 text-sm font-bold outline-none transition-all text-slate-800"
+                    disabled={field.key === 'email'}
+                    className={`w-full bg-slate-50 border-2 border-transparent focus:border-[#00a2a4] rounded-2xl px-6 py-4 text-sm font-bold outline-none transition-all text-slate-800 ${field.key === 'email' ? 'opacity-50 cursor-not-allowed' : ''}`}
                     value={formData[field.key]}
                     onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
                   />
@@ -411,48 +476,128 @@ const IdentitySection = ({ isEditing, setIsEditing, formData, setFormData, handl
   </div>
 );
 
-const AddressesSection = () => (
-  <div className="space-y-8">
-    <div className="flex justify-between items-center">
-      <div>
-        <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tighter italic">Saved <span className="text-[#ff6f61]">Addresses</span></h2>
-        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Manage your delivery hubs</p>
-      </div>
-      <button className="bg-[#00a2a4] text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-teal-100 active:scale-95 flex items-center gap-2">
-        <Plus size={16} /> Add New Address
-      </button>
-    </div>
+const AddressesSection = ({ addresses, handleAddAddress, handleRemoveAddress }) => {
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newAddr, setNewAddr] = useState({ type: 'Home', address: '', phone: '', isDefault: false });
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {[
-        { type: 'Home', address: 'Plot 42, Civil Lines, Amritsar, Punjab - 143001', phone: '+91 98765 43210', isDefault: true },
-        { type: 'Work', address: 'Innovation Hub, Sector 5, Mohali, Punjab - 160062', phone: '+91 98765 00000', isDefault: false },
-      ].map((addr, i) => (
-        <div key={i} className={`bg-white p-8 rounded-[40px] border transition-all relative group cursor-pointer ${
-          addr.isDefault ? 'border-[#00a2a4] shadow-xl shadow-teal-50' : 'border-slate-100 hover:border-slate-200'
-        }`}>
-          {addr.isDefault && (
-            <div className="absolute top-6 right-6 bg-teal-50 text-[#00a2a4] px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">
-              Primary
-            </div>
-          )}
-          <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 mb-6 group-hover:bg-[#00a2a4] group-hover:text-white transition-colors">
-            <MapPin size={24} />
-          </div>
-          <h4 className="text-lg font-black text-slate-900 uppercase italic tracking-tighter mb-2">{addr.type}</h4>
-          <p className="text-xs font-bold text-slate-500 leading-relaxed mb-6">{addr.address}</p>
-          <div className="flex items-center justify-between pt-6 border-t border-slate-50">
-            <p className="text-[10px] font-black text-slate-400 uppercase">{addr.phone}</p>
-            <div className="flex gap-4">
-              <button className="text-[10px] font-black text-[#00a2a4] uppercase hover:underline">Edit</button>
-              <button className="text-[10px] font-black text-red-500 uppercase hover:underline">Delete</button>
-            </div>
-          </div>
+  const submitAdd = (e) => {
+    e.preventDefault();
+    if (!newAddr.address || !newAddr.phone) return toast.error('Fill required fields');
+    handleAddAddress(newAddr);
+    setShowAddForm(false);
+    setNewAddr({ type: 'Home', address: '', phone: '', isDefault: false });
+  };
+
+  return (
+    <div className="space-y-8">
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tighter italic">Saved <span className="text-[#ff6f61]">Addresses</span></h2>
+          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Manage your delivery hubs</p>
         </div>
-      ))}
+        {!showAddForm && (
+          <button 
+            onClick={() => setShowAddForm(true)}
+            className="bg-[#00a2a4] text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-teal-100 active:scale-95 flex items-center gap-2"
+          >
+            <Plus size={16} /> Add New Address
+          </button>
+        )}
+      </div>
+
+      <AnimatePresence>
+        {showAddForm && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="bg-white p-8 rounded-[40px] border border-[#00a2a4] shadow-xl shadow-teal-50 overflow-hidden"
+          >
+            <form onSubmit={submitAdd} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Hub Type</label>
+                <select 
+                  className="w-full bg-slate-50 rounded-2xl px-6 py-4 text-sm font-bold outline-none border-2 border-transparent focus:border-[#00a2a4]"
+                  value={newAddr.type}
+                  onChange={e => setNewAddr({...newAddr, type: e.target.value})}
+                >
+                  <option>Home</option>
+                  <option>Work</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Phone Hub</label>
+                <input 
+                  className="w-full bg-slate-50 rounded-2xl px-6 py-4 text-sm font-bold outline-none border-2 border-transparent focus:border-[#00a2a4]"
+                  placeholder="+91 XXXXX XXXXX"
+                  value={newAddr.phone}
+                  onChange={e => setNewAddr({...newAddr, phone: e.target.value})}
+                />
+              </div>
+              <div className="md:col-span-2 space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Full Physical Address</label>
+                <textarea 
+                  className="w-full bg-slate-50 rounded-2xl px-6 py-4 text-sm font-bold outline-none border-2 border-transparent focus:border-[#00a2a4] min-h-[100px]"
+                  placeholder="Street, Landmark, City, State, Pincode"
+                  value={newAddr.address}
+                  onChange={e => setNewAddr({...newAddr, address: e.target.value})}
+                />
+              </div>
+              <div className="md:col-span-2 flex items-center gap-3">
+                <input 
+                  type="checkbox" 
+                  id="isDefault" 
+                  className="w-5 h-5 accent-[#00a2a4]"
+                  checked={newAddr.isDefault}
+                  onChange={e => setNewAddr({...newAddr, isDefault: e.target.checked})}
+                />
+                <label htmlFor="isDefault" className="text-xs font-bold text-slate-600 uppercase tracking-widest">Set as Primary Location</label>
+              </div>
+              <div className="md:col-span-2 flex gap-4 pt-4">
+                <button type="submit" className="flex-1 bg-[#00a2a4] text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest">Confirm Location</button>
+                <button type="button" onClick={() => setShowAddForm(false)} className="px-8 bg-slate-100 text-slate-500 rounded-2xl text-[10px] font-black uppercase tracking-widest">Cancel</button>
+              </div>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {addresses.length > 0 ? addresses.map((addr) => (
+          <div key={addr._id} className={`bg-white p-8 rounded-[40px] border transition-all relative group cursor-pointer ${
+            addr.isDefault ? 'border-[#00a2a4] shadow-xl shadow-teal-50' : 'border-slate-100 hover:border-slate-200'
+          }`}>
+            {addr.isDefault && (
+              <div className="absolute top-6 right-6 bg-teal-50 text-[#00a2a4] px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest flex items-center gap-1">
+                <CheckCircle size={10} /> Primary
+              </div>
+            )}
+            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 transition-colors ${addr.isDefault ? 'bg-[#00a2a4] text-white' : 'bg-slate-50 text-slate-400 group-hover:bg-[#00a2a4] group-hover:text-white'}`}>
+              <MapPin size={24} />
+            </div>
+            <h4 className="text-lg font-black text-slate-900 uppercase italic tracking-tighter mb-2">{addr.type}</h4>
+            <p className="text-xs font-bold text-slate-500 leading-relaxed mb-6">{addr.address}</p>
+            <div className="flex items-center justify-between pt-6 border-t border-slate-50">
+              <p className="text-[10px] font-black text-slate-400 uppercase">{addr.phone}</p>
+              <button 
+                onClick={() => handleRemoveAddress(addr._id)}
+                className="p-2 text-red-100 hover:text-red-500 transition-colors"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          </div>
+        )) : (
+          <div className="md:col-span-2 text-center py-20 bg-white rounded-[40px] border border-dashed border-slate-200">
+            <MapPin size={40} className="mx-auto text-slate-200 mb-4" />
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No physical locations synced yet</p>
+          </div>
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const WalletSection = () => (
   <div className="space-y-8">
@@ -466,7 +611,7 @@ const WalletSection = () => (
         <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-white/10 rounded-full blur-[80px]"></div>
         <div className="relative z-10">
           <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-70 mb-2">Available Balance</p>
-          <h3 className="text-5xl font-black italic tracking-tighter mb-10">₹1,240.50</h3>
+          <h3 className="text-5xl font-black italic tracking-tighter mb-10">₹0.00</h3>
           
           <div className="space-y-3">
             <button className="w-full bg-white text-[#00a2a4] py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl active:scale-95 transition-all">
@@ -483,24 +628,7 @@ const WalletSection = () => (
           Transaction Hub
         </h3>
         <div className="space-y-4">
-          {[
-            { label: 'Order #MQ-8921 Refund', amount: '+₹450', date: 'Oct 24, 2024', type: 'credit' },
-            { label: 'Medicine Purchase', amount: '-₹890', date: 'Oct 22, 2024', type: 'debit' },
-            { label: 'Loyalty Bonus', amount: '+₹50', date: 'Oct 20, 2024', type: 'credit' },
-          ].map((tx, i) => (
-            <div key={i} className="flex items-center justify-between p-4 rounded-2xl hover:bg-slate-50 transition-all border border-transparent hover:border-slate-100">
-              <div className="flex items-center gap-4">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${tx.type === 'credit' ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-500'}`}>
-                  {tx.type === 'credit' ? <Plus size={18} /> : <Minus size={18} />}
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-800">{tx.label}</p>
-                  <p className="text-[9px] text-slate-400 font-bold uppercase">{tx.date}</p>
-                </div>
-              </div>
-              <p className={`text-sm font-black italic ${tx.type === 'credit' ? 'text-green-600' : 'text-slate-900'}`}>{tx.amount}</p>
-            </div>
-          ))}
+          <p className="text-center py-20 text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em]">No transactions recorded</p>
         </div>
       </div>
     </div>
@@ -516,11 +644,11 @@ const SettingsSection = ({ handleLogout }) => (
 
     <div className="bg-white rounded-[40px] border border-slate-100 p-8 shadow-sm space-y-2">
       {[
-        { label: 'Change Password', icon: ShieldCheck, color: 'text-slate-600' },
+        { label: 'Security Center', icon: ShieldCheck, color: 'text-slate-600' },
         { label: 'Notification Preferences', icon: Bell, color: 'text-slate-600' },
-        { label: 'Privacy & Data', icon: Activity, color: 'text-slate-600' },
-        { label: 'Connected Devices', icon: Settings, color: 'text-slate-600' },
-        { label: 'Deactivate Account', icon: X, color: 'text-red-500' },
+        { label: 'Privacy & Data Protection', icon: Activity, color: 'text-slate-600' },
+        { label: 'Connected Medical Devices', icon: Settings, color: 'text-slate-600' },
+        { label: 'Deactivate Account Hub', icon: X, color: 'text-red-500' },
       ].map((item, i) => (
         <button 
           key={i} 
@@ -550,6 +678,5 @@ const SettingsSection = ({ handleLogout }) => (
     </div>
   </div>
 );
-
 
 export default Profile;
