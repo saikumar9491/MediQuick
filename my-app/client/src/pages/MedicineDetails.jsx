@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -20,7 +20,8 @@ import {
   Clock,
   MapPin,
   BadgeCheck,
-  CreditCard
+  CreditCard,
+  Maximize2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -39,6 +40,11 @@ const MedicineDetails = () => {
   const [loading, setLoading] = useState(true);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [quantity, setQuantity] = useState(1);
+
+  // Zoom Effect State
+  const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
+  const [showZoom, setShowZoom] = useState(false);
+  const imgRef = useRef(null);
 
   useEffect(() => {
     const fetchProductData = async () => {
@@ -74,6 +80,14 @@ const MedicineDetails = () => {
     if (!authLoading) fetchProductData();
   }, [id, authLoading, user?.wishlist]);
 
+  const handleMouseMove = (e) => {
+    if (!imgRef.current) return;
+    const { left, top, width, height } = imgRef.current.getBoundingClientRect();
+    const x = ((e.pageX - left - window.scrollX) / width) * 100;
+    const y = ((e.pageY - top - window.scrollY) / height) * 100;
+    setZoomPos({ x, y });
+  };
+
   const toggleWishlist = async () => {
     if (!user) {
       toast.error('Please login to use wishlist');
@@ -81,7 +95,6 @@ const MedicineDetails = () => {
       return;
     }
 
-    // Optimistic UI
     const originalState = isWishlisted;
     setIsWishlisted(!isWishlisted);
 
@@ -163,7 +176,7 @@ const MedicineDetails = () => {
     <div className="min-h-screen bg-white pb-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
-        {/* Breadcrumbs - High End Minimalist */}
+        {/* Breadcrumbs */}
         <nav className="flex items-center gap-2 py-8 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
           <span className="cursor-pointer hover:text-[#00a2a4] transition-colors" onClick={() => navigate('/')}>Home</span>
           <ChevronRight size={10} strokeWidth={3} className="opacity-30" />
@@ -174,10 +187,16 @@ const MedicineDetails = () => {
 
         <div className="flex flex-col lg:flex-row gap-16">
           
-          {/* Left Column: Image Gallery Section */}
+          {/* Left Column: Image Section with Zoom */}
           <div className="lg:w-1/2">
             <div className="sticky top-32 space-y-8">
-              <div className="relative aspect-square overflow-hidden rounded-[48px] bg-[#f8fafc] border border-slate-100 flex items-center justify-center p-12 sm:p-20 group">
+              <div 
+                className="relative aspect-square overflow-hidden rounded-[48px] bg-[#f8fafc] border border-slate-100 flex items-center justify-center p-12 sm:p-20 group cursor-crosshair"
+                onMouseEnter={() => setShowZoom(true)}
+                onMouseLeave={() => setShowZoom(false)}
+                onMouseMove={handleMouseMove}
+                ref={imgRef}
+              >
                 {/* Floating Badges */}
                 <div className="absolute top-8 left-8 z-10 flex flex-col gap-2">
                   <div className="bg-white/90 backdrop-blur px-3 py-1.5 rounded-full border border-slate-100 shadow-sm flex items-center gap-2">
@@ -198,19 +217,46 @@ const MedicineDetails = () => {
                   </button>
                 </div>
 
+                {/* Normal Image */}
                 <motion.img 
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   src={medicine.image || 'https://placehold.co/600x600?text=Medicine'} 
                   alt={medicine.name}
-                  className="max-h-full w-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700"
+                  className={`max-h-full w-full object-contain mix-blend-multiply transition-opacity duration-300 ${showZoom ? 'opacity-0' : 'opacity-100'}`}
                 />
 
+                {/* Zoomed Image Container */}
+                <AnimatePresence>
+                  {showZoom && (
+                    <motion.div 
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      className="absolute inset-0 z-20 pointer-events-none overflow-hidden rounded-[48px]"
+                      style={{
+                        backgroundImage: `url(${medicine.image || 'https://placehold.co/600x600?text=Medicine'})`,
+                        backgroundPosition: `${zoomPos.x}% ${zoomPos.y}%`,
+                        backgroundSize: '250%',
+                        backgroundRepeat: 'no-repeat',
+                        backgroundColor: '#f8fafc'
+                      }}
+                    >
+                      <div className="absolute bottom-6 left-6 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2 text-white">
+                        <Maximize2 size={12} className="text-teal-400" />
+                        <span className="text-[9px] font-black uppercase tracking-widest">Detail View Active</span>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
                 {/* Offer Badge */}
-                <div className="absolute bottom-8 right-8 bg-[#ff6f61] text-white px-4 py-2 rounded-2xl shadow-xl shadow-red-100">
-                  <p className="text-[10px] font-black uppercase tracking-widest leading-none">Flat</p>
-                  <p className="text-xl font-black italic tracking-tighter">{discountPercent}% OFF</p>
-                </div>
+                {!showZoom && (
+                  <div className="absolute bottom-8 right-8 bg-[#ff6f61] text-white px-4 py-2 rounded-2xl shadow-xl shadow-red-100 transition-opacity">
+                    <p className="text-[10px] font-black uppercase tracking-widest leading-none">Flat</p>
+                    <p className="text-xl font-black italic tracking-tighter">{discountPercent}% OFF</p>
+                  </div>
+                )}
               </div>
 
               {/* Trust Pillars */}
@@ -232,11 +278,9 @@ const MedicineDetails = () => {
             </div>
           </div>
 
-          {/* Right Column: Information & Checkout Flow */}
+          {/* Right Column: Information Section */}
           <div className="lg:w-1/2">
             <div className="space-y-12">
-              
-              {/* Product Info Header */}
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
                   <span className="bg-[#00a2a4] text-white px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest">
@@ -260,7 +304,6 @@ const MedicineDetails = () => {
                 </div>
               </div>
 
-              {/* Modern Pricing Card */}
               <div className="relative rounded-[40px] bg-slate-900 p-10 text-white overflow-hidden shadow-2xl shadow-slate-200">
                 <div className="absolute top-0 right-0 w-40 h-40 bg-teal-500/10 rounded-full blur-[80px]"></div>
                 <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-orange-500/10 rounded-full blur-[100px]"></div>
@@ -287,7 +330,6 @@ const MedicineDetails = () => {
                 </div>
               </div>
 
-              {/* Actions Section */}
               <div className="space-y-6">
                 <div className="flex items-center justify-between p-6 bg-slate-50 rounded-[32px] border border-slate-100">
                   <div>
@@ -327,7 +369,6 @@ const MedicineDetails = () => {
                 </div>
               </div>
 
-              {/* Professional Specs Grid */}
               <div className="space-y-8 pt-10 border-t border-slate-100">
                 <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900">Clinical Specifications</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -347,7 +388,6 @@ const MedicineDetails = () => {
                 </div>
               </div>
 
-              {/* Description & Clinical Notes */}
               <div className="space-y-6 pt-10 border-t border-slate-100">
                 <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900">Therapeutic Description</h3>
                 <p className="text-[15px] font-medium leading-[1.8] text-slate-600">
@@ -364,7 +404,6 @@ const MedicineDetails = () => {
           </div>
         </div>
 
-        {/* High-End Related Section */}
         <section className="mt-40">
           <div className="flex items-end justify-between mb-16 px-4">
             <div>
