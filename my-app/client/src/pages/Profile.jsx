@@ -26,17 +26,15 @@ import {
   CheckCircle,
   Key,
   Eye,
-  EyeOff
+  EyeOff,
+  Fingerprint,
+  QrCode,
+  Globe,
+  Dna
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { API_BASE } from '../utils/apiConfig';
 import { toast } from 'react-hot-toast';
-
-const Minus = ({ size = 24, ...props }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <line x1="5" y1="12" x2="19" y2="12" />
-  </svg>
-);
 
 const Profile = () => {
   const { user, token, logout, setUser, loading } = useAuth();
@@ -416,41 +414,75 @@ const IdentitySection = ({ isEditing, setIsEditing, formData, setFormData, handl
     </div>
 
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-      {/* ID Card Mockup */}
+      {/* PROFESSIONAL MEDICAL ID CARD */}
       <div className="xl:col-span-1">
-        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-[40px] p-8 text-white shadow-2xl relative overflow-hidden group h-full min-h-[350px]">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-[#00a2a4]/20 rounded-full blur-[80px] -mr-32 -mt-32"></div>
+        <div className="relative group perspective-1000 h-full min-h-[350px]">
+          <div className="absolute inset-0 bg-gradient-to-tr from-[#00a2a4] to-teal-400 rounded-[40px] blur-2xl opacity-20 group-hover:opacity-30 transition-opacity"></div>
           
-          <div className="relative z-10 flex flex-col h-full">
-            <div className="flex justify-between items-start mb-10">
+          <div className="relative h-full bg-white rounded-[40px] border border-slate-100 shadow-2xl overflow-hidden flex flex-col">
+            {/* Header Header */}
+            <div className="bg-[#00a2a4] p-6 flex justify-between items-center text-white">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-teal-500 flex items-center justify-center">
-                  <ShieldCheck size={18} fill="white" />
+                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+                  <Dna size={18} />
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-widest italic">MediQuick+ ID</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">Global Health ID</span>
               </div>
-              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-md">
-                <Activity size={18} />
-              </div>
+              <QrCode size={20} className="opacity-50" />
             </div>
 
-            <div className="mt-auto">
-              <h3 className="text-2xl font-black uppercase italic tracking-tighter mb-1 truncate">
-                {formData.name || 'Anonymous Patient'}
-              </h3>
-              <p className="text-[9px] font-bold text-teal-400 uppercase tracking-[0.3em] mb-8">Premium Health Tier</p>
-              
-              <div className="flex justify-between items-end">
-                <div className="space-y-1">
-                  <p className="text-[8px] font-bold opacity-40 uppercase tracking-widest">Patient ID</p>
-                  <p className="text-[11px] font-mono tracking-widest uppercase">MQ-{Math.random().toString(36).substring(7).toUpperCase()}</p>
+            <div className="p-8 flex-1 flex flex-col">
+              <div className="flex justify-between items-start mb-8">
+                <div className="w-20 h-20 rounded-3xl bg-slate-50 border-2 border-slate-100 overflow-hidden shadow-inner">
+                   {formData.image ? <img src={formData.image} className="w-full h-full object-cover" /> : (
+                     <div className="w-full h-full flex items-center justify-center bg-teal-50 text-[#00a2a4] font-black text-2xl uppercase">
+                        {formData.name?.charAt(0) || '?'}
+                     </div>
+                   )}
                 </div>
                 <div className="text-right">
-                  <p className="text-[8px] font-bold opacity-40 uppercase tracking-widest">Verified Since</p>
-                  <p className="text-[11px] font-black">MAY 2024</p>
+                  <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Issue Hub</p>
+                  <p className="text-[10px] font-black text-slate-900 uppercase">AMRITSAR HUB</p>
+                  <div className="mt-4 flex items-center justify-end gap-1 text-[#00a2a4]">
+                    <Fingerprint size={12} />
+                    <span className="text-[8px] font-black uppercase">BIO-VERIFIED</span>
+                  </div>
                 </div>
               </div>
+
+              <div className="space-y-4">
+                <div>
+                  <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Primary Holder</p>
+                  <h3 className="text-xl font-black text-slate-900 uppercase italic tracking-tighter truncate leading-tight">
+                    {formData.name || 'UNREGISTERED'}
+                  </h3>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Patient ID</p>
+                    <p className="text-[10px] font-mono text-slate-800 tracking-wider">MQ-{Math.random().toString(36).substring(7).toUpperCase()}</p>
+                  </div>
+                  <div>
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Status</p>
+                    <div className="flex items-center gap-1">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
+                      <p className="text-[10px] font-black text-green-600 uppercase">ACTIVE</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-auto pt-8 flex justify-between items-center">
+                 <div className="flex gap-1">
+                    {[1,2,3,4].map(i => <div key={i} className="w-6 h-1 rounded-full bg-slate-100"></div>)}
+                 </div>
+                 <Globe size={16} className="text-slate-200" />
+              </div>
             </div>
+            
+            {/* Holographic Stripe */}
+            <div className="h-2 bg-gradient-to-r from-teal-500 via-white to-teal-500 opacity-50"></div>
           </div>
         </div>
       </div>
@@ -489,13 +521,13 @@ const IdentitySection = ({ isEditing, setIsEditing, formData, setFormData, handl
         </div>
 
         {/* Security Summary */}
-        <div className="bg-orange-50 rounded-[32px] p-6 border border-orange-100 flex items-center gap-6">
-          <div className="w-12 h-12 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600 shrink-0">
+        <div className="bg-teal-50 rounded-[32px] p-6 border border-teal-100 flex items-center gap-6">
+          <div className="w-12 h-12 rounded-2xl bg-[#00a2a4] flex items-center justify-center text-white shrink-0 shadow-lg shadow-teal-100">
             <ShieldCheck size={24} />
           </div>
           <div>
-            <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest">2-Step Verification Active</p>
-            <p className="text-[11px] text-orange-900/60 font-bold">Your account is protected by hardware-grade encryption.</p>
+            <p className="text-[10px] font-black text-[#00a2a4] uppercase tracking-widest">Global Encryption Standards Active</p>
+            <p className="text-[11px] text-slate-600 font-bold">Your medical identity is protected by end-to-end blockchain-ready security.</p>
           </div>
         </div>
       </div>
