@@ -433,6 +433,9 @@ const Navbar = () => {
                         <Link to="/my-orders" className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-colors">
                           <ClipboardList size={14} /> My Orders
                         </Link>
+                        <Link to="/wishlist" className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-colors">
+                          <Heart size={14} /> My Wishlist
+                        </Link>
                         <button onClick={logout} className="w-full flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-red-500 hover:bg-red-50 transition-colors border-t border-slate-50 mt-1">
                           <LogOut size={14} /> Logout
                         </button>
