@@ -33,6 +33,21 @@ const MedicineCard = ({ _id, name, brand, price, image, discountPrice, isFlashDe
       return navigate('/login');
     }
 
+    // 🚀 OPTIMISTIC UI UPDATE: Toggle state immediately
+    const originalWishlist = [...(user.wishlist || [])];
+    let updatedWishlist;
+    if (isInWishlist) {
+      updatedWishlist = originalWishlist.filter(item => 
+        (typeof item === 'string' ? item : item._id) !== _id
+      );
+    } else {
+      updatedWishlist = [...originalWishlist, _id];
+    }
+    
+    // Update local state instantly
+    setUser({ ...user, wishlist: updatedWishlist });
+    toast.success(isInWishlist ? 'Removed from wishlist' : 'Added to wishlist');
+
     try {
       const action = isInWishlist ? 'remove' : 'add';
       const res = await fetch(`${API_BASE}/api/users/wishlist/${action}`, {
@@ -44,20 +59,13 @@ const MedicineCard = ({ _id, name, brand, price, image, discountPrice, isFlashDe
         body: JSON.stringify({ productId: _id })
       });
 
-      if (res.ok) {
-        let updatedWishlist;
-        if (isInWishlist) {
-          updatedWishlist = user.wishlist.filter(item => 
-            (typeof item === 'string' ? item : item._id) !== _id
-          );
-        } else {
-          updatedWishlist = [...(user.wishlist || []), _id];
-        }
-        setUser({ ...user, wishlist: updatedWishlist });
-        toast.success(isInWishlist ? 'Removed from wishlist' : 'Added to wishlist');
+      if (!res.ok) {
+        throw new Error('Sync failed');
       }
     } catch (err) {
-      toast.error('Wishlist sync failed');
+      // Revert state if API fails
+      setUser({ ...user, wishlist: originalWishlist });
+      toast.error('Wishlist sync failed. Reverting...');
     }
   };
 
