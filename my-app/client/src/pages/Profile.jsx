@@ -30,7 +30,9 @@ import {
   Fingerprint,
   QrCode,
   Globe,
-  Dna
+  Dna,
+  BadgeCheck,
+  Crown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { API_BASE } from '../utils/apiConfig';
@@ -294,7 +296,7 @@ const DashboardSection = ({ user, navigate, orders, ordersLoading }) => (
   <div className="space-y-8">
     <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
       <div>
-        <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">
+        <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tighter uppercase italic leading-none text-left">
           Welcome back, <span className="text-[#00a2a4]">{user?.name?.split(' ')[0]}</span>
         </h1>
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-3">
@@ -413,123 +415,98 @@ const IdentitySection = ({ isEditing, setIsEditing, formData, setFormData, handl
       </button>
     </div>
 
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-      {/* PROFESSIONAL MEDICAL ID CARD */}
-      <div className="xl:col-span-1">
-        <div className="relative group perspective-1000 h-full min-h-[350px]">
-          <div className="absolute inset-0 bg-gradient-to-tr from-[#00a2a4] to-teal-400 rounded-[40px] blur-2xl opacity-20 group-hover:opacity-30 transition-opacity"></div>
-          
-          <div className="relative h-full bg-white rounded-[40px] border border-slate-100 shadow-2xl overflow-hidden flex flex-col">
-            {/* Header Header */}
-            <div className="bg-[#00a2a4] p-6 flex justify-between items-center text-white">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
-                  <Dna size={18} />
-                </div>
-                <span className="text-[10px] font-black uppercase tracking-widest">Global Health ID</span>
-              </div>
-              <QrCode size={20} className="opacity-50" />
+    {/* MODERN HORIZONTAL COMPACT ID CARD */}
+    <div className="relative group max-w-3xl mx-auto overflow-hidden rounded-[32px] bg-slate-900 shadow-2xl p-[2px]">
+      <div className="absolute inset-0 bg-gradient-to-r from-teal-500 via-purple-500 to-orange-500 animate-gradient-xy opacity-40"></div>
+      
+      <div className="relative bg-slate-900 rounded-[30px] p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-8 overflow-hidden">
+        {/* Animated Background Graphics */}
+        <div className="absolute -top-10 -right-10 w-40 h-40 bg-teal-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-orange-500/10 rounded-full blur-3xl"></div>
+        
+        {/* Profile Visual */}
+        <div className="relative shrink-0">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl border-2 border-teal-500/30 p-1 bg-slate-800/50 backdrop-blur-xl relative z-10">
+            <div className="w-full h-full rounded-xl overflow-hidden bg-slate-700 flex items-center justify-center text-4xl font-black text-teal-400 italic">
+               {formData.image ? <img src={formData.image} className="w-full h-full object-cover" /> : (formData.name?.charAt(0) || '?')}
             </div>
-
-            <div className="p-8 flex-1 flex flex-col">
-              <div className="flex justify-between items-start mb-8">
-                <div className="w-20 h-20 rounded-3xl bg-slate-50 border-2 border-slate-100 overflow-hidden shadow-inner">
-                   {formData.image ? <img src={formData.image} className="w-full h-full object-cover" /> : (
-                     <div className="w-full h-full flex items-center justify-center bg-teal-50 text-[#00a2a4] font-black text-2xl uppercase">
-                        {formData.name?.charAt(0) || '?'}
-                     </div>
-                   )}
-                </div>
-                <div className="text-right">
-                  <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Issue Hub</p>
-                  <p className="text-[10px] font-black text-slate-900 uppercase">AMRITSAR HUB</p>
-                  <div className="mt-4 flex items-center justify-end gap-1 text-[#00a2a4]">
-                    <Fingerprint size={12} />
-                    <span className="text-[8px] font-black uppercase">BIO-VERIFIED</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Primary Holder</p>
-                  <h3 className="text-xl font-black text-slate-900 uppercase italic tracking-tighter truncate leading-tight">
-                    {formData.name || 'UNREGISTERED'}
-                  </h3>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Patient ID</p>
-                    <p className="text-[10px] font-mono text-slate-800 tracking-wider">MQ-{Math.random().toString(36).substring(7).toUpperCase()}</p>
-                  </div>
-                  <div>
-                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Status</p>
-                    <div className="flex items-center gap-1">
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                      <p className="text-[10px] font-black text-green-600 uppercase">ACTIVE</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-auto pt-8 flex justify-between items-center">
-                 <div className="flex gap-1">
-                    {[1,2,3,4].map(i => <div key={i} className="w-6 h-1 rounded-full bg-slate-100"></div>)}
-                 </div>
-                 <Globe size={16} className="text-slate-200" />
-              </div>
-            </div>
-            
-            {/* Holographic Stripe */}
-            <div className="h-2 bg-gradient-to-r from-teal-500 via-white to-teal-500 opacity-50"></div>
+          </div>
+          <div className="absolute -bottom-2 -right-2 bg-teal-500 text-white p-1.5 rounded-lg shadow-lg z-20">
+            <BadgeCheck size={18} fill="currentColor" fillOpacity={0.2} />
           </div>
         </div>
+
+        {/* Data Content */}
+        <div className="flex-1 text-center sm:text-left relative z-10 space-y-6 w-full">
+          <div className="flex flex-col sm:flex-row justify-between items-center sm:items-start gap-2">
+            <div>
+              <h3 className="text-2xl sm:text-3xl font-black text-white uppercase italic tracking-tighter leading-none mb-1">
+                {formData.name || 'Anonymous User'}
+              </h3>
+              <div className="flex items-center justify-center sm:justify-start gap-2 text-[10px] font-black text-teal-400 uppercase tracking-widest">
+                <Crown size={12} fill="currentColor" fillOpacity={0.3} />
+                MediQuick+ Elite Member
+              </div>
+            </div>
+            <div className="text-center sm:text-right">
+              <p className="text-[8px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">Passport No.</p>
+              <p className="text-xs font-mono text-white/70 tracking-widest uppercase">MQ-{Math.random().toString(36).substring(7).toUpperCase()}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-6 border-t border-white/5">
+            <div>
+              <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Contact Hub</p>
+              <p className="text-[11px] font-black text-white/90 uppercase">{formData.phone || 'NOT LINKED'}</p>
+            </div>
+            <div>
+              <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Health Score</p>
+              <p className="text-[11px] font-black text-orange-400 uppercase flex items-center gap-1 justify-center sm:justify-start">
+                <Activity size={10} /> 850 XP
+              </p>
+            </div>
+            <div className="col-span-2 sm:col-span-1 flex justify-center sm:justify-end items-center gap-4">
+               <QrCode size={32} className="text-white opacity-20" />
+               <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-white/20">
+                 <Globe size={14} />
+               </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Holographic scanner effect */}
+        <div className="absolute top-0 bottom-0 left-0 w-[1px] bg-gradient-to-b from-transparent via-teal-400 to-transparent animate-scan"></div>
       </div>
+    </div>
 
-      {/* Editable Fields */}
-      <div className="xl:col-span-2 space-y-6">
-        <div className="bg-white rounded-[40px] border border-slate-100 p-8 shadow-sm">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {[
-              { label: 'Full Name', key: 'name', type: 'text', icon: User },
-              { label: 'Email Address', key: 'email', type: 'email', icon: Bell },
-              { label: 'Phone Line', key: 'phone', type: 'tel', icon: Activity },
-              { label: 'Location Hub', key: 'address', type: 'text', icon: MapPin },
-            ].map((field) => (
-              <div key={field.key} className="space-y-3">
-                <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
-                  <field.icon size={12} className="text-[#00a2a4]" />
-                  {field.label}
-                </label>
-                {isEditing ? (
-                  <input
-                    type={field.type}
-                    disabled={field.key === 'email'}
-                    className={`w-full bg-slate-50 border-2 border-transparent focus:border-[#00a2a4] rounded-2xl px-6 py-4 text-sm font-bold outline-none transition-all text-slate-800 ${field.key === 'email' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    value={formData[field.key]}
-                    onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
-                  />
-                ) : (
-                  <div className="px-6 py-4 rounded-2xl bg-slate-50/50 border border-transparent">
-                    <p className="text-sm font-black text-slate-800">{formData[field.key] || 'Not Set'}</p>
-                  </div>
-                )}
+    <div className="bg-white rounded-[40px] border border-slate-100 p-8 shadow-sm">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {[
+          { label: 'Full Name', key: 'name', type: 'text', icon: User },
+          { label: 'Email Address', key: 'email', type: 'email', icon: Bell },
+          { label: 'Phone Line', key: 'phone', type: 'tel', icon: Activity },
+          { label: 'Location Hub', key: 'address', type: 'text', icon: MapPin },
+        ].map((field) => (
+          <div key={field.key} className="space-y-3">
+            <label className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+              <field.icon size={12} className="text-[#00a2a4]" />
+              {field.label}
+            </label>
+            {isEditing ? (
+              <input
+                type={field.type}
+                disabled={field.key === 'email'}
+                className={`w-full bg-slate-50 border-2 border-transparent focus:border-[#00a2a4] rounded-2xl px-6 py-4 text-sm font-bold outline-none transition-all text-slate-800 ${field.key === 'email' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                value={formData[field.key]}
+                onChange={(e) => setFormData({ ...formData, [field.key]: e.target.value })}
+              />
+            ) : (
+              <div className="px-6 py-4 rounded-2xl bg-slate-50/50 border border-transparent">
+                <p className="text-sm font-black text-slate-800">{formData[field.key] || 'Not Set'}</p>
               </div>
-            ))}
+            )}
           </div>
-        </div>
-
-        {/* Security Summary */}
-        <div className="bg-teal-50 rounded-[32px] p-6 border border-teal-100 flex items-center gap-6">
-          <div className="w-12 h-12 rounded-2xl bg-[#00a2a4] flex items-center justify-center text-white shrink-0 shadow-lg shadow-teal-100">
-            <ShieldCheck size={24} />
-          </div>
-          <div>
-            <p className="text-[10px] font-black text-[#00a2a4] uppercase tracking-widest">Global Encryption Standards Active</p>
-            <p className="text-[11px] text-slate-600 font-bold">Your medical identity is protected by end-to-end blockchain-ready security.</p>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   </div>
