@@ -22,7 +22,7 @@ const MedicineCard = ({ _id, name, brand, price, image, discountPrice, isFlashDe
   return (
     <motion.div
       onClick={() => navigate(`/product/${_id}`)}
-      className="group relative flex w-full h-full flex-col bg-white transition-all duration-300 hover:shadow-xl border border-slate-100 rounded-xl overflow-hidden"
+      className="group relative flex w-full h-full flex-col bg-white transition-all duration-300 border border-slate-100 hover:border-black rounded-xl overflow-hidden"
     >
       {/* Wishlist Icon */}
       <button className="absolute top-3 right-3 z-20 text-slate-200 hover:text-red-500 transition-colors bg-white/80 backdrop-blur-sm p-1.5 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-all">
