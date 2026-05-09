@@ -3,20 +3,62 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, ShieldCheck, Plus, Heart } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
+import { API_BASE } from '../../utils/apiConfig';
 import toast from 'react-hot-toast';
 
 const MedicineCard = ({ _id, name, brand, price, image, discountPrice, isFlashDeal, category, rating = 4.3, numReviews = 1240 }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { user, token, setUser } = useAuth();
 
   const finalPrice = discountPrice || price;
   const mrp = isFlashDeal ? price : Math.round(price * 1.33);
   const discountPercent = Math.round(((mrp - finalPrice) / mrp) * 100);
 
+  const isInWishlist = user?.wishlist?.some(item => 
+    (typeof item === 'string' ? item : item._id) === _id
+  );
+
   const handleAdd = (e) => {
     e.stopPropagation();
     addToCart({ _id, name, brand, price: finalPrice, image });
     toast.success('Added to bag');
+  };
+
+  const handleWishlistToggle = async (e) => {
+    e.stopPropagation();
+    if (!user) {
+      toast.error('Please login to use wishlist');
+      return navigate('/login');
+    }
+
+    try {
+      const action = isInWishlist ? 'remove' : 'add';
+      const res = await fetch(`${API_BASE}/api/users/wishlist/${action}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ productId: _id })
+      });
+
+      if (res.ok) {
+        let updatedWishlist;
+        if (isInWishlist) {
+          updatedWishlist = user.wishlist.filter(item => 
+            (typeof item === 'string' ? item : item._id) !== _id
+          );
+        } else {
+          updatedWishlist = [...(user.wishlist || []), _id];
+        }
+        setUser({ ...user, wishlist: updatedWishlist });
+        toast.success(isInWishlist ? 'Removed from wishlist' : 'Added to wishlist');
+      }
+    } catch (err) {
+      toast.error('Wishlist sync failed');
+    }
   };
 
   return (
@@ -25,11 +67,16 @@ const MedicineCard = ({ _id, name, brand, price, image, discountPrice, isFlashDe
       className="group relative flex w-full h-full flex-col bg-white transition-all duration-300 border border-slate-100 hover:border-black rounded-xl overflow-hidden"
     >
       {/* Wishlist Icon */}
-      <button className="absolute top-3 right-3 z-20 text-slate-200 hover:text-red-500 transition-colors bg-white/80 backdrop-blur-sm p-1.5 rounded-full shadow-sm opacity-0 group-hover:opacity-100 transition-all">
-        <Heart size={16} />
+      <button 
+        onClick={handleWishlistToggle}
+        className={`absolute top-3 right-3 z-20 transition-colors bg-white/80 backdrop-blur-sm p-1.5 rounded-full shadow-sm sm:opacity-0 group-hover:opacity-100 transition-all ${
+          isInWishlist ? 'text-red-500 opacity-100' : 'text-slate-300 hover:text-red-500'
+        }`}
+      >
+        <Heart size={16} fill={isInWishlist ? "currentColor" : "none"} />
       </button>
 
-      {/* Image Container - Reduced Height & Padding */}
+      {/* Image Container */}
       <div className="relative flex h-[160px] sm:h-[180px] w-full items-center justify-center bg-white p-2 sm:p-4">
         <img
           src={image || 'https://placehold.co/300x300?text=Medicine'}
@@ -45,7 +92,7 @@ const MedicineCard = ({ _id, name, brand, price, image, discountPrice, isFlashDe
         )}
       </div>
 
-      {/* Content - Compact Layout */}
+      {/* Content */}
       <div className="flex flex-1 flex-col px-3 pb-3 pt-1">
         <p className="mb-0.5 text-[9px] font-black uppercase tracking-widest text-slate-400">
           {brand}
@@ -54,7 +101,7 @@ const MedicineCard = ({ _id, name, brand, price, image, discountPrice, isFlashDe
           {name}
         </h3>
         
-        {/* Rating Pill - Flipkart Style */}
+        {/* Rating Pill */}
         <div className="flex items-center gap-1.5 mb-2">
           <div className="flex items-center gap-0.5 bg-green-600 text-white px-1.5 py-0.5 rounded text-[10px] font-black">
             {rating} <Star size={8} fill="white" stroke="white" />
