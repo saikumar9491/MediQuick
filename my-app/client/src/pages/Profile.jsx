@@ -20,7 +20,8 @@ import {
   Settings,
   Bell,
   Stethoscope,
-  ClipboardList
+  ClipboardList,
+  Zap
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { API_BASE } from '../utils/apiConfig';
@@ -195,6 +196,12 @@ const Profile = () => {
 };
 
 // --- SUB-COMPONENTS ---
+
+const Minus = ({ size = 24, ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
 
 const DashboardSection = ({ user, navigate }) => (
   <div className="space-y-8">
@@ -544,10 +551,5 @@ const SettingsSection = ({ handleLogout }) => (
   </div>
 );
 
-const Minus = ({ size = 24, ...props }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-    <line x1="5" y1="12" x2="19" y2="12" />
-  </svg>
-);
 
 export default Profile;
