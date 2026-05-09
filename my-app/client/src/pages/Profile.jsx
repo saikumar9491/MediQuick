@@ -23,7 +23,10 @@ import {
   ClipboardList,
   Zap,
   Trash2,
-  CheckCircle
+  CheckCircle,
+  Key,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { API_BASE } from '../utils/apiConfig';
@@ -101,7 +104,7 @@ const Profile = () => {
 
       if (res.ok) {
         const updatedUser = await res.json();
-        setUser({ ...user, ...updatedUser }); // Maintain session while updating fields
+        setUser({ ...user, ...updatedUser });
         setIsEditing(false);
         toast.success('Medical Identity Updated ✅');
       }
@@ -147,6 +150,30 @@ const Profile = () => {
     }
   };
 
+  const handleChangePassword = async (passwords) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/users/profile/change-password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(passwords),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('Password Updated Successfully 🔐');
+        return true;
+      } else {
+        toast.error(data.message || 'Failed to update password');
+        return false;
+      }
+    } catch (err) {
+      toast.error('Connection failed');
+      return false;
+    }
+  };
+
   if (loading)
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-white">
@@ -179,7 +206,7 @@ const Profile = () => {
                   <ShieldCheck size={16} fill="currentColor" fillOpacity={0.1} />
                 </div>
               </div>
-              <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter italic text-center">
+              <h2 className="text-xl font-black text-slate-900 uppercase tracking-tighter italic text-center leading-tight">
                 {user?.name || 'User Profile'}
               </h2>
               <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-1">
@@ -254,7 +281,7 @@ const Profile = () => {
               )}
               {activeTab === 'addresses' && <AddressesSection addresses={user?.addresses || []} handleAddAddress={handleAddAddress} handleRemoveAddress={handleRemoveAddress} />}
               {activeTab === 'wallet' && <WalletSection />}
-              {activeTab === 'settings' && <SettingsSection handleLogout={handleLogout} />}
+              {activeTab === 'settings' && <SettingsSection handleLogout={handleLogout} handleChangePassword={handleChangePassword} />}
             </motion.div>
           </AnimatePresence>
         </main>
@@ -635,48 +662,144 @@ const WalletSection = () => (
   </div>
 );
 
-const SettingsSection = ({ handleLogout }) => (
-  <div className="space-y-8">
-    <div>
-      <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tighter italic">Account <span className="text-slate-500">Settings</span></h2>
-      <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Preferences and system configuration</p>
-    </div>
+const SettingsSection = ({ handleLogout, handleChangePassword }) => {
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [passwords, setPasswords] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
+  const [showOld, setShowOld] = useState(false);
+  const [showNew, setShowNew] = useState(false);
 
-    <div className="bg-white rounded-[40px] border border-slate-100 p-8 shadow-sm space-y-2">
-      {[
-        { label: 'Security Center', icon: ShieldCheck, color: 'text-slate-600' },
-        { label: 'Notification Preferences', icon: Bell, color: 'text-slate-600' },
-        { label: 'Privacy & Data Protection', icon: Activity, color: 'text-slate-600' },
-        { label: 'Connected Medical Devices', icon: Settings, color: 'text-slate-600' },
-        { label: 'Deactivate Account Hub', icon: X, color: 'text-red-500' },
-      ].map((item, i) => (
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    if (passwords.newPassword !== passwords.confirmPassword) return toast.error('Passwords do not match');
+    if (passwords.newPassword.length < 6) return toast.error('Password too short (min 6 chars)');
+    
+    const success = await handleChangePassword({ 
+      oldPassword: passwords.oldPassword, 
+      newPassword: passwords.newPassword 
+    });
+    
+    if (success) {
+      setPasswords({ oldPassword: '', newPassword: '', confirmPassword: '' });
+      setShowPasswordForm(false);
+    }
+  };
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tighter italic">Account <span className="text-slate-500">Settings</span></h2>
+        <p className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Preferences and system configuration</p>
+      </div>
+
+      <AnimatePresence>
+        {showPasswordForm && (
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className="bg-white rounded-[40px] border border-[#00a2a4] p-8 shadow-2xl relative overflow-hidden"
+          >
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-sm font-black uppercase tracking-widest flex items-center gap-2">
+                <Key className="text-[#00a2a4]" size={18} />
+                Secure Password Update
+              </h3>
+              <button onClick={() => setShowPasswordForm(false)} className="p-2 bg-slate-50 rounded-xl text-slate-400 hover:text-red-500"><X size={18} /></button>
+            </div>
+
+            <form onSubmit={onSubmit} className="space-y-6 max-w-md mx-auto">
+              <div className="space-y-2 relative">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Old Hub Password</label>
+                <input 
+                  type={showOld ? 'text' : 'password'}
+                  className="w-full bg-slate-50 rounded-2xl px-6 py-4 text-sm font-bold outline-none border-2 border-transparent focus:border-[#00a2a4]"
+                  value={passwords.oldPassword}
+                  onChange={e => setPasswords({...passwords, oldPassword: e.target.value})}
+                  required
+                />
+                <button type="button" onClick={() => setShowOld(!showOld)} className="absolute right-4 bottom-4 text-slate-300">{showOld ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+              </div>
+
+              <div className="space-y-2 relative">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">New Secure Password</label>
+                <input 
+                  type={showNew ? 'text' : 'password'}
+                  className="w-full bg-slate-50 rounded-2xl px-6 py-4 text-sm font-bold outline-none border-2 border-transparent focus:border-[#00a2a4]"
+                  value={passwords.newPassword}
+                  onChange={e => setPasswords({...passwords, newPassword: e.target.value})}
+                  required
+                />
+                <button type="button" onClick={() => setShowNew(!showNew)} className="absolute right-4 bottom-4 text-slate-300">{showNew ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Confirm New Hub Password</label>
+                <input 
+                  type="password"
+                  className="w-full bg-slate-50 rounded-2xl px-6 py-4 text-sm font-bold outline-none border-2 border-transparent focus:border-[#00a2a4]"
+                  value={passwords.confirmPassword}
+                  onChange={e => setPasswords({...passwords, confirmPassword: e.target.value})}
+                  required
+                />
+              </div>
+
+              <button type="submit" className="w-full bg-[#00a2a4] text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-teal-50 active:scale-95 transition-all">
+                Finalize New Password
+              </button>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="bg-white rounded-[40px] border border-slate-100 p-8 shadow-sm space-y-2">
         <button 
-          key={i} 
+          onClick={() => setShowPasswordForm(true)}
           className="w-full flex items-center justify-between p-4 rounded-2xl hover:bg-slate-50 transition-all group border border-transparent hover:border-slate-100"
         >
           <div className="flex items-center gap-4">
-            <div className={`w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center ${item.color}`}>
-              <item.icon size={18} />
+            <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-600">
+              <Key size={18} />
             </div>
-            <span className={`text-[12px] font-bold uppercase tracking-widest ${item.color}`}>{item.label}</span>
+            <span className="text-[12px] font-bold uppercase tracking-widest text-slate-600">Change Account Password</span>
           </div>
           <ChevronRight size={16} className="text-slate-300 group-hover:text-slate-900" />
         </button>
-      ))}
-      <button 
-        onClick={handleLogout}
-        className="w-full flex items-center justify-between p-4 rounded-2xl hover:bg-red-50 transition-all group mt-6 border border-red-100 bg-red-50/20"
-      >
-        <div className="flex items-center gap-4 text-red-600">
-          <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
-            <LogOut size={18} strokeWidth={3} />
+
+        {[
+          { label: 'Security Center', icon: ShieldCheck, color: 'text-slate-600' },
+          { label: 'Notification Preferences', icon: Bell, color: 'text-slate-600' },
+          { label: 'Privacy & Data Protection', icon: Activity, color: 'text-slate-600' },
+          { label: 'Connected Medical Devices', icon: Settings, color: 'text-slate-600' },
+          { label: 'Deactivate Account Hub', icon: X, color: 'text-red-500' },
+        ].map((item, i) => (
+          <button 
+            key={i} 
+            className="w-full flex items-center justify-between p-4 rounded-2xl hover:bg-slate-50 transition-all group border border-transparent hover:border-slate-100"
+          >
+            <div className="flex items-center gap-4">
+              <div className={`w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center ${item.color}`}>
+                <item.icon size={18} />
+              </div>
+              <span className={`text-[12px] font-bold uppercase tracking-widest ${item.color}`}>{item.label}</span>
+            </div>
+            <ChevronRight size={16} className="text-slate-300 group-hover:text-slate-900" />
+          </button>
+        ))}
+        <button 
+          onClick={handleLogout}
+          className="w-full flex items-center justify-between p-4 rounded-2xl hover:bg-red-50 transition-all group mt-6 border border-red-100 bg-red-50/20"
+        >
+          <div className="flex items-center gap-4 text-red-600">
+            <div className="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+              <LogOut size={18} strokeWidth={3} />
+            </div>
+            <span className="text-[12px] font-black uppercase tracking-widest">Secure Logout</span>
           </div>
-          <span className="text-[12px] font-black uppercase tracking-widest">Secure Logout</span>
-        </div>
-        <ChevronRight size={16} className="text-red-300 group-hover:text-red-600" />
-      </button>
+          <ChevronRight size={16} className="text-red-300 group-hover:text-red-600" />
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default Profile;

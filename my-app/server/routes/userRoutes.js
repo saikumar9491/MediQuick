@@ -18,6 +18,7 @@ import {
   sendAdminEmail,
   addAddress,
   removeAddress,
+  changePassword,
 } from '../controllers/authController.js'; // Ensure path is correct
 import { verifyToken } from '../middleware/authMiddleware.js';
 
@@ -43,6 +44,7 @@ router.post('/google-login', googleLogin);
 // --- Protected Routes (Require Token) ---
 router.get('/profile', verifyToken, getUserProfile);
 router.put('/profile/update', verifyToken, updateUserProfile);
+router.put('/profile/change-password', verifyToken, changePassword);
 
 // Cart & Wishlist Sync
 router.post('/cart/update', verifyToken, updateCart);
