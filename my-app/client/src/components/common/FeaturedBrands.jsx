@@ -59,7 +59,7 @@ const FeaturedBrands = () => {
             className="grid grid-cols-4 gap-x-2 gap-y-4 md:flex md:gap-6 md:overflow-x-auto md:py-4 scroll-smooth no-scrollbar"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {brands.slice(0, 8).map((brand, idx) => (
+            {brands.map((brand, idx) => (
               <div
                 key={idx}
                 onClick={() => navigate(`/brand/${encodeURIComponent(brand.name)}`)}
