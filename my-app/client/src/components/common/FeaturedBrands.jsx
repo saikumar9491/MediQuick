@@ -34,22 +34,15 @@ const FeaturedBrands = () => {
     <section className="bg-white py-12">
       <div className="max-w-[1400px] mx-auto px-5">
         {/* Header Section */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-3xl font-bold text-slate-800 tracking-tight">
-              Top Brands
-            </h2>
-            <p className="text-slate-500 mt-1 text-sm">Explore our premium selection of trusted brands</p>
-          </div>
-
-          <button
-            onClick={() => navigate('/all-brands')}
-            className="group flex items-center gap-2 text-[#ff6f61] font-semibold text-sm px-5 py-2.5 rounded-full bg-[#ff6f61]/10 hover:bg-[#ff6f61] hover:text-white transition-all duration-300"
-          >
-            Explore All 
-            <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-          </button>
+        <div className="mb-4">
+          <h2 className="text-3xl font-bold text-slate-800 tracking-tight">
+            Top Brands
+          </h2>
+          <p className="text-slate-500 mt-1 text-sm">Explore our premium selection of trusted brands</p>
         </div>
+
+        {/* Gradient Underline */}
+        <div className="w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
 
         {/* Carousel Container */}
         <div className="relative group">
