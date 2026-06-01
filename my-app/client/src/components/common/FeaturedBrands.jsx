@@ -31,54 +31,66 @@ const FeaturedBrands = () => {
   };
 
   return (
-    <section className="bg-white py-12">
-      <div className="max-w-[1400px] mx-auto px-5">
+    <section className="bg-white py-6 md:py-12">
+      <div className="max-w-[1400px] mx-auto px-4 md:px-5">
         {/* Header Section */}
-        <div className="mb-4">
-          <h2 className="text-3xl font-bold text-slate-800 tracking-tight">
-            Top Brands
-          </h2>
-          <p className="text-slate-500 mt-1 text-sm">Explore our premium selection of trusted brands</p>
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl md:text-3xl font-bold text-slate-900 tracking-tight">
+              Top Brands
+            </h2>
+            <p className="hidden md:block text-slate-500 mt-1 text-sm">Explore our premium selection of trusted brands</p>
+          </div>
+          
+          {/* Show See All only on desktop since mobile is a grid */}
+          <button
+            onClick={() => navigate('/all-brands')}
+            className="hidden md:flex group items-center gap-2 text-[#ff6f61] font-semibold text-sm px-5 py-2.5 rounded-full bg-[#ff6f61]/10 hover:bg-[#ff6f61] hover:text-white transition-all duration-300"
+          >
+            Explore All 
+            <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+          </button>
         </div>
 
-        {/* Gradient Underline */}
-        <div className="w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
-
-        {/* Carousel Container */}
+        {/* Grid/Carousel Container */}
         <div className="relative group">
           <div 
             ref={scrollRef}
-            className="flex gap-8 overflow-x-auto py-4 scroll-smooth no-scrollbar"
+            className="grid grid-cols-4 gap-x-2 gap-y-4 md:flex md:gap-6 md:overflow-x-auto md:py-4 scroll-smooth no-scrollbar"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {brands.map((brand, idx) => (
+            {brands.slice(0, 8).map((brand, idx) => (
               <div
                 key={idx}
                 onClick={() => navigate(`/brand/${encodeURIComponent(brand.name)}`)}
-                className="flex-none w-[120px] group/item cursor-pointer flex justify-center"
+                className="flex flex-col items-center gap-2 cursor-pointer md:flex-none md:w-[130px] group/item"
               >
-                <div className="w-[120px] h-[120px] rounded-full bg-white border border-gray-300 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center p-5">
+                {/* Blinkit style light teal rounded square */}
+                <div className="w-full aspect-square rounded-2xl bg-[#e8f4f4] hover:bg-[#d8ecec] transition-colors duration-300 flex items-center justify-center p-3 sm:p-4">
                   <img
                     src={brand.logo}
                     alt={brand.name}
-                    className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover/item:scale-105"
+                    className="max-w-full max-h-full object-contain mix-blend-multiply transition-transform duration-300 group-hover/item:scale-105"
                   />
                 </div>
+                <span className="text-[11px] sm:text-sm font-medium text-slate-800 text-center leading-tight line-clamp-2 px-1">
+                  {brand.name}
+                </span>
               </div>
             ))}
           </div>
 
-          {/* Navigation Arrows */}
+          {/* Navigation Arrows (Desktop Only) */}
           <button 
             onClick={() => scroll('left')}
-            className="absolute -left-5 top-[40%] -translate-y-1/2 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-white text-slate-600 shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 hover:text-[#ff6f61]"
+            className="hidden md:flex absolute -left-5 top-[40%] -translate-y-1/2 z-30 h-12 w-12 items-center justify-center rounded-full bg-white text-slate-600 shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 hover:text-[#ff6f61]"
           >
             <ChevronLeft size={24} />
           </button>
 
           <button 
             onClick={() => scroll('right')}
-            className="absolute -right-5 top-[40%] -translate-y-1/2 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-white text-slate-600 shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 hover:text-[#ff6f61]"
+            className="hidden md:flex absolute -right-5 top-[40%] -translate-y-1/2 z-30 h-12 w-12 items-center justify-center rounded-full bg-white text-slate-600 shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 hover:text-[#ff6f61]"
           >
             <ChevronRight size={24} />
           </button>
