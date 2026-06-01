@@ -251,7 +251,6 @@ const MedicinesPage = () => {
                   All products at MediQuick are sourced from verified manufacturers and stored at optimal temperatures.
                 </p>
               </div>
-            </div>
           </aside>
 
           {/* Grid Container */}
@@ -314,7 +313,7 @@ const MedicinesPage = () => {
           </main>
         </div>
       </div>
-      <style>{`
+      <style dangerouslySetInnerHTML={{__html: `
         .custom-scrollbar-hidden::-webkit-scrollbar {
           display: none;
         }
@@ -322,7 +321,7 @@ const MedicinesPage = () => {
           -ms-overflow-style: none;
           scrollbar-width: none;
         }
-      `}</style>
+      `}} />
     </div>
   );
 };
