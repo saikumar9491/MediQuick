@@ -31,7 +31,7 @@ const FeaturedBrands = () => {
   };
 
   return (
-    <section className="bg-slate-50/50 py-12">
+    <section className="bg-white py-12">
       <div className="max-w-[1400px] mx-auto px-5">
         {/* Header Section */}
         <div className="flex items-center justify-between mb-8">
@@ -64,7 +64,7 @@ const FeaturedBrands = () => {
                 onClick={() => navigate(`/brand/${encodeURIComponent(brand.name)}`)}
                 className="flex-none w-[120px] group/item cursor-pointer flex flex-col items-center gap-3"
               >
-                <div className="w-[120px] h-[120px] rounded-full bg-white shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-slate-100 hover:border-[#ff6f61]/30 flex items-center justify-center p-5">
+                <div className="w-[120px] h-[120px] rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-300 border border-slate-100 hover:border-[#ff6f61]/30 flex items-center justify-center p-5">
                   <img
                     src={brand.logo}
                     alt={brand.name}
@@ -81,14 +81,14 @@ const FeaturedBrands = () => {
           {/* Navigation Arrows */}
           <button 
             onClick={() => scroll('left')}
-            className="absolute -left-5 top-[40%] -translate-y-1/2 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-white text-slate-600 shadow-lg border border-slate-100 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 hover:text-[#ff6f61]"
+            className="absolute -left-5 top-[40%] -translate-y-1/2 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-white text-slate-600 shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 hover:text-[#ff6f61]"
           >
             <ChevronLeft size={24} />
           </button>
 
           <button 
             onClick={() => scroll('right')}
-            className="absolute -right-5 top-[40%] -translate-y-1/2 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-white text-slate-600 shadow-lg border border-slate-100 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 hover:text-[#ff6f61]"
+            className="absolute -right-5 top-[40%] -translate-y-1/2 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-white text-slate-600 shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 hover:text-[#ff6f61]"
           >
             <ChevronRight size={24} />
           </button>
