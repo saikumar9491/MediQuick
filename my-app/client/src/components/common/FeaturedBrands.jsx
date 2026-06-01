@@ -63,19 +63,28 @@ const FeaturedBrands = () => {
               <div
                 key={idx}
                 onClick={() => navigate(`/brand/${encodeURIComponent(brand.name)}`)}
-                className="flex flex-col items-center gap-2 cursor-pointer md:flex-none md:w-[130px] group/item"
+                className="flex flex-col items-center gap-2 cursor-pointer md:flex-none md:w-[130px] group/item md:justify-center"
               >
-                {/* Blinkit style light teal rounded square */}
-                <div className="w-full aspect-square rounded-2xl bg-[#e8f4f4] hover:bg-[#d8ecec] transition-colors duration-300 flex items-center justify-center p-3 sm:p-4">
+                {/* MOBILE VIEW: Blinkit style light teal rounded square */}
+                <div className="md:hidden w-full aspect-square rounded-2xl bg-[#e8f4f4] hover:bg-[#d8ecec] transition-colors duration-300 flex items-center justify-center p-3 sm:p-4">
                   <img
                     src={brand.logo}
                     alt={brand.name}
                     className="max-w-full max-h-full object-contain mix-blend-multiply transition-transform duration-300 group-hover/item:scale-105"
                   />
                 </div>
-                <span className="text-[11px] sm:text-sm font-medium text-slate-800 text-center leading-tight line-clamp-2 px-1">
+                <span className="md:hidden text-[11px] sm:text-sm font-medium text-slate-800 text-center leading-tight line-clamp-2 px-1">
                   {brand.name}
                 </span>
+
+                {/* DESKTOP VIEW: White circle with gray border (no text) */}
+                <div className="hidden md:flex w-[120px] h-[120px] rounded-full bg-white border border-gray-300 hover:-translate-y-1 transition-all duration-300 items-center justify-center p-5">
+                  <img
+                    src={brand.logo}
+                    alt={brand.name}
+                    className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover/item:scale-105"
+                  />
+                </div>
               </div>
             ))}
           </div>
