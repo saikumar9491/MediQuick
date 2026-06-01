@@ -282,17 +282,6 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
               box-shadow: 0 4px 15px rgba(0,0,0,0.05);
               border-color: #e2e8f0;
             }
-            .category-inner {
-              width: 100%;
-              height: 100%;
-              border-radius: 8px;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              position: relative;
-              overflow: hidden;
-              transition: all 0.4s ease;
-            }
             .category-image {
               width: 100%;
               height: 100%;
@@ -324,7 +313,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
                     <img src={cat.image} className="w-full h-full object-contain mix-blend-multiply" alt={cat.name} />
                   </div>
                   {/* Desktop Circle/Frame */}
-                  <div className="hidden md:flex category-inner" style={{ backgroundColor: cat.bgColor }}>
+                  <div className="hidden md:flex w-full h-full rounded-lg flex-col items-center relative overflow-hidden transition-all duration-[400ms] ease-out" style={{ backgroundColor: cat.bgColor }}>
                     <img src={cat.image} className="category-image" alt={cat.name} />
                   </div>
                   
