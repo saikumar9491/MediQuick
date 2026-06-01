@@ -117,21 +117,21 @@ const MedicinesPage = () => {
   // Base categories with fallback images
   const baseCategories = [
     { name: 'All', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-    { name: 'Flash Deals', fallback: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=100&h=100&fit=crop' },
-    { name: 'Hair Care', fallback: 'https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=100&h=100&fit=crop' },
-    { name: 'Fitness & Health', fallback: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=100&h=100&fit=crop' },
-    { name: 'Sexual Wellness', fallback: 'https://images.unsplash.com/photo-1577401239170-897942555fb3?w=100&h=100&fit=crop' },
-    { name: 'Vitamins & Nutrition', fallback: 'https://images.unsplash.com/photo-1550572017-edb79903ccfb?w=100&h=100&fit=crop' },
-    { name: 'Diabetes', fallback: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=100&h=100&fit=crop' },
-    { name: 'Cardiac', fallback: 'https://images.unsplash.com/photo-1530497610245-94d3c16cda28?w=100&h=100&fit=crop' },
-    { name: 'Pain Relief', fallback: 'https://images.unsplash.com/photo-1550572017-edb79903ccfb?w=100&h=100&fit=crop' },
-    { name: 'Skin Care', fallback: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&h=100&fit=crop' },
-    { name: 'Oral Care', fallback: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=100&h=100&fit=crop' },
-    { name: 'Elderly Care', fallback: 'https://images.unsplash.com/photo-1516302752946-60124f464010?w=100&h=100&fit=crop' },
-    { name: 'Baby Care', fallback: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=100&h=100&fit=crop' },
-    { name: 'Women Care', fallback: 'https://images.unsplash.com/photo-1601662528567-526cd06f6582?w=100&h=100&fit=crop' },
-    { name: 'Men Grooming', fallback: 'https://images.unsplash.com/photo-1621607512214-68297480165e?w=100&h=100&fit=crop' },
-    { name: 'Ayurveda', fallback: 'https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?w=100&h=100&fit=crop' },
+    { name: 'Flash Deals', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
+    { name: 'Hair Care', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
+    { name: 'Fitness & Health', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
+    { name: 'Sexual Wellness', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
+    { name: 'Vitamins & Nutrition', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
+    { name: 'Diabetes', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
+    { name: 'Cardiac', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
+    { name: 'Pain Relief', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
+    { name: 'Skin Care', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
+    { name: 'Oral Care', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
+    { name: 'Elderly Care', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
+    { name: 'Baby Care', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
+    { name: 'Women Care', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
+    { name: 'Men Grooming', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
+    { name: 'Ayurveda', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
   ];
 
   // Dynamically pull the last product image for each category
@@ -253,8 +253,16 @@ const MedicinesPage = () => {
                       {/* Active indicator bar on mobile */}
                       {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#00a2a4] sm:hidden rounded-r-full" />}
                       
-                      <div className="w-12 h-12 sm:hidden mb-1 bg-white rounded-xl shadow-sm overflow-hidden p-1 border border-slate-100">
-                        <img src={catObj.image} alt={cat} className="w-full h-full object-cover rounded-lg" />
+                      <div className="w-12 h-12 sm:hidden mb-1 bg-white rounded-xl shadow-sm overflow-hidden p-1 border border-slate-100 flex-shrink-0">
+                        <img 
+                          src={catObj.image} 
+                          alt={cat} 
+                          className="w-full h-full object-cover rounded-lg"
+                          onError={(e) => {
+                            e.target.onerror = null; 
+                            e.target.src = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop';
+                          }}
+                        />
                       </div>
                       <span className="text-[9px] sm:text-xs font-bold leading-tight">{cat}</span>
                       {isActive && <ChevronRight className="hidden sm:block h-3 w-3" />}
