@@ -117,25 +117,25 @@ const ConsultPage = () => {
   }, [banners.length]);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pb-20 pt-10">
+    <div className="min-h-screen bg-[#f8fafc] pb-20 pt-8 sm:pt-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* 1. Header Section */}
-        <section className="mb-12 text-center">
+        <section className="mb-6 sm:mb-12 text-center">
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-black uppercase italic tracking-tight text-slate-800 sm:text-5xl"
+            className="text-2xl sm:text-3xl font-black uppercase italic tracking-tight text-slate-800 md:text-5xl"
           >
             Consult <span className="text-[#00a2a4]">Doctors Online</span>
           </motion.h1>
-          <p className="mx-auto mt-4 max-w-2xl text-sm font-bold uppercase tracking-widest text-slate-400">
+          <p className="mx-auto mt-2 sm:mt-4 max-w-2xl text-[10px] sm:text-sm font-bold uppercase tracking-widest text-slate-400 leading-relaxed">
             Get expert advice from certified doctors from the comfort of your home.
           </p>
         </section>
 
         {/* Professional Banner */}
-        <section className="mb-10 overflow-hidden rounded-[2.5rem] bg-slate-900 shadow-2xl border border-slate-100">
+        <section className="mb-8 sm:mb-10 overflow-hidden rounded-2xl sm:rounded-[2.5rem] bg-slate-900 shadow-xl sm:shadow-2xl border border-slate-100">
           <div className="relative h-[160px] sm:h-[220px]">
             <AnimatePresence mode="wait">
               <motion.div
@@ -143,23 +143,23 @@ const ConsultPage = () => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className={`absolute inset-0 bg-gradient-to-br ${banners[currentBanner].bg} p-8 sm:p-12`}
+                className={`absolute inset-0 bg-gradient-to-br ${banners[currentBanner].bg} p-6 sm:p-12`}
               >
-                <div className="absolute right-10 top-1/2 -translate-y-1/2 text-[8rem] opacity-10 select-none">
+                <div className="absolute right-2 sm:right-10 top-1/2 -translate-y-1/2 text-6xl sm:text-[8rem] opacity-10 select-none">
                   {banners[currentBanner].icon}
                 </div>
                 
                 <div className="relative z-10 flex h-full flex-col justify-center">
-                  <span className="mb-3 w-fit rounded-full bg-white/20 px-3 py-0.5 text-[9px] font-black uppercase tracking-widest text-white backdrop-blur-md border border-white/10">
+                  <span className="mb-2 sm:mb-3 w-fit rounded-full bg-white/20 px-2 sm:px-3 py-0.5 text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-white backdrop-blur-md border border-white/10">
                     {banners[currentBanner].tag} SPECIAL
                   </span>
-                  <h2 className="max-w-xl text-xl font-black italic tracking-tighter text-white sm:text-3xl uppercase">
+                  <h2 className="max-w-[200px] sm:max-w-xl text-lg sm:text-xl md:text-3xl font-black italic tracking-tighter text-white uppercase leading-tight">
                     {banners[currentBanner].title}
                   </h2>
-                  <p className="mt-2 max-w-md text-[10px] font-bold text-white/80 sm:text-sm uppercase tracking-widest">
+                  <p className="mt-1 sm:mt-2 max-w-[200px] sm:max-w-md text-[9px] sm:text-[10px] font-bold text-white/80 uppercase tracking-widest line-clamp-2">
                     {banners[currentBanner].desc}
                   </p>
-                  <button className="mt-6 w-fit rounded-xl bg-white px-6 py-2 text-[10px] font-black uppercase tracking-widest text-slate-900 shadow-xl hover:bg-[#00a2a4] hover:text-white transition-all">
+                  <button className="hidden sm:block mt-6 w-fit rounded-xl bg-white px-6 py-2 text-[10px] font-black uppercase tracking-widest text-slate-900 shadow-xl hover:bg-[#00a2a4] hover:text-white transition-all">
                     Consult Now
                   </button>
                 </div>
@@ -181,10 +181,10 @@ const ConsultPage = () => {
         </section>
 
         {/* 2. Doctor Categories (Filter Section) */}
-        <section className="mb-12">
-          <div className="flex items-center gap-2 mb-6">
-            <Filter size={18} className="text-[#00a2a4]" />
-            <h3 className="text-xs font-black uppercase tracking-widest text-slate-800">Choose Specialty</h3>
+        <section className="mb-8 sm:mb-12">
+          <div className="flex items-center gap-2 mb-4 sm:mb-6">
+            <Filter size={16} className="text-[#00a2a4]" />
+            <h3 className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-800">Choose Specialty</h3>
           </div>
           <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar-hidden">
             {categories.map((cat) => (
@@ -205,9 +205,9 @@ const ConsultPage = () => {
         </section>
 
         {/* 3. Doctor Listing Section */}
-        <section className="mb-20">
-          <div className="mb-8 flex items-center justify-between">
-            <h2 className="text-xl font-black uppercase italic tracking-tight text-slate-800">
+        <section className="mb-12 sm:mb-20">
+          <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <h2 className="text-lg sm:text-xl font-black uppercase italic tracking-tight text-slate-800">
               Expert <span className="text-[#00a2a4]">Medical Specialists</span>
             </h2>
             <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">
@@ -215,21 +215,21 @@ const ConsultPage = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredDoctors.map((doc) => (
               <motion.div
                 layout
                 key={doc.id}
-                className="group relative flex flex-col overflow-hidden rounded-[2.5rem] border-2 border-slate-50 bg-white shadow-sm transition-all hover:border-[#00a2a4] hover:shadow-2xl hover:shadow-teal-100"
+                className="group relative flex flex-col sm:flex-row md:flex-col overflow-hidden rounded-2xl sm:rounded-[2.5rem] border-2 border-slate-50 bg-white shadow-sm transition-all hover:border-[#00a2a4] hover:shadow-2xl hover:shadow-teal-100"
               >
                 {/* Doctor Image & Quick Info */}
-                <div className="relative h-64 w-full overflow-hidden bg-slate-100">
+                <div className="relative h-40 sm:h-64 w-1/3 sm:w-full overflow-hidden bg-slate-100 shrink-0">
                   <img 
                     src={doc.image} 
                     alt={doc.name} 
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" 
                   />
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                  <div className="hidden sm:flex absolute bottom-4 left-4 right-4 items-center justify-between">
                     <div className="flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 backdrop-blur-md">
                       <Star size={14} className="fill-amber-400 text-amber-400" />
                       <span className="text-[10px] font-black text-slate-800">{doc.rating} ({doc.reviews})</span>
@@ -240,39 +240,46 @@ const ConsultPage = () => {
                   </div>
                 </div>
 
-                <div className="flex flex-col p-8 flex-1">
-                  <div className="mb-6 flex flex-col">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-[#00a2a4]">{doc.specialty}</span>
+                <div className="flex flex-col p-4 sm:p-8 flex-1">
+                  <div className="mb-3 sm:mb-6 flex flex-col">
+                    <div className="flex sm:hidden items-center justify-between mb-1">
+                      <span className="flex items-center gap-1 text-[9px] font-black text-amber-500">
+                        <Star size={10} className="fill-amber-400" /> {doc.rating}
+                      </span>
+                      <span className="text-[9px] font-black text-[#00a2a4]">{doc.experience} Exp.</span>
+                    </div>
+                    <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-[#00a2a4] leading-tight">{doc.specialty}</span>
                     <h3 className="mt-1 text-2xl font-black uppercase italic tracking-tight text-slate-800 group-hover:text-[#00a2a4] transition-colors">
                       {doc.name}
                     </h3>
                   </div>
 
-                  <div className="mb-8 space-y-3 border-y border-slate-50 py-6">
-                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
-                      <span>Consultation Fee</span>
-                      <span className="text-sm text-slate-800 font-black">₹{doc.fee}</span>
+                  <div className="mb-4 sm:mb-8 space-y-2 sm:space-y-3 border-y border-slate-50 py-3 sm:py-6 mt-auto">
+                    <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400">
+                      <span>Fee</span>
+                      <span className="text-xs sm:text-sm text-slate-800 font-black">₹{doc.fee}</span>
                     </div>
-                    <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-400">
+                    <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400">
                       <span>Available Time</span>
-                      <span className="text-sm text-emerald-600 font-black flex items-center gap-1">
-                        <Clock size={14} /> {doc.time}
+                      <span className="text-[10px] sm:text-sm text-emerald-600 font-black flex items-center gap-1">
+                        <Clock size={12} className="sm:hidden" />
+                        <Clock size={14} className="hidden sm:block" /> {doc.time}
                       </span>
                     </div>
                   </div>
 
-                  <div className="mt-auto flex items-center gap-3">
+                  <div className="mt-auto flex items-center gap-2 sm:gap-3">
                     <button 
                       onClick={() => navigate(`/doctor-details/${doc.id}`)}
-                      className="flex-1 rounded-2xl bg-slate-50 py-4 text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-[#00a2a4] hover:text-white transition-all"
+                      className="flex-1 rounded-xl sm:rounded-2xl bg-slate-50 py-3 sm:py-4 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-600 hover:bg-[#00a2a4] hover:text-white transition-all"
                     >
-                      View Profile
+                      Profile
                     </button>
                     <button 
                       onClick={() => navigate(`/doctor-details/${doc.id}?book=true`)}
-                      className="flex-[1.5] rounded-2xl bg-slate-900 py-4 text-[10px] font-black uppercase tracking-widest text-white shadow-xl shadow-slate-200 hover:bg-[#00a2a4] hover:shadow-teal-100 transition-all"
+                      className="flex-[1.5] rounded-xl sm:rounded-2xl bg-slate-900 py-3 sm:py-4 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-white shadow-lg sm:shadow-xl hover:bg-[#00a2a4] hover:shadow-teal-100 transition-all"
                     >
-                      Consult Now
+                      Consult
                     </button>
                   </div>
                 </div>
@@ -282,12 +289,12 @@ const ConsultPage = () => {
         </section>
 
         {/* Why Consult Online? */}
-        <section className="mb-20 rounded-[3rem] bg-slate-900 p-12 text-white shadow-2xl relative overflow-hidden">
+        <section className="mb-12 sm:mb-20 rounded-3xl sm:rounded-[3rem] bg-slate-900 p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden">
           <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-[#00a2a4]/20 to-transparent" />
           
-          <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 items-center gap-12">
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 items-center gap-8 sm:gap-12">
             <div>
-              <h2 className="text-4xl font-black uppercase italic tracking-tighter sm:text-5xl">
+              <h2 className="text-2xl sm:text-4xl font-black uppercase italic tracking-tighter md:text-5xl">
                 Ready to talk to a <span className="text-[#00a2a4]">Specialist?</span>
               </h2>
               <p className="mt-6 text-sm font-bold text-slate-400 uppercase leading-relaxed tracking-widest">

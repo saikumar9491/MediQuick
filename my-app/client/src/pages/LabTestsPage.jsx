@@ -104,15 +104,15 @@ const LabTestsPage = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pb-20 pt-28">
+    <div className="min-h-screen bg-[#f8fafc] pb-20 pt-20 sm:pt-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* 1. Header Section */}
-        <section className="mb-12 text-center">
+        <section className="mb-6 sm:mb-12 text-center">
           <motion.h1 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-black uppercase italic tracking-tight text-slate-800 sm:text-5xl"
+            className="text-2xl sm:text-3xl font-black uppercase italic tracking-tight text-slate-800 md:text-5xl"
           >
             Book Lab Tests & <span className="text-[#00a2a4]">Health Checkups</span>
           </motion.h1>
@@ -137,8 +137,8 @@ const LabTestsPage = () => {
         </section>
 
         {/* 7. Offers Section */}
-        <section className="mb-16">
-          <div className="rounded-[2rem] bg-gradient-to-r from-[#00a2a4] to-teal-700 p-8 text-white shadow-2xl relative overflow-hidden">
+        <section className="mb-8 sm:mb-16">
+          <div className="rounded-2xl sm:rounded-[2rem] bg-gradient-to-r from-[#00a2a4] to-teal-700 p-5 sm:p-8 text-white shadow-xl relative overflow-hidden">
             <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
             <div className="absolute -left-10 -bottom-10 h-40 w-40 rounded-full bg-black/10 blur-3xl" />
             
@@ -162,10 +162,10 @@ const LabTestsPage = () => {
         </section>
 
         {/* 2. Categories (Filter Section) */}
-        <section className="mb-12">
-          <div className="flex items-center gap-2 mb-6">
-            <Filter size={18} className="text-[#00a2a4]" />
-            <h3 className="text-xs font-black uppercase tracking-widest text-slate-800">Browse by Category</h3>
+        <section className="mb-8 sm:mb-12">
+          <div className="flex items-center gap-2 mb-4 sm:mb-6">
+            <Filter size={16} className="text-[#00a2a4]" />
+            <h3 className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-slate-800">Browse by Category</h3>
           </div>
           <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar-hidden">
             {categories.map((cat) => (
@@ -186,9 +186,9 @@ const LabTestsPage = () => {
         </section>
 
         {/* 3. Popular Tests Section */}
-        <section className="mb-20">
-          <div className="mb-8 flex items-center justify-between">
-            <h2 className="text-xl font-black uppercase italic tracking-tight text-slate-800">
+        <section className="mb-12 sm:mb-20">
+          <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <h2 className="text-lg sm:text-xl font-black uppercase italic tracking-tight text-slate-800">
               Popular <span className="text-[#00a2a4]">Diagnostic Tests</span>
             </h2>
             <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">
@@ -196,15 +196,15 @@ const LabTestsPage = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             {filteredTests.map((test) => (
               <motion.div
                 layout
                 key={test.id}
-                className="group relative flex flex-col overflow-hidden rounded-3xl border-2 border-slate-50 bg-white shadow-sm transition-all hover:border-[#00a2a4] hover:shadow-2xl hover:shadow-teal-100"
+                className="group relative flex flex-col sm:flex-row md:flex-col overflow-hidden rounded-2xl sm:rounded-3xl border-2 border-slate-50 bg-white shadow-sm transition-all hover:border-[#00a2a4] hover:shadow-2xl hover:shadow-teal-100"
               >
                 {/* Image Header */}
-                <div className="h-48 w-full overflow-hidden bg-teal-50">
+                <div className="h-32 sm:h-48 w-full sm:w-1/3 md:w-full overflow-hidden bg-teal-50 shrink-0">
                   <img 
                     src={test.image} 
                     alt={test.name} 
@@ -213,8 +213,8 @@ const LabTestsPage = () => {
                 </div>
 
                 {/* Content Section */}
-                <div className="flex flex-col p-6 flex-1">
-                  <div className="mb-4 flex items-start justify-between">
+                <div className="flex flex-col p-4 sm:p-6 flex-1">
+                  <div className="mb-2 sm:mb-4 flex items-start justify-between">
                     <div className="flex flex-col">
                       <span className="text-[10px] font-black uppercase tracking-widest text-[#00a2a4]">{test.category}</span>
                       <span className="mt-1 flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded w-fit">
@@ -223,19 +223,19 @@ const LabTestsPage = () => {
                     </div>
                   </div>
 
-                  <h3 className="mb-2 text-lg font-black uppercase italic tracking-tight text-slate-800 group-hover:text-[#00a2a4]">
+                  <h3 className="mb-1 sm:mb-2 text-sm sm:text-lg font-black uppercase italic tracking-tight text-slate-800 group-hover:text-[#00a2a4] leading-tight">
                     {test.name}
                   </h3>
-                  <p className="mb-6 text-[11px] font-bold leading-relaxed text-slate-400 line-clamp-2">
+                  <p className="mb-3 sm:mb-6 text-[10px] sm:text-[11px] font-bold leading-relaxed text-slate-400 line-clamp-2">
                     {test.desc}
                   </p>
 
-                  <div className="mb-6 flex items-center gap-4 border-y border-slate-50 py-4">
+                  <div className="mb-4 sm:mb-6 flex items-center gap-4 border-y border-slate-50 py-3 sm:py-4 mt-auto">
                     <div className="flex flex-col">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Price</span>
-                      <div className="flex items-end gap-2">
-                        <span className="text-xl font-black text-slate-800">₹{test.price}</span>
-                        <span className="mb-0.5 text-xs font-bold text-slate-300 line-through">₹{test.mrp}</span>
+                      <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400">Price</span>
+                      <div className="flex items-end gap-1 sm:gap-2">
+                        <span className="text-lg sm:text-xl font-black text-slate-800">₹{test.price}</span>
+                        <span className="mb-0.5 text-[10px] sm:text-xs font-bold text-slate-300 line-through">₹{test.mrp}</span>
                       </div>
                     </div>
                     <div className="ml-auto flex flex-col items-end">
@@ -265,22 +265,22 @@ const LabTestsPage = () => {
         </section>
 
         {/* 6. Why Choose Us Section */}
-        <section className="mb-20 rounded-[3rem] bg-white p-10 shadow-xl shadow-slate-200/50 border border-slate-100">
-          <div className="mb-12 text-center">
-            <h2 className="text-2xl font-black uppercase italic tracking-tight text-slate-800">
-              Why Choose <span className="text-[#00a2a4]">MediQuick Diagnostics?</span>
+        <section className="mb-12 sm:mb-20 rounded-2xl sm:rounded-[3rem] bg-white p-6 sm:p-10 shadow-xl shadow-slate-200/50 border border-slate-100">
+          <div className="mb-8 sm:mb-12 text-center">
+            <h2 className="text-xl sm:text-2xl font-black uppercase italic tracking-tight text-slate-800">
+              Why Choose <span className="text-[#00a2a4]">MediQuick?</span>
             </h2>
-            <p className="mt-2 text-[10px] font-black uppercase tracking-widest text-slate-400">Your health is our top priority</p>
+            <p className="mt-2 text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-slate-400">Your health is our top priority</p>
           </div>
 
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-4 sm:gap-8 md:grid-cols-4">
             {trustPoints.map((point) => (
               <div key={point.title} className="text-center group">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-3xl bg-teal-50 text-[#00a2a4] group-hover:scale-110 group-hover:rotate-3 transition-transform">
+                <div className="mx-auto mb-3 sm:mb-4 flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-2xl sm:rounded-3xl bg-teal-50 text-[#00a2a4] group-hover:scale-110 group-hover:rotate-3 transition-transform">
                   {point.icon}
                 </div>
-                <h4 className="mb-1 text-sm font-black uppercase tracking-widest text-slate-800">{point.title}</h4>
-                <p className="text-[10px] font-bold text-slate-400 uppercase leading-relaxed">{point.desc}</p>
+                <h4 className="mb-1 text-[10px] sm:text-sm font-black uppercase tracking-widest text-slate-800 leading-tight">{point.title}</h4>
+                <p className="hidden sm:block text-[10px] font-bold text-slate-400 uppercase leading-relaxed">{point.desc}</p>
               </div>
             ))}
           </div>

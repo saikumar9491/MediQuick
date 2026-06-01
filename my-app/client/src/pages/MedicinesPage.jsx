@@ -125,32 +125,32 @@ const MedicinesPage = () => {
   }, [banners.length]);
 
   const categories = [
-    'All',
-    'Flash Deals',
-    'Hair Care',
-    'Fitness & Health',
-    'Sexual Wellness',
-    'Vitamins & Nutrition',
-    'Diabetes',
-    'Cardiac',
-    'Pain Relief',
-    'Skin Care',
-    'Oral Care',
-    'Elderly Care',
-    'Baby Care',
-    'Women Care',
-    'Men Grooming',
-    'Ayurveda',
+    { name: 'All', emoji: '🌟' },
+    { name: 'Flash Deals', emoji: '⚡' },
+    { name: 'Hair Care', emoji: '💇' },
+    { name: 'Fitness & Health', emoji: '💪' },
+    { name: 'Sexual Wellness', emoji: '💖' },
+    { name: 'Vitamins & Nutrition', emoji: '💊' },
+    { name: 'Diabetes', emoji: '🩸' },
+    { name: 'Cardiac', emoji: '❤️' },
+    { name: 'Pain Relief', emoji: '🩹' },
+    { name: 'Skin Care', emoji: '✨' },
+    { name: 'Oral Care', emoji: '🦷' },
+    { name: 'Elderly Care', emoji: '👴' },
+    { name: 'Baby Care', emoji: '👶' },
+    { name: 'Women Care', emoji: '👩' },
+    { name: 'Men Grooming', emoji: '👨' },
+    { name: 'Ayurveda', emoji: '🌿' },
   ];
 
   const filteredMedicines = medicines; 
 
   return (
     <div className="min-h-screen bg-[#f8fafc] pb-20 pt-6">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-0 sm:px-6 lg:px-8">
         
-        {/* Portal Banner */}
-        <section className="mb-10 overflow-hidden rounded-2xl bg-slate-900 shadow-sm border border-slate-100">
+        {/* Portal Banner - Hidden on mobile to save space for grid */}
+        <section className="hidden md:block mb-10 overflow-hidden rounded-2xl bg-slate-900 shadow-sm border border-slate-100 mx-4 sm:mx-0">
           <div className="relative h-[180px] sm:h-[240px]">
             <AnimatePresence mode="wait">
               <motion.div
@@ -192,21 +192,23 @@ const MedicinesPage = () => {
           </div>
         </section>
 
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-row gap-0 sm:gap-8 bg-white sm:bg-transparent min-h-screen sm:min-h-0">
           
           {/* Sidebar */}
-          <aside className="w-full lg:w-64 shrink-0">
-            <div className="sticky top-28 space-y-6">
-              <div className="rounded-xl bg-white p-5 shadow-sm border border-slate-100">
-                <div className="mb-6 flex items-center justify-between border-b border-slate-50 pb-4">
-                  <div className="flex items-center gap-2">
-                    <ListFilter className="h-4 w-4 text-blue-600" />
-                    <h3 className="text-sm font-black uppercase tracking-widest text-slate-900">Categories</h3>
-                  </div>
+          <aside className="w-[80px] sm:w-64 shrink-0 bg-[#f4f6f9] sm:bg-transparent border-r border-slate-100 sm:border-0 h-[calc(100vh-64px)] sm:h-auto overflow-y-auto custom-scrollbar-hidden sticky top-16 sm:top-28">
+            <div className="space-y-0 sm:space-y-6 sm:bg-white sm:p-5 sm:rounded-xl sm:shadow-sm sm:border sm:border-slate-100">
+              <div className="hidden sm:flex mb-6 items-center justify-between border-b border-slate-50 pb-4">
+                <div className="flex items-center gap-2">
+                  <ListFilter className="h-4 w-4 text-blue-600" />
+                  <h3 className="text-sm font-black uppercase tracking-widest text-slate-900">Categories</h3>
                 </div>
+              </div>
 
-                <div className="flex flex-wrap gap-1.5 lg:flex-col lg:gap-1">
-                  {categories.map((cat) => (
+              <div className="flex flex-col gap-0 sm:gap-1">
+                {categories.map((catObj) => {
+                  const cat = catObj.name;
+                  const isActive = filter === cat;
+                  return (
                     <button
                       key={cat}
                       onClick={() => {
@@ -221,21 +223,26 @@ const MedicinesPage = () => {
                           navigate(`/medicines?filter=${slug}`);
                         }
                       }}
-                      className={`flex items-center justify-between rounded-lg px-4 py-2.5 text-xs font-bold transition-all ${
-                        filter === cat
-                          ? 'bg-blue-600 text-white shadow-md shadow-blue-100'
-                          : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'
+                      className={`relative flex flex-col sm:flex-row items-center justify-center sm:justify-between py-3 sm:px-4 sm:py-2.5 text-center sm:text-left transition-all ${
+                        isActive
+                          ? 'bg-white sm:bg-blue-600 text-slate-900 sm:text-white shadow-sm sm:shadow-md sm:shadow-blue-100 sm:rounded-lg'
+                          : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900 sm:rounded-lg'
                       }`}
                     >
-                      <span>{cat}</span>
-                      {filter === cat && <ChevronRight className="h-3 w-3" />}
+                      {/* Active indicator bar on mobile */}
+                      {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-500 sm:hidden rounded-r-full" />}
+                      
+                      <div className="text-2xl sm:hidden mb-1 bg-white p-2 rounded-full shadow-sm">{catObj.emoji}</div>
+                      <span className="text-[9px] sm:text-xs font-bold leading-tight">{cat}</span>
+                      {isActive && <ChevronRight className="hidden sm:block h-3 w-3" />}
                     </button>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
+            </div>
 
-              {/* Trust Section */}
-              <div className="rounded-xl bg-slate-900 p-6 text-white shadow-lg relative overflow-hidden">
+            {/* Trust Section - Hidden on mobile */}
+            <div className="hidden sm:block mt-6 rounded-xl bg-slate-900 p-6 text-white shadow-lg relative overflow-hidden">
                 <div className="absolute -right-6 -bottom-6 h-20 w-20 rounded-full bg-blue-600/20 blur-xl" />
                 <h4 className="text-xs font-black uppercase tracking-widest mb-4 flex items-center gap-2">
                   <CheckCircle2 size={14} className="text-blue-400" /> Guaranteed Quality
@@ -248,8 +255,8 @@ const MedicinesPage = () => {
           </aside>
 
           {/* Grid Container */}
-          <main className="flex-1 min-w-0">
-            <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <main className="flex-1 min-w-0 bg-white sm:bg-transparent p-2 sm:p-0">
+            <div className="hidden sm:flex mb-8 flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div>
                 <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">
                   {filter} {subFilter && <span className="text-blue-600">› {subFilter}</span>} <span className="text-blue-600">Items</span>
@@ -268,13 +275,13 @@ const MedicinesPage = () => {
             </div>
 
             {loading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
                 {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                  <div key={n} className="aspect-[4/5] animate-pulse rounded-xl bg-white border border-slate-100" />
+                  <div key={n} className="aspect-[4/5] animate-pulse rounded-xl bg-slate-100 border border-slate-100" />
                 ))}
               </div>
             ) : filteredMedicines.length > 0 ? (
-              <motion.div layout className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+              <motion.div layout className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
                 <AnimatePresence>
                   {filteredMedicines.map((med) => (
                     <motion.div
@@ -307,6 +314,15 @@ const MedicinesPage = () => {
           </main>
         </div>
       </div>
+      <style>{`
+        .custom-scrollbar-hidden::-webkit-scrollbar {
+          display: none;
+        }
+        .custom-scrollbar-hidden {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 };
