@@ -64,11 +64,11 @@ const FeaturedBrands = () => {
                 onClick={() => navigate(`/brand/${encodeURIComponent(brand.name)}`)}
                 className="flex-none w-[120px] group/item cursor-pointer flex justify-center"
               >
-                <div className="w-[120px] h-[120px] rounded-full bg-white shadow-[0_4px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] hover:-translate-y-2 transition-all duration-300 border border-slate-100 hover:border-[#ff6f61]/30 flex items-center justify-center p-5">
+                <div className="w-[120px] h-[120px] rounded-full bg-white border border-slate-100 hover:border-[#ff6f61]/30 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center p-5">
                   <img
                     src={brand.logo}
                     alt={brand.name}
-                    className="max-w-full max-h-full object-contain grayscale opacity-70 group-hover/item:grayscale-0 group-hover/item:opacity-100 transition-all duration-300"
+                    className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover/item:scale-105"
                   />
                 </div>
               </div>
