@@ -240,9 +240,9 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-sm">
       <div className="border-b border-slate-100 bg-white px-4 py-2 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 lg:gap-8">
+        <div className="mx-auto hidden lg:flex max-w-[1440px] items-center justify-between gap-4 lg:gap-8">
           
-          {/* Logo */}
+          {/* Logo (Desktop) */}
           <Link to="/" className="flex shrink-0 items-center gap-2">
             <div className="flex h-7 w-7 items-center justify-center rounded bg-[#00a2a4] text-white">
               <ShoppingBag size={16} strokeWidth={3} />
@@ -252,25 +252,10 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* User & Cart (Mobile) */}
-          <div className="flex items-center gap-3 lg:hidden">
-            <Link to="/cart" className="relative text-slate-700">
-              <ShoppingCart size={22} />
-              {cartItems.length > 0 && (
-                <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#ff6f61] text-[9px] font-bold text-white shadow-sm">
-                  {cartItems.length}
-                </span>
-              )}
-            </Link>
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="rounded-lg p-1 text-slate-900">
-              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-
-          {/* Location Selector (Desktop Only) */}
+          {/* Location Selector (Desktop) */}
           <div 
             onClick={handleDetectLocation}
-            className="hidden lg:flex items-center gap-2 px-3 py-1.5 hover:bg-slate-50 transition-colors cursor-pointer group shrink-0 border-r border-slate-100 pr-6"
+            className="flex items-center gap-2 px-3 py-1.5 hover:bg-slate-50 transition-colors cursor-pointer group shrink-0 border-r border-slate-100 pr-6"
           >
             <MapPin size={18} className="text-slate-400 group-hover:text-[#00a2a4]" />
             <div className="flex flex-col">
@@ -282,7 +267,7 @@ const Navbar = () => {
           </div>
 
           {/* Search Bar (Desktop) */}
-          <div className="hidden lg:block relative flex-1 group min-w-[300px]">
+          <div className="relative flex-1 group min-w-[300px]">
             <form onSubmit={handleSearch} className="relative w-full">
               <input
                 type="text"
@@ -344,7 +329,7 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Actions */}
-          <div className="hidden items-center gap-6 xl:flex shrink-0 relative">
+          <div className="flex items-center gap-6 shrink-0 relative">
             <div 
               onMouseEnter={() => setShowFlashDeals(true)}
               onMouseLeave={() => setShowFlashDeals(false)}
@@ -395,84 +380,104 @@ const Navbar = () => {
                 </motion.div>
               )}
             </AnimatePresence>
+          </div>
 
-            {/* User & Cart (Desktop) */}
-            <div className="flex items-center gap-5 border-l border-slate-100 pl-6">
-              {user ? (
-                <div 
-                  className="relative group cursor-pointer"
-                  onMouseEnter={() => setShowUserDropdown(true)}
-                  onMouseLeave={() => setShowUserDropdown(false)}
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden group-hover:border-teal-400 transition-colors">
-                      {user.image ? <img src={user.image} className="h-full w-full object-cover" alt="" /> : <User size={16} className="text-slate-400" />}
-                    </div>
-                    <ChevronDown size={14} className={`text-slate-400 transition-transform ${showUserDropdown ? 'rotate-180' : ''}`} />
+          {/* User & Cart (Desktop) */}
+          <div className="flex items-center gap-5 border-l border-slate-100 pl-6">
+            {user ? (
+              <div 
+                className="relative group cursor-pointer"
+                onMouseEnter={() => setShowUserDropdown(true)}
+                onMouseLeave={() => setShowUserDropdown(false)}
+              >
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden group-hover:border-teal-400 transition-colors">
+                    {user.image ? <img src={user.image} className="h-full w-full object-cover" alt="" /> : <User size={16} className="text-slate-400" />}
                   </div>
-
-                  <AnimatePresence>
-                    {showUserDropdown && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        className="absolute right-0 top-full z-[70] mt-2 w-52 rounded-xl bg-white p-2 shadow-2xl border border-slate-100"
-                      >
-                        <div className="px-3 py-2 border-b border-slate-50 mb-1">
-                          <p className="truncate text-[10px] font-bold text-slate-400 uppercase tracking-widest">{user.email}</p>
-                        </div>
-                        {user.isAdmin && (
-                          <Link to="/admin-dashboard" className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-[#00a2a4] hover:bg-teal-50 transition-colors">
-                            <ShieldCheck size={14} /> Admin Dashboard
-                          </Link>
-                        )}
-                        <Link to="/profile" className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-colors">
-                          <User size={14} /> My Profile
-                        </Link>
-                        <Link to="/my-orders" className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-colors">
-                          <ClipboardList size={14} /> My Orders
-                        </Link>
-                        <Link to="/wishlist" className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-colors">
-                          <Heart size={14} /> My Wishlist
-                        </Link>
-                        <button onClick={logout} className="w-full flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-red-500 hover:bg-red-50 transition-colors border-t border-slate-50 mt-1">
-                          <LogOut size={14} /> Logout
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  <ChevronDown size={14} className={`text-slate-400 transition-transform ${showUserDropdown ? 'rotate-180' : ''}`} />
                 </div>
-              ) : (
-                <Link to="/login" className="text-[13px] font-bold text-slate-700 hover:text-[#00a2a4] whitespace-nowrap">
-                  Login | Signup
-                </Link>
-              )}
-              
-              <Link to="/cart" className="relative text-slate-700 hover:text-[#00a2a4] transition-colors">
-                <ShoppingCart size={22} />
-                {cartItems.length > 0 && (
-                  <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#ff6f61] text-[9px] font-bold text-white shadow-sm">
-                    {cartItems.length}
-                  </span>
-                )}
+
+                <AnimatePresence>
+                  {showUserDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                      className="absolute right-0 top-full z-[70] mt-2 w-52 rounded-xl bg-white p-2 shadow-2xl border border-slate-100"
+                    >
+                      <div className="px-3 py-2 border-b border-slate-50 mb-1">
+                        <p className="truncate text-[10px] font-bold text-slate-400 uppercase tracking-widest">{user.email}</p>
+                      </div>
+                      {user.isAdmin && (
+                        <Link to="/admin-dashboard" className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-[#00a2a4] hover:bg-teal-50 transition-colors">
+                          <ShieldCheck size={14} /> Admin Dashboard
+                        </Link>
+                      )}
+                      <Link to="/profile" className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-colors">
+                        <User size={14} /> My Profile
+                      </Link>
+                      <Link to="/my-orders" className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-colors">
+                        <ClipboardList size={14} /> My Orders
+                      </Link>
+                      <Link to="/wishlist" className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-slate-600 hover:bg-slate-50 transition-colors">
+                        <Heart size={14} /> My Wishlist
+                      </Link>
+                      <button onClick={logout} className="w-full flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-red-500 hover:bg-red-50 transition-colors border-t border-slate-50 mt-1">
+                        <LogOut size={14} /> Logout
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <Link to="/login" className="text-[13px] font-bold text-slate-700 hover:text-[#00a2a4] whitespace-nowrap">
+                Login | Signup
               </Link>
-            </div>
+            )}
+            
+            <Link to="/cart" className="relative text-slate-700 hover:text-[#00a2a4] transition-colors">
+              <ShoppingCart size={22} />
+              {cartItems.length > 0 && (
+                <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#ff6f61] text-[9px] font-bold text-white shadow-sm">
+                  {cartItems.length}
+                </span>
+              )}
+            </Link>
           </div>
         </div>
 
-        {/* Mobile Search Row (Tata 1mg Style) */}
-        <div className="mt-3 lg:hidden pb-2">
-          <form onSubmit={handleSearch} className="relative w-full">
-            <input
-              type="text"
-              placeholder="Search for Medicines, Health Products"
-              className="w-full rounded-xl bg-slate-50 border border-slate-100 px-10 py-3 text-[14px] font-medium outline-none transition-all focus:border-[#00a2a4] focus:bg-white"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-          </form>
+        {/* Mobile Header (Blinkit Style) */}
+        <div className="flex flex-col lg:hidden w-full pt-1 pb-2">
+           <div className="flex justify-between items-center w-full mb-3">
+              <div className="flex flex-col cursor-pointer" onClick={handleDetectLocation}>
+                 <span className="text-[20px] font-black text-slate-900 leading-tight">Delivery in 10 minutes</span>
+                 <div className="flex items-center gap-1 text-slate-600 mt-0.5">
+                     <span className="text-[13px] truncate max-w-[220px]">Near, {isDetecting ? 'Detecting...' : locationName}</span>
+                     <ChevronDown size={14}/>
+                 </div>
+              </div>
+              <div 
+                className="h-9 w-9 rounded-full bg-white flex items-center justify-center border-2 border-slate-900 overflow-hidden shadow-sm"
+                onClick={() => setIsMenuOpen(true)}
+              >
+                 {user?.image ? (
+                   <img src={user.image} className="h-full w-full object-cover" alt="" />
+                 ) : (
+                   <User size={20} className="text-slate-800" />
+                 )}
+              </div>
+           </div>
+           
+           <form onSubmit={handleSearch} className="relative w-full">
+             <input
+               type="text"
+               placeholder="Search for medicines..."
+               className="w-full rounded-xl bg-slate-50 border border-slate-100 px-10 py-3 text-[14px] font-medium outline-none transition-all focus:border-[#00a2a4] focus:bg-white"
+               value={searchQuery}
+               onChange={(e) => setSearchQuery(e.target.value)}
+             />
+             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+           </form>
         </div>
       </div>
 

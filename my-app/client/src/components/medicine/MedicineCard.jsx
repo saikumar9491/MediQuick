@@ -70,69 +70,125 @@ const MedicineCard = ({ _id, name, brand, price, image, discountPrice, isFlashDe
   };
 
   return (
-    <motion.div
-      onClick={() => navigate(`/product/${_id}`)}
-      className="group relative flex w-full h-full flex-col bg-white transition-all duration-300 border border-slate-100 hover:border-black rounded-xl overflow-hidden"
-    >
-      {/* Wishlist Icon */}
-      <button 
-        onClick={handleWishlistToggle}
-        className={`absolute top-3 right-3 z-20 transition-colors bg-white/80 backdrop-blur-sm p-1.5 rounded-full shadow-sm sm:opacity-0 group-hover:opacity-100 transition-all ${
-          isInWishlist ? 'text-red-500 opacity-100' : 'text-slate-300 hover:text-red-500'
-        }`}
+    <>
+      {/* ---------------- MOBILE VIEW (Blinkit Style) ---------------- */}
+      <motion.div
+        onClick={() => navigate(`/product/${_id}`)}
+        className="group md:hidden relative flex w-full h-full flex-col bg-white border border-slate-200 rounded-xl overflow-hidden"
       >
-        <Heart size={16} fill={isInWishlist ? "currentColor" : "none"} />
-      </button>
-
-      {/* Image Container */}
-      <div className="relative flex h-[160px] sm:h-[180px] w-full items-center justify-center bg-white p-2 sm:p-4">
-        <img
-          src={image || 'https://placehold.co/300x300?text=Medicine'}
-          alt={name}
-          className="h-full w-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
-        />
-        
-        {/* Flash Deal Tag */}
-        {isFlashDeal && (
-          <div className="absolute bottom-2 left-2 bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest shadow-lg shadow-red-200">
-            Flash Deal
+        {/* Discount Badge */}
+        {discountPercent > 0 && (
+          <div className="absolute top-0 left-0 bg-blue-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-br-lg z-10">
+            {discountPercent}% OFF
           </div>
         )}
-      </div>
 
-      {/* Content */}
-      <div className="flex flex-1 flex-col px-3 pb-3 pt-1">
-        <p className="mb-0.5 text-[9px] font-black uppercase tracking-widest text-slate-400">
-          {brand}
-        </p>
-        <h3 className="mb-1 line-clamp-2 min-h-[30px] text-[12px] font-bold leading-tight text-slate-800 group-hover:text-[#00a2a4] transition-colors">
-          {name}
-        </h3>
-        
-        {/* Rating Pill */}
-        <div className="flex items-center gap-1.5 mb-2">
-          <div className="flex items-center gap-0.5 bg-green-600 text-white px-1.5 py-0.5 rounded text-[10px] font-black">
-            {rating} <Star size={8} fill="white" stroke="white" />
-          </div>
-          <span className="text-[10px] text-slate-400 font-bold">({numReviews})</span>
+        {/* Image Container */}
+        <div className="relative flex h-[110px] w-full items-center justify-center p-2 bg-white">
+          <img
+            src={image || 'https://placehold.co/300x300?text=Medicine'}
+            alt={name}
+            className="h-full w-full object-contain mix-blend-multiply"
+          />
         </div>
 
-        <div className="mt-auto space-y-2">
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[15px] font-black text-slate-900 leading-none">₹{finalPrice}</span>
-            <span className="text-[11px] text-slate-400 line-through leading-none mt-0.5">₹{mrp}</span>
-            <span className="text-[11px] font-black text-green-600 leading-none mt-0.5">{discountPercent}% off</span>
+        {/* Content */}
+        <div className="flex flex-1 flex-col px-2 pb-2">
+          {/* Delivery Tag */}
+          <div className="flex items-center text-[9px] font-bold text-slate-500 mb-1 bg-slate-50 w-fit px-1 py-0.5 rounded">
+            <span className="text-[10px] mr-1">⏱</span> 10 MINS
           </div>
+
+          <h3 className="line-clamp-2 text-[11px] font-bold leading-tight text-slate-800">
+            {name}
+          </h3>
+          <span className="text-[10px] text-slate-400 mt-0.5 mb-2 line-clamp-1">
+            {category || brand}
+          </span>
+
+          <div className="mt-auto flex items-end justify-between w-full">
+            <div className="flex flex-col">
+              <span className="text-[14px] font-black text-slate-900 leading-none">₹{finalPrice}</span>
+              {mrp > finalPrice && (
+                <span className="text-[10px] text-slate-400 line-through leading-none mt-1">₹{mrp}</span>
+              )}
+            </div>
+            
+            <button
+              onClick={handleAdd}
+              className="rounded-md border border-green-600 bg-green-50 px-4 py-1 text-[11px] font-bold text-green-700 active:bg-green-100 transition-colors"
+            >
+              ADD
+            </button>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ---------------- DESKTOP VIEW (Original Style) ---------------- */}
+      <motion.div
+        onClick={() => navigate(`/product/${_id}`)}
+        className="hidden md:flex group relative w-full h-full flex-col bg-white transition-all duration-300 border border-slate-100 hover:border-black rounded-xl overflow-hidden"
+      >
+        {/* Wishlist Icon */}
+        <button 
+          onClick={handleWishlistToggle}
+          className={`absolute top-3 right-3 z-20 transition-colors bg-white/80 backdrop-blur-sm p-1.5 rounded-full shadow-sm md:opacity-0 group-hover:opacity-100 transition-all ${
+            isInWishlist ? 'text-red-500 md:opacity-100' : 'text-slate-300 hover:text-red-500'
+          }`}
+        >
+          <Heart size={16} fill={isInWishlist ? "currentColor" : "none"} />
+        </button>
+
+        {/* Image Container */}
+        <div className="relative flex h-[180px] w-full items-center justify-center bg-white p-4">
+          <img
+            src={image || 'https://placehold.co/300x300?text=Medicine'}
+            alt={name}
+            className="h-full w-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500"
+          />
           
-          <button
-            onClick={handleAdd}
-            className="w-full flex items-center justify-center rounded-lg border-2 border-[#ff6f61]/10 bg-[#ff6f61]/5 py-2 text-[10px] font-black uppercase tracking-widest text-[#ff6f61] transition-all hover:bg-[#ff6f61] hover:text-white hover:border-[#ff6f61] shadow-sm active:scale-95"
-          >
-            Add to Bag
-          </button>
+          {/* Flash Deal Tag */}
+          {isFlashDeal && (
+            <div className="absolute bottom-2 left-2 bg-red-500 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest shadow-lg shadow-red-200">
+              Flash Deal
+            </div>
+          )}
         </div>
-      </div>
-    </motion.div>
+
+        {/* Content */}
+        <div className="flex flex-1 flex-col px-3 pb-3 pt-1">
+          <p className="mb-0.5 text-[9px] font-black uppercase tracking-widest text-slate-400">
+            {brand}
+          </p>
+          <h3 className="mb-1 line-clamp-2 min-h-[30px] text-[12px] font-bold leading-tight text-slate-800 group-hover:text-[#00a2a4] transition-colors">
+            {name}
+          </h3>
+          
+          {/* Rating Pill */}
+          <div className="flex items-center gap-1.5 mb-2">
+            <div className="flex items-center gap-0.5 bg-green-600 text-white px-1.5 py-0.5 rounded text-[10px] font-black">
+              {rating} <Star size={8} fill="white" stroke="white" />
+            </div>
+            <span className="text-[10px] text-slate-400 font-bold">({numReviews})</span>
+          </div>
+
+          <div className="mt-auto space-y-2">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[15px] font-black text-slate-900 leading-none">₹{finalPrice}</span>
+              <span className="text-[11px] text-slate-400 line-through leading-none mt-0.5">₹{mrp}</span>
+              <span className="text-[11px] font-black text-green-600 leading-none mt-0.5">{discountPercent}% off</span>
+            </div>
+            
+            <button
+              onClick={handleAdd}
+              className="w-full flex items-center justify-center rounded-lg border-2 border-[#ff6f61]/10 bg-[#ff6f61]/5 py-2 text-[10px] font-black uppercase tracking-widest text-[#ff6f61] transition-all hover:bg-[#ff6f61] hover:text-white hover:border-[#ff6f61] shadow-sm active:scale-95"
+            >
+              Add to Bag
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </>
   );
 };
 

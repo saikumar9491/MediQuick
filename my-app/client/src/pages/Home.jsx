@@ -253,16 +253,16 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       </section>
 
       {/* Shop by Categories */}
-      <section className="bg-white py-10">
-        <div className="mx-auto max-w-[1400px] px-5">
-          <div className="flex items-center justify-between mb-1">
-            <h2 className="text-[22px] font-semibold text-[#212121] tracking-tight">
+      <section className="bg-white py-4 md:py-10">
+        <div className="mx-auto max-w-[1400px] px-3 md:px-5">
+          <div className="flex items-center justify-between mb-3 md:mb-1">
+            <h2 className="text-xl md:text-[22px] font-bold md:font-semibold text-slate-900 md:text-[#212121] tracking-tight">
               Shop by categories
             </h2>
           </div>
 
-          {/* Gradient Underline */}
-          <div className="w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
+          {/* Gradient Underline (Desktop Only) */}
+          <div className="hidden md:block w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
 
           <style>{`
             .custom-scrollbar-hidden::-webkit-scrollbar { display: none; }
@@ -305,10 +305,10 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
             }
           `}</style>
           
-          <div className="relative group">
+          <div className="relative group mt-2 md:mt-0">
             <div 
               ref={categoryScrollRef}
-              className="custom-scrollbar-hidden flex gap-5 overflow-x-auto pt-4 pb-8 scroll-smooth px-2"
+              className="grid grid-cols-4 gap-x-2 gap-y-4 md:flex md:gap-5 md:overflow-x-auto md:pt-4 md:pb-8 scroll-smooth md:px-2"
             >
               {mainCategories.map((cat, idx) => (
                 <motion.div
@@ -317,18 +317,28 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: idx * 0.05 }}
                   onClick={() => navigate(cat.path)}
-                  className="category-frame group/item"
+                  className="flex flex-col items-center gap-1.5 md:block md:category-frame group/item cursor-pointer"
                 >
-                  <div className="category-inner" style={{ backgroundColor: cat.bgColor }}>
+                  {/* Mobile Square */}
+                  <div className="md:hidden w-full aspect-square rounded-2xl bg-[#e8f4f4] flex items-center justify-center p-2.5">
+                    <img src={cat.image} className="w-full h-full object-contain mix-blend-multiply" alt={cat.name} />
+                  </div>
+                  {/* Desktop Circle/Frame */}
+                  <div className="hidden md:flex category-inner" style={{ backgroundColor: cat.bgColor }}>
                     <img src={cat.image} className="category-image" alt={cat.name} />
                   </div>
+                  
+                  {/* Mobile Text */}
+                  <span className="md:hidden text-[11px] font-medium text-slate-800 text-center leading-tight line-clamp-2 px-1">
+                    {cat.name}
+                  </span>
                 </motion.div>
               ))}
             </div>
 
             <button 
               onClick={() => categoryScrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' })}
-              className="absolute -right-4 top-[40%] -translate-y-1/2 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-400 shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ff6f61]"
+              className="hidden md:flex absolute -right-4 top-[40%] -translate-y-1/2 z-30 h-11 w-11 items-center justify-center rounded-full bg-white text-slate-400 shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ff6f61]"
             >
               <ChevronRight size={24} />
             </button>
@@ -337,45 +347,50 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       </section>
 
       {/* Trending Products */}
-      <section className="bg-white py-10">
-        <div className="mx-auto max-w-[1400px] px-5">
-          <div className="flex items-center justify-between mb-1">
-            <h2 className="text-[22px] font-semibold text-[#212121] tracking-tight">
+      <section className="bg-white py-4 md:py-10">
+        <div className="mx-auto max-w-[1400px] px-3 md:px-5">
+          <div className="flex items-center justify-between mb-3 md:mb-1">
+            <h2 className="text-xl md:text-[22px] font-bold md:font-semibold text-slate-900 md:text-[#212121] tracking-tight">
               Trending products
             </h2>
             <button 
               onClick={() => navigate('/all-medicines')} 
-              className="flex items-center gap-1 text-[#ff6f61] font-medium text-[14px] px-3.5 py-1.5 rounded-[4px] border border-[#ff6f61] hover:bg-[#ff6f61] hover:text-white transition-all duration-200"
+              className="md:hidden text-[#00a2a4] font-bold text-[13px]"
+            >
+              see all
+            </button>
+            <button 
+              onClick={() => navigate('/all-medicines')} 
+              className="hidden md:flex items-center gap-1 text-[#ff6f61] font-medium text-[14px] px-3.5 py-1.5 rounded-[4px] border border-[#ff6f61] hover:bg-[#ff6f61] hover:text-white transition-all duration-200"
             >
               See all <ChevronRight size={16} />
             </button>
           </div>
 
-          {/* Gradient Underline */}
-          <div className="w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
+          {/* Gradient Underline (Desktop Only) */}
+          <div className="hidden md:block w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
 
           <div className="relative group">
             {loading ? (
-              <div className="flex gap-6 overflow-hidden">
+              <div className="flex gap-4 md:gap-6 overflow-hidden">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="min-w-[200px] h-72 animate-pulse rounded-xl bg-slate-100" />
+                  <div key={i} className="min-w-[150px] md:min-w-[200px] h-56 md:h-72 animate-pulse rounded-xl bg-slate-100" />
                 ))}
               </div>
             ) : (
               <div 
                 ref={trendingScrollRef}
-                className="custom-scrollbar-hidden flex items-stretch gap-6 overflow-x-auto pt-4 pb-8 scroll-smooth px-2"
+                className="custom-scrollbar-hidden flex items-stretch gap-4 md:gap-6 overflow-x-auto md:pt-4 pb-4 md:pb-8 scroll-smooth md:px-2"
               >
                 {medicines.filter(m => m.isTrending).length > 0 ? (
                   medicines.filter(m => m.isTrending).map((med) => (
-                    <div key={med._id} className="min-w-[220px] max-w-[220px] flex">
+                    <div key={med._id} className="min-w-[140px] max-w-[140px] md:min-w-[220px] md:max-w-[220px] flex">
                       <MedicineCard {...med} />
                     </div>
                   ))
                 ) : (
-                  // Fallback to first 10 if none marked as trending (optional, but good for initial state)
                   medicines.slice(0, 10).map((med) => (
-                    <div key={med._id} className="min-w-[220px] max-w-[220px] flex">
+                    <div key={med._id} className="min-w-[140px] max-w-[140px] md:min-w-[220px] md:max-w-[220px] flex">
                       <MedicineCard {...med} />
                     </div>
                   ))
@@ -386,7 +401,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
             {!loading && (
               <button 
                 onClick={() => trendingScrollRef.current?.scrollBy({ left: 440, behavior: 'smooth' })}
-                className="absolute -right-4 top-[40%] -translate-y-1/2 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-400 shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ff6f61]"
+                className="hidden md:flex absolute -right-4 top-[40%] -translate-y-1/2 z-30 h-11 w-11 items-center justify-center rounded-full bg-white text-slate-400 shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ff6f61]"
               >
                 <ChevronRight size={24} />
               </button>
@@ -396,38 +411,44 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       </section>
 
       {/* Skin Care Products */}
-      <section className="bg-white py-10">
-        <div className="mx-auto max-w-[1400px] px-5">
-          <div className="flex items-center justify-between mb-1">
-            <h2 className="text-[22px] font-semibold text-[#212121] tracking-tight">
+      <section className="bg-white py-4 md:py-10">
+        <div className="mx-auto max-w-[1400px] px-3 md:px-5">
+          <div className="flex items-center justify-between mb-3 md:mb-1">
+            <h2 className="text-xl md:text-[22px] font-bold md:font-semibold text-slate-900 md:text-[#212121] tracking-tight">
               Skin Care
             </h2>
             <button 
               onClick={() => navigate('/medicines?filter=skin-care')} 
-              className="flex items-center gap-1 text-[#ff6f61] font-medium text-[14px] px-3.5 py-1.5 rounded-[4px] border border-[#ff6f61] hover:bg-[#ff6f61] hover:text-white transition-all duration-200"
+              className="md:hidden text-[#00a2a4] font-bold text-[13px]"
+            >
+              see all
+            </button>
+            <button 
+              onClick={() => navigate('/medicines?filter=skin-care')} 
+              className="hidden md:flex items-center gap-1 text-[#ff6f61] font-medium text-[14px] px-3.5 py-1.5 rounded-[4px] border border-[#ff6f61] hover:bg-[#ff6f61] hover:text-white transition-all duration-200"
             >
               See all <ChevronRight size={16} />
             </button>
           </div>
 
           {/* Gradient Underline */}
-          <div className="w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
+          <div className="hidden md:block w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
 
           <div className="relative group">
             {loading ? (
-              <div className="flex gap-6 overflow-hidden">
+              <div className="flex gap-4 md:gap-6 overflow-hidden">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="min-w-[200px] h-72 animate-pulse rounded-xl bg-slate-100" />
+                  <div key={i} className="min-w-[150px] md:min-w-[200px] h-56 md:h-72 animate-pulse rounded-xl bg-slate-100" />
                 ))}
               </div>
             ) : (
               <div 
                 ref={skinCareScrollRef}
-                className="custom-scrollbar-hidden flex items-stretch gap-6 overflow-x-auto pt-4 pb-8 scroll-smooth px-2"
+                className="custom-scrollbar-hidden flex items-stretch gap-4 md:gap-6 overflow-x-auto md:pt-4 pb-4 md:pb-8 scroll-smooth md:px-2"
               >
                 {medicines.filter(m => m.category === 'Skin Care').length > 0 ? (
                   medicines.filter(m => m.category === 'Skin Care').map((med) => (
-                    <div key={med._id} className="min-w-[220px] max-w-[220px] flex">
+                    <div key={med._id} className="min-w-[140px] max-w-[140px] md:min-w-[220px] md:max-w-[220px] flex">
                       <MedicineCard {...med} />
                     </div>
                   ))
@@ -442,7 +463,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
             {!loading && medicines.filter(m => m.category === 'Skin Care').length > 0 && (
               <button 
                 onClick={() => skinCareScrollRef.current?.scrollBy({ left: 440, behavior: 'smooth' })}
-                className="absolute -right-4 top-[40%] -translate-y-1/2 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-400 shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ff6f61]"
+                className="hidden md:flex absolute -right-4 top-[40%] -translate-y-1/2 z-30 h-11 w-11 items-center justify-center rounded-full bg-white text-slate-400 shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ff6f61]"
               >
                 <ChevronRight size={24} />
               </button>
@@ -518,37 +539,43 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       )}
 
       {/* Ayurveda Products */}
-      <section className="bg-white py-10">
-        <div className="mx-auto max-w-[1400px] px-5">
-          <div className="flex items-center justify-between mb-1">
-            <h2 className="text-[22px] font-semibold text-[#212121] tracking-tight">
+      <section className="bg-white py-4 md:py-10">
+        <div className="mx-auto max-w-[1400px] px-3 md:px-5">
+          <div className="flex items-center justify-between mb-3 md:mb-1">
+            <h2 className="text-xl md:text-[22px] font-bold md:font-semibold text-slate-900 md:text-[#212121] tracking-tight">
               Ayurveda
             </h2>
             <button 
               onClick={() => navigate('/ayurveda')} 
-              className="flex items-center gap-1 text-[#ff6f61] font-medium text-[14px] px-3.5 py-1.5 rounded-[4px] border border-[#ff6f61] hover:bg-[#ff6f61] hover:text-white transition-all duration-200"
+              className="md:hidden text-[#00a2a4] font-bold text-[13px]"
+            >
+              see all
+            </button>
+            <button 
+              onClick={() => navigate('/ayurveda')} 
+              className="hidden md:flex items-center gap-1 text-[#ff6f61] font-medium text-[14px] px-3.5 py-1.5 rounded-[4px] border border-[#ff6f61] hover:bg-[#ff6f61] hover:text-white transition-all duration-200"
             >
               See all <ChevronRight size={16} />
             </button>
           </div>
 
-          <div className="w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
+          <div className="hidden md:block w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
 
           <div className="relative group">
             {loading ? (
-              <div className="flex gap-6 overflow-hidden">
+              <div className="flex gap-4 md:gap-6 overflow-hidden">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="min-w-[200px] h-72 animate-pulse rounded-xl bg-slate-100" />
+                  <div key={i} className="min-w-[150px] md:min-w-[200px] h-56 md:h-72 animate-pulse rounded-xl bg-slate-100" />
                 ))}
               </div>
             ) : (
               <div 
                 ref={ayurScrollRef}
-                className="custom-scrollbar-hidden flex items-stretch gap-6 overflow-x-auto pt-4 pb-8 scroll-smooth px-2"
+                className="custom-scrollbar-hidden flex items-stretch gap-4 md:gap-6 overflow-x-auto md:pt-4 pb-4 md:pb-8 scroll-smooth md:px-2"
               >
                 {medicines.filter(m => m.category === 'Ayurveda').length > 0 ? (
                   medicines.filter(m => m.category === 'Ayurveda').map((med) => (
-                    <div key={med._id} className="min-w-[220px] max-w-[220px] flex">
+                    <div key={med._id} className="min-w-[140px] max-w-[140px] md:min-w-[220px] md:max-w-[220px] flex">
                       <MedicineCard {...med} />
                     </div>
                   ))
@@ -563,7 +590,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
             {!loading && medicines.filter(m => m.category === 'Ayurveda').length > 0 && (
               <button 
                 onClick={() => ayurScrollRef.current?.scrollBy({ left: 440, behavior: 'smooth' })}
-                className="absolute -right-4 top-[40%] -translate-y-1/2 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-white text-slate-400 shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ff6f61]"
+                className="hidden md:flex absolute -right-4 top-[40%] -translate-y-1/2 z-30 h-11 w-11 items-center justify-center rounded-full bg-white text-slate-400 shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ff6f61]"
               >
                 <ChevronRight size={24} />
               </button>
