@@ -91,19 +91,9 @@ const MedicinesPage = () => {
       setSubFilter(displaySub);
 
       try {
-        let url = `${API_BASE}/api/medicines`;
-        const params = new URLSearchParams();
-        if (rawFilter && rawFilter !== 'flash') params.append('category', displayFilter);
-        if (rawSub) params.append('subCategory', displaySub);
-        
-        if (params.toString()) url += `?${params.toString()}`;
-
+        const url = `${API_BASE}/api/medicines`;
         const res = await fetch(url);
         let data = await res.json();
-        
-        if (rawFilter === 'flash') {
-          data = data.filter(m => m.isFlashDeal);
-        }
         
         setMedicines(Array.isArray(data) ? data : []);
       } catch (err) {
@@ -124,26 +114,57 @@ const MedicinesPage = () => {
     return () => clearInterval(timer);
   }, [banners.length]);
 
-  const categories = [
-    { name: 'All', image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-    { name: 'Flash Deals', image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=100&h=100&fit=crop' },
-    { name: 'Hair Care', image: 'https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=100&h=100&fit=crop' },
-    { name: 'Fitness & Health', image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=100&h=100&fit=crop' },
-    { name: 'Sexual Wellness', image: 'https://images.unsplash.com/photo-1577401239170-897942555fb3?w=100&h=100&fit=crop' },
-    { name: 'Vitamins & Nutrition', image: 'https://images.unsplash.com/photo-1550572017-edb79903ccfb?w=100&h=100&fit=crop' },
-    { name: 'Diabetes', image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=100&h=100&fit=crop' },
-    { name: 'Cardiac', image: 'https://images.unsplash.com/photo-1530497610245-94d3c16cda28?w=100&h=100&fit=crop' },
-    { name: 'Pain Relief', image: 'https://images.unsplash.com/photo-1550572017-edb79903ccfb?w=100&h=100&fit=crop' },
-    { name: 'Skin Care', image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&h=100&fit=crop' },
-    { name: 'Oral Care', image: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=100&h=100&fit=crop' },
-    { name: 'Elderly Care', image: 'https://images.unsplash.com/photo-1516302752946-60124f464010?w=100&h=100&fit=crop' },
-    { name: 'Baby Care', image: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=100&h=100&fit=crop' },
-    { name: 'Women Care', image: 'https://images.unsplash.com/photo-1601662528567-526cd06f6582?w=100&h=100&fit=crop' },
-    { name: 'Men Grooming', image: 'https://images.unsplash.com/photo-1621607512214-68297480165e?w=100&h=100&fit=crop' },
-    { name: 'Ayurveda', image: 'https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?w=100&h=100&fit=crop' },
+  // Base categories with fallback images
+  const baseCategories = [
+    { name: 'All', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
+    { name: 'Flash Deals', fallback: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=100&h=100&fit=crop' },
+    { name: 'Hair Care', fallback: 'https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=100&h=100&fit=crop' },
+    { name: 'Fitness & Health', fallback: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=100&h=100&fit=crop' },
+    { name: 'Sexual Wellness', fallback: 'https://images.unsplash.com/photo-1577401239170-897942555fb3?w=100&h=100&fit=crop' },
+    { name: 'Vitamins & Nutrition', fallback: 'https://images.unsplash.com/photo-1550572017-edb79903ccfb?w=100&h=100&fit=crop' },
+    { name: 'Diabetes', fallback: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=100&h=100&fit=crop' },
+    { name: 'Cardiac', fallback: 'https://images.unsplash.com/photo-1530497610245-94d3c16cda28?w=100&h=100&fit=crop' },
+    { name: 'Pain Relief', fallback: 'https://images.unsplash.com/photo-1550572017-edb79903ccfb?w=100&h=100&fit=crop' },
+    { name: 'Skin Care', fallback: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&h=100&fit=crop' },
+    { name: 'Oral Care', fallback: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=100&h=100&fit=crop' },
+    { name: 'Elderly Care', fallback: 'https://images.unsplash.com/photo-1516302752946-60124f464010?w=100&h=100&fit=crop' },
+    { name: 'Baby Care', fallback: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=100&h=100&fit=crop' },
+    { name: 'Women Care', fallback: 'https://images.unsplash.com/photo-1601662528567-526cd06f6582?w=100&h=100&fit=crop' },
+    { name: 'Men Grooming', fallback: 'https://images.unsplash.com/photo-1621607512214-68297480165e?w=100&h=100&fit=crop' },
+    { name: 'Ayurveda', fallback: 'https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?w=100&h=100&fit=crop' },
   ];
 
-  const filteredMedicines = medicines; 
+  // Dynamically pull the last product image for each category
+  const categories = useMemo(() => {
+    return baseCategories.map(cat => {
+      let image = cat.fallback;
+      if (cat.name === 'All') {
+        const lastProd = medicines[medicines.length - 1];
+        if (lastProd) image = lastProd.image;
+      } else if (cat.name === 'Flash Deals') {
+        const lastFlash = medicines.filter(m => m.isFlashDeal).pop();
+        if (lastFlash) image = lastFlash.image;
+      } else {
+        const lastProd = medicines.filter(m => m.category === cat.name).pop();
+        if (lastProd) image = lastProd.image;
+      }
+      return { name: cat.name, image };
+    });
+  }, [medicines]);
+
+  // Client-side filtering
+  const filteredMedicines = useMemo(() => {
+    let result = medicines;
+    if (filter === 'Flash Deals') {
+      result = result.filter(m => m.isFlashDeal);
+    } else if (filter !== 'All') {
+      result = result.filter(m => m.category === filter);
+    }
+    if (subFilter) {
+      result = result.filter(m => m.subCategory === subFilter);
+    }
+    return result;
+  }, [medicines, filter, subFilter]); 
 
   return (
     <div className="min-h-screen bg-[#f8fafc] pb-20 pt-6">
