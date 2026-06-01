@@ -64,7 +64,7 @@ const FeaturedBrands = () => {
                 onClick={() => navigate(`/brand/${encodeURIComponent(brand.name)}`)}
                 className="flex-none w-[120px] group/item cursor-pointer flex justify-center"
               >
-                <div className="w-[120px] h-[120px] rounded-full bg-white border border-slate-100 hover:border-[#ff6f61]/30 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center p-5">
+                <div className="w-[120px] h-[120px] rounded-full bg-white hover:-translate-y-1 transition-all duration-300 flex items-center justify-center p-5">
                   <img
                     src={brand.logo}
                     alt={brand.name}
