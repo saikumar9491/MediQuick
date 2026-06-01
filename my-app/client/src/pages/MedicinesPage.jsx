@@ -125,22 +125,22 @@ const MedicinesPage = () => {
   }, [banners.length]);
 
   const categories = [
-    { name: 'All', emoji: '🌟' },
-    { name: 'Flash Deals', emoji: '⚡' },
-    { name: 'Hair Care', emoji: '💇' },
-    { name: 'Fitness & Health', emoji: '💪' },
-    { name: 'Sexual Wellness', emoji: '💖' },
-    { name: 'Vitamins & Nutrition', emoji: '💊' },
-    { name: 'Diabetes', emoji: '🩸' },
-    { name: 'Cardiac', emoji: '❤️' },
-    { name: 'Pain Relief', emoji: '🩹' },
-    { name: 'Skin Care', emoji: '✨' },
-    { name: 'Oral Care', emoji: '🦷' },
-    { name: 'Elderly Care', emoji: '👴' },
-    { name: 'Baby Care', emoji: '👶' },
-    { name: 'Women Care', emoji: '👩' },
-    { name: 'Men Grooming', emoji: '👨' },
-    { name: 'Ayurveda', emoji: '🌿' },
+    { name: 'All', image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
+    { name: 'Flash Deals', image: 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=100&h=100&fit=crop' },
+    { name: 'Hair Care', image: 'https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=100&h=100&fit=crop' },
+    { name: 'Fitness & Health', image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=100&h=100&fit=crop' },
+    { name: 'Sexual Wellness', image: 'https://images.unsplash.com/photo-1577401239170-897942555fb3?w=100&h=100&fit=crop' },
+    { name: 'Vitamins & Nutrition', image: 'https://images.unsplash.com/photo-1550572017-edb79903ccfb?w=100&h=100&fit=crop' },
+    { name: 'Diabetes', image: 'https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=100&h=100&fit=crop' },
+    { name: 'Cardiac', image: 'https://images.unsplash.com/photo-1530497610245-94d3c16cda28?w=100&h=100&fit=crop' },
+    { name: 'Pain Relief', image: 'https://images.unsplash.com/photo-1550572017-edb79903ccfb?w=100&h=100&fit=crop' },
+    { name: 'Skin Care', image: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=100&h=100&fit=crop' },
+    { name: 'Oral Care', image: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=100&h=100&fit=crop' },
+    { name: 'Elderly Care', image: 'https://images.unsplash.com/photo-1516302752946-60124f464010?w=100&h=100&fit=crop' },
+    { name: 'Baby Care', image: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=100&h=100&fit=crop' },
+    { name: 'Women Care', image: 'https://images.unsplash.com/photo-1601662528567-526cd06f6582?w=100&h=100&fit=crop' },
+    { name: 'Men Grooming', image: 'https://images.unsplash.com/photo-1621607512214-68297480165e?w=100&h=100&fit=crop' },
+    { name: 'Ayurveda', image: 'https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?w=100&h=100&fit=crop' },
   ];
 
   const filteredMedicines = medicines; 
@@ -230,9 +230,11 @@ const MedicinesPage = () => {
                       }`}
                     >
                       {/* Active indicator bar on mobile */}
-                      {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-green-500 sm:hidden rounded-r-full" />}
+                      {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#00a2a4] sm:hidden rounded-r-full" />}
                       
-                      <div className="text-2xl sm:hidden mb-1 bg-white p-2 rounded-full shadow-sm">{catObj.emoji}</div>
+                      <div className="w-12 h-12 sm:hidden mb-1 bg-white rounded-xl shadow-sm overflow-hidden p-1 border border-slate-100">
+                        <img src={catObj.image} alt={cat} className="w-full h-full object-cover rounded-lg" />
+                      </div>
                       <span className="text-[9px] sm:text-xs font-bold leading-tight">{cat}</span>
                       {isActive && <ChevronRight className="hidden sm:block h-3 w-3" />}
                     </button>
