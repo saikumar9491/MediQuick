@@ -55,28 +55,25 @@ const FeaturedBrands = () => {
         <div className="relative group">
           <div 
             ref={scrollRef}
-            className="flex gap-6 overflow-x-auto py-4 scroll-smooth no-scrollbar"
+            className="flex gap-8 overflow-x-auto py-4 scroll-smooth no-scrollbar"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {brands.map((brand, idx) => (
               <div
                 key={idx}
                 onClick={() => navigate(`/brand/${encodeURIComponent(brand.name)}`)}
-                className="flex-none w-[180px] group/item cursor-pointer"
+                className="flex-none w-[120px] group/item cursor-pointer flex flex-col items-center gap-3"
               >
-                <div className="bg-white rounded-2xl p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100 flex flex-col items-center gap-4 h-full">
-                  <div className="w-full h-[80px] flex items-center justify-center p-2">
-                    <img
-                      src={brand.logo}
-                      alt={brand.name}
-                      className="max-w-full max-h-full object-contain grayscale opacity-80 group-hover/item:grayscale-0 group-hover/item:opacity-100 transition-all duration-300"
-                    />
-                  </div>
-                  <div className="w-full h-px bg-slate-50"></div>
-                  <span className="text-sm font-medium text-slate-600 group-hover/item:text-[#ff6f61] transition-colors text-center w-full truncate">
-                    {brand.name}
-                  </span>
+                <div className="w-[120px] h-[120px] rounded-full bg-white shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-slate-100 hover:border-[#ff6f61]/30 flex items-center justify-center p-5">
+                  <img
+                    src={brand.logo}
+                    alt={brand.name}
+                    className="max-w-full max-h-full object-contain grayscale opacity-70 group-hover/item:grayscale-0 group-hover/item:opacity-100 transition-all duration-300"
+                  />
                 </div>
+                <span className="text-sm font-semibold text-slate-600 group-hover/item:text-[#ff6f61] transition-colors text-center w-full truncate px-1">
+                  {brand.name}
+                </span>
               </div>
             ))}
           </div>
@@ -84,14 +81,14 @@ const FeaturedBrands = () => {
           {/* Navigation Arrows */}
           <button 
             onClick={() => scroll('left')}
-            className="absolute -left-5 top-1/2 -translate-y-1/2 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-white text-slate-600 shadow-lg border border-slate-100 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 hover:text-[#ff6f61]"
+            className="absolute -left-5 top-[40%] -translate-y-1/2 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-white text-slate-600 shadow-lg border border-slate-100 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 hover:text-[#ff6f61]"
           >
             <ChevronLeft size={24} />
           </button>
 
           <button 
             onClick={() => scroll('right')}
-            className="absolute -right-5 top-1/2 -translate-y-1/2 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-white text-slate-600 shadow-lg border border-slate-100 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 hover:text-[#ff6f61]"
+            className="absolute -right-5 top-[40%] -translate-y-1/2 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-white text-slate-600 shadow-lg border border-slate-100 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 hover:text-[#ff6f61]"
           >
             <ChevronRight size={24} />
           </button>
