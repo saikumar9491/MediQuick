@@ -95,9 +95,9 @@ const SplineChart = () => {
         const y = 30 + r * 100;
         const val = Math.round(200 - r * 200);
         return (
-          <g key={i} className="opacity-10">
-            <line x1="40" y1={y} x2="480" y2={y} stroke="#000" strokeWidth="0.8" strokeDasharray="3 3" />
-            <text x="32" y={y + 3} textAnchor="end" className="text-[9px] font-black fill-slate-800">{val}</text>
+          <g key={i}>
+            <line x1="40" y1={y} x2="480" y2={y} stroke="#E2E8F0" strokeWidth="1" strokeDasharray="3 3" />
+            <text x="32" y={y + 3.5} textAnchor="end" className="text-[10px] font-bold fill-slate-550">{val}</text>
           </g>
         );
       })}
@@ -109,7 +109,7 @@ const SplineChart = () => {
         </g>
       ))}
       {data.map((d, i) => (
-        <text key={i} x={40 + (i / 6) * 420} y="158" textAnchor="middle" className="text-[9px] font-bold fill-slate-400">{d.label}</text>
+        <text key={i} x={40 + (i / 6) * 420} y="162" textAnchor="middle" className="text-[10.5px] font-bold fill-slate-550">{d.label}</text>
       ))}
     </svg>
   );
