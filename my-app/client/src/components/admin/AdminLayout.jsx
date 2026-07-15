@@ -164,19 +164,19 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
   };
 
   const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-[#1E293B] text-slate-300">
+    <div className="flex flex-col h-full bg-[#1E3A8A] text-slate-100">
       {/* Brand Header */}
-      <div className="flex items-center justify-between px-6 py-5 border-b border-slate-700/50 bg-[#0F172A]">
+      <div className="flex items-center justify-between px-6 py-5 border-b border-blue-900/50 bg-[#172554]">
         <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-500/20">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-500 text-white shadow-md shadow-orange-500/20">
             <Shield className="h-5 w-5" />
           </div>
           <div>
-            <h1 className="text-md font-black tracking-tight text-white">MediQuick<span className="text-blue-500"> Admin</span></h1>
-            <p className="text-[9px] font-bold text-slate-500 tracking-wider uppercase">Store Management</p>
+            <h1 className="text-md font-black tracking-tight text-white">MediQuick<span className="text-orange-500"> Admin</span></h1>
+            <p className="text-[9px] font-bold text-slate-400 tracking-wider uppercase">Store Management</p>
           </div>
         </div>
-        <button onClick={toggleSidebar} className="hidden lg:block text-slate-400 hover:text-white transition-colors">
+        <button onClick={toggleSidebar} className="hidden lg:block text-slate-300 hover:text-white transition-colors">
           <ChevronRight className={`h-5 w-5 transform transition-transform ${sidebarOpen ? 'rotate-180' : ''}`} />
         </button>
       </div>
@@ -193,18 +193,18 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
                 onClick={() => handleTabClick(item.id, item)}
                 className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-semibold tracking-wide transition-all ${
                   isTabActive && !item.hasSubmenu
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10'
-                    : 'hover:bg-slate-800 text-slate-300 hover:text-white'
+                    ? 'bg-[#1D4ED8] text-white shadow-lg shadow-blue-500/10'
+                    : 'hover:bg-blue-800 text-slate-200 hover:text-white'
                 }`}
               >
                 <div className="flex items-center gap-3.5">
-                  <Icon className={`h-4.5 w-4.5 ${isTabActive && !item.hasSubmenu ? 'text-white' : 'text-slate-400 group-hover:text-white'}`} />
+                  <Icon className={`h-4.5 w-4.5 ${isTabActive && !item.hasSubmenu ? 'text-white' : 'text-slate-300 group-hover:text-white'}`} />
                   {sidebarOpen && <span>{item.label}</span>}
                 </div>
                 {sidebarOpen && (
                   <div className="flex items-center gap-2">
                     {item.badge > 0 && (
-                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-black text-[#1E293B] animate-pulse">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-orange-500 text-[10px] font-black text-white animate-pulse">
                         {item.badge}
                       </span>
                     )}
@@ -227,8 +227,8 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
                         onClick={() => handleSubTabClick(item.id, sub.id)}
                         className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all ${
                           isSubActive
-                            ? 'bg-slate-700/60 text-white font-bold'
-                            : 'hover:bg-slate-800/50 text-slate-400 hover:text-white'
+                            ? 'bg-blue-800 text-white font-bold'
+                            : 'hover:bg-blue-800/50 text-slate-350 hover:text-white'
                         }`}
                       >
                         <SubIcon className="h-3.5 w-3.5" />
@@ -244,15 +244,15 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
       </div>
 
       {/* Footer Profile & Logout */}
-      <div className="p-4 border-t border-slate-700/50 bg-[#0F172A]/40">
+      <div className="p-4 border-t border-blue-900/50 bg-[#172554]/40">
         {sidebarOpen && user && (
           <div className="flex items-center gap-3 mb-4 px-2">
-            <div className="h-9 w-9 rounded-full bg-slate-700 flex items-center justify-center text-blue-500 font-bold border border-slate-600 shadow-sm flex-shrink-0">
+            <div className="h-9 w-9 rounded-full bg-blue-800 text-white flex items-center justify-center font-bold border border-blue-700 shadow-sm flex-shrink-0">
               {user.name ? user.name[0].toUpperCase() : 'A'}
             </div>
             <div className="min-w-0">
               <p className="text-xs font-bold text-white truncate">{user.name || 'Admin User'}</p>
-              <span className="inline-block px-1.5 py-0.5 rounded-md bg-blue-500/20 text-[8px] font-black text-blue-400 uppercase tracking-wider mt-0.5">
+              <span className="inline-block px-1.5 py-0.5 rounded-md bg-orange-500/20 text-[8px] font-black text-orange-400 uppercase tracking-wider mt-0.5">
                 {user.role || 'Super Admin'}
               </span>
             </div>
@@ -260,7 +260,7 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
         )}
         <button
           onClick={handleLogout}
-          className={`w-full flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-sm font-semibold tracking-wide text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition-all`}
+          className={`w-full flex items-center gap-3.5 px-3.5 py-3 rounded-xl text-sm font-semibold tracking-wide text-orange-300 hover:bg-orange-500/10 hover:text-orange-200 transition-all`}
         >
           <LogOut className="h-4.5 w-4.5" />
           {sidebarOpen && <span>Logout</span>}
@@ -270,7 +270,7 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
   );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-900 flex text-slate-850 dark:text-slate-100 antialiased font-sans transition-colors duration-200">
+    <div className="min-h-screen bg-white dark:bg-slate-900 flex text-slate-800 dark:text-slate-100 antialiased font-sans transition-colors duration-200">
       {/* Desktop Sidebar */}
       <aside 
         className={`hidden lg:block h-screen sticky top-0 border-r border-slate-200/50 dark:border-slate-800 shadow-sm transition-all duration-300 z-30 ${
@@ -296,7 +296,7 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="lg:hidden fixed inset-y-0 left-0 w-64 bg-[#1E293B] shadow-2xl z-50 overflow-hidden"
+              className="lg:hidden fixed inset-y-0 left-0 w-64 bg-[#1E3A8A] shadow-2xl z-50 overflow-hidden"
             >
               <SidebarContent />
             </motion.aside>
@@ -320,7 +320,7 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
               <input
                 type="text"
                 placeholder="Search orders, products, audits..."
-                className="w-80 pl-10 pr-4 py-2 text-xs font-medium bg-slate-50 dark:bg-slate-850 rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-sm/5 text-slate-800 dark:text-slate-100"
+                className="w-80 pl-10 pr-4 py-2 text-xs font-medium bg-slate-50 dark:bg-slate-850 rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-orange-500 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-sm/5 text-slate-800 dark:text-slate-100"
               />
             </div>
           </div>
@@ -339,7 +339,7 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
             {stats?.lowStockCount > 0 && (
               <div 
                 onClick={() => handleTabClick('notifications', {})}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/50 rounded-lg text-[10px] font-bold uppercase cursor-pointer hover:bg-amber-100 transition-all select-none"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 dark:bg-rose-950/30 text-[#EF4444] dark:text-rose-450 border border-red-100 dark:border-rose-900/50 rounded-lg text-[10px] font-bold uppercase cursor-pointer hover:bg-red-100 transition-all select-none"
               >
                 <AlertTriangle className="h-3.5 w-3.5 animate-bounce" />
                 <span>{stats.lowStockCount} Low Stock Alert(s)</span>
@@ -348,7 +348,7 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
 
             {/* Profile Dropdown Simulation */}
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-full bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm border border-blue-100 dark:border-slate-700">
+              <div className="h-8 w-8 rounded-full bg-blue-50 dark:bg-slate-800 text-[#1E3A8A] dark:text-blue-400 flex items-center justify-center font-bold text-sm border border-blue-100 dark:border-slate-700">
                 <User className="h-4 w-4" />
               </div>
               <span className="text-xs font-bold text-slate-700 dark:text-slate-200 hidden sm:block">
