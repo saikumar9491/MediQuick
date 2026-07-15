@@ -19,6 +19,7 @@ import {
   addAddress,
   removeAddress,
   changePassword,
+  updateUserRole,
 } from '../controllers/authController.js'; // Ensure path is correct
 import { verifyToken } from '../middleware/authMiddleware.js';
 
@@ -60,5 +61,6 @@ router.get('/', verifyToken, isAdmin, getAllUsers);
 router.put('/:id/block', verifyToken, isAdmin, blockUser);
 router.delete('/:id', verifyToken, isAdmin, deleteUser);
 router.post('/send-email', verifyToken, isAdmin, sendAdminEmail);
+router.put('/:id/role', verifyToken, isAdmin, updateUserRole);
 
 export default router;

@@ -92,4 +92,59 @@ router.put('/:id/status', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
+/**
+ * @desc    Assign Delivery Agent (Admin)
+ * @route   PUT /api/orders/:id/assign-agent
+ * @access  Private/Admin
+ */
+router.put('/:id/assign-agent', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const { agentName } = req.body;
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    order.assignedAgent = agentName;
+    const updated = await order.save();
+    res.json(updated);
+  } catch (err) {
+    res.status(550).json({ message: "Error assigning delivery agent", error: err.message });
+  }
+});
+
+/**
+ * @desc    Process Return/Refund Request (Admin)
+ * @route   PUT /api/orders/:id/refund
+ * @access  Private/Admin
+ */
+router.put('/:id/refund', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const { action } = req.body; // 'approve' or 'reject'
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    
+    if (action === 'approve') {
+      order.isRefunded = true;
+      order.isReturnRequested = false;
+      order.status = 'Cancelled';
+      
+      // Credit wallet
+      const customer = await User.findById(order.userId);
+      if (customer) {
+        customer.walletBalance = (customer.walletBalance || 0) + order.totalAmount;
+        await customer.save();
+      }
+    } else {
+      order.isReturnRequested = false;
+    }
+    
+    const updated = await order.save();
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ message: "Error processing refund", error: err.message });
+  }
+});
+
 export default router;

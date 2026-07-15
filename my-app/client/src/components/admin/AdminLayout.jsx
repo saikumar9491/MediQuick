@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Home, 
@@ -25,7 +25,9 @@ import {
   Clock,
   RefreshCw,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -36,8 +38,29 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
   const [productsOpen, setProductsOpen] = useState(false);
   const [ordersOpen, setOrdersOpen] = useState(false);
   
+  const [theme, setTheme] = useState(() => {
+    const cached = localStorage.getItem('mq_admin_theme');
+    return cached || 'light';
+  });
+
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('bg-slate-900', 'text-slate-100');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('bg-slate-900', 'text-slate-100');
+    }
+  }, [theme]);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(nextTheme);
+    localStorage.setItem('mq_admin_theme', nextTheme);
+  };
 
   const handleLogout = () => {
     logout();
@@ -224,12 +247,14 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
       <div className="p-4 border-t border-slate-700/50 bg-[#0F172A]/40">
         {sidebarOpen && user && (
           <div className="flex items-center gap-3 mb-4 px-2">
-            <div className="h-9 w-9 rounded-full bg-slate-700 flex items-center justify-center text-blue-500 font-bold border border-slate-600 shadow-sm">
+            <div className="h-9 w-9 rounded-full bg-slate-700 flex items-center justify-center text-blue-500 font-bold border border-slate-600 shadow-sm flex-shrink-0">
               {user.name ? user.name[0].toUpperCase() : 'A'}
             </div>
             <div className="min-w-0">
               <p className="text-xs font-bold text-white truncate">{user.name || 'Admin User'}</p>
-              <p className="text-[10px] text-slate-500 truncate">{user.email || 'admin@mediquick.com'}</p>
+              <span className="inline-block px-1.5 py-0.5 rounded-md bg-blue-500/20 text-[8px] font-black text-blue-400 uppercase tracking-wider mt-0.5">
+                {user.role || 'Super Admin'}
+              </span>
             </div>
           </div>
         )}
@@ -245,10 +270,10 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
   );
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex text-slate-800 antialiased font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-900 flex text-slate-850 dark:text-slate-100 antialiased font-sans transition-colors duration-200">
       {/* Desktop Sidebar */}
       <aside 
-        className={`hidden lg:block h-screen sticky top-0 border-r border-slate-200/50 shadow-sm transition-all duration-300 z-30 ${
+        className={`hidden lg:block h-screen sticky top-0 border-r border-slate-200/50 dark:border-slate-800 shadow-sm transition-all duration-300 z-30 ${
           sidebarOpen ? 'w-64' : 'w-20'
         }`}
       >
@@ -282,30 +307,39 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
       {/* Main Page Area */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto custom-scrollbar">
         {/* Top Navbar */}
-        <header className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-slate-200/60 z-20 px-6 py-4 flex items-center justify-between">
+        <header className="sticky top-0 bg-white/80 dark:bg-slate-900/85 backdrop-blur-md border-b border-slate-200/60 dark:border-slate-800/80 z-20 px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setMobileSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-all active:scale-95"
+              className="lg:hidden p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-850 hover:text-slate-700 dark:hover:text-slate-200 transition-all active:scale-95"
             >
               <Menu className="h-5 w-5" />
             </button>
             <div className="relative hidden md:block">
-              <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
               <input
                 type="text"
                 placeholder="Search orders, products, audits..."
-                className="w-80 pl-10 pr-4 py-2 text-xs font-medium bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:border-blue-500 focus:bg-white transition-all shadow-sm/5"
+                className="w-80 pl-10 pr-4 py-2 text-xs font-medium bg-slate-50 dark:bg-slate-850 rounded-xl border border-slate-200 dark:border-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-sm/5 text-slate-800 dark:text-slate-100"
               />
             </div>
           </div>
 
           <div className="flex items-center gap-4">
+            {/* Theme Toggle Button */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
+              title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+            >
+              {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+            </button>
+
             {/* Low stock notice shortcut */}
             {stats?.lowStockCount > 0 && (
               <div 
                 onClick={() => handleTabClick('notifications', {})}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-lg text-[10px] font-bold uppercase cursor-pointer hover:bg-amber-100 transition-all select-none"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/50 rounded-lg text-[10px] font-bold uppercase cursor-pointer hover:bg-amber-100 transition-all select-none"
               >
                 <AlertTriangle className="h-3.5 w-3.5 animate-bounce" />
                 <span>{stats.lowStockCount} Low Stock Alert(s)</span>
@@ -314,10 +348,10 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
 
             {/* Profile Dropdown Simulation */}
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-sm border border-blue-100">
+              <div className="h-8 w-8 rounded-full bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold text-sm border border-blue-100 dark:border-slate-700">
                 <User className="h-4 w-4" />
               </div>
-              <span className="text-xs font-bold text-slate-700 hidden sm:block">
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-200 hidden sm:block">
                 {user?.name || 'Administrator'}
               </span>
             </div>
@@ -344,6 +378,12 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
           background: #cbd5e1;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #334155;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #475569;
         }
       `}</style>
     </div>

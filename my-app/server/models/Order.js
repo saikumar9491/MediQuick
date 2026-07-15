@@ -39,7 +39,10 @@ const OrderSchema = new mongoose.Schema({
     default: 'Confirmed',
     enum: ['Confirmed', 'Shipped', 'Out for Delivery', 'Delivered', 'Cancelled'] 
   },
-
+  isReturnRequested: { type: Boolean, default: false },
+  returnReason: { type: String },
+  isRefunded: { type: Boolean, default: false },
+  assignedAgent: { type: String },
 }, { 
   // Automatically manages createdAt and updatedAt fields
   timestamps: true 

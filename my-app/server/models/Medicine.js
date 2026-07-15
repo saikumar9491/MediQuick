@@ -8,6 +8,13 @@ const reviewSchema = new mongoose.Schema({
   isApproved: { type: Boolean, default: true },
 }, { timestamps: true });
 
+const variantSchema = new mongoose.Schema({
+  size: { type: String },
+  weight: { type: String },
+  price: { type: Number, required: true },
+  countInStock: { type: Number, default: 0 }
+});
+
 const medicineSchema = mongoose.Schema({
   name: { type: String, required: true },
   brand: { type: String, required: true },
@@ -24,6 +31,9 @@ const medicineSchema = mongoose.Schema({
   isTrending: { type: Boolean, default: false },
   discountPrice: { type: Number },
   subCategory: { type: String },
+  sku: { type: String },
+  tags: [{ type: String }],
+  variants: [variantSchema]
 }, { timestamps: true });
 
 export default mongoose.model('Medicine', medicineSchema);

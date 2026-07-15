@@ -40,18 +40,24 @@ const seedDashboard = async () => {
         phone: "9876543210",
         password: hashedPassword,
         isAdmin: true,
+        role: "Super Admin",
         isVerified: true
       });
       await admin.save();
       console.log("✅ Admin user created: admin@mediquick.com (password123)");
+    } else {
+      admin.role = "Super Admin";
+      admin.isAdmin = true;
+      await admin.save();
+      console.log("✅ Admin role configured as Super Admin");
     }
 
     // Normal customer list
     const customerData = [
-      { name: "John Doe", email: "john@example.com", phone: "9876500001" },
-      { name: "Jane Smith", email: "jane@example.com", phone: "9876500002" },
-      { name: "Alice Johnson", email: "alice@example.com", phone: "9876500003" },
-      { name: "Bob Brown", email: "bob@example.com", phone: "9876500004" }
+      { name: "John Doe", email: "john@example.com", phone: "9876500001", role: "Admin", loyaltyPoints: 340, walletBalance: 1200 },
+      { name: "Jane Smith", email: "jane@example.com", phone: "9876500002", role: "Admin", loyaltyPoints: 120, walletBalance: 450 },
+      { name: "Alice Johnson", email: "alice@example.com", phone: "9876500003", role: "Manager", loyaltyPoints: 80, walletBalance: 0 },
+      { name: "Bob Brown", email: "bob@example.com", phone: "9876500004", role: "Warehouse Staff", loyaltyPoints: 15, walletBalance: 200 }
     ];
 
     const customers = [];
@@ -64,8 +70,16 @@ const seedDashboard = async () => {
           phone: c.phone,
           password: hashedPassword,
           isAdmin: false,
+          role: c.role,
+          loyaltyPoints: c.loyaltyPoints,
+          walletBalance: c.walletBalance,
           isVerified: true
         });
+        await u.save();
+      } else {
+        u.role = c.role;
+        u.loyaltyPoints = c.loyaltyPoints;
+        u.walletBalance = c.walletBalance;
         await u.save();
       }
       customers.push(u);
@@ -77,7 +91,7 @@ const seedDashboard = async () => {
     const coupons = [
       { code: "WELCOME10", discount: 10, expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), isActive: true },
       { code: "HEALTH20", discount: 20, expiryDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), isActive: true },
-      { code: "FREESHIP", discount: 5, expiryDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), isActive: false }, // expired/inactive
+      { code: "FREESHIP", discount: 5, expiryDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), isActive: false },
       { code: "SUPER30", discount: 30, expiryDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), isActive: true }
     ];
     await Coupon.insertMany(coupons);
@@ -101,8 +115,8 @@ const seedDashboard = async () => {
     await settings.save();
     console.log("✅ Store settings inserted");
 
-    // 5. Seed Reviews on medicines
-    console.log("⭐ Seeding product reviews...");
+    // 5. Seed Reviews, SKUs, tags, and variants on medicines
+    console.log("⭐ Seeding product reviews & variants...");
     const comments = [
       "Excellent product! Very effective.",
       "Good packaging, quick delivery.",
@@ -115,10 +129,15 @@ const seedDashboard = async () => {
 
     for (let i = 0; i < medicines.length; i++) {
       const med = medicines[i];
-      // clear old reviews
       med.reviews = [];
-      
-      // add 1-2 reviews
+      med.sku = `MQ-${med.name.slice(0,3).toUpperCase()}-${100 + i}`;
+      med.tags = [med.category.toLowerCase(), med.brand.toLowerCase(), 'healthcare'];
+
+      med.variants = [
+        { size: "Standard Pack", weight: "50g", price: med.price, countInStock: med.countInStock },
+        { size: "Bulk Pack", weight: "150g", price: Math.round(med.price * 2.5), countInStock: Math.max(10, med.countInStock - 10) }
+      ];
+
       const count = Math.floor(Math.random() * 2) + 1;
       for (let r = 0; r < count; r++) {
         const randCust = customers[Math.floor(Math.random() * customers.length)];
@@ -128,7 +147,7 @@ const seedDashboard = async () => {
           rating: ratings[randIdx],
           comment: comments[randIdx],
           user: randCust._id,
-          isApproved: Math.random() > 0.15 // 85% approved, 15% pending
+          isApproved: Math.random() > 0.15
         });
       }
       
@@ -137,12 +156,12 @@ const seedDashboard = async () => {
       med.rating = approved.length > 0 ? (approved.reduce((acc, r) => r.rating + acc, 0) / approved.length) : 0;
       await med.save();
     }
-    console.log("✅ Product reviews updated");
+    console.log("✅ Product reviews, variants, and SKUs updated");
 
     // 6. Seed Orders over a 30-day range
     console.log("🛒 Seeding orders...");
     const statuses = ["Confirmed", "Shipped", "Out for Delivery", "Delivered", "Cancelled"];
-    const statusWeights = [0.1, 0.2, 0.1, 0.55, 0.05]; // Mostly delivered
+    const statusWeights = [0.1, 0.2, 0.1, 0.55, 0.05];
 
     const selectStatus = () => {
       const r = Math.random();
@@ -157,9 +176,7 @@ const seedDashboard = async () => {
     const ordersToInsert = [];
     const now = new Date();
 
-    // Create around 35 orders spread across the last 30 days
     for (let d = 30; d >= 0; d--) {
-      // 0 to 3 orders per day
       const dailyOrderCount = Math.floor(Math.random() * 3);
       
       for (let count = 0; count < dailyOrderCount; count++) {
@@ -167,12 +184,10 @@ const seedDashboard = async () => {
         const orderStatus = selectStatus();
         const orderDate = new Date(now.getTime() - d * 24 * 60 * 60 * 1000 - Math.floor(Math.random() * 12 * 60 * 60 * 1000));
         
-        // Random 1 to 3 items
         const itemCount = Math.floor(Math.random() * 3) + 1;
         const items = [];
         let totalAmount = 0;
 
-        // Choose random products
         const shuffled = [...medicines].sort(() => 0.5 - Math.random());
         for (let itemIdx = 0; itemIdx < itemCount; itemIdx++) {
           const med = shuffled[itemIdx];
@@ -188,10 +203,13 @@ const seedDashboard = async () => {
           totalAmount += med.price * qty;
         }
 
-        // Add tax and shipping
         const taxAmount = Math.round(totalAmount * 0.18);
         const shippingAmount = totalAmount > 500 ? 0 : 50;
         const finalTotal = totalAmount + taxAmount + shippingAmount;
+
+        const isDelivered = orderStatus === 'Delivered';
+        const isShipped = orderStatus === 'Shipped';
+        const isReturned = orderStatus === 'Cancelled' && Math.random() > 0.5;
 
         ordersToInsert.push({
           userId: customer._id,
@@ -204,17 +222,19 @@ const seedDashboard = async () => {
           },
           paymentMethod: Math.random() > 0.3 ? "Razorpay" : "Cash on Delivery",
           status: orderStatus,
+          assignedAgent: (isDelivered || isShipped) ? ["Amit Sharma", "Rohan Verma", "Simran Kaur"][Math.floor(Math.random() * 3)] : undefined,
+          isReturnRequested: isReturned,
+          returnReason: isReturned ? "Incorrect medicine variant delivered" : undefined,
           createdAt: orderDate,
           updatedAt: orderDate
         });
       }
     }
 
-    // Insert orders
     const seededOrders = await Order.insertMany(ordersToInsert);
     console.log(`✅ ${seededOrders.length} orders seeded successfully!`);
 
-    // 7. Update User orders array and total spending statistics
+    // 7. Update User orders array
     for (const customer of customers) {
       const userOrders = seededOrders.filter(o => o.userId.toString() === customer._id.toString());
       customer.orders = userOrders.map(o => o._id);

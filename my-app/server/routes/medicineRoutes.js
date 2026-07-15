@@ -9,7 +9,8 @@ import {
   createMedicineReview,
   getRelatedMedicines,
   toggleFlashDeal,
-  toggleTrending
+  toggleTrending,
+  generateAIDescription
 } from '../controllers/medicineController.js';
 import { verifyToken, isAdmin } from '../middleware/authMiddleware.js';
 
@@ -64,5 +65,8 @@ router.patch('/:id/flash-deal', verifyToken, isAdmin, toggleFlashDeal);
 
 // Toggle Trending status
 router.patch('/:id/trending', verifyToken, isAdmin, toggleTrending);
+
+// Generate AI product descriptions (Admin only)
+router.post('/ai-description', verifyToken, isAdmin, generateAIDescription);
 
 export default router;

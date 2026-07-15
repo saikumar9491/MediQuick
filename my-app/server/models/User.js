@@ -14,6 +14,13 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
 
     isAdmin: { type: Boolean, required: true, default: false },
+    role: { 
+      type: String, 
+      default: 'Admin', 
+      enum: ['Super Admin', 'Admin', 'Manager', 'Warehouse Staff'] 
+    },
+    loyaltyPoints: { type: Number, default: 0 },
+    walletBalance: { type: Number, default: 0 },
     isVerified: { type: Boolean, default: false },
     isBlocked: { type: Boolean, default: false },
 
