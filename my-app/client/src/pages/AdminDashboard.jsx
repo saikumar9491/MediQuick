@@ -2088,34 +2088,6 @@ const AdminDashboard = () => {
           </>
         )}
       </AnimatePresence>
-
-      <style>{`
-        .dark .bg-[#F8FAFC] {
-          background-color: #1E293B !important;
-        }
-        .dark .border-[#E5E7EB] {
-          border-color: #334155 !important;
-        }
-        .dark .bg-white {
-          background-color: #1E293B !important;
-          color: #F8FAFC !important;
-        }
-        .dark .border-slate-200 {
-          border-color: #334155 !important;
-        }
-        .dark .text-slate-800 {
-          color: #F8FAFC !important;
-        }
-        .dark .text-slate-700 {
-          color: #E2E8F0 !important;
-        }
-        .dark .text-slate-600 {
-          color: #CBD5E1 !important;
-        }
-        .dark .text-slate-500 {
-          color: #94A3B8 !important;
-        }
-      `}</style>
     </AdminLayout>
   );
 };
