@@ -331,7 +331,14 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
           </div>
 
           <div className="flex items-center gap-4.5">
-
+            {/* Go back to Home */}
+            <button 
+              onClick={() => navigate('/')}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-orange-500 hover:bg-orange-600 text-white text-[10px] font-black uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer mr-1"
+            >
+              <Home className="h-3.5 w-3.5" />
+              <span className="hidden md:inline">Back to Store</span>
+            </button>
 
             {/* Mail Icon */}
             <button className="p-1.5 text-slate-300 hover:text-white rounded-lg hover:bg-slate-700/50 transition-all relative">
