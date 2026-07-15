@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit3, Save, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Trash2, Edit3, Save, X, ChevronDown, ChevronUp, Activity } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const AdminCategoryManager = ({ token, API_BASE }) => {
