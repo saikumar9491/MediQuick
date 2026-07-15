@@ -78,7 +78,10 @@ function AppLayout({ medicines, featured, loading }) {
   const hideWhatsAppRoutes = ['/login', '/signup', '/forgot-password', '/admin-dashboard', '/verify-otp'];
   const hideFooterRoutes = ['/login', '/signup', '/forgot-password', '/admin-dashboard', '/verify-otp'];
 
-  const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
+  const shouldHideNavbar =
+    hideNavbarRoutes.includes(location.pathname) ||
+    location.pathname === '/admin-dashboard' ||
+    location.pathname.startsWith('/admin');
   const shouldHideWhatsApp =
     hideWhatsAppRoutes.includes(location.pathname) ||
     location.pathname.startsWith('/admin');
