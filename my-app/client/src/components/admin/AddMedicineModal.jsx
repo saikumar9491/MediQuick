@@ -27,6 +27,7 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
     image: '',
     needsRx: false,
     isFlashDeal: false,
+    isTrending: false,
     discountPrice: '',
   });
 
@@ -65,6 +66,7 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
         image: '',
         needsRx: false,
         isFlashDeal: false,
+        isTrending: false,
         discountPrice: '',
       });
     }
@@ -284,6 +286,20 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
                 />
               </div>
             )}
+          </div>
+
+          <div className="rounded-md border border-orange-100 bg-orange-50/50 p-4 space-y-3">
+            <label className="flex cursor-pointer items-center gap-3">
+              <input
+                type="checkbox"
+                checked={formData.isTrending}
+                className="h-4 w-4 accent-orange-500"
+                onChange={(e) => setFormData({ ...formData, isTrending: e.target.checked })}
+              />
+              <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-widest text-orange-600">
+                Mark as Trending Product
+              </span>
+            </label>
           </div>
 
           <button
