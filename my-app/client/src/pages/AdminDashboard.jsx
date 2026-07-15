@@ -129,6 +129,55 @@ const SparklineBlue = () => (
   </svg>
 );
 
+const SVGBarChart = ({ data, color = "#1E3A8A" }) => {
+  if (!data || data.length === 0) return (
+    <div className="flex h-48 items-center justify-center text-xs font-semibold text-slate-400">No chart data available</div>
+  );
+
+  const width = 500;
+  const height = 200;
+  const padding = 30;
+  const chartWidth = width - padding * 2;
+  const chartHeight = height - padding * 2;
+
+  const yValues = data.map(d => d.value);
+  const maxY = Math.max(...yValues, 10);
+  const minY = 0;
+
+  const barWidth = (chartWidth / data.length) * 0.6;
+  const barSpacing = (chartWidth / data.length) * 0.4;
+
+  return (
+    <div className="relative w-full h-full">
+      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full overflow-visible">
+        {[0, 0.25, 0.5, 0.75, 1].map((r, idx) => {
+          const y = padding + r * chartHeight;
+          const val = Math.round(maxY - r * (maxY - minY));
+          return (
+            <g key={idx} className="opacity-5">
+              <line x1={padding} y1={y} x2={width - padding} y2={y} stroke="#000" strokeWidth="1" />
+              <text x={padding - 8} y={y + 3} textAnchor="end" className="text-[8px] font-bold fill-slate-805 dark:fill-slate-200">{val}</text>
+            </g>
+          );
+        })}
+        {data.map((d, i) => {
+          const x = padding + i * (barWidth + barSpacing) + barSpacing / 2;
+          const barHeight = ((d.value - minY) / (maxY - minY)) * chartHeight;
+          const y = padding + chartHeight - barHeight;
+          
+          return (
+            <g key={i} className="group cursor-pointer">
+              <rect x={x} y={y} width={barWidth} height={barHeight} rx="2" fill={color} className="opacity-90 hover:opacity-100 transition-opacity" />
+              <text x={x + barWidth / 2} y={height - padding + 12} textAnchor="middle" className="text-[8px] font-bold fill-slate-400 dark:text-slate-500">{d.label}</text>
+              <title>{`${d.label}: ${d.value}`}</title>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+};
+
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [activeSubTab, setActiveSubTab] = useState('');
@@ -2053,51 +2102,3 @@ const AdminDashboard = () => {
 };
 
 export default AdminDashboard;
-export const SVGBarChart = ({ data, color = "#1E3A8A" }) => {
-  if (!data || data.length === 0) return (
-    <div className="flex h-48 items-center justify-center text-xs font-semibold text-slate-400">No chart data available</div>
-  );
-
-  const width = 500;
-  const height = 200;
-  const padding = 30;
-  const chartWidth = width - padding * 2;
-  const chartHeight = height - padding * 2;
-
-  const yValues = data.map(d => d.value);
-  const maxY = Math.max(...yValues, 10);
-  const minY = 0;
-
-  const barWidth = (chartWidth / data.length) * 0.6;
-  const barSpacing = (chartWidth / data.length) * 0.4;
-
-  return (
-    <div className="relative w-full h-full">
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-full overflow-visible">
-        {[0, 0.25, 0.5, 0.75, 1].map((r, idx) => {
-          const y = padding + r * chartHeight;
-          const val = Math.round(maxY - r * (maxY - minY));
-          return (
-            <g key={idx} className="opacity-5">
-              <line x1={padding} y1={y} x2={width - padding} y2={y} stroke="#000" strokeWidth="1" />
-              <text x={padding - 8} y={y + 3} textAnchor="end" className="text-[8px] font-bold fill-slate-805 dark:fill-slate-200">{val}</text>
-            </g>
-          );
-        })}
-        {data.map((d, i) => {
-          const x = padding + i * (barWidth + barSpacing) + barSpacing / 2;
-          const barHeight = ((d.value - minY) / (maxY - minY)) * chartHeight;
-          const y = padding + chartHeight - barHeight;
-          
-          return (
-            <g key={i} className="group cursor-pointer">
-              <rect x={x} y={y} width={barWidth} height={barHeight} rx="2" fill={color} className="opacity-90 hover:opacity-100 transition-opacity" />
-              <text x={x + barWidth / 2} y={height - padding + 12} textAnchor="middle" className="text-[8px] font-bold fill-slate-400 dark:text-slate-500">{d.label}</text>
-              <title>{`${d.label}: ${d.value}`}</title>
-            </g>
-          );
-        })}
-      </svg>
-    </div>
-  );
-};
