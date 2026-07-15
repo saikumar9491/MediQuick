@@ -22,7 +22,8 @@ import {
   BadgeCheck,
   CreditCard,
   Maximize2,
-  Sliders
+  Sliders,
+  Package
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
