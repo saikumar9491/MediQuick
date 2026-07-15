@@ -40,6 +40,7 @@ import DoctorDetailsPage from './pages/DoctorDetailsPage';
 import WhatsAppSupport from './components/common/WhatsAppSupport';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import BottomNav from './components/common/BottomNav';
 import ScrollToTop from './components/common/ScrollToTop';
 
@@ -128,7 +129,11 @@ function AppLayout({ medicines, featured, loading }) {
           <Route element={<AdminRoute />}>
             <Route
               path="/admin-dashboard"
-              element={<AdminDashboard medicines={medicines} />}
+              element={
+                <ErrorBoundary>
+                  <AdminDashboard medicines={medicines} />
+                </ErrorBoundary>
+              }
             />
             <Route
               path="/admin/flash-deals"
