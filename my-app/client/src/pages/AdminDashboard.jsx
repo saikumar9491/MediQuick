@@ -97,7 +97,7 @@ const SplineChart = () => {
         return (
           <g key={i}>
             <line x1="40" y1={y} x2="480" y2={y} stroke="#E2E8F0" strokeWidth="1" strokeDasharray="3 3" />
-            <text x="32" y={y + 3.5} textAnchor="end" className="text-[10px] font-bold fill-slate-550">{val}</text>
+            <text x="32" y={y + 3.5} textAnchor="end" className="text-[10px] font-bold fill-slate-500">{val}</text>
           </g>
         );
       })}
@@ -109,7 +109,7 @@ const SplineChart = () => {
         </g>
       ))}
       {data.map((d, i) => (
-        <text key={i} x={40 + (i / 6) * 420} y="162" textAnchor="middle" className="text-[10.5px] font-bold fill-slate-550">{d.label}</text>
+        <text key={i} x={40 + (i / 6) * 420} y="162" textAnchor="middle" className="text-[10.5px] font-bold fill-slate-500">{d.label}</text>
       ))}
     </svg>
   );
@@ -157,7 +157,7 @@ const SVGBarChart = ({ data, color = "#1E3A8A" }) => {
           return (
             <g key={idx} className="opacity-5">
               <line x1={padding} y1={y} x2={width - padding} y2={y} stroke="#000" strokeWidth="1" />
-              <text x={padding - 8} y={y + 3} textAnchor="end" className="text-[8px] font-bold fill-slate-805 dark:fill-slate-200">{val}</text>
+              <text x={padding - 8} y={y + 3} textAnchor="end" className="text-[8px] font-bold fill-slate-800 dark:fill-slate-200">{val}</text>
             </g>
           );
         })}
@@ -806,7 +806,7 @@ const AdminDashboard = () => {
                 <div className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-lg p-5 shadow-sm">
                   <span className="text-[10px] font-bold text-orange-500 uppercase tracking-wider">Unique Visitors</span>
                   <div className="flex items-center gap-2 mt-1">
-                    <h4 className="text-2xl font-black text-slate-850">652</h4>
+                    <h4 className="text-2xl font-black text-slate-800">652</h4>
                     <ArrowDown className="h-4.5 w-4.5 text-rose-500" />
                   </div>
                   <span className="block text-[9px] text-slate-400 font-bold tracking-wide mt-1.5">36% From Last 6 Months</span>
@@ -816,7 +816,7 @@ const AdminDashboard = () => {
                 <div className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-lg p-5 shadow-sm">
                   <span className="text-[10px] font-bold text-orange-500 uppercase tracking-wider">Monthly Earnings</span>
                   <div className="flex items-center gap-2 mt-1">
-                    <h4 className="text-2xl font-black text-slate-850">5963</h4>
+                    <h4 className="text-2xl font-black text-slate-800">5963</h4>
                     <ArrowUp className="h-4.5 w-4.5 text-emerald-500" />
                   </div>
                   <span className="block text-[9px] text-slate-400 font-bold tracking-wide mt-1.5">36% From Last 6 Months</span>
@@ -900,7 +900,7 @@ const AdminDashboard = () => {
                 <div className="bg-[#FFFFFF] border border-[#E5E7EB] rounded-lg p-5 shadow-sm flex flex-col justify-between">
                   <div>
                     <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Products</span>
-                    <h4 className="text-xl font-black text-slate-805 mt-1">985</h4>
+                    <h4 className="text-xl font-black text-slate-800 mt-1">985</h4>
                   </div>
                   <div className="mt-3">
                     <SparklineBlue />
@@ -977,7 +977,7 @@ const AdminDashboard = () => {
                           <span className="text-[9px] text-slate-400 font-bold uppercase">{item.time}</span>
                         </div>
                         <p className="font-black text-slate-700 mt-1 truncate">{item.desc}</p>
-                        <p className="text-[10px] text-slate-450 truncate mt-0.5">{item.sub}</p>
+                        <p className="text-[10px] text-slate-500 truncate mt-0.5">{item.sub}</p>
                       </div>
                     </div>
                   ))}
@@ -1042,7 +1042,7 @@ const AdminDashboard = () => {
                       className={`px-3.5 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider border transition-all ${
                         productFilter === cat
                           ? 'bg-[#1E3A8A] text-white border-[#1E3A8A] shadow-sm'
-                          : 'bg-white dark:bg-slate-850 text-slate-655 dark:text-slate-300 border-[#E5E7EB] dark:border-slate-700 hover:border-slate-400'
+                          : 'bg-white dark:bg-slate-850 text-slate-600 dark:text-slate-300 border-[#E5E7EB] dark:border-slate-700 hover:border-slate-400'
                       }`}
                     >
                       {cat}
@@ -1071,7 +1071,7 @@ const AdminDashboard = () => {
                               <img src={item.image} className="h-10 w-10 object-contain rounded-lg border border-[#E5E7EB] bg-white p-1" alt="" />
                               <div>
                                 <span className="block text-[9px] font-black text-[#1E3A8A] dark:text-blue-400">{item.sku || 'MQ-GEN-100'}</span>
-                                <span className="block font-bold text-slate-855 dark:text-slate-200">{item.name}</span>
+                                <span className="block font-bold text-slate-800 dark:text-slate-200">{item.name}</span>
                                 <span className="text-[9px] text-slate-400 uppercase font-semibold">{item.brand}</span>
                               </div>
                             </td>
@@ -1312,7 +1312,7 @@ const AdminDashboard = () => {
                       {newProduct.variants.map((v, idx) => (
                         <div key={idx} className="flex justify-between items-center bg-white border border-[#E5E7EB] p-2.5 rounded-lg">
                           <div>
-                            <span className="font-bold text-slate-805">{v.size || v.weight || 'Default'}</span>
+                            <span className="font-bold text-slate-800">{v.size || v.weight || 'Default'}</span>
                             <span className="block text-[9px] text-slate-400">₹{v.price} / Stock: {v.countInStock}</span>
                           </div>
                           <button type="button" onClick={() => handleRemoveVariant(idx)} className="text-[#EF4444] font-bold hover:underline text-[10px]">Remove</button>
@@ -1350,7 +1350,7 @@ const AdminDashboard = () => {
                       const isOut = item.countInStock === 0;
                       return (
                         <tr key={item._id} className="hover:bg-[#F8FAFC]">
-                          <td className="px-6 py-4 font-bold text-slate-750">{item.name}</td>
+                          <td className="px-6 py-4 font-bold text-slate-700">{item.name}</td>
                           <td className="px-6 py-4">
                             <span className="bg-slate-100 px-2 py-0.5 rounded text-[10px] text-slate-500 font-bold uppercase">{item.category}</span>
                           </td>
@@ -1395,7 +1395,7 @@ const AdminDashboard = () => {
         {activeTab === 'orders' && (
           <motion.div key="orders" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-6">
             <div>
-              <h2 className="text-xl font-black text-slate-805 dark:text-slate-100 tracking-tight">Order Logs</h2>
+              <h2 className="text-xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Order Logs</h2>
               <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mt-0.5">Moderate deliveries, agent assignments, and customer returns</p>
             </div>
 
@@ -1445,13 +1445,13 @@ const AdminDashboard = () => {
                   <tbody className="divide-y divide-[#E5E7EB] bg-white">
                     {getFilteredOrders().map(o => (
                       <tr key={o._id} className="hover:bg-[#F8FAFC]">
-                        <td className="px-6 py-4 font-bold text-slate-850">#{o._id.slice(-6).toUpperCase()}</td>
+                        <td className="px-6 py-4 font-bold text-slate-800">#{o._id.slice(-6).toUpperCase()}</td>
                         <td className="px-6 py-4">
                           <span className="block font-bold text-slate-700">{o.userId?.name || 'Walkin'}</span>
                           <span className="text-[10px] text-slate-400">{o.userId?.email || 'N/A'}</span>
                         </td>
                         <td className="px-6 py-4 text-slate-500 font-medium">{new Date(o.createdAt).toLocaleDateString()}</td>
-                        <td className="px-6 py-4 font-bold text-slate-850">₹{o.totalAmount}</td>
+                        <td className="px-6 py-4 font-bold text-slate-800">₹{o.totalAmount}</td>
                         <td className="px-6 py-4">
                           {o.status === 'Cancelled' ? (
                             <span className="text-slate-400">N/A</span>
@@ -1532,11 +1532,11 @@ const AdminDashboard = () => {
                               {cust.name[0]}
                             </div>
                             <div>
-                              <span className="font-bold text-slate-855 block">{cust.name}</span>
-                              <span className="text-[10px] text-slate-450">{cust.email}</span>
+                              <span className="font-bold text-slate-800 block">{cust.name}</span>
+                              <span className="text-[10px] text-slate-500">{cust.email}</span>
                             </div>
                           </td>
-                          <td className="px-6 py-4 font-black text-slate-850">₹{cust.walletBalance || 0}</td>
+                          <td className="px-6 py-4 font-black text-slate-800">₹{cust.walletBalance || 0}</td>
                           <td className="px-6 py-4 text-center font-bold text-emerald-500">{cust.loyaltyPoints || 0} XP</td>
                           <td className="px-6 py-4">
                             <select
@@ -1621,7 +1621,7 @@ const AdminDashboard = () => {
                       <tr key={o._id} className="hover:bg-[#F8FAFC]">
                         <td className="px-6 py-4 font-bold text-slate-800">TXN_{o._id.slice(4, 12).toUpperCase()}</td>
                         <td className="px-6 py-4 font-medium text-slate-650">{o.userId?.name || 'Guest'}</td>
-                        <td className="px-6 py-4 font-bold text-slate-850">₹{o.totalAmount}</td>
+                        <td className="px-6 py-4 font-bold text-slate-800">₹{o.totalAmount}</td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border ${
                             o.isRefunded ? 'bg-rose-50 text-[#EF4444] border-red-100' :
@@ -1662,7 +1662,7 @@ const AdminDashboard = () => {
                     {orders.filter(o => o.status !== 'Cancelled').map(o => (
                       <tr key={o._id} className="hover:bg-[#F8FAFC]">
                         <td className="px-6 py-4">
-                          <span className="block font-bold text-slate-805">#{o._id.slice(-6).toUpperCase()}</span>
+                          <span className="block font-bold text-slate-800">#{o._id.slice(-6).toUpperCase()}</span>
                           <span className="text-[9px] text-slate-400 font-semibold">{o.userId?.name || 'Walkin'}</span>
                         </td>
                         <td className="px-6 py-4 flex flex-col">
@@ -1691,7 +1691,7 @@ const AdminDashboard = () => {
         {activeTab === 'coupons' && (
           <motion.div key="coupons" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm self-start">
-              <h4 className="text-sm font-bold text-slate-855 mb-6">Create Discount Coupon</h4>
+              <h4 className="text-sm font-bold text-slate-800 mb-6">Create Discount Coupon</h4>
               <form onSubmit={handleCreateCoupon} className="space-y-4 text-xs font-medium">
                 <div className="flex flex-col gap-1.5">
                   <label className="font-bold text-slate-500 uppercase">Coupon Code</label>
@@ -1742,7 +1742,7 @@ const AdminDashboard = () => {
                         <td className="px-6 py-4 font-bold">{c.discount}% Off</td>
                         <td className="px-6 py-4 text-center">
                           <span className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-black uppercase border ${
-                            c.isActive ? 'bg-emerald-50 text-[#22C55E] border-emerald-100' : 'bg-slate-50 text-slate-450 border-slate-205'
+                            c.isActive ? 'bg-emerald-50 text-[#22C55E] border-emerald-100' : 'bg-slate-50 text-slate-500 border-slate-205'
                           }`}>
                             {c.isActive ? 'Active' : 'Inactive'}
                           </span>
@@ -1790,7 +1790,7 @@ const AdminDashboard = () => {
                         <td className="px-6 py-4 font-bold text-slate-700">{r.customerName}</td>
                         <td className="px-6 py-4 flex items-center gap-2">
                           <img src={r.productImage} className="h-8 w-8 object-contain bg-white rounded border p-0.5" alt="" />
-                          <span className="font-bold text-slate-855">{r.productName}</span>
+                          <span className="font-bold text-slate-800">{r.productName}</span>
                         </td>
                         <td className="px-6 py-4 text-yellow-500 font-bold">{"⭐".repeat(r.rating)}</td>
                         <td className="px-6 py-4 text-slate-500 max-w-xs truncate">{r.comment}</td>
@@ -1842,14 +1842,14 @@ const AdminDashboard = () => {
         {activeTab === 'notifications' && (
           <motion.div key="notifications" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-6">
             <div>
-              <h2 className="text-xl font-black text-slate-805 tracking-tight">System Alerts Log</h2>
+              <h2 className="text-xl font-black text-slate-800 tracking-tight">System Alerts Log</h2>
             </div>
             <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm space-y-4">
               {lowStockProducts.map(p => (
                 <div key={p._id} className="flex gap-4 items-start p-4 bg-red-50/50 border border-red-100 rounded-xl text-xs">
                   <AlertTriangle className="h-5 w-5 text-[#EF4444] flex-shrink-0" />
                   <div>
-                    <h5 className="font-bold text-slate-855">Critical Stock Warning</h5>
+                    <h5 className="font-bold text-slate-800">Critical Stock Warning</h5>
                     <p className="text-slate-500 mt-1">{p.name} is running low ({p.countInStock} units left).</p>
                   </div>
                 </div>
@@ -1891,7 +1891,7 @@ const AdminDashboard = () => {
             {/* Global Settings */}
             {(activeSubTab === 'global-settings' || activeSubTab === '') && (
               <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm max-w-4xl">
-                <h4 className="text-sm font-bold text-slate-850 mb-6">Store Global Configuration</h4>
+                <h4 className="text-sm font-bold text-slate-800 mb-6">Store Global Configuration</h4>
                 <form onSubmit={handleSaveSettings} className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs font-semibold">
                   <div className="flex flex-col gap-1.5">
                     <label className="font-bold text-slate-500 uppercase">Store Name</label>
@@ -2003,7 +2003,7 @@ const AdminDashboard = () => {
             <motion.div initial={{ opacity: 0, scale: 0.95, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 30 }} className="fixed inset-x-4 top-10 bottom-10 md:inset-x-20 md:top-20 md:bottom-20 bg-white rounded-3xl z-50 overflow-hidden shadow-2xl flex flex-col max-w-4xl mx-auto text-xs border dark:border-slate-800">
               <div className="px-6 py-4 bg-slate-50 dark:bg-slate-900 border-b dark:border-slate-800 flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm font-bold text-slate-850 dark:text-slate-200">Order Invoice Summary</h4>
+                  <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">Order Invoice Summary</h4>
                   <p className="text-[10px] text-slate-400">ID: #{selectedOrder._id}</p>
                 </div>
                 <div className="flex gap-2">
@@ -2019,10 +2019,10 @@ const AdminDashboard = () => {
                   <div className="border border-[#E5E7EB] dark:border-slate-800 rounded-xl p-4 bg-[#F8FAFC]">
                     <h5 className="font-bold text-slate-800 dark:text-slate-200 mb-2 uppercase text-[9px]">Billing Profile</h5>
                     <p className="font-bold">{selectedOrder.userId?.name || 'Walkin Customer'}</p>
-                    <p className="text-slate-450 mt-1">{selectedOrder.userId?.email || 'N/A'}</p>
+                    <p className="text-slate-500 mt-1">{selectedOrder.userId?.email || 'N/A'}</p>
                   </div>
                   <div className="border border-[#E5E7EB] dark:border-slate-800 rounded-xl p-4 bg-[#F8FAFC]">
-                    <h5 className="font-bold text-slate-855 dark:text-slate-200 mb-3 uppercase text-[9px]">Purchased Items</h5>
+                    <h5 className="font-bold text-slate-800 dark:text-slate-200 mb-3 uppercase text-[9px]">Purchased Items</h5>
                     {selectedOrder.items?.map((item, idx) => (
                       <div key={idx} className="flex justify-between items-center py-1">
                         <span>{item.name} x{item.quantity}</span>
@@ -2034,7 +2034,7 @@ const AdminDashboard = () => {
 
                 <div className="space-y-4">
                   <div className="border border-[#E5E7EB] dark:border-slate-800 rounded-xl p-4 bg-[#F8FAFC]">
-                    <h5 className="font-bold text-slate-855 dark:text-slate-200 mb-2 uppercase text-[9px]">Destination</h5>
+                    <h5 className="font-bold text-slate-800 dark:text-slate-200 mb-2 uppercase text-[9px]">Destination</h5>
                     <p>{selectedOrder.shippingAddress?.building}, {selectedOrder.shippingAddress?.area}</p>
                     <span className="text-[10px] font-bold text-blue-500">PIN: {selectedOrder.shippingAddress?.pincode}</span>
                   </div>
@@ -2085,7 +2085,7 @@ const AdminDashboard = () => {
         .dark .border-slate-200 {
           border-color: #334155 !important;
         }
-        .dark .text-slate-805 {
+        .dark .text-slate-800 {
           color: #F8FAFC !important;
         }
         .dark .text-slate-700 {
