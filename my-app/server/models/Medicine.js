@@ -5,6 +5,7 @@ const reviewSchema = new mongoose.Schema({
   rating: { type: Number, required: true },
   comment: { type: String, required: true },
   user: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
+  isApproved: { type: Boolean, default: true },
 }, { timestamps: true });
 
 const medicineSchema = mongoose.Schema({
@@ -17,6 +18,7 @@ const medicineSchema = mongoose.Schema({
   image: { type: String, default: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR62OQ4G_o-9YnZ-G_Xw9_G_Xw9_G_Xw9_G_Xw&usqp=CAU' },
   rating: { type: Number, default: 0 },
   numReviews: { type: Number, default: 0 },
+  reviews: [reviewSchema],
   needsRx: { type: Boolean, default: false },
   isFlashDeal: { type: Boolean, default: false },
   isTrending: { type: Boolean, default: false },
