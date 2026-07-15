@@ -1084,13 +1084,13 @@ const AdminDashboard = () => {
                       {inventory
                         .filter(item => productFilter === 'All' || item.category === productFilter)
                         .map(item => (
-                          <tr key={item._id} className="hover:bg-[#F8FAFC] dark:hover:bg-slate-800/30">
+                          <tr key={item._id} className="hover:bg-[#F8FAFC]">
                             <td className="px-6 py-4 flex items-center gap-4">
-                              <img src={item.image} className="h-10 w-10 object-contain rounded-lg border border-[#E5E7EB] bg-white p-1" alt="" />
+                              <img src={item.image} className="h-12 w-12 object-contain rounded-lg border border-[#E5E7EB] bg-white p-1 flex-shrink-0" alt="" />
                               <div>
-                                <span className="block text-[9px] font-black text-[#1E3A8A] dark:text-blue-400">{item.sku || 'MQ-GEN-100'}</span>
-                                <span className="block font-bold text-slate-800 dark:text-slate-200">{item.name}</span>
-                                <span className="text-[9px] text-slate-400 uppercase font-semibold">{item.brand}</span>
+                                <span className="block text-[10px] font-black text-[#1E3A8A]">{item.sku || 'MQ-GEN-100'}</span>
+                                <span className="block font-bold text-slate-800 text-[13px] leading-tight mb-0.5">{item.name}</span>
+                                <span className="text-[10.5px] text-slate-500 uppercase font-bold">{item.brand}</span>
                               </div>
                             </td>
                             <td className="px-6 py-4">
@@ -1368,7 +1368,13 @@ const AdminDashboard = () => {
                       const isOut = item.countInStock === 0;
                       return (
                         <tr key={item._id} className="hover:bg-[#F8FAFC]">
-                          <td className="px-6 py-4 font-bold text-slate-700">{item.name}</td>
+                          <td className="px-6 py-4 flex items-center gap-4">
+                            <img src={item.image} className="h-12 w-12 object-contain rounded-lg border border-[#E5E7EB] bg-white p-1 flex-shrink-0" alt="" />
+                            <div>
+                              <span className="block font-bold text-slate-800 text-[13px] leading-tight mb-0.5">{item.name}</span>
+                              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{item.sku || 'MQ-GEN-100'} • {item.brand}</span>
+                            </div>
+                          </td>
                           <td className="px-6 py-4">
                             <span className="bg-slate-100 px-2 py-0.5 rounded text-[10px] text-slate-500 font-bold uppercase">{item.category}</span>
                           </td>
