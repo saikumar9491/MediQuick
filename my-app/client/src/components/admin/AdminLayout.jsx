@@ -266,7 +266,7 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex text-slate-800 dark:text-slate-100 antialiased font-sans transition-colors duration-200">
       {/* Desktop Sidebar */}
       <aside 
-        className={`hidden lg:block h-screen sticky top-0 shadow-sm transition-all duration-300 z-30 ${
+        className={`hidden lg:block h-screen sticky top-0 shadow-sm transition-all duration-300 z-30 flex-shrink-0 ${
           sidebarOpen ? 'w-60' : 'w-20'
         }`}
       >
