@@ -44,29 +44,13 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
   const [productsOpen, setProductsOpen] = useState(false);
   const [ordersOpen, setOrdersOpen] = useState(false);
   
-  const [theme, setTheme] = useState(() => {
-    const cached = localStorage.getItem('mq_admin_theme');
-    return cached || 'light';
-  });
-
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-      document.body.classList.add('bg-slate-900', 'text-slate-100');
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.body.classList.remove('bg-slate-900', 'text-slate-100');
-    }
-  }, [theme]);
-
-  const toggleTheme = () => {
-    const nextTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(nextTheme);
-    localStorage.setItem('mq_admin_theme', nextTheme);
-  };
+    document.documentElement.classList.remove('dark');
+    document.body.classList.remove('bg-slate-900', 'text-slate-100');
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -337,13 +321,7 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
           </div>
 
           <div className="flex items-center gap-4.5">
-            {/* Theme Toggle Button */}
-            <button
-              onClick={toggleTheme}
-              className="p-1.5 text-slate-300 hover:text-white rounded-lg hover:bg-slate-700/50 transition-all"
-            >
-              {theme === 'light' ? <Moon className="h-4.5 w-4.5" /> : <Sun className="h-4.5 w-4.5" />}
-            </button>
+
 
             {/* Mail Icon */}
             <button className="p-1.5 text-slate-300 hover:text-white rounded-lg hover:bg-slate-700/50 transition-all relative">
