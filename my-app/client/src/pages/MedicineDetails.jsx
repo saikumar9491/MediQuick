@@ -49,14 +49,14 @@ const MedicineDetails = () => {
   const imgRef = useRef(null);
 
   const packVariants = [
-    { label: '10 Tablets', multiplier: 1.0, info: 'Base Pack', icon: '💊' },
-    { label: '15 Tablets', multiplier: 1.45, info: 'Save 5%', icon: '💊' },
-    { label: '30 Tablets', multiplier: 2.7, info: 'Save 10%', icon: '📦' },
-    { label: '60 Tablets', multiplier: 5.1, info: 'Save 15%', icon: '📦' },
-    { label: '100 Tablets', multiplier: 8.0, info: 'Save 20%', icon: '🧪' }
+    { label: 'Whole', multiplier: 1.0, info: '', icon: '🐟' },
+    { label: 'Cleaned & Gutted', multiplier: 1.05, info: '+5%', icon: '🍤' },
+    { label: 'Steaks', multiplier: 1.10, info: '+10%', icon: '🥩' },
+    { label: 'Fillets', multiplier: 1.15, info: '+15%', icon: '🍣' },
+    { label: 'Boneless Cubes', multiplier: 1.20, info: '+20%', icon: '🧊' }
   ];
 
-  const [selectedVariant, setSelectedVariant] = useState(packVariants[0]);
+  const [selectedVariant, setSelectedVariant] = useState(packVariants[2]);
   const [pincode, setPincode] = useState('');
   const [deliveryMessage, setDeliveryMessage] = useState('');
   const [checkedBundleItems, setCheckedBundleItems] = useState([]);
@@ -355,91 +355,86 @@ const MedicineDetails = () => {
               
               {/* Brand and reviews header */}
               <div className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <span className="bg-[#00a2a4]/10 text-[#00a2a4] px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest">
-                    {medicine.brand || 'Premium Healthcare'}
+                <div className="flex flex-col gap-2">
+                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">
+                    {medicine.category}
                   </span>
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-green-50 text-green-700 border border-green-100">
-                    <Star size={12} fill="currentColor" />
-                    <span className="text-[11px] font-black">4.9</span>
-                    <span className="text-[11px] font-bold opacity-40 ml-1">| 1,240 REVIEWS</span>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-50 text-teal-700 rounded-full border border-teal-100 font-bold text-[10px] uppercase tracking-wider self-start">
+                    <span className="h-1.5 w-1.5 bg-teal-500 rounded-full animate-ping"></span>
+                    <span>42 units sold in last 24 hrs</span>
                   </div>
                 </div>
 
-                <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-slate-900 uppercase italic leading-tight">
+                <h1 className="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight">
                   {medicine.name}
                 </h1>
-                
-                <div className="flex flex-wrap gap-4 text-[10px] font-black uppercase tracking-widest text-slate-400">
-                  <span className="flex items-center gap-1.5"><Info size={14} className="text-[#00a2a4]" /> Category: {medicine.category}</span>
-                  <span className="flex items-center gap-1.5"><Clock size={14} className="text-[#00a2a4]" /> Exp: Dec 2026</span>
-                  <span className="flex items-center gap-1.5"><MapPin size={14} className="text-[#00a2a4]" /> From: Amritsar Hub</span>
-                </div>
               </div>
 
               {/* Price Block */}
-              <div className="border border-slate-100 bg-[#F8FAFC]/50 rounded-3xl p-6 sm:p-8 flex items-baseline gap-4 relative overflow-hidden">
-                <div className="relative z-10">
-                  <div className="flex items-baseline gap-3">
-                    <h2 className="text-5xl font-black tracking-tighter italic text-slate-900">
-                      ₹{Math.round(finalPrice * selectedVariant.multiplier)}
-                    </h2>
-                    <span className="text-sm font-black text-[#ff6f61] uppercase tracking-wider bg-red-50 border border-red-100 px-2 py-0.5 rounded-md">
-                      -{discountPercent}% OFF
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-3 mt-2 text-slate-500">
-                    <span className="text-xs font-bold uppercase tracking-wider">M.R.P.:</span>
-                    <span className="text-xs font-bold line-through">₹{Math.round(mrp * selectedVariant.multiplier)}</span>
-                    <span className="text-xs font-black text-teal-600 uppercase tracking-widest">Inclusive of all taxes</span>
-                  </div>
+              <div className="space-y-1">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-lg font-bold text-slate-800">₹</span>
+                  <span className="text-3xl font-extrabold text-slate-900 leading-none">
+                    {Math.round(finalPrice * selectedVariant.multiplier)}
+                  </span>
+                </div>
+                <div className="text-xs font-bold text-slate-400 flex items-center gap-2">
+                  <span className="text-red-500">-{discountPercent}%</span>
+                  <span>M.R.P.: <span className="line-through">₹{Math.round(mrp * selectedVariant.multiplier)}</span></span>
                 </div>
               </div>
 
+              {/* Stock Status */}
+              <div className="space-y-1">
+                <p className="text-xs font-bold text-emerald-600">In Stock</p>
+                <p className="text-xs text-slate-500 font-medium">
+                  FREE delivery <span className="font-bold text-slate-800">Tomorrow</span>. Order within <span className="text-orange-500 font-bold">4 hrs 12 mins.</span>
+                </p>
+              </div>
+
               {/* LIVE Quality Index circular meter (Screenshot style freshness meter) */}
-              <div className="flex items-center justify-between p-4 sm:p-5 rounded-3xl border border-teal-150 bg-teal-50/20 shadow-sm">
+              <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-100 shadow-sm">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-2xl bg-white border shadow-sm flex items-center justify-center text-[#00a2a4] flex-shrink-0">
-                    <ShieldCheck size={20} />
+                  <div className="relative h-10 w-10 flex items-center justify-center bg-sky-50 rounded-full">
+                    <svg className="absolute transform -rotate-90 w-full h-full">
+                      <circle cx="20" cy="20" r="16" stroke="#E2E8F0" strokeWidth="2.5" fill="transparent" />
+                      <circle cx="20" cy="20" r="16" stroke="#0ea5e9" strokeWidth="2.5" fill="transparent" strokeDasharray={100} strokeDashoffset={100 - 73} />
+                    </svg>
+                    <span className="text-xs relative z-10">🔬</span>
                   </div>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-black uppercase tracking-wider text-slate-800">Premium Potency</span>
-                      <span className="bg-emerald-500 text-white text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded">LIVE</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-black uppercase text-slate-800">Premium Potency</span>
+                      <span className="bg-[#0ea5e9] text-white text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full">LIVE</span>
                     </div>
-                    <p className="text-[10px] font-bold text-slate-500 mt-0.5">Verified clinical assay 13h ago</p>
+                    <p className="text-[10px] text-slate-450 font-bold mt-0.5">Tested <span className="font-black text-slate-700">13h ago</span> (at 01:57).</p>
                   </div>
                 </div>
-                
-                <div className="flex items-center gap-3">
-                  <div className="relative h-12 w-12 flex items-center justify-center">
-                    <svg className="absolute transform -rotate-90 w-full h-full">
-                      <circle cx="24" cy="24" r="18" stroke="#E2E8F0" strokeWidth="3" fill="transparent" />
-                      <circle cx="24" cy="24" r="18" stroke="#00a2a4" strokeWidth="3" fill="transparent" strokeDasharray={113} strokeDashoffset={113 - (113 * 99) / 100} />
-                    </svg>
-                    <span className="text-xs font-black text-[#00a2a4]">99%</span>
+                <div className="text-right flex items-center gap-2">
+                  <div>
+                    <span className="text-xl font-black text-sky-500 leading-none">99%</span>
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mt-0.5">METER</p>
                   </div>
-                  <span className="text-[8px] font-black uppercase tracking-widest text-slate-400">Potency<br/>Index</span>
                 </div>
               </div>
 
               {/* Delivery Checker Box */}
-              <div className="p-4 sm:p-5 rounded-3xl border border-slate-100 bg-[#F8FAFC]">
+              <div className="p-4 rounded-2xl border border-slate-100 bg-[#f4f7f6]">
                 <div className="flex items-center gap-2 mb-3">
-                  <Truck className="h-4 w-4 text-slate-500" />
-                  <span className="text-[10.5px] font-black uppercase tracking-wider text-slate-800">Check Expected Delivery</span>
+                  <Truck size={14} className="text-slate-500" />
+                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-700">Check Expected Delivery</span>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex bg-white rounded-xl overflow-hidden border border-slate-200 p-0.5 shadow-sm">
                   <input 
                     type="text" 
                     placeholder="Enter Pincode" 
                     value={pincode}
                     onChange={(e) => setPincode(e.target.value)}
-                    className="flex-1 px-3.5 py-2.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#00a2a4]"
+                    className="flex-1 px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none"
                   />
                   <button 
                     onClick={handleCheckDelivery}
-                    className="px-5 py-2.5 rounded-xl bg-[#00a2a4] hover:bg-[#008284] text-white text-xs font-bold transition-all shadow-md active:scale-95 cursor-pointer"
+                    className="px-5 py-2 bg-[#ccd9d7] hover:bg-[#b0c0be] text-slate-700 text-xs font-bold rounded-lg transition-all cursor-pointer"
                   >
                     Check
                   </button>
@@ -452,67 +447,78 @@ const MedicineDetails = () => {
               {/* Variant Selector Pills ("Choose Your Cut" Equivalent) */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <Sliders className="h-4 w-4 text-slate-500" />
-                  <span className="text-[10.5px] font-black uppercase tracking-wider text-slate-800">Choose Pack Size</span>
+                  <Sliders size={14} className="text-slate-500" />
+                  <span className="text-[10.5px] font-black uppercase tracking-wider text-slate-800">Choose Your Cut</span>
                 </div>
                 <div className="flex flex-wrap gap-2.5">
-                  {packVariants.map((variant) => (
-                    <button
-                      key={variant.label}
-                      onClick={() => setSelectedVariant(variant)}
-                      className={`flex items-center gap-2 px-4 py-2.5 rounded-full border text-[11px] font-bold transition-all duration-200 cursor-pointer active:scale-95 ${
-                        selectedVariant.label === variant.label
-                          ? 'bg-teal-50 border-[#00a2a4] text-[#00a2a4] shadow-sm'
-                          : 'bg-white border-slate-200 text-slate-700 hover:border-slate-400'
-                      }`}
-                    >
-                      <span>{variant.icon}</span>
-                      <span>{variant.label}</span>
-                      <span className={`text-[9px] font-black ${selectedVariant.label === variant.label ? 'text-teal-600' : 'text-slate-400'}`}>
-                        {variant.info}
-                      </span>
-                    </button>
-                  ))}
+                  {packVariants.map((variant) => {
+                    const isSelected = selectedVariant.label === variant.label;
+                    return (
+                      <button
+                        key={variant.label}
+                        onClick={() => setSelectedVariant(variant)}
+                        className={`flex items-center gap-1.5 px-4 py-2 rounded-full border text-[11px] font-bold transition-all duration-205 cursor-pointer active:scale-95 ${
+                          isSelected
+                            ? 'bg-[#1e293b] border-[#1e293b] text-white shadow-sm'
+                            : 'bg-white border-slate-200 text-slate-700 hover:border-slate-400'
+                        }`}
+                      >
+                        <span>{variant.icon}</span>
+                        <span>{variant.label}</span>
+                        {variant.info && (
+                          <span className={`text-[9px] font-black ${isSelected ? 'text-teal-400' : 'text-slate-400'}`}>
+                            {variant.info}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
+                {selectedVariant && (
+                  <p className="text-[10px] font-bold text-emerald-600">
+                    ✓ {selectedVariant.label} selected ({selectedVariant.info ? `${selectedVariant.info} processing fee` : 'no extra fee'})
+                  </p>
+                )}
               </div>
 
-              {/* Action Buttons */}
+              {/* Action Buttons & Quantity (Stacked layout exactly like screenshot 2) */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                  <div>
-                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Set Quantity</p>
-                    <p className="text-[11px] font-bold text-[#00a2a4]">{selectedVariant.label} per unit pack</p>
-                  </div>
-                  <div className="flex items-center gap-6 bg-white p-1 rounded-xl shadow-sm border border-slate-100">
-                    <button 
-                      onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                      className="w-8 h-8 rounded-lg hover:bg-slate-900 hover:text-white transition-all flex items-center justify-center active:scale-90"
-                    >
-                      <Minus size={14} strokeWidth={3} />
-                    </button>
-                    <span className="text-base font-black text-slate-900 w-4 text-center">{quantity}</span>
-                    <button 
-                      onClick={() => setQuantity(q => q + 1)}
-                      className="w-8 h-8 rounded-lg hover:bg-slate-900 hover:text-white transition-all flex items-center justify-center active:scale-90"
-                    >
-                      <Plus size={14} strokeWidth={3} />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-3">
                   <button 
                     onClick={handleAddToCart}
-                    className="flex-1 bg-slate-900 text-white hover:bg-slate-850 py-4.5 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center gap-3 shadow-md cursor-pointer"
+                    className="w-full bg-[#1e293b] hover:bg-slate-800 text-white py-3.5 rounded-full text-xs font-black uppercase tracking-widest transition-all active:scale-95 cursor-pointer shadow-md flex items-center justify-center"
                   >
-                    <ShoppingCart size={16} /> Add to Cart
+                    Add to Cart
                   </button>
                   <button 
                     onClick={handleBuyNow}
-                    className="flex-1 bg-[#00a2a4] text-white py-4.5 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-lg shadow-teal-500/20 hover:bg-[#008284] transition-all active:scale-95 flex items-center justify-center gap-3 cursor-pointer"
+                    className="w-full bg-[#52b5a5] hover:bg-[#43a393] text-white py-3.5 rounded-full text-xs font-black uppercase tracking-widest transition-all active:scale-95 cursor-pointer shadow-md flex items-center justify-center"
                   >
-                    <Zap size={16} fill="currentColor" /> Buy Now
+                    Buy Now
                   </button>
+                </div>
+
+                {/* Quantity adjuster */}
+                <div className="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div>
+                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Quantity</p>
+                    <p className="text-[11px] font-bold text-[#00a2a4]">{selectedVariant.label} package yield</p>
+                  </div>
+                  <div className="flex items-center gap-5 bg-white p-1 rounded-xl shadow-sm border border-slate-100">
+                    <button 
+                      onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                      className="w-7 h-7 rounded-lg hover:bg-slate-900 hover:text-white transition-all flex items-center justify-center active:scale-90"
+                    >
+                      <Minus size={12} strokeWidth={3} />
+                    </button>
+                    <span className="text-sm font-black text-slate-900 w-4 text-center">{quantity}</span>
+                    <button 
+                      onClick={() => setQuantity(q => q + 1)}
+                      className="w-7 h-7 rounded-lg hover:bg-slate-900 hover:text-white transition-all flex items-center justify-center active:scale-90"
+                    >
+                      <Plus size={12} strokeWidth={3} />
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -548,22 +554,21 @@ const MedicineDetails = () => {
                     Disclaimer: This information is for clinical awareness. Please ensure you are under the supervision of a registered medical practitioner while using this product.
                   </p>
                 </div>
-              </div>
-
             </div>
           </div>
         </div>
+      </div>
 
         {/* Bundle Cross-sell Section ("Frequently Bought Together") */}
         {related.length > 0 && (
-          <div className="mt-20 rounded-[36px] border border-slate-100 bg-[#F8FAFC]/60 p-6 sm:p-8 space-y-6">
+          <div className="mt-20 rounded-[36px] bg-white border border-slate-100 p-6 sm:p-8 space-y-6">
             <div className="flex items-center gap-2.5">
               <div className="h-8 w-8 rounded-xl bg-teal-50 flex items-center justify-center text-[#00a2a4] shadow-sm">
                 <Package size={16} />
               </div>
               <div>
                 <h4 className="text-sm font-black uppercase tracking-wider text-slate-900">Frequently Bought Together</h4>
-                <p className="text-[10px] font-bold text-slate-500">Save when you bundle these healthcare picks</p>
+                <p className="text-[10px] font-bold text-slate-500">Save when you bundle these fresh picks</p>
               </div>
             </div>
 
@@ -573,50 +578,71 @@ const MedicineDetails = () => {
                 
                 {/* Current Item */}
                 <div className="flex flex-col items-center text-center p-4 rounded-3xl bg-white border border-[#E5E7EB] w-36 relative shadow-sm hover:scale-[1.02] transition-all">
-                  <input 
-                    type="checkbox"
-                    checked={checkedBundleItems.includes(medicine._id)}
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setCheckedBundleItems(prev => [...prev, medicine._id]);
-                      } else {
+                  <div 
+                    onClick={() => {
+                      if (checkedBundleItems.includes(medicine._id)) {
                         setCheckedBundleItems(prev => prev.filter(id => id !== medicine._id));
+                      } else {
+                        setCheckedBundleItems(prev => [...prev, medicine._id]);
                       }
                     }}
-                    className="absolute top-3.5 right-3.5 h-4 w-4 accent-[#00a2a4] cursor-pointer"
-                  />
+                    className="absolute top-3.5 right-3.5 cursor-pointer z-10"
+                  >
+                    {checkedBundleItems.includes(medicine._id) ? (
+                      <div className="h-5 w-5 rounded-full bg-[#52b5a5] flex items-center justify-center text-white border border-[#52b5a5]">
+                        <CheckCircle2 size={12} className="text-white" />
+                      </div>
+                    ) : (
+                      <div className="h-5 w-5 rounded-full bg-white border-2 border-slate-300" />
+                    )}
+                  </div>
+                  
                   <div className="h-16 w-16 flex items-center justify-center mb-2">
                     <img src={medicine.image} className="max-h-full max-w-full object-contain mix-blend-multiply" alt="" />
                   </div>
-                  <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">This Item</span>
-                  <p className="text-[10px] font-bold text-slate-800 line-clamp-1 mt-1">{medicine.name}</p>
-                  <span className="text-[11.5px] font-black text-slate-900 mt-1">₹{Math.round(finalPrice * selectedVariant.multiplier)}</span>
+                  <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest bg-teal-50 text-[#00a2a4] px-2 py-0.5 rounded-full self-start mb-1">THIS ITEM</span>
+                  <p className="text-[10px] font-bold text-slate-800 line-clamp-1 mt-1 text-left w-full">{medicine.name}</p>
+                  <div className="flex items-center gap-2 mt-1 w-full text-left">
+                    <span className="text-[11px] font-black text-slate-900">₹{Math.round(finalPrice * selectedVariant.multiplier)}</span>
+                    <span className="text-[9px] font-bold text-slate-450 line-through">₹{Math.round(mrp * selectedVariant.multiplier)}</span>
+                  </div>
                 </div>
 
                 {/* Related items */}
                 {related.slice(0, 3).map((item) => {
                   const itemPrice = item.discountPrice || item.price;
+                  const itemMrp = Math.round(item.price * 1.33);
                   return (
                     <React.Fragment key={item._id}>
                       <span className="text-lg font-black text-slate-300 select-none">+</span>
                       <div className="flex flex-col items-center text-center p-4 rounded-3xl bg-white border border-[#E5E7EB] w-36 relative shadow-sm hover:scale-[1.02] transition-all">
-                        <input 
-                          type="checkbox"
-                          checked={checkedBundleItems.includes(item._id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setCheckedBundleItems(prev => [...prev, item._id]);
-                            } else {
+                        <div 
+                          onClick={() => {
+                            if (checkedBundleItems.includes(item._id)) {
                               setCheckedBundleItems(prev => prev.filter(id => id !== item._id));
+                            } else {
+                              setCheckedBundleItems(prev => [...prev, item._id]);
                             }
                           }}
-                          className="absolute top-3.5 right-3.5 h-4 w-4 accent-[#00a2a4] cursor-pointer"
-                        />
+                          className="absolute top-3.5 right-3.5 cursor-pointer z-10"
+                        >
+                          {checkedBundleItems.includes(item._id) ? (
+                            <div className="h-5 w-5 rounded-full bg-[#52b5a5] flex items-center justify-center text-white border border-[#52b5a5]">
+                              <CheckCircle2 size={12} className="text-white" />
+                            </div>
+                          ) : (
+                            <div className="h-5 w-5 rounded-full bg-white border-2 border-slate-300" />
+                          )}
+                        </div>
+
                         <div className="h-16 w-16 flex items-center justify-center mb-2">
                           <img src={item.image} className="max-h-full max-w-full object-contain mix-blend-multiply" alt="" />
                         </div>
-                        <p className="text-[10px] font-bold text-slate-800 line-clamp-2 min-h-[30px] leading-tight">{item.name}</p>
-                        <span className="text-[11.5px] font-black text-slate-900 mt-1">₹{itemPrice}</span>
+                        <p className="text-[10px] font-bold text-slate-800 line-clamp-2 min-h-[30px] leading-tight text-left w-full">{item.name}</p>
+                        <div className="flex items-center gap-2 mt-1 w-full text-left">
+                          <span className="text-[11px] font-black text-slate-900">₹{itemPrice}</span>
+                          <span className="text-[9px] font-bold text-slate-450 line-through">₹{itemMrp}</span>
+                        </div>
                       </div>
                     </React.Fragment>
                   );
@@ -624,15 +650,17 @@ const MedicineDetails = () => {
               </div>
 
               {/* Bundle Calculation Card */}
-              <div className="w-full lg:w-64 rounded-3xl bg-teal-50/40 border border-teal-100/60 p-6 flex flex-col justify-between items-center text-center">
-                <span className="text-[9px] font-black uppercase tracking-widest text-[#00a2a4] bg-teal-50 px-2 py-0.5 rounded-full">Bundle Deal</span>
-                <div className="my-4">
+              <div className="w-full lg:w-64 rounded-3xl bg-[#f4f7f6] border border-slate-100 p-6 flex flex-col justify-between items-center text-center">
+                <span className="text-[9px] font-black uppercase tracking-widest text-[#00a2a4] bg-teal-50 px-2.5 py-1 rounded-full flex items-center gap-1">
+                  <span className="h-1.5 w-1.5 bg-[#00a2a4] rounded-full"></span> RECENTLY VIEWED
+                </span>
+                <div className="my-5">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{checkedBundleItems.length} Items Total</p>
                   <h3 className="text-3xl font-black text-slate-900 mt-1">₹{bundleTotal}</h3>
                 </div>
                 <button 
                   onClick={handleAddBundleToCart}
-                  className="w-full bg-slate-900 text-white hover:bg-slate-800 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 shadow-md cursor-pointer"
+                  className="w-full bg-[#1e293b] text-white hover:bg-slate-800 py-3.5 rounded-full text-xs font-black uppercase tracking-wider transition-all active:scale-95 shadow-md cursor-pointer"
                 >
                   Add Bundle to Cart
                 </button>
