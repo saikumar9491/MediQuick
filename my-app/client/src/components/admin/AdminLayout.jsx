@@ -161,17 +161,21 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
       {/* Brand Header */}
       <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200/80 dark:border-slate-800 bg-[#2D3748] text-white">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded bg-orange-500 text-white font-black text-sm">
+          <div className="flex h-8 w-8 items-center justify-center rounded bg-orange-500 text-white font-black text-sm flex-shrink-0">
             E
           </div>
-          <div>
-            <h1 className="text-sm font-black tracking-wider uppercase text-white">Empire</h1>
-            <p className="text-[9px] font-bold text-slate-300 tracking-widest uppercase">Admin System</p>
-          </div>
+          {sidebarOpen && (
+            <div>
+              <h1 className="text-sm font-black tracking-wider uppercase text-white">Empire</h1>
+              <p className="text-[9px] font-bold text-slate-300 tracking-widest uppercase">Admin System</p>
+            </div>
+          )}
         </div>
-        <button onClick={toggleSidebar} className="hidden lg:block text-slate-300 hover:text-white transition-colors">
-          <ChevronRight className={`h-4.5 w-4.5 transform transition-transform ${sidebarOpen ? 'rotate-180' : ''}`} />
-        </button>
+        {sidebarOpen && (
+          <button onClick={toggleSidebar} className="hidden lg:block text-slate-300 hover:text-white transition-colors">
+            <ChevronRight className={`h-4.5 w-4.5 transform transition-transform rotate-180`} />
+          </button>
+        )}
       </div>
 
       {/* Navigation Links */}
@@ -303,8 +307,14 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
         <header className="sticky top-0 bg-[#2D3748] z-20 px-6 py-4 flex items-center justify-between text-white border-b border-[#1A202C]">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => setMobileSidebarOpen(true)}
-              className="lg:hidden p-1.5 rounded-lg text-slate-300 hover:bg-slate-700/50 hover:text-white transition-all"
+              onClick={() => {
+                if (window.innerWidth >= 1024) {
+                  toggleSidebar();
+                } else {
+                  setMobileSidebarOpen(true);
+                }
+              }}
+              className="p-1.5 rounded-lg text-slate-300 hover:bg-slate-700/50 hover:text-white transition-all"
             >
               <Menu className="h-5 w-5" />
             </button>
