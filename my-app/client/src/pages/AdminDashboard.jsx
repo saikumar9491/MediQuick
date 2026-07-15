@@ -677,6 +677,24 @@ const AdminDashboard = () => {
     } catch (err) { toast.error('Deletion failed'); }
   };
 
+  const handleDeleteBanner = async (id) => {
+    if (!window.confirm('Delete this banner?')) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/banners/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        toast.success('Banner deleted');
+        setBanners(prev => prev.filter(b => b._id !== id));
+      } else {
+        toast.error('Failed to delete banner');
+      }
+    } catch (err) {
+      toast.error('Network error');
+    }
+  };
+
   // Invoice Print
   const handlePrintInvoice = () => {
     const printContent = printAreaRef.current.innerHTML;
@@ -1939,7 +1957,7 @@ const AdminDashboard = () => {
             {activeSubTab === 'banners' && (
               <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm max-w-4xl">
                 <h4 className="text-sm font-bold text-[#1E3A8A] mb-6">Promotional Banners Manager</h4>
-                <AdminBannerManager token={token} API_BASE={API_BASE} />
+                <AdminBannerManager banners={banners} setBanners={setBanners} token={token} API_BASE={API_BASE} handleDeleteBanner={handleDeleteBanner} />
               </div>
             )}
 
