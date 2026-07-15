@@ -422,6 +422,16 @@ const AdminDashboard = () => {
     toast.success('Report downloaded successfully!');
   };
 
+  const handleAddNew = () => {
+    setEditingProduct(null);
+    setIsModalOpen(true);
+  };
+
+  const handleEdit = (product) => {
+    setEditingProduct(product);
+    setIsModalOpen(true);
+  };
+
   // Product Operations
   const handleSaveProduct = async (productData) => {
     const isEdit = !!editingProduct;
@@ -1824,48 +1834,123 @@ const AdminDashboard = () => {
 
         {/* ================= TAB 11: SETTINGS ================= */}
         {activeTab === 'settings' && (
-          <motion.div key="settings" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm max-w-4xl">
-            <h4 className="text-sm font-bold text-slate-850 mb-6">Store Global Configuration</h4>
-            <form onSubmit={handleSaveSettings} className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs font-semibold">
-              <div className="flex flex-col gap-1.5">
-                <label className="font-bold text-slate-500 uppercase">Store Name</label>
-                <input
-                  type="text" required value={settingsForm.storeName}
-                  onChange={e => setSettingsForm({ ...settingsForm, storeName: e.target.value })}
-                  className="border border-[#E5E7EB] bg-white rounded-xl px-3.5 py-2.5 font-bold"
-                />
-              </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="font-bold text-slate-500 uppercase">Gateway Provider</label>
-                <select
-                  value={settingsForm.paymentGateway}
-                  onChange={e => setSettingsForm({ ...settingsForm, paymentGateway: e.target.value })}
-                  className="border border-[#E5E7EB] bg-white rounded-xl px-3.5 py-2.5"
+          <motion.div key="settings" initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }} className="space-y-6">
+            <div>
+              <h2 className="text-xl font-black text-slate-800 dark:text-slate-100 tracking-tight">Settings Hub</h2>
+              <p className="text-xs font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider mt-0.5">Configure store info, manage banners, and view admin profile</p>
+            </div>
+
+            {/* Sub Tabs */}
+            <div className="flex border-b border-[#E5E7EB] dark:border-slate-800 text-xs font-bold text-slate-500 gap-6">
+              {[
+                { id: 'global-settings', label: 'Global Configurations' },
+                { id: 'banners', label: 'Banners Manager' },
+                { id: 'profile', label: 'Admin Profile' }
+              ].map(sub => (
+                <button
+                  key={sub.id}
+                  onClick={() => setActiveSubTab(sub.id)}
+                  type="button"
+                  className={`pb-3.5 border-b-2 transition-all ${
+                    activeSubTab === sub.id || (activeSubTab === '' && sub.id === 'global-settings')
+                      ? 'border-[#F97316] text-[#F97316] font-black' 
+                      : 'border-transparent hover:text-slate-800'
+                  }`}
                 >
-                  <option value="Razorpay">Razorpay Checkout</option>
-                  <option value="Stripe">Stripe API</option>
-                </select>
+                  {sub.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Global Settings Subtab */}
+            {(activeSubTab === 'global-settings' || activeSubTab === '') && (
+              <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm max-w-4xl">
+                <h4 className="text-sm font-bold text-slate-850 mb-6">Store Global Configuration</h4>
+                <form onSubmit={handleSaveSettings} className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs font-semibold">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-bold text-slate-500 uppercase">Store Name</label>
+                    <input
+                      type="text" required value={settingsForm.storeName}
+                      onChange={e => setSettingsForm({ ...settingsForm, storeName: e.target.value })}
+                      className="border border-[#E5E7EB] bg-white rounded-xl px-3.5 py-2.5 font-bold"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-bold text-slate-500 uppercase">Gateway Provider</label>
+                    <select
+                      value={settingsForm.paymentGateway}
+                      onChange={e => setSettingsForm({ ...settingsForm, paymentGateway: e.target.value })}
+                      className="border border-[#E5E7EB] bg-white rounded-xl px-3.5 py-2.5"
+                    >
+                      <option value="Razorpay">Razorpay Checkout</option>
+                      <option value="Stripe">Stripe API</option>
+                    </select>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-bold text-slate-500 uppercase">Shipping Fees (₹)</label>
+                    <input
+                      type="number" required value={settingsForm.shippingCharges}
+                      onChange={e => setSettingsForm({ ...settingsForm, shippingCharges: e.target.value })}
+                      className="border border-[#E5E7EB] bg-white rounded-xl px-3.5 py-2.5"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="font-bold text-slate-500 uppercase">Tax Rate (%)</label>
+                    <input
+                      type="number" required value={settingsForm.tax}
+                      onChange={e => setSettingsForm({ ...settingsForm, tax: e.target.value })}
+                      className="border border-[#E5E7EB] bg-white rounded-xl px-3.5 py-2.5"
+                    />
+                  </div>
+                  <button type="submit" className="md:col-span-2 py-3 bg-[#F97316] text-white font-bold rounded-xl shadow-md hover:bg-orange-600">
+                    Save Configurations
+                  </button>
+                </form>
               </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="font-bold text-slate-500 uppercase">Shipping Fees (₹)</label>
-                <input
-                  type="number" required value={settingsForm.shippingCharges}
-                  onChange={e => setSettingsForm({ ...settingsForm, shippingCharges: e.target.value })}
-                  className="border border-[#E5E7EB] bg-white rounded-xl px-3.5 py-2.5"
-                />
+            )}
+
+            {/* Banners Manager Subtab */}
+            {activeSubTab === 'banners' && (
+              <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm max-w-4xl">
+                <h4 className="text-sm font-bold text-slate-855 mb-6">Promotional Banners Manager</h4>
+                <AdminBannerManager token={token} API_BASE={API_BASE} />
               </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="font-bold text-slate-500 uppercase">Tax Rate (%)</label>
-                <input
-                  type="number" required value={settingsForm.tax}
-                  onChange={e => setSettingsForm({ ...settingsForm, tax: e.target.value })}
-                  className="border border-[#E5E7EB] bg-white rounded-xl px-3.5 py-2.5"
-                />
+            )}
+
+            {/* Profile Subtab */}
+            {activeSubTab === 'profile' && (
+              <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm max-w-2xl">
+                <h4 className="text-sm font-bold text-slate-800 mb-6">Administrator Settings</h4>
+                <div className="space-y-6 text-xs font-semibold">
+                  <div className="flex items-center gap-4 border-b pb-4">
+                    <div className="h-16 w-16 rounded-full bg-blue-800 text-white flex items-center justify-center font-black text-2xl border">
+                      {user.name ? user.name[0].toUpperCase() : 'A'}
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-slate-800 text-sm">{user.name}</h5>
+                      <span className="inline-block px-2 py-0.5 rounded bg-orange-500/20 text-[#F97316] text-[10px] font-black uppercase mt-1">
+                        {user.role || 'Super Admin'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="font-bold text-slate-500 uppercase tracking-wide flex items-center gap-1.5">
+                      <Globe className="h-4 w-4" /> Language Selection
+                    </label>
+                    <select
+                      value={profileLang}
+                      onChange={e => { setProfileLang(e.target.value); toast.success('Language adjusted'); }}
+                      className="border border-[#E5E7EB] bg-white rounded-xl px-3.5 py-2.5"
+                    >
+                      <option value="en">English (US)</option>
+                      <option value="es">Español (ES)</option>
+                      <option value="fr">Français (FR)</option>
+                    </select>
+                  </div>
+                </div>
               </div>
-              <button type="submit" className="md:col-span-2 py-3 bg-[#F97316] text-white font-bold rounded-xl shadow-md hover:bg-orange-600">
-                Save Configurations
-              </button>
-            </form>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
