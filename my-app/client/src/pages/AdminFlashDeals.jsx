@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { API_BASE } from '../utils/apiConfig';
 
-const AdminFlashDeals = () => {
+const AdminFlashDeals = ({ embedded }) => {
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -99,16 +99,19 @@ const AdminFlashDeals = () => {
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
-          title: 'Flash Sale Banner',
-          image: bannerPreview,
-          category: 'flash'
+          title: 'Daily Flash Sale banner',
+          category: 'flash',
+          image: bannerPreview || flashBanner.image
         })
       });
-      if (!res.ok) throw new Error('Failed to save banner');
-      toast.success('Flash Deal Banner Updated', { id: loadToast });
-      setBannerFile(null);
-      setBannerPreview('');
-      fetchMedicinesAndBanners();
+      const data = await res.json();
+      if (res.ok) {
+        toast.success('Flash Banner Saved!', { id: loadToast });
+        setBannerPreview('');
+        fetchMedicinesAndBanners();
+      } else {
+        toast.error(data.message, { id: loadToast });
+      }
     } catch (err) {
       toast.error(err.message, { id: loadToast });
     }
@@ -130,7 +133,9 @@ const AdminFlashDeals = () => {
   };
 
   if (loading) {
-    return (
+    return embedded ? (
+      <div className="p-12 text-center text-xs font-black text-slate-400 uppercase tracking-widest animate-pulse">Loading Flash Deals Panel...</div>
+    ) : (
       <div className="min-h-screen pt-20 flex items-center justify-center bg-[#fdfdfd]">
         <div className="animate-spin text-4xl">⚡</div>
       </div>
@@ -138,15 +143,17 @@ const AdminFlashDeals = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#fdfdfd] pt-20 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className={embedded ? "space-y-6" : "min-h-screen bg-[#fdfdfd] pt-20 pb-12"}>
+      <div className={embedded ? "w-full" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"}>
         
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <Link to="/admin-dashboard" className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 mb-2 inline-block">
-              ← Back to Dashboard
-            </Link>
+            {!embedded && (
+              <Link to="/admin-dashboard" className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 mb-2 inline-block">
+                ← Back to Dashboard
+              </Link>
+            )}
             <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-slate-900">
               ⚡ Flash Deals Manager
             </h1>

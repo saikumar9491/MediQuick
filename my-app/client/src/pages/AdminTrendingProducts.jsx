@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { API_BASE } from '../utils/apiConfig';
 import { TrendingUp, Plus, Trash2, Search, ArrowLeft } from 'lucide-react';
 
-const AdminTrendingProducts = () => {
+const AdminTrendingProducts = ({ embedded }) => {
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -55,7 +55,9 @@ const AdminTrendingProducts = () => {
   };
 
   if (loading) {
-    return (
+    return embedded ? (
+      <div className="p-12 text-center text-xs font-black text-slate-400 uppercase tracking-widest animate-pulse">Loading Trending Panel...</div>
+    ) : (
       <div className="min-h-screen pt-20 flex items-center justify-center bg-[#fdfdfd]">
         <div className="animate-spin text-4xl text-blue-600">📈</div>
       </div>
@@ -63,15 +65,17 @@ const AdminTrendingProducts = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#fdfdfd] pt-20 pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className={embedded ? "space-y-6" : "min-h-screen bg-[#fdfdfd] pt-20 pb-12"}>
+      <div className={embedded ? "w-full" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"}>
         
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <Link to="/admin-dashboard" className="flex items-center gap-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 mb-2 transition-colors">
-              <ArrowLeft size={14} /> Back to Dashboard
-            </Link>
+            {!embedded && (
+              <Link to="/admin-dashboard" className="flex items-center gap-2 text-[10px] sm:text-xs font-black uppercase tracking-widest text-gray-400 hover:text-blue-600 mb-2 transition-colors">
+                <ArrowLeft size={14} /> Back to Dashboard
+              </Link>
+            )}
             <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-slate-900 flex items-center gap-3">
               <TrendingUp className="text-blue-600" /> Trending Products
             </h1>

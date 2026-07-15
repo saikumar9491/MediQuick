@@ -54,6 +54,8 @@ import AdminCategoryManager from '../components/admin/AdminCategoryManager';
 import InvoiceTemplate from '../components/admin/InvoiceTemplate';
 import AdminLayout from '../components/admin/AdminLayout';
 import AdminBannerManager from '../components/admin/AdminBannerManager';
+import AdminFlashDeals from './AdminFlashDeals';
+import AdminTrendingProducts from './AdminTrendingProducts';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
 import { API_BASE } from '../utils/apiConfig';
@@ -381,6 +383,67 @@ const AdminDashboard = () => {
       ...prev,
       variants: prev.variants.filter((_, idx) => idx !== index)
     }));
+  };
+
+  const handleToggleFlashQuick = async (item) => {
+    if (item.isFlashDeal) {
+      if (window.confirm(`Remove ${item.name} from Flash Deals?`)) {
+        try {
+          const res = await fetch(`${API_BASE}/api/medicines/${item._id}/flash-deal`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ isFlashDeal: false, discountPrice: null })
+          });
+          if (res.ok) {
+            toast.success('Removed from Flash Deals');
+            fetchInitialData();
+          }
+        } catch (err) { toast.error('Failed to update'); }
+      }
+    } else {
+      const priceInput = window.prompt(`Set ${item.name} to Flash Deal. Enter Discount Price (Regular: ₹${item.price}):`);
+      if (priceInput === null) return;
+      const discountPrice = Number(priceInput);
+      if (isNaN(discountPrice) || discountPrice <= 0 || discountPrice >= item.price) {
+        toast.error('Please enter a valid price lower than regular price');
+        return;
+      }
+      try {
+        const res = await fetch(`${API_BASE}/api/medicines/${item._id}/flash-deal`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ isFlashDeal: true, discountPrice })
+        });
+        if (res.ok) {
+          toast.success('Added to Flash Deals!');
+          fetchInitialData();
+        }
+      } catch (err) { toast.error('Failed to add'); }
+    }
+  };
+
+  const handleToggleTrendingQuick = async (item) => {
+    const newStatus = !item.isTrending;
+    try {
+      const res = await fetch(`${API_BASE}/api/medicines/${item._id}/trending`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ isTrending: newStatus })
+      });
+      if (res.ok) {
+        toast.success(newStatus ? 'Added to Trending!' : 'Removed from Trending');
+        fetchInitialData();
+      }
+    } catch (err) { toast.error('Failed to update'); }
   };
 
   const handleExportCSV = (type) => {
@@ -1117,14 +1180,28 @@ const AdminDashboard = () => {
                               </div>
                             </td>
                             <td className="px-6 py-4">
-                              <div className="flex justify-center gap-2">
-                                <button onClick={() => handleEdit(item)} className="p-1.5 text-[#1E3A8A] hover:bg-blue-50 rounded-lg transition-colors">
-                                  <Edit3 className="h-4.5 w-4.5" />
-                                </button>
-                                <button onClick={() => handleDelete(item._id)} className="p-1.5 text-[#EF4444] hover:bg-red-50 rounded-lg transition-colors">
-                                  <Trash2 className="h-4.5 w-4.5" />
-                                </button>
-                              </div>
+                               <div className="flex justify-center gap-2">
+                                 <button onClick={() => handleEdit(item)} className="p-1.5 text-[#1E3A8A] hover:bg-blue-50 rounded-lg transition-colors">
+                                   <Edit3 className="h-4.5 w-4.5" />
+                                 </button>
+                                 <button 
+                                   onClick={() => handleToggleFlashQuick(item)} 
+                                   title={item.isFlashDeal ? "Remove from Flash Deals" : "Set to Flash Deal"}
+                                   className={`p-1.5 rounded-lg transition-colors ${item.isFlashDeal ? 'bg-amber-100 text-amber-600 hover:bg-amber-150' : 'text-slate-400 hover:bg-slate-100'}`}
+                                 >
+                                   <Percent className="h-4.5 w-4.5" />
+                                 </button>
+                                 <button 
+                                   onClick={() => handleToggleTrendingQuick(item)} 
+                                   title={item.isTrending ? "Remove from Trending" : "Set to Trending"}
+                                   className={`p-1.5 rounded-lg transition-colors ${item.isTrending ? 'bg-orange-100 text-orange-600 hover:bg-orange-150' : 'text-slate-400 hover:bg-slate-100'}`}
+                                 >
+                                   <TrendingUp className="h-4.5 w-4.5" />
+                                 </button>
+                                 <button onClick={() => handleDelete(item._id)} className="p-1.5 text-[#EF4444] hover:bg-red-50 rounded-lg transition-colors">
+                                   <Trash2 className="h-4.5 w-4.5" />
+                                 </button>
+                               </div>
                             </td>
                           </tr>
                         ))}
@@ -1410,6 +1487,20 @@ const AdminDashboard = () => {
                     })}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {/* Flash Deals Manager */}
+            {activeSubTab === 'flash-deals' && (
+              <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm">
+                <AdminFlashDeals embedded={true} />
+              </div>
+            )}
+
+            {/* Trending Products Manager */}
+            {activeSubTab === 'trending' && (
+              <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-sm">
+                <AdminTrendingProducts embedded={true} />
               </div>
             )}
           </motion.div>

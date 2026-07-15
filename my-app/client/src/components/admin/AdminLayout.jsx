@@ -18,6 +18,7 @@ import {
   ChevronDown, 
   ChevronRight,
   Shield,
+  TrendingUp,
   Search,
   User,
   Activity,
@@ -79,6 +80,8 @@ const AdminLayout = ({ children, activeTab, setActiveTab, activeSubTab, setActiv
         { id: 'add-product', label: 'Add Product', icon: ChevronRight },
         { id: 'categories', label: 'Categories', icon: Activity },
         { id: 'inventory', label: 'Inventory', icon: ChevronRight },
+        { id: 'flash-deals', label: 'Flash Deals', icon: Tag },
+        { id: 'trending', label: 'Trending Products', icon: TrendingUp },
       ]
     },
     {
