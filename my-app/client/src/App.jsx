@@ -33,6 +33,9 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminFlashDeals from './pages/AdminFlashDeals';
 import AdminTrendingProducts from './pages/AdminTrendingProducts';
 import AllCategoriesPage from './pages/AllCategoriesPage';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminCommandCenter from './pages/admin/AdminCommandCenter';
+import AdminPlaceholder from './pages/admin/AdminPlaceholder';
 import LabTestDetailsPage from './pages/LabTestDetailsPage';
 import DoctorDetailsPage from './pages/DoctorDetailsPage';
 
@@ -130,22 +133,40 @@ function AppLayout({ medicines, featured, loading }) {
           </Route>
 
           <Route element={<AdminRoute />}>
-            <Route
-              path="/admin-dashboard"
-              element={
-                <ErrorBoundary>
-                  <AdminDashboard medicines={medicines} />
-                </ErrorBoundary>
-              }
-            />
-            <Route
-              path="/admin/flash-deals"
-              element={<AdminFlashDeals />}
-            />
-            <Route
-              path="/admin/trending"
-              element={<AdminTrendingProducts />}
-            />
+            {/* Legacy Dashboard Route */ }
+            <Route path="/admin-dashboard" element={<AdminDashboard medicines={medicines} />} />
+
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<Navigate to="overview" replace />} />
+              <Route path="overview" element={<AdminCommandCenter />} />
+              <Route path="products" element={<AdminPlaceholder />} />
+              <Route path="add-product" element={<AdminPlaceholder />} />
+              <Route path="orders" element={<AdminPlaceholder />} />
+              <Route path="pos-terminal" element={<AdminPlaceholder />} />
+              <Route path="logistics" element={<AdminPlaceholder />} />
+              <Route path="radar" element={<AdminPlaceholder />} />
+              <Route path="complaints" element={<AdminPlaceholder />} />
+              <Route path="returns" element={<AdminPlaceholder />} />
+              <Route path="fleet" element={<AdminPlaceholder />} />
+              <Route path="coupons" element={<AdminPlaceholder />} />
+              <Route path="flash-sales" element={<AdminFlashDeals />} />
+              <Route path="marketing" element={<AdminPlaceholder />} />
+              <Route path="abandoned-cart" element={<AdminPlaceholder />} />
+              <Route path="ai-pricing" element={<AdminPlaceholder />} />
+              <Route path="notifications-composer" element={<AdminPlaceholder />} />
+              <Route path="ab-testing" element={<AdminPlaceholder />} />
+              <Route path="customers" element={<AdminPlaceholder />} />
+              <Route path="messages" element={<AdminPlaceholder />} />
+              <Route path="reviews" element={<AdminPlaceholder />} />
+              <Route path="search-discovery" element={<AdminPlaceholder />} />
+              <Route path="support-console" element={<AdminPlaceholder />} />
+              <Route path="inventory-alerts" element={<AdminPlaceholder />} />
+              <Route path="live-ops" element={<AdminPlaceholder />} />
+              <Route path="xray-monitor" element={<AdminPlaceholder />} />
+              <Route path="analytics" element={<AdminPlaceholder />} />
+              <Route path="settings" element={<AdminPlaceholder />} />
+              <Route path="trending" element={<AdminTrendingProducts />} />
+            </Route>
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />
