@@ -302,16 +302,16 @@ export const addAddress = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
-    
-    const { type, address, phone, isDefault } = req.body;
-    
+
+    const { type, name, phone, addressLine1, addressLine2, landmark, city, state, pincode, isDefault } = req.body;
+
     if (isDefault) {
       user.addresses.forEach(a => a.isDefault = false);
     }
-    
-    user.addresses.push({ type, address, phone, isDefault });
+
+    user.addresses.push({ type, name, phone, addressLine1, addressLine2, landmark, city, state, pincode, isDefault: !!isDefault });
     await user.save();
-    return res.status(200).json(user.addresses);
+    return res.status(200).json(user);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

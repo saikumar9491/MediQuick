@@ -10,6 +10,9 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     const categories = await Category.find({});
+    if (categories.length === 0) {
+      return res.json([]);
+    }
     res.json(categories);
   } catch (error) {
     res.status(500).json({ message: error.message });

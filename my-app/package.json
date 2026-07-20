@@ -4,5 +4,8 @@
   "description": "Dummy package.json to fix Vercel Root Directory issue",
   "scripts": {
     "build": "cd server && npm install"
+  },
+  "dependencies": {
+    "puppeteer": "^25.3.0"
   }
 }

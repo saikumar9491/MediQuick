@@ -6,7 +6,9 @@ import connectDB from './config/db.js';
 import mongoose from 'mongoose';
 
 // Route Imports
+import customerRoutes from './routes/customerRoutes.js';
 import userRoutes from './routes/userRoutes.js'; 
+import productRoutes from './routes/productRoutes.js';
 import medicineRoutes from './routes/medicineRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import prescriptionRoutes from './routes/prescriptionRoutes.js';
@@ -17,6 +19,20 @@ import categoryRoutes from './routes/categoryRoutes.js';
 import couponRoutes from './routes/couponRoutes.js';
 import settingRoutes from './routes/settingRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
+import logisticsRoutes from './routes/logisticsRoutes.js';
+import complaintRoutes from './routes/complaintRoutes.js';
+import returnRoutes from './routes/returnRoutes.js';
+import fleetRoutes from './routes/fleetRoutes.js';
+import abandonedCartRoutes from './routes/abandonedCartRoutes.js';
+import marketingRoutes from './routes/marketingRoutes.js';
+import pricingRoutes from './routes/pricingRoutes.js';
+import abTestRoutes from './routes/abTestRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import searchDiscoveryRoutes from './routes/searchDiscoveryRoutes.js';
+import messageRoutes from './routes/messageRoutes.js';
+import deliveryRoutes from './routes/deliveryRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
 
 // ⚙️ INITIALIZATION
 dotenv.config();
@@ -87,10 +103,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // For production file storage, use Cloudinary or AWS S3.
 app.use('/uploads', express.static('uploads'));
 
+import uploadRoutes from './routes/uploadRoutes.js';
+
 /**
  * 3. MASTER HUB ROUTES
  */
+app.use('/api/customers', customerRoutes);
 app.use('/api/users', userRoutes); 
+app.use('/api/products', productRoutes);
 app.use('/api/medicines', medicineRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
@@ -101,6 +121,21 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/settings', settingRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/upload', uploadRoutes);
+app.use('/api/logistics', logisticsRoutes);
+app.use('/api/complaints', complaintRoutes);
+app.use('/api/returns', returnRoutes);
+app.use('/api/fleet', fleetRoutes);
+app.use('/api/carts', abandonedCartRoutes);
+app.use('/api/marketing', marketingRoutes);
+app.use('/api/pricing', pricingRoutes);
+app.use('/api/ab-tests', abTestRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/admin/search-discovery', searchDiscoveryRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/delivery', deliveryRoutes);
+app.use('/api/payment', paymentRoutes);
 
 /**
  * 4. CLOUD HEALTH MONITOR
@@ -194,3 +229,4 @@ if (!isVercel) {
 
 // Export the app for Vercel serverless usage
 export default app;
+// Environment reload trigger: Razorpay credentials updated

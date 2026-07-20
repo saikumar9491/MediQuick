@@ -61,15 +61,81 @@ const MedicineDetails = () => {
   const [deliveryMessage, setDeliveryMessage] = useState('');
   const [checkedBundleItems, setCheckedBundleItems] = useState([]);
 
+  // Real Delivery Estimation States
+  const [deliveryInfo, setDeliveryInfo] = useState(null);
+  const [isServiceable, setIsServiceable] = useState(true);
+  const [countdownTime, setCountdownTime] = useState(0);
+
+  const fetchDeliveryEstimate = async (targetPincode) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/delivery/estimate?pincode=${targetPincode}`);
+      const data = await res.json();
+      if (data.isServiceable) {
+        setDeliveryInfo(data);
+        setIsServiceable(true);
+        setCountdownTime(data.cutoffCountdownMs);
+        setDeliveryMessage(`✓ Serviced by ${data.hubName} Hub. Delivery expected ${data.deliveryDateString}.`);
+      } else {
+        setDeliveryInfo(null);
+        setIsServiceable(false);
+        setDeliveryMessage('Delivery not available in your area.');
+      }
+    } catch (err) {
+      console.error('Error estimating delivery:', err);
+    }
+  };
+
   useEffect(() => {
     if (medicine && related.length > 0) {
       setCheckedBundleItems([medicine._id, ...related.slice(0, 3).map(r => r._id)]);
     }
   }, [medicine, related]);
 
+  // Sync with global location change & initial load
+  useEffect(() => {
+    const currentPincode = localStorage.getItem('userPincode') || '110001';
+    setPincode(currentPincode);
+    fetchDeliveryEstimate(currentPincode);
+
+    const handleLocationChange = () => {
+      const freshPincode = localStorage.getItem('userPincode') || '110001';
+      setPincode(freshPincode);
+      fetchDeliveryEstimate(freshPincode);
+    };
+
+    window.addEventListener('locationChanged', handleLocationChange);
+    return () => window.removeEventListener('locationChanged', handleLocationChange);
+  }, []);
+
+  // Countdown timer decrementer
+  useEffect(() => {
+    if (countdownTime <= 0) return;
+    const interval = setInterval(() => {
+      setCountdownTime(prev => {
+        if (prev <= 1000) {
+          const currentPincode = localStorage.getItem('userPincode') || '110001';
+          fetchDeliveryEstimate(currentPincode);
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1000;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [countdownTime]);
+
+  const formatCountdown = (ms) => {
+    if (ms <= 0) return '0 hrs 0 mins';
+    const totalSeconds = Math.floor(ms / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return `${hours}h ${minutes}m ${seconds}s`;
+  };
+
   const handleCheckDelivery = () => {
     if (/^\d{6}$/.test(pincode)) {
-      setDeliveryMessage(`✓ FREE Delivery Tomorrow! Order in 4 hrs.`);
+      fetchDeliveryEstimate(pincode);
     } else {
       toast.error('Please enter a valid 6-digit Pincode');
     }
@@ -384,12 +450,23 @@ const MedicineDetails = () => {
                 </div>
               </div>
 
-              {/* Stock Status */}
-              <div className="space-y-1">
+              {/* Stock Status & Delivery Promise */}
+              <div className="space-y-2">
                 <p className="text-xs font-bold text-emerald-600">In Stock</p>
-                <p className="text-xs text-slate-500 font-medium">
-                  FREE delivery <span className="font-bold text-slate-800">Tomorrow</span>. Order within <span className="text-orange-500 font-bold">4 hrs 12 mins.</span>
-                </p>
+                {isServiceable ? (
+                  <p className="text-xs text-slate-500 font-medium">
+                    FREE delivery <span className="font-bold text-slate-800">{deliveryInfo?.deliveryDateString || 'Tomorrow'}</span>
+                    {countdownTime > 0 && (
+                      <>
+                        . Order within <span className="text-orange-500 font-bold">{formatCountdown(countdownTime)}</span>
+                      </>
+                    )}
+                  </p>
+                ) : (
+                  <p className="text-xs text-red-650 font-bold bg-red-50 px-3 py-1.5 rounded-lg inline-block border border-red-105">
+                    ⚠️ Delivery not available in your area
+                  </p>
+                )}
               </div>
 
               {/* LIVE Quality Index circular meter (Screenshot style freshness meter) */}

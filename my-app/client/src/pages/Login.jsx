@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { GoogleLogin } from '@react-oauth/google';
 import toast from 'react-hot-toast';
@@ -11,6 +11,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -40,7 +41,8 @@ const Login = () => {
     try {
       const data = await loginPromise;
       await login(data.user, data.token);
-      navigate('/');
+      const from = location.state?.from || '/';
+      navigate(from, { replace: true });
     } finally {
       setLoading(false);
     }
@@ -68,7 +70,8 @@ const Login = () => {
     try {
       const data = await googlePromise;
       await login(data.user, data.token);
-      navigate('/');
+      const from = location.state?.from || '/';
+      navigate(from, { replace: true });
     } finally {
       setLoading(false);
     }

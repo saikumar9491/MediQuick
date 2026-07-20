@@ -37,17 +37,22 @@ const Checkout = () => {
   const [couponCode, setCouponCode] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
 
+  // Real Delivery Estimation States
+  const [isServiceable, setIsServiceable] = useState(true);
+  const [deliveryEstimate, setDeliveryEstimate] = useState(null);
+  const [validationLoading, setValidationLoading] = useState(false);
+
   const [addressData, setAddressData] = useState({
     name: user?.name || '',
     phone: user?.phone || '',
     email: user?.email || '',
-    pincode: '',
+    pincode: localStorage.getItem('userPincode') || '',
     building: '',
     area: '',
     landmark: '',
-    city: 'Amritsar',
+    city: localStorage.getItem('locationName') || 'New Delhi',
     district: '',
-    state: 'Punjab',
+    state: 'Delhi',
     country: 'India',
     type: 'Home',
   });
@@ -60,6 +65,34 @@ const Checkout = () => {
   const discount = subtotal > 500 ? 100 : 0;
   const deliveryFee = deliveryType === 'express' ? 99 : (subtotal > 1000 || subtotal === 0 ? 0 : 50);
   const total = subtotal + deliveryFee - discount;
+
+  useEffect(() => {
+    if (addressData.pincode.length === 6) {
+      const validatePincode = async () => {
+        setValidationLoading(true);
+        try {
+          const res = await fetch(`${API_BASE}/api/delivery/estimate?pincode=${addressData.pincode}`);
+          const data = await res.json();
+          if (data.isServiceable) {
+            setIsServiceable(true);
+            setDeliveryEstimate(data);
+          } else {
+            setIsServiceable(false);
+            setDeliveryEstimate(null);
+            toast.error(data.message || 'Pincode not serviceable');
+          }
+        } catch (err) {
+          console.error('Error validating pincode:', err);
+        } finally {
+          setValidationLoading(false);
+        }
+      };
+      validatePincode();
+    } else {
+      setIsServiceable(true);
+      setDeliveryEstimate(null);
+    }
+  }, [addressData.pincode]);
 
   useEffect(() => {
     if (activeCart.length === 0 && !orderPlaced) {
@@ -351,12 +384,17 @@ const Checkout = () => {
                     ))}
                   </div>
 
+                  {!isServiceable && (
+                    <p className="text-xs font-bold text-red-500 text-center mb-2">
+                      ⚠️ Delivery is not available to this pincode.
+                    </p>
+                  )}
                   <button 
                     onClick={() => setActiveStep(2)} 
-                    disabled={!addressData.building || !addressData.pincode}
-                    className="w-full rounded-[2rem] bg-slate-900 py-6 text-xs font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all hover:bg-[#00a2a4] disabled:bg-slate-50 disabled:text-slate-200"
+                    disabled={!addressData.building || !addressData.pincode || !isServiceable || validationLoading}
+                    className="w-full flex items-center justify-center gap-2 rounded-[2rem] bg-slate-900 py-6 text-xs font-black uppercase tracking-[0.2em] text-white shadow-xl transition-all hover:bg-[#00a2a4] disabled:bg-slate-50 disabled:text-slate-200"
                   >
-                    Save & Continue
+                    {validationLoading ? <Loader2 size={16} className="animate-spin text-[#00a2a4]" /> : 'Save & Continue'}
                   </button>
                 </div>
               ) : (
@@ -394,7 +432,9 @@ const Checkout = () => {
                       >
                         <div>
                           <p className="text-[10px] font-black uppercase tracking-widest">Standard Delivery</p>
-                          <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">2 — 3 Business Days | FREE</p>
+                          <p className="text-[8px] font-bold text-slate-400 uppercase mt-1">
+                            {deliveryEstimate ? `Estimated: ${deliveryEstimate.deliveryDateString}` : '2 — 3 Business Days'} | FREE
+                          </p>
                         </div>
                         <div className={`h-5 w-5 rounded-full border-2 ${deliveryType === 'standard' ? 'bg-[#00a2a4] border-[#00a2a4]' : 'border-slate-200'}`} />
                       </div>
@@ -404,7 +444,9 @@ const Checkout = () => {
                       >
                         <div>
                           <p className="text-[10px] font-black uppercase tracking-widest">Express Priority</p>
-                          <p className="text-[8px] font-bold text-[#00a2a4] uppercase mt-1">Same Day / Next Day | ₹99</p>
+                          <p className="text-[8px] font-bold text-[#00a2a4] uppercase mt-1">
+                            {deliveryEstimate ? `Estimated: Priority (${deliveryEstimate.deliveryDateString})` : 'Same Day / Next Day'} | ₹99
+                          </p>
                         </div>
                         <div className={`h-5 w-5 rounded-full border-2 ${deliveryType === 'express' ? 'bg-[#00a2a4] border-[#00a2a4]' : 'border-slate-200'}`} />
                       </div>

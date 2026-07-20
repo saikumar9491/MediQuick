@@ -12,17 +12,18 @@ import { Toaster } from 'react-hot-toast';
 
 // Pages
 import Home from './pages/Home';
-import Checkout from './pages/Checkout';
-import MyOrders from './pages/MyOrders';
+import Checkout from './pages/Checkout/Checkout';
+import OrderConfirmation from './pages/Checkout/OrderConfirmation';
+import MyOrders from './pages/MyOrders/MyOrders';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import VerifyOtp from './pages/Auth/VerifyOtp'; // 🛰️ IMPORTED VERIFY OTP
 import ForgotPassword from './pages/ForgotPassword';
-import Wishlist from './pages/Wishlist';
-import Profile from './pages/Profile';
-import MedicineDetails from './pages/MedicineDetails';
+import Wishlist from './pages/Wishlist/Wishlist';
+import Profile from './pages/Profile/Profile';
+import ProductDetails from './pages/ProductDetails/ProductDetails';
 import BrandPage from './pages/BrandPage';
-import Cart from './pages/Cart';
+import Cart from './pages/Cart/Cart';
 import MedicinesPage from './pages/MedicinesPage';
 import LabTestsPage from './pages/LabTestsPage';
 import ConsultPage from './pages/ConsultPage';
@@ -31,11 +32,29 @@ import CarePlanPage from './pages/CarePlanPage';
 import SkinCarePage from './pages/SkinCarePage';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminFlashDeals from './pages/AdminFlashDeals';
+import AddProduct from './pages/admin/AddProduct/AddProduct';
+import Orders from './pages/admin/Orders/Orders';
 import AdminTrendingProducts from './pages/AdminTrendingProducts';
 import AllCategoriesPage from './pages/AllCategoriesPage';
 import AdminLayout from './components/admin/AdminLayout';
-import AdminCommandCenter from './pages/admin/AdminCommandCenter';
+import CommandCenter from './pages/admin/CommandCenter/CommandCenter';
+import Products from './pages/admin/Products/Products';
 import AdminPlaceholder from './pages/admin/AdminPlaceholder';
+import POSTerminal from './pages/admin/POSTerminal/POSTerminal';
+import Logistics from './pages/admin/Logistics/Logistics';
+import LiveRadar from './pages/admin/LiveRadar/LiveRadar';
+import Complaints from './pages/admin/Complaints/Complaints';
+import ReturnsRefunds from './pages/admin/ReturnsRefunds/ReturnsRefunds';
+import ABTesting from './pages/admin/ABTesting/ABTesting.jsx';
+import NotificationComposer from './pages/admin/NotificationComposer/NotificationComposer.jsx';
+import AIPricing from './pages/admin/AIPricing/AIPricing.jsx';
+import SearchDiscovery from './pages/admin/SearchDiscovery/SearchDiscovery.jsx';
+import Reviews from './pages/admin/Reviews/Reviews.jsx';
+import Messages from './pages/admin/Messages/Messages.jsx';
+import Fleet from './pages/admin/Fleet/Fleet';
+import Coupons from './pages/admin/Coupons/Coupons';
+import AbandonedCart from './pages/admin/AbandonedCart/AbandonedCart';
+import Marketing from './pages/admin/Marketing/Marketing';
 import LabTestDetailsPage from './pages/LabTestDetailsPage';
 import DoctorDetailsPage from './pages/DoctorDetailsPage';
 
@@ -122,49 +141,62 @@ function AppLayout({ medicines, featured, loading }) {
           <Route path="/skin-care" element={<SkinCarePage />} />
           <Route path="/offers" element={<div className="pt-24 p-4 text-center font-bold">Offers coming soon!</div>} />
 
-          <Route path="/product/:id" element={<MedicineDetails />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
+          <Route path="/medicines/:id" element={<ProductDetails />} />
 
           <Route element={<ProtectedRoute />}>
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
             <Route path="/my-orders" element={<MyOrders />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/profile" element={<Profile />} />
           </Route>
 
           <Route element={<AdminRoute />}>
-            {/* Legacy Dashboard Route */ }
-            <Route path="/admin-dashboard" element={<AdminDashboard medicines={medicines} />} />
-
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<Navigate to="overview" replace />} />
-              <Route path="overview" element={<AdminCommandCenter />} />
-              <Route path="products" element={<AdminPlaceholder />} />
-              <Route path="add-product" element={<AdminPlaceholder />} />
-              <Route path="orders" element={<AdminPlaceholder />} />
-              <Route path="pos-terminal" element={<AdminPlaceholder />} />
-              <Route path="logistics" element={<AdminPlaceholder />} />
-              <Route path="radar" element={<AdminPlaceholder />} />
-              <Route path="complaints" element={<AdminPlaceholder />} />
-              <Route path="returns" element={<AdminPlaceholder />} />
-              <Route path="fleet" element={<AdminPlaceholder />} />
-              <Route path="coupons" element={<AdminPlaceholder />} />
+              <Route path="overview" element={<CommandCenter />} />
+              <Route path="products" element={<Products />} />
+              <Route path="add-product" element={<AddProduct />} />
+              <Route path="edit-product/:id" element={<AddProduct />} />
+              <Route path="orders" element={<Orders />} />
+              <Route path="pos-terminal" element={<POSTerminal />} />
+              <Route path="logistics" element={<Logistics />} />
+              <Route path="live-radar" element={<LiveRadar />} />
+              <Route path="complaints" element={<Complaints />} />
+              <Route path="returns" element={<ReturnsRefunds />} />
               <Route path="flash-sales" element={<AdminFlashDeals />} />
-              <Route path="marketing" element={<AdminPlaceholder />} />
-              <Route path="abandoned-cart" element={<AdminPlaceholder />} />
-              <Route path="ai-pricing" element={<AdminPlaceholder />} />
-              <Route path="notifications-composer" element={<AdminPlaceholder />} />
-              <Route path="ab-testing" element={<AdminPlaceholder />} />
-              <Route path="customers" element={<AdminPlaceholder />} />
-              <Route path="messages" element={<AdminPlaceholder />} />
-              <Route path="reviews" element={<AdminPlaceholder />} />
-              <Route path="search-discovery" element={<AdminPlaceholder />} />
-              <Route path="support-console" element={<AdminPlaceholder />} />
-              <Route path="inventory-alerts" element={<AdminPlaceholder />} />
-              <Route path="live-ops" element={<AdminPlaceholder />} />
-              <Route path="xray-monitor" element={<AdminPlaceholder />} />
-              <Route path="analytics" element={<AdminPlaceholder />} />
-              <Route path="settings" element={<AdminPlaceholder />} />
+              <Route path="ai-pricing" element={<AIPricing />} />
+              <Route path="notifications-composer" element={<NotificationComposer />} />
+              <Route path="ab-testing" element={<ABTesting />} />
+              <Route path="customers" element={<AdminPlaceholder pageName="Customers" />} />
+              <Route path="search-discovery" element={<SearchDiscovery />} />
+              <Route path="reviews" element={<Reviews />} />
+              <Route path="messages" element={<Messages />} />
+              <Route path="returns" element={<ReturnsRefunds />} />
+
+              {/* Marketing & Growth */}
+              <Route path="marketing" element={<Marketing />} />
+              <Route path="coupons" element={<Coupons />} />
+              <Route path="abandoned-cart" element={<AbandonedCart />} />
+              
+              {/* Analytics & Reports */}
+              <Route path="sales-report" element={<AdminPlaceholder pageName="Sales Report" />} />
+              
+              {/* Operations & Logistics */}
+              <Route path="logistics" element={<Logistics />} />
+              <Route path="fleet" element={<Fleet />} />
+              <Route path="live-radar" element={<LiveRadar />} />
+              
+              {/* System & Settings */}
+              <Route path="search-discovery" element={<AdminPlaceholder pageName="Search & Discovery" />} />
+              <Route path="support-console" element={<AdminPlaceholder pageName="Support Console" />} />
+              <Route path="inventory-alerts" element={<AdminPlaceholder pageName="Inventory Alerts" />} />
+              <Route path="live-ops" element={<AdminPlaceholder pageName="Live Ops" />} />
+              <Route path="xray-monitor" element={<AdminPlaceholder pageName="X-Ray Monitor" />} />
+              <Route path="analytics" element={<AdminPlaceholder pageName="Analytics" />} />
+              <Route path="settings" element={<AdminPlaceholder pageName="Settings" />} />
               <Route path="trending" element={<AdminTrendingProducts />} />
             </Route>
           </Route>
@@ -183,12 +215,22 @@ function AppLayout({ medicines, featured, loading }) {
 function App() {
   const { loading: authLoading } = useAuth();
   const [medicines, setMedicines] = useState(() => {
-    const cached = localStorage.getItem('mq_medicines');
-    return cached ? JSON.parse(cached) : [];
+    try {
+      const cached = localStorage.getItem('mq_medicines');
+      const parsed = cached ? JSON.parse(cached) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
   });
   const [featured, setFeatured] = useState(() => {
-    const cached = localStorage.getItem('mq_featured');
-    return cached ? JSON.parse(cached) : [];
+    try {
+      const cached = localStorage.getItem('mq_featured');
+      const parsed = cached ? JSON.parse(cached) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
   });
   const [medicinesLoading, setMedicinesLoading] = useState(!medicines.length);
 
@@ -208,8 +250,8 @@ function App() {
         const medData = await medRes.json();
         const topData = await topRes.json();
 
-        const medArray = Array.isArray(medData) ? medData : [];
-        const topArray = Array.isArray(topData) ? topData : [];
+        const medArray = Array.isArray(medData) ? medData : (medData.medicines || []);
+        const topArray = Array.isArray(topData) ? topData : (topData.medicines || []);
 
         setMedicines(medArray);
         setFeatured(topArray);

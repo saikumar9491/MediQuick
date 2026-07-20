@@ -1,10 +1,13 @@
+import mongoose from 'mongoose';
 import Medicine from '../models/Medicine.js';
+import SearchLog from '../models/SearchLog.js';
+import Order from '../models/Order.js';
 
 // @desc    Get all medicines (supports Search, Category & Trending)
 // @route   GET /api/medicines
 export const getMedicines = async (req, res) => {
   try {
-    const { category, search, subCategory, trending, brand } = req.query;
+    const { category, search, subCategory, trending, brand, page = 1, limit = 10, rx } = req.query;
     let query = {};
 
     if (category && category !== 'All') {
@@ -26,12 +29,78 @@ export const getMedicines = async (req, res) => {
     }
 
     if (search) {
-      query.name = { $regex: search, $options: 'i' };
+      // Search by name, brand, subCategory, sku, or salt
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { brand: { $regex: search, $options: 'i' } },
+        { subCategory: { $regex: search, $options: 'i' } },
+        { sku: { $regex: search, $options: 'i' } },
+        { salt: { $regex: search, $options: 'i' } }
+      ];
+    }
+    
+    // Support filtering by Rx requirement for Admin Dashboard
+    if (rx === 'Required' || rx === 'true') {
+      query.needsRx = true;
+    } else if (rx === 'Not Required' || rx === 'false') {
+      query.needsRx = false;
     }
 
-    const medicines = await Medicine.find(query).sort({ createdAt: -1 });
-    res.status(200).json(medicines);
+    // Support stockStatus filtering
+    if (req.query.stockStatus) {
+      const stockStatus = req.query.stockStatus;
+      if (stockStatus === 'in_stock') {
+        query.countInStock = { $gte: 10 };
+      } else if (stockStatus === 'low_stock') {
+        query.countInStock = { $gt: 0, $lt: 10 };
+      } else if (stockStatus === 'out_of_stock') {
+        query.countInStock = 0;
+      }
+    }
+
+    // DEBUG: Log the actual MongoDB query
+    console.log('--- DEBUG: getMedicines Query ---');
+    console.log('Incoming params:', req.query);
+    console.log('MongoDB Query:', JSON.stringify(query, null, 2));
+
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const totalCount = await Medicine.countDocuments(query);
+    const totalCollectionCount = await Medicine.countDocuments({});
+    
+    const medicines = await Medicine.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNumber);
+
+    // LOG SEARCH
+    if (search && search.trim() !== '') {
+      try {
+        await SearchLog.create({
+          query: search.trim().toLowerCase(),
+          resultCount: totalCount,
+          customerId: req.user ? req.user._id : null
+        });
+      } catch (err) {
+        console.error("Failed to log search:", err);
+      }
+    }
+      
+    // DEBUG: Log the returned counts
+    console.log(`Matched Documents: ${totalCount} | Total in Collection: ${totalCollectionCount}`);
+    console.log(`Returning ${medicines.length} documents for page ${pageNumber} (limit ${limitNumber})`);
+    console.log('---------------------------------');
+
+    res.status(200).json({
+      medicines,
+      page: pageNumber,
+      totalPages: Math.ceil(totalCount / limitNumber),
+      total: totalCount
+    });
   } catch (error) {
+    console.error('getMedicines error:', error);
     res.status(500).json({ message: 'Failed to fetch medicines from Hub' });
   }
 };
@@ -89,10 +158,72 @@ export const getMedicineById = async (req, res) => {
  * --- ADMIN FUNCTIONS ---
  */
 
+// @desc    Get Products Summary Stats
+// @route   GET /api/admin/stats/products-summary
+export const getProductsSummaryStats = async (req, res) => {
+  try {
+    const pipeline = [
+      {
+        $facet: {
+          totalProducts: [{ $count: 'count' }],
+          activeProducts: [
+            { $match: { isActive: true } },
+            { $count: 'count' }
+          ],
+          lowStock: [
+            { $match: { countInStock: { $gt: 0, $lt: 10 } } },
+            { $count: 'count' }
+          ],
+          outOfStock: [
+            { $match: { countInStock: 0 } },
+            { $count: 'count' }
+          ]
+        }
+      }
+    ];
+
+    const result = await Medicine.aggregate(pipeline);
+    
+    // Format the result
+    const stats = {
+      totalProducts: result[0].totalProducts[0]?.count || 0,
+      activeProducts: result[0].activeProducts[0]?.count || 0,
+      lowStock: result[0].lowStock[0]?.count || 0,
+      outOfStock: result[0].outOfStock[0]?.count || 0,
+    };
+
+    res.status(200).json(stats);
+  } catch (error) {
+    console.error('getProductsSummaryStats error:', error);
+    res.status(500).json({ message: 'Failed to generate product stats' });
+  }
+};
+
 // @desc    Add a new medicine unit
 // @route   POST /api/medicines
 export const addMedicine = async (req, res) => {
   try {
+    const { name, brand, salt, category, subCategory, price, countInStock, needsRx, expiryDate } = req.body;
+    
+    // Server-side validation
+    const missingFields = [];
+    if (!name) missingFields.push('name');
+    if (!brand) missingFields.push('brand');
+    if (!salt) missingFields.push('salt');
+    if (!category) missingFields.push('category');
+    if (!subCategory) missingFields.push('subCategory');
+    if (price === undefined || price < 0) missingFields.push('price (must be >= 0)');
+    if (countInStock === undefined || countInStock < 0) missingFields.push('countInStock (must be >= 0)');
+    if (needsRx === undefined) missingFields.push('needsRx');
+    if (!expiryDate) missingFields.push('expiryDate');
+
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        message: 'Validation failed',
+        error: `Missing or invalid required fields: ${missingFields.join(', ')}`
+      });
+    }
+
     const newMedicine = new Medicine(req.body);
     const savedMedicine = await newMedicine.save();
     res.status(201).json(savedMedicine);
@@ -108,6 +239,21 @@ export const addMedicine = async (req, res) => {
 // @route   PUT /api/medicines/:id
 export const updateMedicine = async (req, res) => {
   try {
+    const { price, countInStock } = req.body;
+    if (price !== undefined && price < 0) {
+      return res.status(400).json({ message: 'Validation failed', error: 'Price must be >= 0' });
+    }
+    if (countInStock !== undefined && countInStock < 0) {
+      return res.status(400).json({ message: 'Validation failed', error: 'Stock must be >= 0' });
+    }
+
+    const original = await Medicine.findById(req.params.id);
+    if (!original) {
+      return res.status(404).json({ message: 'Medicine not found' });
+    }
+
+    const originalStock = original.countInStock || 0;
+
     const updatedMedicine = await Medicine.findByIdAndUpdate(
       req.params.id,
       { $set: req.body },
@@ -116,6 +262,43 @@ export const updateMedicine = async (req, res) => {
 
     if (!updatedMedicine) {
       return res.status(404).json({ message: 'Medicine not found' });
+    }
+
+    const newStock = updatedMedicine.countInStock || 0;
+    if (originalStock === 0 && newStock > 0) {
+      try {
+        const { default: RestockSubscription } = await import('../models/RestockSubscription.js');
+        const { default: Notification } = await import('../models/Notification.js');
+
+        const subs = await RestockSubscription.find({
+          productId: updatedMedicine._id,
+          notifiedAt: null
+        });
+
+        if (subs.length > 0) {
+          const notif = new Notification({
+            title: 'Product Back In Stock!',
+            message: `"${updatedMedicine.name}" is back in stock! Order now before it runs out.`,
+            channels: ['push', 'email'],
+            audienceType: 'Custom',
+            status: 'Sent',
+            sentAt: new Date(),
+            recipientCount: subs.length,
+            deliveredCount: subs.length,
+            createdBy: req.user?.id || req.user?._id
+          });
+          await notif.save();
+
+          const now = new Date();
+          for (const sub of subs) {
+            sub.notifiedAt = now;
+            await sub.save();
+          }
+          console.log(`Triggered restock notification for ${subs.length} subscribers on product ${updatedMedicine.name}`);
+        }
+      } catch (hookErr) {
+        console.error('Error in restock subscription notification hook:', hookErr);
+      }
     }
 
     res.status(200).json(updatedMedicine);
@@ -248,5 +431,82 @@ export const generateAIDescription = async (req, res) => {
     res.json({ description: descriptions[randomIdx] });
   } catch (err) {
     res.status(550).json({ message: "AI generation engine failure", error: err.message });
+  }
+};
+
+// @desc    Bulk Update Medicines (e.g., status)
+// @route   PATCH /api/medicines/bulk-update
+export const bulkUpdateMedicines = async (req, res) => {
+  try {
+    const { ids, updateData } = req.body;
+    
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ message: 'No medicine IDs provided for bulk update' });
+    }
+
+    const result = await Medicine.updateMany(
+      { _id: { $in: ids } },
+      { $set: updateData }
+    );
+
+    res.status(200).json({ message: `Successfully updated ${result.modifiedCount} medicines`, result });
+  } catch (error) {
+    console.error('bulkUpdateMedicines error:', error);
+    res.status(500).json({ message: 'Bulk update failed', error: error.message });
+  }
+};
+
+// @desc    Bulk Delete Medicines
+// @route   DELETE /api/medicines/bulk-delete
+export const bulkDeleteMedicines = async (req, res) => {
+  try {
+    const { ids } = req.body;
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ message: 'No medicine IDs provided for bulk delete' });
+    }
+
+    const result = await Medicine.deleteMany({ _id: { $in: ids } });
+
+    res.status(200).json({ message: `Successfully deleted ${result.deletedCount} medicines`, result });
+  } catch (error) {
+    console.error('bulkDeleteMedicines error:', error);
+    res.status(500).json({ message: 'Bulk delete failed', error: error.message });
+  }
+};
+
+// @desc    Get sales stats (units sold in last 24h) for a single product
+// @route   GET /api/medicines/:id/sales-stats
+export const getSalesStats = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const past24Hours = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    const result = await Order.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: past24Hours },
+          status: { $ne: 'Cancelled' }
+        }
+      },
+      { $unwind: '$items' },
+      {
+        $match: {
+          'items.productId': new mongoose.Types.ObjectId(id)
+        }
+      },
+      {
+        $group: {
+          _id: '$items.productId',
+          totalSold: { $sum: '$items.quantity' }
+        }
+      }
+    ]);
+
+    const totalSold = result.length > 0 ? result[0].totalSold : 0;
+    res.status(200).json({ totalSold });
+  } catch (error) {
+    console.error('Error fetching sales stats:', error);
+    res.status(500).json({ message: 'Error calculating sales stats' });
   }
 };

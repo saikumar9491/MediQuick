@@ -45,14 +45,17 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
-  const [locationName, setLocationName] = useState('New Delhi');
+  const [locationName, setLocationName] = useState(() => localStorage.getItem('locationName') || 'New Delhi');
+  const [userPincode, setUserPincode] = useState(() => localStorage.getItem('userPincode') || '110001');
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [pincodeInput, setPincodeInput] = useState('');
   const [isDetecting, setIsDetecting] = useState(false);
   const [hoveredCategory, setHoveredCategory] = useState(null);
   const [mobileOpenCategory, setMobileOpenCategory] = useState(null);
 
   const handleDetectLocation = () => {
     if (!navigator.geolocation) {
-      alert("Geolocation is not supported by your browser");
+      toast.error("Geolocation is not supported by your browser");
       return;
     }
 
@@ -63,10 +66,18 @@ const Navbar = () => {
         const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=en`);
         const data = await res.json();
         
-        // Enhanced extraction for maximum specificity
         const addr = data.address;
         const city = addr.city || addr.town || addr.village || addr.hamlet || addr.suburb || addr.neighbourhood || addr.state_district || addr.city_district || addr.county || "Current Location";
+        
+        // Save to localStorage
+        const detectedPincode = addr.postcode || '110001';
+        localStorage.setItem('locationName', city);
+        localStorage.setItem('userPincode', detectedPincode);
+        
         setLocationName(city);
+        setUserPincode(detectedPincode);
+        window.dispatchEvent(new Event('locationChanged'));
+        setShowLocationModal(false);
       } catch (error) {
         console.error("Error detecting location:", error);
       } finally {
@@ -78,11 +89,43 @@ const Navbar = () => {
     });
   };
 
+  const handlePincodeSubmit = (e) => {
+    e.preventDefault();
+    if (!/^\d{6}$/.test(pincodeInput)) {
+      toast.error('Please enter a valid 6-digit Pincode');
+      return;
+    }
+
+    // For simplicity, map some common pincodes to area names
+    let area = 'Delhi Area';
+    if (pincodeInput.startsWith('11')) area = 'New Delhi';
+    else if (pincodeInput.startsWith('40')) area = 'Mumbai';
+    else if (pincodeInput.startsWith('56')) area = 'Bengaluru';
+    else if (pincodeInput.startsWith('60')) area = 'Chennai';
+    else area = `Pincode ${pincodeInput}`;
+
+    localStorage.setItem('locationName', area);
+    localStorage.setItem('userPincode', pincodeInput);
+    
+    setLocationName(area);
+    setUserPincode(pincodeInput);
+    window.dispatchEvent(new Event('locationChanged'));
+    setShowLocationModal(false);
+    toast.success(`Location set to ${area} (${pincodeInput})`);
+  };
+
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (user && !sessionStorage.getItem('locationPrompted')) {
+      sessionStorage.setItem('locationPrompted', 'true');
+      setShowLocationModal(true);
+    }
+  }, [user]);
 
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchSuggestions, setShowSearchSuggestions] = useState(false);
@@ -254,16 +297,19 @@ const Navbar = () => {
 
           {/* Location Selector (Desktop) */}
           <div 
-            onClick={handleDetectLocation}
+            onClick={() => {
+              setPincodeInput(userPincode);
+              setShowLocationModal(true);
+            }}
             className="flex items-center gap-2 px-3 py-1.5 hover:bg-slate-50 transition-colors cursor-pointer group shrink-0 border-r border-slate-100 pr-6"
           >
             <MapPin size={18} className="text-slate-400 group-hover:text-[#00a2a4]" />
             <div className="flex flex-col">
               <span className="text-[13px] font-bold text-slate-800">
-                {isDetecting ? 'Detecting...' : locationName}
+                {isDetecting ? 'Detecting...' : `${locationName} (${userPincode})`}
               </span>
             </div>
-            <Crosshair size={14} className={`text-slate-400 ml-1 ${isDetecting ? 'animate-spin text-[#00a2a4]' : ''}`} />
+            <ChevronDown size={14} className="text-slate-400 group-hover:text-[#00a2a4]" />
           </div>
 
           {/* Search Bar (Desktop) */}
@@ -409,7 +455,7 @@ const Navbar = () => {
                         <p className="truncate text-[10px] font-bold text-slate-400 uppercase tracking-widest">{user.email}</p>
                       </div>
                       {user.isAdmin && (
-                        <Link to="/admin-dashboard" className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-[#00a2a4] hover:bg-teal-50 transition-colors">
+                        <Link to="/admin" className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-[#00a2a4] hover:bg-teal-50 transition-colors">
                           <ShieldCheck size={14} /> Admin Dashboard
                         </Link>
                       )}
@@ -449,10 +495,13 @@ const Navbar = () => {
         {/* Mobile Header (Blinkit Style) */}
         <div className="flex flex-col lg:hidden w-full pt-1 pb-2">
            <div className="flex justify-between items-center w-full mb-3">
-              <div className="flex flex-col cursor-pointer" onClick={handleDetectLocation}>
+              <div className="flex flex-col cursor-pointer" onClick={() => {
+                setPincodeInput(userPincode);
+                setShowLocationModal(true);
+              }}>
                  <span className="text-[20px] font-black text-slate-900 leading-tight">Delivery in 10 minutes</span>
                  <div className="flex items-center gap-1 text-slate-600 mt-0.5">
-                     <span className="text-[13px] truncate max-w-[220px]">Near, {isDetecting ? 'Detecting...' : locationName}</span>
+                     <span className="text-[13px] truncate max-w-[220px]">Near, {isDetecting ? 'Detecting...' : `${locationName} (${userPincode})`}</span>
                      <ChevronDown size={14}/>
                  </div>
               </div>
@@ -667,6 +716,59 @@ const Navbar = () => {
           </Link>
         ))}
       </nav>
+      {/* Location Modal */}
+      <AnimatePresence>
+        {showLocationModal && (
+          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-[100] p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100">
+                <span className="font-black text-slate-800 text-sm uppercase tracking-wider">Select Delivery Location</span>
+                <button onClick={() => setShowLocationModal(false)} className="p-1 rounded-lg hover:bg-slate-50 text-slate-400 hover:text-slate-600">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="p-6 space-y-5">
+                <button
+                  onClick={handleDetectLocation}
+                  disabled={isDetecting}
+                  className="w-full flex items-center justify-center gap-2 py-3 bg-[#00a2a4]/10 hover:bg-[#00a2a4]/20 text-[#00a2a4] font-bold text-xs uppercase tracking-wider rounded-xl transition-all"
+                >
+                  <MapPin className="w-4 h-4" />
+                  {isDetecting ? 'Detecting...' : 'Detect My Location'}
+                </button>
+
+                <div className="relative flex items-center justify-center">
+                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100"></div></div>
+                  <span className="relative px-3 bg-white text-[10px] font-bold uppercase tracking-widest text-slate-400">OR ENTER PINCODE</span>
+                </div>
+
+                <form onSubmit={handlePincodeSubmit} className="space-y-4">
+                  <input
+                    type="text"
+                    maxLength={6}
+                    placeholder="Enter 6-digit pincode"
+                    value={pincodeInput}
+                    onChange={(e) => setPincodeInput(e.target.value.replace(/\D/g, ''))}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#00a2a4] font-bold text-center text-lg tracking-widest text-slate-800"
+                  />
+                  <button
+                    type="submit"
+                    className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all"
+                  >
+                    Confirm Location
+                  </button>
+                </form>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </header>
   );
 };

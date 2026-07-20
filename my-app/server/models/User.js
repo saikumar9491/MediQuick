@@ -38,12 +38,26 @@ const userSchema = new mongoose.Schema(
     orders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }],
     addresses: [
       {
-        type: { type: String, default: 'Home' },
-        address: { type: String, required: true },
-        phone: { type: String, required: true },
-        isDefault: { type: Boolean, default: false },
+        type:         { type: String, default: 'Home', enum: ['Home', 'Work', 'Other'] },
+        name:         { type: String },
+        phone:        { type: String, required: true },
+        addressLine1: { type: String, required: true },
+        addressLine2: { type: String },
+        landmark:     { type: String },
+        city:         { type: String },
+        state:        { type: String },
+        pincode:      { type: String },
+        isDefault:    { type: Boolean, default: false },
       },
     ],
+    dob: { type: Date, default: null },
+    deleted: { type: Boolean, default: false },
+    notificationPreferences: {
+      orderUpdates: { type: Boolean, default: true },
+      promotionalOffers: { type: Boolean, default: true },
+      prescriptionReminders: { type: Boolean, default: true },
+      priceDropAlerts: { type: Boolean, default: true }
+    }
   },
   { timestamps: true }
 );

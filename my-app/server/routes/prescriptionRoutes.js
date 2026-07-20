@@ -6,6 +6,50 @@ import { verifyToken } from '../middleware/authMiddleware.js'; // Ensure privacy
 
 const router = express.Router();
 
+// Multer config — memory storage so we can base64-encode
+// TODO: Replace with Cloudinary upload for production permanent storage
+const memStorage = multer.memoryStorage();
+const prescriptionUpload = multer({
+  storage: memStorage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/') || file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only images and PDFs are allowed'), false);
+    }
+  },
+});
+
+/**
+ * @route   POST /api/prescriptions/upload
+ * @desc    Upload a prescription for checkout — returns base64 data URL
+ *          TODO: swap internals to Cloudinary when keys are available
+ * @access  Private
+ */
+router.post('/upload', verifyToken, prescriptionUpload.single('prescription'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    // Convert to base64 data URL (stored in MongoDB as prescriptionUrl on Order)
+    const base64 = req.file.buffer.toString('base64');
+    const dataUrl = `data:${req.file.mimetype};base64,${base64}`;
+
+    res.status(200).json({
+      success: true,
+      prescriptionUrl: dataUrl,
+      fileName: req.file.originalname,
+      fileSize: req.file.size,
+      message: 'Prescription uploaded successfully',
+    });
+  } catch (err) {
+    console.error('Prescription upload error:', err);
+    res.status(500).json({ message: 'Upload failed', error: err.message });
+  }
+});
+
 // 1. IMPROVED STORAGE CONFIGURATION
 // diskStorage allows us to keep the original file extension
 // 🛡️ VERCEL COMPATIBILITY: Use /tmp for uploads as the rest of the filesystem is read-only

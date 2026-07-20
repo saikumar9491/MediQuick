@@ -10,7 +10,10 @@ import {
   getRelatedMedicines,
   toggleFlashDeal,
   toggleTrending,
-  generateAIDescription
+  generateAIDescription,
+  bulkUpdateMedicines,
+  bulkDeleteMedicines,
+  getSalesStats
 } from '../controllers/medicineController.js';
 import { verifyToken, isAdmin } from '../middleware/authMiddleware.js';
 
@@ -33,6 +36,9 @@ router.get('/top', getTopMedicines);
 // Also defined before /:id to ensure proper path matching.
 router.get('/related/:id', getRelatedMedicines);
 
+// 3.5. Fetch sales stats for a medicine
+router.get('/:id/sales-stats', getSalesStats);
+
 // 4. Fetch a single medicine by its specific MongoDB _id
 router.get('/:id', getMedicineById);
 
@@ -50,6 +56,12 @@ router.post('/:id/reviews', verifyToken, createMedicineReview);
  * @description ADMIN PROTECTED ROUTES
  * Requires both 'verifyToken' and 'isAdmin' permissions.
  */
+
+// Bulk Update existing products
+router.patch('/bulk-update', verifyToken, isAdmin, bulkUpdateMedicines);
+
+// Bulk Delete existing products
+router.delete('/bulk-delete', verifyToken, isAdmin, bulkDeleteMedicines);
 
 // Add new inventory to the Amritsar Hub database
 router.post('/add', verifyToken, isAdmin, addMedicine);

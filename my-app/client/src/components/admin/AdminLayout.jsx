@@ -6,14 +6,121 @@ import {
   Tag, Zap, Megaphone, ShoppingBag, Cpu, Bell, SplitSquareHorizontal,
   Users, MessageSquare, Star, Search, LifeBuoy,
   AlertOctagon, Radio, Eye, BarChart2, Settings,
-  LogOut, Menu, ChevronRight, Home, Mail
+  LogOut, Menu, ChevronRight, Home, ChevronDown
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 
+const SidebarContent = ({ sidebarOpen, toggleSidebar, activeTab, handleTabClick, handleLogout, menuGroups }) => {
+  const [expandedGroups, setExpandedGroups] = useState({});
+
+  // Initialize expanded groups based on active tab
+  useEffect(() => {
+    const initialExpanded = {};
+    menuGroups.forEach(group => {
+      // Default to expanded if it contains the active tab, or if it's the Core Commerce (first group)
+      const hasActiveTab = group.items.some(item => item.id === activeTab);
+      initialExpanded[group.title] = hasActiveTab || group.title === 'Core Commerce';
+    });
+    setExpandedGroups(initialExpanded);
+  }, [activeTab, menuGroups]);
+
+  const toggleGroup = (title) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [title]: !prev[title]
+    }));
+  };
+
+  return (
+    <div className="flex flex-col h-full bg-white text-slate-700 border-r border-slate-200/80">
+    {/* Brand Header */}
+    <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200/80 bg-[#065F60] text-white">
+      <div className="flex items-center gap-2.5">
+        <div className="flex h-8 w-8 items-center justify-center rounded bg-teal-500 text-white font-black text-sm flex-shrink-0">
+          M
+        </div>
+        {sidebarOpen && (
+          <div>
+            <h1 className="text-sm font-black tracking-wider uppercase text-white">Midiquick</h1>
+            <p className="text-[9px] font-bold text-teal-200 tracking-widest uppercase">Admin Control Hub</p>
+          </div>
+        )}
+      </div>
+      {sidebarOpen && (
+        <button onClick={toggleSidebar} className="hidden lg:block text-teal-200 hover:text-white transition-colors">
+          <ChevronRight className={`h-4.5 w-4.5 transform transition-transform rotate-180`} />
+        </button>
+      )}
+    </div>
+
+    {/* Navigation Links */}
+    <div className="flex-1 overflow-y-auto px-3.5 py-6 space-y-2 custom-scrollbar text-xs font-semibold">
+      {menuGroups.map((group, groupIndex) => {
+        const isExpanded = expandedGroups[group.title];
+        
+        return (
+          <div key={groupIndex} className="space-y-1">
+            {sidebarOpen && group.title !== 'Footer' && (
+              <button 
+                onClick={() => toggleGroup(group.title)}
+                className="w-full flex items-center justify-between px-3 py-2 mt-4 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors"
+              >
+                <span>{group.title}</span>
+                <ChevronDown className={`h-3 w-3 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+              </button>
+            )}
+            
+            <div className={`space-y-1 ${!isExpanded && sidebarOpen && group.title !== 'Footer' ? 'hidden' : 'block'}`}>
+              {group.items.map((item) => {
+                const isTabActive = activeTab === item.id;
+                const Icon = item.icon;
+
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleTabClick(item.id)}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all ${
+                      isTabActive
+                        ? 'bg-teal-50 text-teal-700 font-bold border-l-4 border-teal-500 rounded-l-none'
+                        : 'hover:bg-slate-50 text-slate-600'
+                    }`}
+                    title={!sidebarOpen ? item.label : ''}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon className={`h-4.5 w-4.5 ${isTabActive ? 'text-teal-600' : 'text-slate-400'}`} />
+                      {sidebarOpen && <span>{item.label}</span>}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+
+    {/* Footer Profile & Logout */}
+    <div className="p-4 border-t border-slate-200/80 bg-slate-50/30">
+      <button
+        onClick={handleLogout}
+        className="w-full flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-[11px] font-semibold text-rose-500 hover:bg-rose-50 transition-all"
+      >
+        <LogOut className="h-4.5 w-4.5" />
+        {sidebarOpen && <span>Sign Out</span>}
+      </button>
+    </div>
+  </div>
+  );
+};
+
 const AdminLayout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    const saved = localStorage.getItem('adminSidebarOpen');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -33,7 +140,13 @@ const AdminLayout = () => {
     navigate('/login');
   };
 
-  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  const toggleSidebar = () => {
+    setSidebarOpen(prev => {
+      const newState = !prev;
+      localStorage.setItem('adminSidebarOpen', JSON.stringify(newState));
+      return newState;
+    });
+  };
 
   const menuGroups = [
     {
@@ -50,7 +163,7 @@ const AdminLayout = () => {
       title: 'Operations & Logistics',
       items: [
         { id: 'logistics', label: 'Logistics', icon: Truck },
-        { id: 'radar', label: 'Live Radar', icon: MapPin },
+        { id: 'live-radar', label: 'Live Radar', icon: MapPin },
         { id: 'complaints', label: 'Complaints', icon: AlertTriangle },
         { id: 'returns', label: 'Returns & Refunds', icon: RefreshCw },
         { id: 'fleet', label: 'Fleet Console', icon: Briefcase },
@@ -105,86 +218,24 @@ const AdminLayout = () => {
     setMobileSidebarOpen(false);
   };
 
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full bg-white text-slate-700 border-r border-slate-200/80">
-      {/* Brand Header */}
-      <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200/80 bg-[#065F60] text-white">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded bg-teal-500 text-white font-black text-sm flex-shrink-0">
-            M
-          </div>
-          {sidebarOpen && (
-            <div>
-              <h1 className="text-sm font-black tracking-wider uppercase text-white">Midiquick</h1>
-              <p className="text-[9px] font-bold text-teal-200 tracking-widest uppercase">Admin Control Hub</p>
-            </div>
-          )}
-        </div>
-        {sidebarOpen && (
-          <button onClick={toggleSidebar} className="hidden lg:block text-teal-200 hover:text-white transition-colors">
-            <ChevronRight className={`h-4.5 w-4.5 transform transition-transform rotate-180`} />
-          </button>
-        )}
-      </div>
-
-      {/* Navigation Links */}
-      <div className="flex-1 overflow-y-auto px-3.5 py-6 space-y-6 custom-scrollbar text-xs font-semibold">
-        {menuGroups.map((group, groupIndex) => (
-          <div key={groupIndex} className="space-y-1">
-            {sidebarOpen && group.title !== 'Footer' && (
-              <h3 className="px-3 mb-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                {group.title}
-              </h3>
-            )}
-            
-            {group.items.map((item) => {
-              const isTabActive = activeTab === item.id;
-              const Icon = item.icon;
-
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => handleTabClick(item.id)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all ${
-                    isTabActive
-                      ? 'bg-teal-50 text-teal-700 font-bold border-l-4 border-teal-500 rounded-l-none'
-                      : 'hover:bg-slate-50 text-slate-600'
-                  }`}
-                  title={!sidebarOpen ? item.label : ''}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className={`h-4.5 w-4.5 ${isTabActive ? 'text-teal-600' : 'text-slate-400'}`} />
-                    {sidebarOpen && <span>{item.label}</span>}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        ))}
-      </div>
-
-      {/* Footer Profile & Logout */}
-      <div className="p-4 border-t border-slate-200/80 bg-slate-50/30">
-        <button
-          onClick={handleLogout}
-          className="w-full flex items-center gap-3.5 px-3 py-2.5 rounded-lg text-[11px] font-semibold text-rose-500 hover:bg-rose-50 transition-all"
-        >
-          <LogOut className="h-4.5 w-4.5" />
-          {sidebarOpen && <span>Sign Out</span>}
-        </button>
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-[#F4F7F6] flex text-slate-800 antialiased font-sans transition-colors duration-200">
       {/* Desktop Sidebar */}
       <aside 
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         className={`hidden lg:block h-screen sticky top-0 shadow-sm transition-all duration-300 z-30 flex-shrink-0 ${
-          sidebarOpen ? 'w-64' : 'w-20'
+          (sidebarOpen || isHovered) ? 'w-64' : 'w-20'
         }`}
       >
-        <SidebarContent />
+        <SidebarContent 
+          sidebarOpen={sidebarOpen || isHovered}
+          toggleSidebar={toggleSidebar}
+          activeTab={activeTab}
+          handleTabClick={handleTabClick}
+          handleLogout={handleLogout}
+          menuGroups={menuGroups}
+        />
       </aside>
 
       {/* Mobile Sidebar */}
@@ -205,14 +256,21 @@ const AdminLayout = () => {
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
               className="lg:hidden fixed inset-y-0 left-0 w-64 bg-white shadow-2xl z-50 overflow-hidden"
             >
-              <SidebarContent />
+              <SidebarContent 
+                sidebarOpen={sidebarOpen}
+                toggleSidebar={toggleSidebar}
+                activeTab={activeTab}
+                handleTabClick={handleTabClick}
+                handleLogout={handleLogout}
+                menuGroups={menuGroups}
+              />
             </motion.aside>
           </>
         )}
       </AnimatePresence>
 
       {/* Main Page Area */}
-      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto custom-scrollbar">
+      <div id="main-content-scroll" className="flex-1 flex flex-col min-w-0 h-screen overflow-y-auto custom-scrollbar">
         {/* Top Navbar */}
         <header className="sticky top-0 bg-white z-20 px-6 py-4 flex items-center justify-between border-b border-slate-200 shadow-sm">
           <div className="flex items-center gap-4">
@@ -224,7 +282,7 @@ const AdminLayout = () => {
                   setMobileSidebarOpen(true);
                 }
               }}
-              className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all"
+              className="lg:hidden p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 transition-all"
             >
               <Menu className="h-5 w-5" />
             </button>

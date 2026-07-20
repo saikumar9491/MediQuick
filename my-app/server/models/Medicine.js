@@ -4,8 +4,12 @@ const reviewSchema = new mongoose.Schema({
   name: { type: String, required: true },
   rating: { type: Number, required: true },
   comment: { type: String, required: true },
+  title: { type: String }, // NEW FIELD
+  images: [{ type: String }], // NEW FIELD (Cloudinary URLs)
   user: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
-  isApproved: { type: Boolean, default: true },
+  isApproved: { type: Boolean, default: false }, // Moderation default
+  adminResponse: { type: String }, // NEW FIELD
+  orderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Order' }, // For verified purchase
 }, { timestamps: true });
 
 const variantSchema = new mongoose.Schema({
@@ -27,12 +31,27 @@ const medicineSchema = mongoose.Schema({
   numReviews: { type: Number, default: 0 },
   reviews: [reviewSchema],
   needsRx: { type: Boolean, default: false },
+  isActive: { type: Boolean, default: true },
   isFlashDeal: { type: Boolean, default: false },
   isTrending: { type: Boolean, default: false },
+  isFeatured: { type: Boolean, default: false },
   discountPrice: { type: Number },
   subCategory: { type: String },
   sku: { type: String },
+  expiryDate: { type: Date },
+  manufacturingDate: { type: Date },
+  batchNumber: { type: String },
+  dosageForm: { type: String },
+  strength: { type: String },
+  salt: { type: String },
+  lowStockThreshold: { type: Number, default: 10 },
+  unit: { type: String },
   tags: [{ type: String }],
+  usesAndBenefits: { type: String, default: '' },
+  howToUse: { type: String, default: '' },
+  safetyInformation: { type: String, default: '' },
+  ingredients: { type: String, default: '' },
+  verifiedAuthentic: { type: Boolean, default: false },
   variants: [variantSchema]
 }, { timestamps: true });
 

@@ -26,6 +26,16 @@ const seedDashboard = async () => {
       process.exit(1);
     }
 
+    // Mark some medicines as trending so the homepage is populated
+    console.log("🔥 Setting some medicines as trending...");
+    await Medicine.updateMany({}, { isTrending: false });
+    const medicinesToTrend = await Medicine.find().limit(8);
+    for (const med of medicinesToTrend) {
+      med.isTrending = true;
+      await med.save();
+    }
+    console.log("✅ 8 medicines marked as trending");
+
     // 2. Create or find mock users
     console.log("👤 Creating mock customers...");
     const salt = await bcrypt.genSalt(10);
@@ -89,10 +99,10 @@ const seedDashboard = async () => {
     // 3. Seed Coupons
     console.log("🎟 Seeding coupons...");
     const coupons = [
-      { code: "WELCOME10", discount: 10, expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), isActive: true },
-      { code: "HEALTH20", discount: 20, expiryDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), isActive: true },
-      { code: "FREESHIP", discount: 5, expiryDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), isActive: false },
-      { code: "SUPER30", discount: 30, expiryDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), isActive: true }
+      { code: "WELCOME10", discountValue: 10, validTo: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), isActive: true },
+      { code: "HEALTH20", discountValue: 20, validTo: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), isActive: true },
+      { code: "FREESHIP", discountValue: 5, validTo: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), isActive: false },
+      { code: "SUPER30", discountValue: 30, validTo: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), isActive: true }
     ];
     await Coupon.insertMany(coupons);
     console.log("✅ Coupons inserted");
@@ -160,7 +170,7 @@ const seedDashboard = async () => {
 
     // 6. Seed Orders over a 30-day range
     console.log("🛒 Seeding orders...");
-    const statuses = ["Confirmed", "Shipped", "Out for Delivery", "Delivered", "Cancelled"];
+    const statuses = ["Confirmed", "Processing", "Out for Delivery", "Delivered", "Cancelled"];
     const statusWeights = [0.1, 0.2, 0.1, 0.55, 0.05];
 
     const selectStatus = () => {

@@ -32,25 +32,32 @@ export const CartProvider = ({ children }) => {
       }
 
       try {
-        const res = await fetch(`${API_BASE}/api/users/profile`, {
+        // Primary: load from Cart collection (live stock data)
+        const cartRes = await fetch(`${API_BASE}/api/cart`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        if (res.ok) {
-          const data = await res.json();
-          if (data?.cart) {
-            // Reconstruct the flat cart structure used in the frontend
-            const backendCart = data.cart
-              .filter(item => item.productId)
-              .map(item => ({
-                ...item.productId,
-                quantity: item.quantity
-              }));
-
-            // Only overwrite if backend has items or if local is empty
-            // This prevents race conditions on slow reloads
-            if (backendCart.length > 0 || cart.length === 0) {
-              setCart(backendCart);
+        if (cartRes.ok) {
+          const data = await cartRes.json();
+          if (data?.items?.length > 0 || cart.length === 0) {
+            const backendCart = data.items.map(item => ({
+              _id: item.productId,
+              ...item,
+            }));
+            setCart(backendCart);
+          }
+        } else {
+          // Fallback: load from User.cart (legacy)
+          const profileRes = await fetch(`${API_BASE}/api/users/profile`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (profileRes.ok) {
+            const data = await profileRes.json();
+            if (data?.cart) {
+              const backendCart = data.cart
+                .filter(item => item.productId)
+                .map(item => ({ ...item.productId, quantity: item.quantity }));
+              if (backendCart.length > 0 || cart.length === 0) setCart(backendCart);
             }
           }
         }
@@ -58,10 +65,7 @@ export const CartProvider = ({ children }) => {
         console.error('Cart Backend Sync Failed:', err);
       } finally {
         setIsLoaded(true);
-        // Delay allowing auto-save to ensure state updates are flushed
-        setTimeout(() => {
-          blockSave.current = false;
-        }, 1000);
+        setTimeout(() => { blockSave.current = false; }, 1000);
       }
     };
 
@@ -76,24 +80,27 @@ export const CartProvider = ({ children }) => {
     const autoSave = async () => {
       setSaveStatus('saving');
       const dbPayload = cart.map(item => ({
-        productId: item._id,
+        productId: item._id || item.productId,
         quantity: item.quantity
       }));
 
       try {
-        const res = await fetch(`${API_BASE}/api/users/cart/update`, {
+        // Sync to User.cart (for profile/order endpoints)
+        await fetch(`${API_BASE}/api/users/cart/update`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
           body: JSON.stringify({ cart: dbPayload }),
         });
 
-        if (res.ok) {
-          setSaveStatus('saved');
-          setTimeout(() => setSaveStatus('idle'), 2000);
-        }
+        // Sync to Cart collection (for Abandoned Cart tracking)
+        await fetch(`${API_BASE}/api/cart/update`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ items: dbPayload }),
+        });
+
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus('idle'), 2000);
       } catch (err) {
         console.error('Auto-save failed:', err);
       }
@@ -140,6 +147,7 @@ export const CartProvider = ({ children }) => {
   return (
     <CartContext.Provider value={{ 
       cartItems: cart, 
+      setCartItems: setCart,
       addToCart, 
       removeFromCart, 
       updateQuantity, 
