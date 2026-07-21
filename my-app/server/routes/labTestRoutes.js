@@ -9,9 +9,13 @@ import { verifyToken, isAdmin } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 // Multer storage configuration for PDF reports
-const reportDir = 'uploads/reports/';
-if (!fs.existsSync(reportDir)) {
-  fs.mkdirSync(reportDir, { recursive: true });
+const reportDir = process.env.VERCEL ? '/tmp' : 'uploads/reports/';
+try {
+  if (!fs.existsSync(reportDir)) {
+    fs.mkdirSync(reportDir, { recursive: true });
+  }
+} catch (err) {
+  console.warn('Serverless environment: Using /tmp for reports');
 }
 
 const storage = multer.diskStorage({

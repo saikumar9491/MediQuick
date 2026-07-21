@@ -7,9 +7,13 @@ import { verifyToken, isAdmin } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 // Ensure uploads directory exists
-const uploadDir = 'uploads/';
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+const uploadDir = process.env.VERCEL ? '/tmp' : 'uploads/';
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch (err) {
+  console.warn('Serverless environment: Using /tmp for uploads');
 }
 
 // Multer storage configuration

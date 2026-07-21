@@ -9,9 +9,13 @@ import { verifyToken, isAdmin } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 // Multer storage for E-Prescription PDF uploads
-const prescriptionDir = 'uploads/prescriptions/';
-if (!fs.existsSync(prescriptionDir)) {
-  fs.mkdirSync(prescriptionDir, { recursive: true });
+const prescriptionDir = process.env.VERCEL ? '/tmp' : 'uploads/prescriptions/';
+try {
+  if (!fs.existsSync(prescriptionDir)) {
+    fs.mkdirSync(prescriptionDir, { recursive: true });
+  }
+} catch (err) {
+  console.warn('Serverless environment: Using /tmp for prescriptions');
 }
 
 const storage = multer.diskStorage({
