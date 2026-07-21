@@ -9,23 +9,23 @@ import {
 } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { Toaster } from 'react-hot-toast';
+import { API_BASE } from './utils/apiConfig';
+import { useGoogleOneTapLogin } from '@react-oauth/google';
 
 // Pages
 import Home from './pages/Home';
 import Checkout from './pages/Checkout/Checkout';
 import OrderConfirmation from './pages/Checkout/OrderConfirmation';
 import MyOrders from './pages/MyOrders/MyOrders';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
 import VerifyOtp from './pages/Auth/VerifyOtp'; // 🛰️ IMPORTED VERIFY OTP
-import ForgotPassword from './pages/ForgotPassword';
+import AuthModal from './components/AuthModal/AuthModal'; // 🛰️ IMPORTED AUTH MODAL
+import ResetPassword from './pages/Auth/ResetPassword';
 import Wishlist from './pages/Wishlist/Wishlist';
 import Profile from './pages/Profile/Profile';
 import ProductDetails from './pages/ProductDetails/ProductDetails';
 import BrandPage from './pages/BrandPage';
 import Cart from './pages/Cart/Cart';
 import MedicinesPage from './pages/MedicinesPage';
-import LabTestsPage from './pages/LabTestsPage';
 import ConsultPage from './pages/ConsultPage';
 import AyurvedaPage from './pages/AyurvedaPage';
 import CarePlanPage from './pages/CarePlanPage';
@@ -35,7 +35,7 @@ import AdminFlashDeals from './pages/AdminFlashDeals';
 import AddProduct from './pages/admin/AddProduct/AddProduct';
 import Orders from './pages/admin/Orders/Orders';
 import AdminTrendingProducts from './pages/AdminTrendingProducts';
-import AllCategoriesPage from './pages/AllCategoriesPage';
+import AllCategoriesPage from './pages/Categories/AllCategoriesPage';
 import AdminLayout from './components/admin/AdminLayout';
 import CommandCenter from './pages/admin/CommandCenter/CommandCenter';
 import Products from './pages/admin/Products/Products';
@@ -55,8 +55,15 @@ import Fleet from './pages/admin/Fleet/Fleet';
 import Coupons from './pages/admin/Coupons/Coupons';
 import AbandonedCart from './pages/admin/AbandonedCart/AbandonedCart';
 import Marketing from './pages/admin/Marketing/Marketing';
-import LabTestDetailsPage from './pages/LabTestDetailsPage';
 import DoctorDetailsPage from './pages/DoctorDetailsPage';
+import LabTestsHome from './pages/LabTests/LabTestsHome';
+import LabTestDetail from './pages/LabTests/LabTestDetail';
+import LabTestBooking from './pages/LabTests/LabTestBooking';
+import LabTestsAdmin from './pages/admin/LabTests/LabTestsAdmin';
+import LabBookingsAdmin from './pages/admin/LabTests/LabBookingsAdmin';
+import DoctorsAdmin from './pages/admin/Doctors/DoctorsAdmin';
+import DoctorAppointmentsAdmin from './pages/admin/Doctors/DoctorAppointmentsAdmin';
+import PageManagementAdmin from './pages/admin/PageManagement/PageManagementAdmin';
 
 // Global Components
 import WhatsAppSupport from './components/common/WhatsAppSupport';
@@ -69,7 +76,7 @@ import ScrollToTop from './components/common/ScrollToTop';
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
   if (loading) return <LoadingScreen message="Loading Secure Access..." icon="💊" />;
-  return user ? <Outlet /> : <Navigate to="/login" replace />;
+  return user ? <Outlet /> : <Navigate to="/" replace />;
 };
 
 const AdminRoute = () => {
@@ -90,24 +97,56 @@ const LoadingScreen = ({ message, icon }) => (
   </div>
 );
 
-import { API_BASE } from './utils/apiConfig';
+const GoogleOneTapPrompt = () => {
+  const { user, login } = useAuth();
+  
+  useGoogleOneTapLogin({
+    onSuccess: async (credentialResponse) => {
+      try {
+        const res = await fetch(`${API_BASE}/api/users/google-login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: credentialResponse.credential }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          login(data.token, data.user);
+          import('react-hot-toast').then(({ default: toast }) => {
+            toast.success("Welcome back to MediQuick!");
+          });
+        }
+      } catch (error) {
+        console.error("Google One Tap Error:", error);
+      }
+    },
+    onError: () => {
+      console.log('Google One Tap Failed');
+    },
+    disabled: !!user, // Disable if user is already logged in
+    cancel_on_tap_outside: false // Prevent accidental dismissal which triggers the 2-hour cooldown
+  });
+
+  return null;
+};
 
 function AppLayout({ medicines, featured, loading }) {
   const location = useLocation();
+  const { user } = useAuth();
 
   // 🛡️ Added /verify-otp to hidden routes to maintain focus
-  const hideNavbarRoutes = ['/login', '/signup', '/forgot-password', '/verify-otp'];
-  const hideWhatsAppRoutes = ['/login', '/signup', '/forgot-password', '/admin-dashboard', '/verify-otp'];
-  const hideFooterRoutes = ['/login', '/signup', '/forgot-password', '/admin-dashboard', '/verify-otp'];
+  const hideNavbarRoutes = ['/verify-otp', '/reset-password', '/admin'];
+  const hideWhatsAppRoutes = ['/admin', '/verify-otp', '/reset-password'];
+  const hideFooterRoutes = ['/admin', '/verify-otp', '/reset-password'];
 
   const shouldHideNavbar =
-    hideNavbarRoutes.includes(location.pathname) ||
-    location.pathname === '/admin-dashboard' ||
+    hideNavbarRoutes.some(r => location.pathname.startsWith(r)) ||
+    location.pathname === '/admin' ||
     location.pathname.startsWith('/admin');
-  const shouldHideWhatsApp =
-    hideWhatsAppRoutes.includes(location.pathname) ||
-    location.pathname.startsWith('/admin');
-  const shouldHideFooter = hideFooterRoutes.includes(location.pathname) || location.pathname.startsWith('/admin');
+  const shouldHideWhatsApp = hideWhatsAppRoutes.some(r => location.pathname.startsWith(r));
+  const shouldHideFooter = 
+    hideFooterRoutes.some(r => location.pathname.startsWith(r)) || 
+    location.pathname.startsWith('/admin') || 
+    location.pathname.endsWith('/book');
 
   return (
     <>
@@ -118,25 +157,31 @@ function AppLayout({ medicines, featured, loading }) {
           style: { fontSize: '12px', fontWeight: '700' },
         }}
       />
+      
+      <AuthModal />
+      {!user && <GoogleOneTapPrompt />}
 
       {!shouldHideNavbar && <Navbar medicines={medicines} />}
 
       <main className={!shouldHideNavbar ? 'min-h-[80vh]' : ''}>
         <Routes>
           <Route path="/" element={<Home medicines={medicines} featured={featured} loading={loading} />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
           <Route path="/verify-otp" element={<VerifyOtp />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/brand/:brandName" element={<BrandPage />} />
 
           <Route path="/medicines" element={<MedicinesPage />} />
           <Route path="/categories" element={<AllCategoriesPage />} />
-          <Route path="/lab-tests" element={<LabTestsPage />} />
-          <Route path="/lab-test-details/:id" element={<LabTestDetailsPage />} />
+          <Route path="/lab-tests" element={<LabTestsHome />} />
+          <Route path="/lab-tests/:id" element={<LabTestDetail />} />
+          <Route path="/lab_tests" element={<LabTestsHome />} />
+          <Route path="/lab_tests/:id" element={<LabTestDetail />} />
           <Route path="/consult" element={<ConsultPage />} />
+          <Route path="/consult-doctor" element={<ConsultPage />} />
+          <Route path="/consult-doctor/:id" element={<DoctorDetailsPage />} />
           <Route path="/doctor-details/:id" element={<DoctorDetailsPage />} />
           <Route path="/ayurveda" element={<AyurvedaPage />} />
+          <Route path="/category/ayurveda" element={<AyurvedaPage />} />
           <Route path="/care-plan" element={<CarePlanPage />} />
           <Route path="/skin-care" element={<SkinCarePage />} />
           <Route path="/offers" element={<div className="pt-24 p-4 text-center font-bold">Offers coming soon!</div>} />
@@ -147,6 +192,8 @@ function AppLayout({ medicines, featured, loading }) {
           <Route element={<ProtectedRoute />}>
             <Route path="/cart" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/lab-tests/:id/book" element={<LabTestBooking />} />
+            <Route path="/lab_tests/:id/book" element={<LabTestBooking />} />
             <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
             <Route path="/my-orders" element={<MyOrders />} />
             <Route path="/wishlist" element={<Wishlist />} />
@@ -161,6 +208,11 @@ function AppLayout({ medicines, featured, loading }) {
               <Route path="add-product" element={<AddProduct />} />
               <Route path="edit-product/:id" element={<AddProduct />} />
               <Route path="orders" element={<Orders />} />
+              <Route path="lab-tests" element={<LabTestsAdmin />} />
+              <Route path="lab-bookings" element={<LabBookingsAdmin />} />
+              <Route path="doctors" element={<DoctorsAdmin />} />
+              <Route path="doctor-appointments" element={<DoctorAppointmentsAdmin />} />
+              <Route path="page-management" element={<PageManagementAdmin />} />
               <Route path="pos-terminal" element={<POSTerminal />} />
               <Route path="logistics" element={<Logistics />} />
               <Route path="live-radar" element={<LiveRadar />} />
@@ -243,8 +295,8 @@ function App() {
     const fetchData = async () => {
       try {
         const [medRes, topRes] = await Promise.all([
-          fetch(`${API_BASE}/api/medicines`),
-          fetch(`${API_BASE}/api/medicines/top`)
+          fetch(`${API_BASE}/api/medicines?limit=1000`),
+          fetch(`${API_BASE}/api/medicines/top?limit=1000`)
         ]);
         
         const medData = await medRes.json();

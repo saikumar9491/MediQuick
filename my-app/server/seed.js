@@ -2,6 +2,11 @@ import 'dotenv/config';
 import mongoose from 'mongoose';
 import connectDB from './config/db.js';
 import Medicine from './models/Medicine.js';
+import Category from './models/Category.js';
+import LabTest from './models/LabTest.js';
+import Doctor from './models/Doctor.js';
+import CarePlan from './models/CarePlan.js';
+import PageContent from './models/PageContent.js';
 
 const medicines = [
   // ================= DIABETES =================
@@ -193,7 +198,7 @@ const medicines = [
   description: "Rich source of Vitamin C that boosts immunity and metabolism.",
   price: 200,
   countInStock: 45,
-  image: "https://www.jiomart.com/images/product/original/rves9tne7h/tata-1mg-tejasya-amla-juice-relieves-from-acidity-healthy-hair-and-skin-pack-of-1-product-images-orves9tne7h-p603670325-0-202308051658.jpg?im=Resize=(1000,1000)",
+  image: "https://www.netmeds.com/images/product-v1/600x600/1005844/tata_1mg_tejasya_amla_juice_1000_ml_0_1.jpg",
   needsPrescription: false
 },
 {
@@ -275,7 +280,7 @@ const medicines = [
   description: "Energy and amino acid supplement that supports workout performance.",
   price: 2100,
   countInStock: 18,
-  image: "https://cdn11.bigcommerce.com/s-ilgxsy4t82/images/stencil/1280x1280/products/287793/891498/619EcHWXpKS__78168.1719831463.jpg?c=1&imbypass=on",
+  image: "https://m.media-amazon.com/images/I/61M-1Pq-3QL._SL1500_.jpg",
   needsPrescription: false
 },
 {
@@ -316,7 +321,7 @@ const medicines = [
   description: "High protein nutritional drink that supports muscle health and recovery.",
   price: 620,
   countInStock: 30,
-  image: "https://www.jiomart.com/images/product/original/rvbn1qwrm9/pentasure-hp-whey-protein-banana-vanilla-flavour-1-kg-product-images-orvbn1qwrm9-p599947689-0-202510131838.jpg?im=Resize=(420,420)",
+  image: "https://www.netmeds.com/images/product-v1/600x600/840428/pentasure_hp_powder_banana_vanilla_flavour_1_kg_0_1.jpg",
   needsPrescription: false
 },
 {
@@ -337,7 +342,7 @@ const medicines = [
   description: "Easy-to-use glucometer that provides fast and accurate blood glucose readings.",
   price: 1250,
   countInStock: 20,
-  image: "https://tse1.mm.bing.net/th/id/OIP.IOPiVfIP82pxzkcmJsG95gHaHa?rs=1&pid=ImgDetMain&o=7&rm=3",
+  image: "https://m.media-amazon.com/images/I/61N1-Jq7KGL._SL1000_.jpg",
   needsPrescription: false
 },
 {
@@ -357,7 +362,7 @@ const medicines = [
   description: "Test strips designed for use with Accu-Chek Guide meters for precise readings.",
   price: 720,
   countInStock: 50,
-  image: "https://healkit.in/sg/wp-content/uploads/2024/02/accu-chek-guide-50-strips-buy-online.jpg",
+  image: "https://m.media-amazon.com/images/I/71k42TqWwTL._SL1500_.jpg",
   needsPrescription: false
 },
 {
@@ -419,7 +424,7 @@ const medicines = [
   description: "Gentle moisturizing lotion specially formulated for baby's delicate skin.",
   price: 520,
   countInStock: 35,
-  image: "https://babymall.hk/wp-content/uploads/2020/03/302990200140_01.jpg",
+  image: "https://m.media-amazon.com/images/I/71YyNis1HML._SL1500_.jpg",
   needsPrescription: false
 },
 {
@@ -561,19 +566,255 @@ const medicines = [
   }
 ];
 
+
+const categoriesList = [
+  { 
+    name: 'Health Resource Center', 
+    iconName: 'BookOpen', 
+    path: '/categories',
+    subOptions: [
+      { name: 'All Medicines', path: '/categories' },
+      { name: 'Lab Tests', path: '/lab-tests' },
+      { name: 'Ayurveda', path: '/ayurveda' },
+      { name: 'Consult Top Doctors', path: '/consult' },
+      { name: 'Care Plan', path: '/care-plan' }
+    ]
+  },
+  { name: 'Hair Care', iconName: 'Sparkles', path: '/medicines?filter=hair-care', subOptions: ['Hair Oils', 'Shampoos & Conditioners', 'Hair Serums', 'Hair Creams & Masks', 'Hair Colour', 'Hair Growth Products', 'Essential Oils'] },
+  { name: 'Fitness & Health', iconName: 'Dumbbell', path: '/medicines?filter=fitness', subOptions: ['Vitamins', 'Proteins', 'Health Drinks', 'Gym Accessories'] },
+  { name: 'Sexual Wellness', iconName: 'Activity', path: '/medicines?filter=sexual-wellness', subOptions: ['Condoms', 'Lubricants', 'Personal Wash', 'Performance'] },
+  { name: 'Vitamins & Nutrition', iconName: 'Apple', path: '/medicines?filter=vitamins', subOptions: ['Multivitamins', 'Minerals', 'Omega & Fish Oil', 'Biotin'] },
+  { name: 'Supports & Braces', iconName: 'Heart', path: '/medicines?filter=supports', subOptions: ['Knee Supports', 'Back Supports', 'Ankle Supports', 'Wrist Supports'] },
+  { name: 'Immunity Boosters', iconName: 'Shield', path: '/medicines?filter=immunity', subOptions: ['Chyawanprash', 'Herbal Juices', 'Vitamin C', 'Zinc'] },
+  { name: 'Homeopathy', iconName: 'Leaf', path: '/medicines?filter=homeopathy', subOptions: ['Cough & Cold', 'Digestion', 'Skin Care', 'Hair Care'] },
+  { name: 'Pet Care', iconName: 'Dog', path: '/medicines?filter=pet-care', subOptions: ['Dog Food', 'Cat Food', 'Pet Grooming', 'Pet Medicines'] }
+];
+
+const labTestsList = [
+  {
+    name: "Complete Blood Count (CBC)",
+    description: "Evaluates overall health and detects a wide range of disorders, including anemia, infection, and leukemia.",
+    parameters: ["Hemoglobin", "Total Leukocyte Count (WBC)", "Red Blood Cell Count (RBC)", "Platelet Count", "Mean Corpuscular Volume (MCV)", "Hematocrit (PCV)"],
+    sampleType: "Blood",
+    prepInstructions: "No special preparation or fasting is required.",
+    price: 299,
+    discountedPrice: 249,
+    turnaroundHours: 24,
+    category: "Full Body Checkup"
+  },
+  {
+    name: "Thyroid Profile (Total T3, Total T4, TSH)",
+    description: "Helps evaluate thyroid gland function and diagnose conditions like hypothyroidism or hyperthyroidism.",
+    parameters: ["Triiodothyronine (T3)", "Thyroxine (T4)", "Thyroid Stimulating Hormone (TSH)"],
+    sampleType: "Blood",
+    prepInstructions: "No fasting is strictly required, but morning collection is highly recommended.",
+    price: 499,
+    discountedPrice: 399,
+    turnaroundHours: 24,
+    category: "Thyroid"
+  },
+  {
+    name: "Diabetes Screening (HbA1c & Fasting Sugar)",
+    description: "Provides an average of your blood sugar control over the past 3 months along with your current fasting sugar level.",
+    parameters: ["HbA1c (Glycated Hemoglobin)", "Average Blood Glucose", "Fasting Blood Sugar"],
+    sampleType: "Blood",
+    prepInstructions: "10-12 hours of overnight fasting is mandatory prior to the test.",
+    price: 599,
+    discountedPrice: 450,
+    turnaroundHours: 24,
+    category: "Diabetes"
+  }
+];
+
+const doctorsList = [
+  {
+    name: "Dr. Amit Sharma",
+    photo: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=600&q=80",
+    qualifications: "MBBS, MD (Internal Medicine)",
+    specialization: "General Physician",
+    experienceYears: 14,
+    bio: "Senior consultant with extensive experience in preventative health, fever management, diabetes control, and chronic care.",
+    languagesSpoken: ["English", "Hindi", "Punjabi"],
+    consultationFee: 499,
+    consultationModes: ["chat", "video", "audio"],
+    rating: 4.9,
+    numReviews: 142,
+    registrationNumber: "MCI-48291",
+    isActive: true,
+    isVerified: true
+  },
+  {
+    name: "Dr. Priya Verma",
+    photo: "https://images.unsplash.com/photo-1594824813566-88855ce78341?auto=format&fit=crop&w=600&q=80",
+    qualifications: "MBBS, MD (Dermatology)",
+    specialization: "Dermatologist",
+    experienceYears: 10,
+    bio: "Specialist in acne treatments, eczema, hair loss therapies, and clinical skin health.",
+    languagesSpoken: ["English", "Hindi"],
+    consultationFee: 699,
+    consultationModes: ["chat", "video"],
+    rating: 4.8,
+    numReviews: 98,
+    registrationNumber: "MCI-59102",
+    isActive: true,
+    isVerified: true
+  },
+  {
+    name: "Dr. Rajesh Gupta",
+    photo: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=600&q=80",
+    qualifications: "MBBS, DCH (Pediatrics)",
+    specialization: "Pediatrician",
+    experienceYears: 12,
+    bio: "Child healthcare specialist focusing on infant nutrition, growth milestones, and pediatric fever care.",
+    languagesSpoken: ["English", "Hindi"],
+    consultationFee: 599,
+    consultationModes: ["video", "audio"],
+    rating: 4.9,
+    numReviews: 175,
+    registrationNumber: "MCI-37190",
+    isActive: true,
+    isVerified: true
+  },
+  {
+    name: "Dr. Sneha Reddy",
+    photo: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=600&q=80",
+    qualifications: "MBBS, MS (Obstetrics & Gynaecology)",
+    specialization: "Gynecologist",
+    experienceYears: 11,
+    bio: "Expert in women's health, PCOS management, prenatal guidance, and hormonal wellness.",
+    languagesSpoken: ["English", "Hindi", "Telugu"],
+    consultationFee: 649,
+    consultationModes: ["chat", "video", "audio"],
+    rating: 4.9,
+    numReviews: 110,
+    registrationNumber: "MCI-62819",
+    isActive: true,
+    isVerified: true
+  }
+];
+
+const carePlansList = [
+  {
+    name: "Care Plan Monthly",
+    tier: "monthly",
+    price: 199,
+    discountPercentage: 5,
+    freeDeliveryThreshold: 199,
+    benefitsList: [
+      "Free Delivery on orders above ₹199",
+      "Extra 5% discount on all medicines",
+      "Priority customer care & chat support"
+    ],
+    isActive: true
+  },
+  {
+    name: "Care Plan Annual",
+    tier: "annual",
+    price: 999,
+    discountPercentage: 10,
+    freeDeliveryThreshold: 0,
+    benefitsList: [
+      "Free Delivery on ALL orders (No min order)",
+      "Extra 10% discount on all medicines",
+      "1 Free Annual CBC Lab Checkup",
+      "Priority customer care & dedicated manager"
+    ],
+    isActive: true
+  }
+];
+
+const pageContentList = [
+  {
+    pageKey: "lab-tests",
+    title: "Lab Tests & Diagnostics",
+    heroHeadline: "Book lab tests from your home.",
+    heroSubtext: "Certified lab assistants collect samples at your convenience. Accurate diagnostic reports are uploaded directly to your profile.",
+    status: "Live",
+    trustClaims: [
+      { text: "NABL Accredited Partner Labs Only", confirmedAccurate: true },
+      { text: "100% Home Sample Collection", confirmedAccurate: true },
+      { text: "Digital Reports Delivered via Profile", confirmedAccurate: true }
+    ],
+    auditLog: [{ updatedBy: "System Seed", action: "Initial Seed" }]
+  },
+  {
+    pageKey: "ayurveda",
+    title: "Ayurveda & Herbal Care",
+    heroHeadline: "Ayurveda, rooted in tradition",
+    heroSubtext: "Time-tested herbal wellness formulas, classical Chyawanprash, pure juices, and natural remedies.",
+    status: "Live",
+    themeAccent: "#4A6B49",
+    aboutBlock: "Ayurveda is a 5,000-year-old traditional Indian system of holistic healing and wellness.",
+    auditLog: [{ updatedBy: "System Seed", action: "Initial Seed" }]
+  },
+  {
+    pageKey: "consult",
+    title: "Doctor Consultations",
+    heroHeadline: "Talk to certified doctors from home.",
+    heroSubtext: "Connect with verified medical specialists via HD video, audio, or instant chat. Get digital prescriptions & medical advice.",
+    status: "Live",
+    auditLog: [{ updatedBy: "System Seed", action: "Initial Seed" }]
+  },
+  {
+    pageKey: "care-plan",
+    title: "MediQuick Care Plan",
+    heroHeadline: "MediQuick Care Plan",
+    heroSubtext: "Unlimited free delivery, extra medicine discounts, and priority healthcare support for you and your family.",
+    status: "Live",
+    faqs: [
+      { question: "How does billing work?", answer: "Care Plan is billed as a 1-time upfront payment for your selected billing frequency." },
+      { question: "Can I cancel anytime?", answer: "Yes! You can cancel your subscription at any time with 1 click from your profile." }
+    ],
+    auditLog: [{ updatedBy: "System Seed", action: "Initial Seed" }]
+  }
+];
+
 const seedDatabase = async () => {
   try {
     console.log("⏳ Initializing database connection...");
     await connectDB();
 
-    // Verification step: Ensure the model is working
     console.log("🗑️  Cleaning 'medicines' collection...");
     await Medicine.deleteMany({});
 
+    console.log("🗑️  Cleaning 'categories' collection...");
+    await Category.deleteMany({});
+
+    console.log("🗑️  Cleaning 'labtests' collection...");
+    await LabTest.deleteMany({});
+
+    console.log("🗑️  Cleaning 'doctors' collection...");
+    await Doctor.deleteMany({});
+
+    console.log("🗑️  Cleaning 'careplans' collection...");
+    await CarePlan.deleteMany({});
+
+    console.log("🗑️  Cleaning 'pagecontents' collection...");
+    await PageContent.deleteMany({});
+
     console.log("🌱 Inserting fresh medicine records...");
     const createdMedicines = await Medicine.insertMany(medicines);
-
     console.log(`✅ Success! ${createdMedicines.length} medicines added to MediQuick+`);
+
+    console.log("🌱 Inserting fresh category records...");
+    const createdCategories = await Category.insertMany(categoriesList);
+    console.log(`✅ Success! ${createdCategories.length} categories added to MediQuick+`);
+
+    console.log("🌱 Inserting fresh lab test records...");
+    const createdLabTests = await LabTest.insertMany(labTestsList);
+    console.log(`✅ Success! ${createdLabTests.length} lab tests added to MediQuick+`);
+
+    console.log("🌱 Inserting fresh doctor records...");
+    const createdDoctors = await Doctor.insertMany(doctorsList);
+    console.log(`✅ Success! ${createdDoctors.length} doctors added to MediQuick+`);
+
+    console.log("🌱 Inserting fresh Care Plan records...");
+    const createdCarePlans = await CarePlan.insertMany(carePlansList);
+    console.log(`✅ Success! ${createdCarePlans.length} care plans added to MediQuick+`);
+
+    console.log("🌱 Inserting fresh Page Content records...");
+    const createdPageContents = await PageContent.insertMany(pageContentList);
+    console.log(`✅ Success! ${createdPageContents.length} page contents added to MediQuick+`);
     
     // Explicitly close connection and exit
     await mongoose.connection.close();

@@ -1,14 +1,13 @@
 import React from 'react';
-import WishlistProductCard from './WishlistProductCard';
+import ProductCard from '../../../components/ProductCard/ProductCard';
 
 const WishlistGrid = ({ items, token, onRemove, onUndo }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       {items.map(item => (
-        <WishlistProductCard
+        <ProductCard
           key={item._id}
-          item={item}
-          token={token}
+          {...item}
           onRemove={onRemove}
           onUndo={onUndo}
         />

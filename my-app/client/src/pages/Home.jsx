@@ -253,111 +253,194 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       </section>
 
       {/* Shop by Categories */}
-      <section className="bg-white py-4 md:py-10">
-        <div className="mx-auto max-w-[1400px] px-3 md:px-5">
-          <div className="flex items-center justify-between mb-3 md:mb-1">
-            <h2 className="text-xl md:text-[22px] font-bold md:font-semibold text-slate-900 md:text-[#212121] tracking-tight">
-              Shop by categories
-            </h2>
+      <section style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f0fafa 100%)', padding: '48px 0' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 20px' }}>
+
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '32px' }}>
+            <div>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(0,162,164,0.08)', border: '1px solid rgba(0,162,164,0.2)', borderRadius: '100px', padding: '4px 12px', marginBottom: '10px' }}>
+                <span style={{ fontSize: '16px' }}>🛍️</span>
+                <span style={{ fontSize: '11px', fontWeight: 800, color: '#00a2a4', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Browse Categories</span>
+              </div>
+              <h2 style={{ fontSize: '28px', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.02em', lineHeight: 1.1, margin: 0 }}>
+                Shop by Category
+              </h2>
+              <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '6px', fontWeight: 500 }}>
+                Find exactly what you need, fast
+              </p>
+            </div>
           </div>
 
-          {/* Gradient Underline (Desktop Only) */}
-          <div className="hidden md:block w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
-
           <style>{`
-            .custom-scrollbar-hidden::-webkit-scrollbar { display: none; }
-            .custom-scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
-            .category-frame {
-              min-width: 165px;
-              width: 165px;
-              aspect-ratio: 1/1;
-              background: white;
-              border: 1px solid #f1f4f6;
-              border-radius: 6px;
-              padding: 12px;
+            .cat-scroll-container { scrollbar-width: none; -ms-overflow-style: none; }
+            .cat-scroll-container::-webkit-scrollbar { display: none; }
+            .cat-card {
               cursor: pointer;
-              transition: all 0.3s ease;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              gap: 10px;
+              transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             }
-            .category-frame:hover {
-              box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-              border-color: #e2e8f0;
+            .cat-card:hover .cat-img-wrapper {
+              transform: translateY(-8px) scale(1.03);
+              box-shadow: 0 16px 40px rgba(0,0,0,0.14) !important;
             }
-            .category-image {
-              width: 100%;
-              height: 100%;
-              object-fit: cover;
-              z-index: 5;
-              transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            .cat-card:hover .cat-label {
+              color: #00a2a4 !important;
             }
-            .category-frame:hover .category-image {
-              transform: scale(1.1);
+            .cat-img-wrapper {
+              transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+              box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            }
+            .cat-group:hover .cat-nav-btn { opacity: 1 !important; }
+            .cat-nav-btn:hover {
+              background: linear-gradient(135deg, #00a2a4, #007b7d) !important;
+              color: white !important;
+              border-color: transparent !important;
+              box-shadow: 0 4px 20px rgba(0,162,164,0.4) !important;
             }
           `}</style>
-          
-          <div className="relative group mt-2 md:mt-0">
-            <div 
+
+          <div className="cat-group" style={{ position: 'relative' }}>
+            {/* Left Arrow */}
+            <button
+              onClick={() => categoryScrollRef.current?.scrollBy({ left: -360, behavior: 'smooth' })}
+              className="cat-nav-btn"
+              style={{
+                position: 'absolute', left: '-18px', top: '42%', transform: 'translateY(-50%)',
+                zIndex: 30, width: '42px', height: '42px',
+                display: 'none',
+                alignItems: 'center', justifyContent: 'center',
+                borderRadius: '50%', background: 'white', border: '1.5px solid #e2e8f0',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+                cursor: 'pointer', color: '#475569', opacity: 0, transition: 'all 0.2s',
+              }}
+            >
+              <ChevronLeft size={19} />
+            </button>
+
+            {/* Right Arrow */}
+            <button
+              onClick={() => categoryScrollRef.current?.scrollBy({ left: 360, behavior: 'smooth' })}
+              className="cat-nav-btn"
+              style={{
+                position: 'absolute', right: '-18px', top: '42%', transform: 'translateY(-50%)',
+                zIndex: 30, width: '42px', height: '42px',
+                display: 'flex',
+                alignItems: 'center', justifyContent: 'center',
+                borderRadius: '50%', background: 'white', border: '1.5px solid #e2e8f0',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+                cursor: 'pointer', color: '#475569', opacity: 0, transition: 'all 0.2s',
+              }}
+            >
+              <ChevronRight size={19} />
+            </button>
+
+            {/* Categories — 4-col grid on mobile, horizontal scroll on desktop */}
+            <div
               ref={categoryScrollRef}
-              className="grid grid-cols-4 gap-x-2 gap-y-4 md:flex md:gap-5 md:overflow-x-auto md:pt-4 md:pb-8 scroll-smooth md:px-2"
+              className="cat-scroll-container"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: '14px',
+              }}
             >
               {mainCategories.map((cat, idx) => (
                 <motion.div
                   key={idx}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: idx * 0.05 }}
+                  className="cat-card"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.06, duration: 0.4, ease: 'easeOut' }}
                   onClick={() => navigate(cat.path)}
-                  className="flex flex-col items-center gap-1.5 md:block md:category-frame group/item cursor-pointer"
                 >
-                  {/* Mobile Square */}
-                  <div className="md:hidden w-full aspect-square rounded-2xl bg-[#e8f4f4] flex items-center justify-center p-2.5">
-                    <img src={cat.image} className="w-full h-full object-contain mix-blend-multiply" alt={cat.name} />
+                  {/* Image Card */}
+                  <div
+                    className="cat-img-wrapper"
+                    style={{
+                      width: '100%',
+                      aspectRatio: '1/1',
+                      borderRadius: '20px',
+                      background: cat.bgColor,
+                      overflow: 'hidden',
+                      display: 'flex',
+                      alignItems: 'flex-end',
+                      justifyContent: 'center',
+                      position: 'relative',
+                    }}
+                  >
+                    {/* Subtle gradient overlay at top */}
+                    <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.08) 100%)', zIndex: 1 }} />
+                    {/* Category name tag */}
+                    <div style={{
+                      position: 'absolute', top: '10px', left: '10px', right: '10px',
+                      background: 'rgba(0,0,0,0.3)', backdropFilter: 'blur(8px)',
+                      borderRadius: '10px', padding: '4px 8px', zIndex: 3,
+                      border: '1px solid rgba(255,255,255,0.2)',
+                    }}>
+                      <span style={{ fontSize: '10px', fontWeight: 800, color: 'white', letterSpacing: '0.02em', textAlign: 'center', display: 'block', lineHeight: 1.3 }}>
+                        {cat.name}
+                      </span>
+                    </div>
+                    {/* Product Image */}
+                    <img
+                      src={cat.image}
+                      alt={cat.name}
+                      style={{ width: '85%', height: '75%', objectFit: 'contain', position: 'relative', zIndex: 2, transition: 'transform 0.4s ease' }}
+                    />
                   </div>
-                  {/* Desktop Circle/Frame */}
-                  <div className="hidden md:flex w-full h-full rounded-lg flex-col items-center relative overflow-hidden transition-all duration-[400ms] ease-out" style={{ backgroundColor: cat.bgColor }}>
-                    <img src={cat.image} className="category-image" alt={cat.name} />
-                  </div>
-                  
-                  {/* Mobile Text */}
-                  <span className="md:hidden text-[11px] font-medium text-slate-800 text-center leading-tight line-clamp-2 px-1">
-                    {cat.name}
-                  </span>
                 </motion.div>
               ))}
             </div>
-
-            <button 
-              onClick={() => categoryScrollRef.current?.scrollBy({ left: 400, behavior: 'smooth' })}
-              className="hidden md:flex absolute -right-4 top-[40%] -translate-y-1/2 z-30 h-11 w-11 items-center justify-center rounded-full bg-white text-slate-400 shadow-xl border border-slate-100 opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ff6f61]"
-            >
-              <ChevronRight size={24} />
-            </button>
           </div>
+
+          <style>{`
+            @media (min-width: 768px) {
+              .cat-scroll-container {
+                display: flex !important;
+                flex-direction: row !important;
+                gap: 20px !important;
+                overflow-x: auto !important;
+                padding: 16px 4px 24px !important;
+              }
+              .cat-card {
+                flex: none !important;
+                width: 160px !important;
+              }
+              .cat-img-wrapper {
+                width: 160px !important;
+                height: 160px !important;
+                border-radius: 24px !important;
+              }
+              .cat-group .cat-nav-btn:first-of-type {
+                display: flex !important;
+              }
+            }
+          `}</style>
+
         </div>
       </section>
 
       {/* Trending Products */}
-      <section className="bg-white py-4 md:py-10">
-        <div className="mx-auto max-w-[1400px] px-3 md:px-5">
-          <div className="flex items-center justify-between mb-3 md:mb-1">
-            <h2 className="text-xl md:text-[22px] font-bold md:font-semibold text-slate-900 md:text-[#212121] tracking-tight">
-              Trending products
-            </h2>
+      <section className="bg-white py-6 md:py-12">
+        <div className="mx-auto max-w-[1400px] px-4 md:px-5">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight uppercase">
+                Trending Products
+              </h2>
+              <p className="hidden md:block text-slate-400 mt-1 text-xs font-bold uppercase tracking-wider">Top rated picks by our community</p>
+            </div>
             <button 
               onClick={() => navigate('/all-medicines')} 
-              className="md:hidden text-[#00a2a4] font-bold text-[13px]"
-            >
-              see all
-            </button>
-            <button 
-              onClick={() => navigate('/all-medicines')} 
-              className="hidden md:flex items-center gap-1 text-[#ff6f61] font-medium text-[14px] px-3.5 py-1.5 rounded-[4px] border border-[#ff6f61] hover:bg-[#ff6f61] hover:text-white transition-all duration-200"
+              className="flex items-center gap-1 text-[#00a2a4] hover:text-[#007b7d] font-bold text-xs md:text-sm transition-colors uppercase tracking-wider"
             >
               See all <ChevronRight size={16} />
             </button>
           </div>
-
-          {/* Gradient Underline (Desktop Only) */}
-          <div className="hidden md:block w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
 
           <div className="relative group">
             {loading ? (
@@ -400,28 +483,22 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       </section>
 
       {/* Skin Care Products */}
-      <section className="bg-white py-4 md:py-10">
-        <div className="mx-auto max-w-[1400px] px-3 md:px-5">
-          <div className="flex items-center justify-between mb-3 md:mb-1">
-            <h2 className="text-xl md:text-[22px] font-bold md:font-semibold text-slate-900 md:text-[#212121] tracking-tight">
-              Skin Care
-            </h2>
+      <section className="bg-white py-6 md:py-12">
+        <div className="mx-auto max-w-[1400px] px-4 md:px-5">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight uppercase">
+                Skin Care
+              </h2>
+              <p className="hidden md:block text-slate-400 mt-1 text-xs font-bold uppercase tracking-wider">Nourish and protect your skin</p>
+            </div>
             <button 
               onClick={() => navigate('/medicines?filter=skin-care')} 
-              className="md:hidden text-[#00a2a4] font-bold text-[13px]"
-            >
-              see all
-            </button>
-            <button 
-              onClick={() => navigate('/medicines?filter=skin-care')} 
-              className="hidden md:flex items-center gap-1 text-[#ff6f61] font-medium text-[14px] px-3.5 py-1.5 rounded-[4px] border border-[#ff6f61] hover:bg-[#ff6f61] hover:text-white transition-all duration-200"
+              className="flex items-center gap-1 text-[#00a2a4] hover:text-[#007b7d] font-bold text-xs md:text-sm transition-colors uppercase tracking-wider"
             >
               See all <ChevronRight size={16} />
             </button>
           </div>
-
-          {/* Gradient Underline */}
-          <div className="hidden md:block w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
 
           <div className="relative group">
             {loading ? (
@@ -528,27 +605,22 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       )}
 
       {/* Ayurveda Products */}
-      <section className="bg-white py-4 md:py-10">
-        <div className="mx-auto max-w-[1400px] px-3 md:px-5">
-          <div className="flex items-center justify-between mb-3 md:mb-1">
-            <h2 className="text-xl md:text-[22px] font-bold md:font-semibold text-slate-900 md:text-[#212121] tracking-tight">
-              Ayurveda
-            </h2>
+      <section className="bg-white py-6 md:py-12">
+        <div className="mx-auto max-w-[1400px] px-4 md:px-5">
+          <div className="flex items-end justify-between mb-8">
+            <div>
+              <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight uppercase">
+                Ayurveda
+              </h2>
+              <p className="hidden md:block text-slate-400 mt-1 text-xs font-bold uppercase tracking-wider">Natural Vedic healing therapies</p>
+            </div>
             <button 
               onClick={() => navigate('/ayurveda')} 
-              className="md:hidden text-[#00a2a4] font-bold text-[13px]"
-            >
-              see all
-            </button>
-            <button 
-              onClick={() => navigate('/ayurveda')} 
-              className="hidden md:flex items-center gap-1 text-[#ff6f61] font-medium text-[14px] px-3.5 py-1.5 rounded-[4px] border border-[#ff6f61] hover:bg-[#ff6f61] hover:text-white transition-all duration-200"
+              className="flex items-center gap-1 text-[#00a2a4] hover:text-[#007b7d] font-bold text-xs md:text-sm transition-colors uppercase tracking-wider"
             >
               See all <ChevronRight size={16} />
             </button>
           </div>
-
-          <div className="hidden md:block w-full h-[1.5px] bg-gradient-to-r from-[#ff6f61] via-[#ff6f61]/20 to-transparent mb-8"></div>
 
           <div className="relative group">
             {loading ? (

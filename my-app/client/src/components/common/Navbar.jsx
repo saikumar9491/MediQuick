@@ -38,7 +38,7 @@ import { API_BASE } from '../../utils/apiConfig';
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const { user, logout, setShowAuthModal, setAuthModalView } = useAuth();
   const { cartItems } = useCart();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -123,7 +123,7 @@ const Navbar = () => {
   useEffect(() => {
     if (user && !sessionStorage.getItem('locationPrompted')) {
       sessionStorage.setItem('locationPrompted', 'true');
-      setShowLocationModal(true);
+      handleDetectLocation();
     }
   }, [user]);
 
@@ -297,10 +297,7 @@ const Navbar = () => {
 
           {/* Location Selector (Desktop) */}
           <div 
-            onClick={() => {
-              setPincodeInput(userPincode);
-              setShowLocationModal(true);
-            }}
+            onClick={() => handleDetectLocation()}
             className="flex items-center gap-2 px-3 py-1.5 hover:bg-slate-50 transition-colors cursor-pointer group shrink-0 border-r border-slate-100 pr-6"
           >
             <MapPin size={18} className="text-slate-400 group-hover:text-[#00a2a4]" />
@@ -476,9 +473,15 @@ const Navbar = () => {
                 </AnimatePresence>
               </div>
             ) : (
-              <Link to="/login" className="text-[13px] font-bold text-slate-700 hover:text-[#00a2a4] whitespace-nowrap">
+              <button 
+                onClick={() => {
+                  setAuthModalView('login');
+                  setShowAuthModal(true);
+                }}
+                className="text-[13px] font-bold text-slate-700 hover:text-[#00a2a4] whitespace-nowrap"
+              >
                 Login | Signup
-              </Link>
+              </button>
             )}
             
             <Link to="/cart" className="relative text-slate-700 hover:text-[#00a2a4] transition-colors">
@@ -495,10 +498,7 @@ const Navbar = () => {
         {/* Mobile Header (Blinkit Style) */}
         <div className="flex flex-col lg:hidden w-full pt-1 pb-2">
            <div className="flex justify-between items-center w-full mb-3">
-              <div className="flex flex-col cursor-pointer" onClick={() => {
-                setPincodeInput(userPincode);
-                setShowLocationModal(true);
-              }}>
+              <div className="flex flex-col cursor-pointer" onClick={() => handleDetectLocation()}>
                  <span className="text-[20px] font-black text-slate-900 leading-tight">Delivery in 10 minutes</span>
                  <div className="flex items-center gap-1 text-slate-600 mt-0.5">
                      <span className="text-[13px] truncate max-w-[220px]">Near, {isDetecting ? 'Detecting...' : `${locationName} (${userPincode})`}</span>
@@ -678,11 +678,29 @@ const Navbar = () => {
 
                 <div className="mt-8 border-t border-slate-100 pt-8">
                   {user ? (
-                    <button onClick={logout} className="w-full rounded-xl bg-red-500 py-4 text-sm font-bold text-white shadow-xl active:scale-95">
-                      LOGOUT
-                    </button>
+                    <>
+                      {user.isAdmin && (
+                        <Link 
+                          to="/admin" 
+                          onClick={() => setIsMenuOpen(false)}
+                          className="w-full mb-3 flex items-center justify-center gap-2 rounded-xl bg-teal-50 py-3 text-sm font-bold text-[#00a2a4] shadow-sm active:scale-95"
+                        >
+                          <ShieldCheck size={18} /> Admin Dashboard
+                        </Link>
+                      )}
+                      <button onClick={logout} className="w-full rounded-xl bg-red-500 py-4 text-sm font-bold text-white shadow-xl active:scale-95">
+                        LOGOUT
+                      </button>
+                    </>
                   ) : (
-                    <button onClick={() => navigate('/login')} className="w-full rounded-xl bg-[#00a2a4] py-4 text-sm font-bold text-white shadow-xl active:scale-95">
+                    <button 
+                      onClick={() => {
+                        setAuthModalView('login');
+                        setShowAuthModal(true);
+                        setIsMenuOpen(false);
+                      }} 
+                      className="w-full rounded-xl bg-[#00a2a4] py-4 text-sm font-bold text-white shadow-xl active:scale-95"
+                    >
                       LOGIN / SIGNUP
                     </button>
                   )}
@@ -716,59 +734,7 @@ const Navbar = () => {
           </Link>
         ))}
       </nav>
-      {/* Location Modal */}
-      <AnimatePresence>
-        {showLocationModal && (
-          <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-[100] p-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100">
-                <span className="font-black text-slate-800 text-sm uppercase tracking-wider">Select Delivery Location</span>
-                <button onClick={() => setShowLocationModal(false)} className="p-1 rounded-lg hover:bg-slate-50 text-slate-400 hover:text-slate-600">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="p-6 space-y-5">
-                <button
-                  onClick={handleDetectLocation}
-                  disabled={isDetecting}
-                  className="w-full flex items-center justify-center gap-2 py-3 bg-[#00a2a4]/10 hover:bg-[#00a2a4]/20 text-[#00a2a4] font-bold text-xs uppercase tracking-wider rounded-xl transition-all"
-                >
-                  <MapPin className="w-4 h-4" />
-                  {isDetecting ? 'Detecting...' : 'Detect My Location'}
-                </button>
 
-                <div className="relative flex items-center justify-center">
-                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-100"></div></div>
-                  <span className="relative px-3 bg-white text-[10px] font-bold uppercase tracking-widest text-slate-400">OR ENTER PINCODE</span>
-                </div>
-
-                <form onSubmit={handlePincodeSubmit} className="space-y-4">
-                  <input
-                    type="text"
-                    maxLength={6}
-                    placeholder="Enter 6-digit pincode"
-                    value={pincodeInput}
-                    onChange={(e) => setPincodeInput(e.target.value.replace(/\D/g, ''))}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#00a2a4] font-bold text-center text-lg tracking-widest text-slate-800"
-                  />
-                  <button
-                    type="submit"
-                    className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all"
-                  >
-                    Confirm Location
-                  </button>
-                </form>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
     </header>
   );
 };

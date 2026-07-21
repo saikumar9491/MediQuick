@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import { OAuth2Client } from 'google-auth-library';
+import crypto from 'crypto';
 
 // Google OAuth client using environment variable
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -11,11 +12,9 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 // EMAIL CONFIG (FIXED FOR RENDER & BREVO)
 // -----------------------------
 const createTransporter = () => {
-  // 🚀 Port 2525 is the industry secret for bypassing Render's SMTP blocks
   const host = 'smtp-relay.brevo.com';
   const port = 2525; 
 
-  // Must match Brevo Login (e.g., a59a01001@smtp-brevo.com) and your Master Key
   const user = process.env.EMAIL_USER; 
   const pass = process.env.EMAIL_PASS;
 
@@ -29,11 +28,9 @@ const createTransporter = () => {
     secure: false, 
     auth: { user, pass },
     tls: {
-      // 🛡️ Critical for stable handshakes on shared cloud networks
       rejectUnauthorized: false,
       minVersion: 'TLSv1.2'
     },
-    // ⏱️ Extended timeouts to ensure the connection doesn't drop
     connectionTimeout: 40000, 
     greetingTimeout: 40000,
     socketTimeout: 40000,
@@ -44,7 +41,6 @@ const sendEmail = async ({ email, subject, message }) => {
   try {
     const transporter = createTransporter();
     const info = await transporter.sendMail({
-      // 🛰️ Match your verified Brevo sender exactly
       from: `"MediQuick Hub" <balisaikumar9491@gmail.com>`, 
       to: email.trim().toLowerCase(),
       subject,
@@ -71,12 +67,11 @@ export const signup = async (req, res) => {
 
     const normalizedEmail = email.trim().toLowerCase();
     const existingUser = await User.findOne({ email: normalizedEmail });
-    if (existingUser) return res.status(400).json({ message: 'User already exists' });
+    if (existingUser) return res.status(400).json({ message: 'An account with this email already exists — log in instead?' });
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    // 🚀 STEP 1: Send Email FIRST (Prevents ghost users in DB)
     await sendEmail({
       email: normalizedEmail,
       subject: 'MediQuick Account Verification OTP',
@@ -90,7 +85,6 @@ export const signup = async (req, res) => {
       `,
     });
 
-    // 🚀 STEP 2: Save to DB with a 20-minute window
     await User.create({
       name,
       phone,
@@ -112,8 +106,6 @@ export const verifyOTP = async (req, res) => {
   const { email, otp } = req.body;
   try {
     const normalizedEmail = email.trim().toLowerCase();
-    
-    // 🛡️ Grace Period: Offset current time by 5 seconds to handle server clock drift
     const checkTime = new Date(Date.now() - 5000);
 
     const user = await User.findOne({
@@ -136,15 +128,16 @@ export const verifyOTP = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, rememberMe } = req.body;
   try {
     const user = await User.findOne({ email: email.trim().toLowerCase() });
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Incorrect email or password' });
     }
     if (!user.isVerified) return res.status(403).json({ message: 'Please verify your email first' });
 
-    const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const expiresIn = rememberMe ? '30d' : '7d';
+    const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn });
     return res.json({ token, user: { _id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin } });
   } catch (error) {
     return res.status(500).json({ message: 'Login failed' });
@@ -155,39 +148,68 @@ export const forgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
     const user = await User.findOne({ email: email.trim().toLowerCase() });
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    
+    // Always return the same success message to prevent email enumeration
+    const successMessage = "If an account exists for this email, we've sent a reset link";
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    user.otp = otp;
-    user.otpExpire = new Date(Date.now() + 20 * 60 * 1000); // 🚀 20 Min
+    if (!user) {
+      return res.status(200).json({ message: successMessage });
+    }
+
+    // Generate a secure crypto token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    
+    // Hash token and set to user model
+    user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+    user.resetPasswordExpire = new Date(Date.now() + 60 * 60 * 1000); // 1 Hour
+    
     await user.save();
+
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
 
     await sendEmail({
       email: user.email,
-      subject: 'MediQuick Password Reset OTP',
-      message: `<h1>Reset OTP: ${otp}</h1><p>Valid for 20 minutes.</p>`,
+      subject: 'MediQuick Password Reset',
+      message: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 12px; max-width: 600px;">
+          <h2 style="color: #2ecc71; margin-top: 0;">Password Reset Request</h2>
+          <p style="color: #475569; font-size: 15px; line-height: 1.5;">You requested to reset your password. Click the button below to set a new password. This link is valid for 1 hour.</p>
+          <div style="margin: 30px 0;">
+            <a href="${resetUrl}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 99px; font-weight: 600; font-size: 14px;">Reset Password</a>
+          </div>
+          <p style="color: #64748b; font-size: 13px;">If you didn't request this, you can safely ignore this email.</p>
+        </div>
+      `,
     });
-    return res.status(200).json({ message: 'Reset code sent' });
+
+    return res.status(200).json({ message: successMessage });
   } catch (error) {
-    return res.status(500).json({ message: error.message || 'Forgot password failed' });
+    return res.status(500).json({ message: 'Forgot password failed' });
   }
 };
 
-export const resetPassword = async (req, res) => {
-  const { email, otp, newPassword } = req.body;
+export const resetPasswordWithToken = async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
   try {
-    const checkTime = new Date(Date.now() - 5000);
+    // Get hashed token
+    const resetPasswordToken = crypto.createHash('sha256').update(token).digest('hex');
+
     const user = await User.findOne({
-      email: email.trim().toLowerCase(),
-      otp,
-      otpExpire: { $gt: checkTime },
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() },
     });
 
-    if (!user) return res.status(400).json({ message: 'Invalid code or request expired' });
+    if (!user) {
+      return res.status(400).json({ message: 'This reset link is invalid or has expired. Request a new one.' });
+    }
 
+    // Set new password
     user.password = await bcrypt.hash(newPassword, 10);
-    user.otp = undefined;
-    user.otpExpire = undefined;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
     await user.save();
 
     return res.status(200).json({ message: 'Password updated successfully' });

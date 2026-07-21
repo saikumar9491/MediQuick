@@ -1,114 +1,203 @@
 import React, { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronLeft } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Sparkles } from 'lucide-react';
 
 const FeaturedBrands = () => {
   const navigate = useNavigate();
   const scrollRef = useRef(null);
 
   const brands = [
-    { name: "Himalaya", logo: "https://i.pinimg.com/1200x/b2/16/ae/b216aeadcf434aff0f744cd316441109.jpg" },
-    { name: "Horlicks", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYGZBK5fqq4DOF1ncMX9x8j5buAtfyvXl6Eg&s" },
-    { name: "Omron", logo: "https://logowik.com/content/uploads/images/omron5779.jpg" },
-    { name: "Moov", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzbV10OmJFxQiUVwIPUFjflSmVHaZyRxQFGA&s" },
-    { name: "Dr. Morepen", logo: "https://media.licdn.com/dms/image/v2/C4E0BAQFj9xmjoi9Ccg/company-logo_200_200/company-logo_200_200/0/1630643946445?e=2147483647&v=beta&t=EGJjuMhTrRnMXN4MN74ZpN6nj5f0jjjOPC1NphqvgfE" },
-    { name: "Bare Anatomy", logo: "https://i0.wp.com/www.hamroshringar.com/wp-content/uploads/2022/03/bare-anatomy-logo.webp?fit=600%2C400&ssl=1" },
-    { name: "Dabur", logo: "https://static.wikia.nocookie.net/logopedia/images/6/62/Dabur_new.jpg/revision/latest?cb=20200323060319" },
-    { name: "Chemist at Play", logo: "https://m.media-amazon.com/images/I/31VHGbtF85L.jpg" },
-    { name: "Nivea", logo: "https://cdn.freebiesupply.com/logos/large/2x/nivea-2-logo-png-transparent.png" },
-    { name: "Protinex", logo: "https://www.protinex.com/wp-content/themes/protinex/assets/images/logo.svg" },
-    { name: "Cetaphil", logo: "https://i.pinimg.com/1200x/4b/c7/1b/4bc71be1e103635a2f5d1ca0299e42a8.jpg" }
+    { name: "Himalaya", logo: "https://i.pinimg.com/1200x/b2/16/ae/b216aeadcf434aff0f744cd316441109.jpg", color: "#e8f5e9" },
+    { name: "Horlicks", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYGZBK5fqq4DOF1ncMX9x8j5buAtfyvXl6Eg&s", color: "#fff8e1" },
+    { name: "Omron", logo: "https://logowik.com/content/uploads/images/omron5779.jpg", color: "#e3f2fd" },
+    { name: "Moov", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQzbV10OmJFxQiUVwIPUFjflSmVHaZyRxQFGA&s", color: "#fce4ec" },
+    { name: "Dr. Morepen", logo: "https://media.licdn.com/dms/image/v2/C4E0BAQFj9xmjoi9Ccg/company-logo_200_200/company-logo_200_200/0/1630643946445?e=2147483647&v=beta&t=EGJjuMhTrRnMXN4MN74ZpN6nj5f0jjjOPC1NphqvgfE", color: "#e8eaf6" },
+    { name: "Bare Anatomy", logo: "https://i0.wp.com/www.hamroshringar.com/wp-content/uploads/2022/03/bare-anatomy-logo.webp?fit=600%2C400&ssl=1", color: "#f3e5f5" },
+    { name: "Dabur", logo: "https://static.wikia.nocookie.net/logopedia/images/6/62/Dabur_new.jpg/revision/latest?cb=20200323060319", color: "#fff3e0" },
+    { name: "Chemist at Play", logo: "https://m.media-amazon.com/images/I/31VHGbtF85L.jpg", color: "#e0f7fa" },
+    { name: "Nivea", logo: "https://cdn.freebiesupply.com/logos/large/2x/nivea-2-logo-png-transparent.png", color: "#e3f2fd" },
+    { name: "Protinex", logo: "https://www.protinex.com/wp-content/themes/protinex/assets/images/logo.svg", color: "#fce4ec" },
+    { name: "Cetaphil", logo: "https://i.pinimg.com/1200x/4b/c7/1b/4bc71be1e103635a2f5d1ca0299e42a8.jpg", color: "#e8f5e9" },
   ];
 
   const scroll = (direction) => {
     if (scrollRef.current) {
-      const scrollAmount = 300;
-      scrollRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
-      });
+      scrollRef.current.scrollBy({ left: direction === 'left' ? -320 : 320, behavior: 'smooth' });
     }
   };
 
   return (
-    <section className="bg-white py-6 md:py-12">
-      <div className="max-w-[1400px] mx-auto px-4 md:px-5">
-        {/* Header Section */}
-        <div className="mb-4 flex items-center justify-between">
+    <section style={{ background: 'linear-gradient(180deg, #f8fffe 0%, #ffffff 100%)', padding: '48px 0' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '0 20px' }}>
+
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '32px' }}>
           <div>
-            <h2 className="text-xl md:text-3xl font-bold text-slate-900 tracking-tight">
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(0,162,164,0.08)', border: '1px solid rgba(0,162,164,0.2)', borderRadius: '100px', padding: '4px 12px', marginBottom: '10px' }}>
+              <Sparkles size={12} color="#00a2a4" />
+              <span style={{ fontSize: '11px', fontWeight: 800, color: '#00a2a4', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Trusted Partners</span>
+            </div>
+            <h2 style={{ fontSize: '28px', fontWeight: 900, color: '#0f172a', letterSpacing: '-0.02em', lineHeight: 1.1, margin: 0 }}>
               Top Brands
             </h2>
-            <p className="hidden md:block text-slate-500 mt-1 text-sm">Explore our premium selection of trusted brands</p>
+            <p style={{ fontSize: '13px', color: '#94a3b8', marginTop: '6px', fontWeight: 500 }}>
+              Shop from 500+ trusted healthcare brands
+            </p>
           </div>
-          
-          {/* Show See All only on desktop since mobile is a grid */}
+
           <button
             onClick={() => navigate('/all-brands')}
-            className="hidden md:flex group items-center gap-2 text-[#ff6f61] font-semibold text-sm px-5 py-2.5 rounded-full bg-[#ff6f61]/10 hover:bg-[#ff6f61] hover:text-white transition-all duration-300"
+            style={{
+              display: 'flex', alignItems: 'center', gap: '6px',
+              padding: '10px 20px',
+              borderRadius: '100px',
+              background: 'linear-gradient(135deg, #00a2a4, #007b7d)',
+              color: 'white',
+              fontWeight: 700,
+              fontSize: '13px',
+              border: 'none',
+              cursor: 'pointer',
+              boxShadow: '0 4px 15px rgba(0,162,164,0.3)',
+              transition: 'all 0.2s',
+              flexShrink: 0,
+            }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,162,164,0.4)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,162,164,0.3)'; }}
           >
-            Explore All 
-            <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+            Explore All <ChevronRight size={15} />
           </button>
         </div>
 
-        {/* Grid/Carousel Container */}
-        <div className="relative group">
-          <div 
+        {/* Scrollable Brands Container */}
+        <div style={{ position: 'relative' }} className="brand-scroll-group">
+
+          {/* Left Arrow */}
+          <button
+            onClick={() => scroll('left')}
+            className="brand-nav-btn brand-nav-left"
+            style={{
+              position: 'absolute', left: '-18px', top: '50%', transform: 'translateY(-50%)',
+              zIndex: 30, width: '44px', height: '44px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              borderRadius: '50%', background: 'white', border: '1.5px solid #e2e8f0',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+              cursor: 'pointer', color: '#475569',
+              opacity: 0, transition: 'all 0.2s',
+            }}
+          >
+            <ChevronLeft size={20} />
+          </button>
+
+          {/* Right Arrow */}
+          <button
+            onClick={() => scroll('right')}
+            className="brand-nav-btn brand-nav-right"
+            style={{
+              position: 'absolute', right: '-18px', top: '50%', transform: 'translateY(-50%)',
+              zIndex: 30, width: '44px', height: '44px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              borderRadius: '50%', background: 'white', border: '1.5px solid #e2e8f0',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+              cursor: 'pointer', color: '#475569',
+              opacity: 0, transition: 'all 0.2s',
+            }}
+          >
+            <ChevronRight size={20} />
+          </button>
+
+          {/* Brands Row - Mobile: 4-col grid, Desktop: horizontal scroll */}
+          <div
             ref={scrollRef}
-            className="grid grid-cols-4 gap-x-2 gap-y-4 md:flex md:gap-6 md:overflow-x-auto md:py-4 scroll-smooth no-scrollbar"
+            className="brands-scroller"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {brands.map((brand, idx) => (
               <div
                 key={idx}
                 onClick={() => navigate(`/brand/${encodeURIComponent(brand.name)}`)}
-                className="flex flex-col items-center gap-2 cursor-pointer md:flex-none md:w-[130px] group/item md:justify-center"
+                className="brand-card"
+                style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}
               >
-                {/* MOBILE VIEW: Blinkit style light teal rounded square */}
-                <div className="md:hidden w-full aspect-square rounded-2xl bg-[#e8f4f4] hover:bg-[#d8ecec] transition-colors duration-300 flex items-center justify-center p-3 sm:p-4">
+                {/* Logo card */}
+                <div
+                  className="brand-logo-wrapper"
+                  style={{
+                    width: '110px',
+                    height: '110px',
+                    borderRadius: '20px',
+                    background: brand.color,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '18px',
+                    transition: 'all 0.25s cubic-bezier(0.34,1.56,0.64,1)',
+                    border: '1.5px solid rgba(0,0,0,0.05)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                  }}
+                >
                   <img
                     src={brand.logo}
                     alt={brand.name}
-                    className="max-w-full max-h-full object-contain mix-blend-multiply transition-transform duration-300 group-hover/item:scale-105"
+                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', position: 'relative', zIndex: 1, transition: 'transform 0.25s ease' }}
+                    onError={e => { e.target.style.display = 'none'; }}
                   />
                 </div>
-                <span className="md:hidden text-[11px] sm:text-sm font-medium text-slate-800 text-center leading-tight line-clamp-2 px-1">
+                {/* Brand name */}
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#374151', textAlign: 'center', lineHeight: 1.3, maxWidth: '110px' }}>
                   {brand.name}
                 </span>
-
-                {/* DESKTOP VIEW: White circle with gray border (no text) */}
-                <div className="hidden md:flex w-[120px] h-[120px] rounded-full bg-white border border-gray-300 hover:-translate-y-1 transition-all duration-300 items-center justify-center p-5">
-                  <img
-                    src={brand.logo}
-                    alt={brand.name}
-                    className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover/item:scale-105"
-                  />
-                </div>
               </div>
             ))}
           </div>
-
-          {/* Navigation Arrows (Desktop Only) */}
-          <button 
-            onClick={() => scroll('left')}
-            className="hidden md:flex absolute -left-5 top-[40%] -translate-y-1/2 z-30 h-12 w-12 items-center justify-center rounded-full bg-white text-slate-600 shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 hover:text-[#ff6f61]"
-          >
-            <ChevronLeft size={24} />
-          </button>
-
-          <button 
-            onClick={() => scroll('right')}
-            className="hidden md:flex absolute -right-5 top-[40%] -translate-y-1/2 z-30 h-12 w-12 items-center justify-center rounded-full bg-white text-slate-600 shadow-[0_4px_12px_rgba(0,0,0,0.1)] border border-slate-100 opacity-0 group-hover:opacity-100 transition-all hover:scale-110 hover:text-[#ff6f61]"
-          >
-            <ChevronRight size={24} />
-          </button>
         </div>
       </div>
 
-      <style jsx>{`
-        .no-scrollbar::-webkit-scrollbar {
+      <style>{`
+        .brands-scroller {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
+        }
+
+        @media (min-width: 768px) {
+          .brands-scroller {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            overflow-x: auto;
+            padding: 12px 4px 20px;
+            scroll-snap-type: x mandatory;
+          }
+          .brand-card {
+            flex: none;
+            scroll-snap-align: start;
+          }
+          .brand-logo-wrapper {
+            width: 120px !important;
+            height: 120px !important;
+          }
+        }
+
+        .brands-scroller::-webkit-scrollbar {
           display: none;
+        }
+
+        .brand-card:hover .brand-logo-wrapper {
+          transform: translateY(-6px) scale(1.04);
+          box-shadow: 0 12px 28px rgba(0,0,0,0.12) !important;
+        }
+
+        .brand-scroll-group:hover .brand-nav-btn {
+          opacity: 1 !important;
+        }
+
+        .brand-nav-btn:hover {
+          background: linear-gradient(135deg, #00a2a4, #007b7d) !important;
+          color: white !important;
+          border-color: transparent !important;
+          transform: translateY(-50%) scale(1.1) !important;
         }
       `}</style>
     </section>

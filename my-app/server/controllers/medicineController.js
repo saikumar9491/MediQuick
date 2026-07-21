@@ -5,9 +5,26 @@ import Order from '../models/Order.js';
 
 // @desc    Get all medicines (supports Search, Category & Trending)
 // @route   GET /api/medicines
+// @desc    Get all medicines (supports Search, Category, Price Range, Brands, Rx, Stock & Sorting)
+// @route   GET /api/medicines
 export const getMedicines = async (req, res) => {
   try {
-    const { category, search, subCategory, trending, brand, page = 1, limit = 10, rx } = req.query;
+    const { 
+      category, 
+      search, 
+      subCategory, 
+      trending, 
+      brand, 
+      page = 1, 
+      limit = 12, 
+      rx, 
+      prescriptionRequired,
+      priceMin, 
+      priceMax,
+      inStock,
+      sort = 'recommended' 
+    } = req.query;
+
     let query = {};
 
     if (category && category !== 'All') {
@@ -15,13 +32,16 @@ export const getMedicines = async (req, res) => {
     }
 
     if (subCategory) {
-      // Using partial match for subCategory to be more lenient (e.g., "Shampoos" matches "Shampoos & Conditioners")
       query.subCategory = { $regex: new RegExp(subCategory.trim(), 'i') };
     }
 
-    if (brand) {
-      // Use case-insensitive exact match or regex
-      query.brand = { $regex: new RegExp(`^${brand.trim()}$`, 'i') };
+    if (brand && brand !== 'All') {
+      const brandArray = brand.split(',').map(b => b.trim()).filter(Boolean);
+      if (brandArray.length === 1) {
+        query.brand = { $regex: new RegExp(`^${brandArray[0]}$`, 'i') };
+      } else if (brandArray.length > 1) {
+        query.brand = { $in: brandArray.map(b => new RegExp(`^${b}$`, 'i')) };
+      }
     }
 
     if (trending === 'true') {
@@ -29,7 +49,6 @@ export const getMedicines = async (req, res) => {
     }
 
     if (search) {
-      // Search by name, brand, subCategory, sku, or salt
       query.$or = [
         { name: { $regex: search, $options: 'i' } },
         { brand: { $regex: search, $options: 'i' } },
@@ -39,43 +58,62 @@ export const getMedicines = async (req, res) => {
       ];
     }
     
-    // Support filtering by Rx requirement for Admin Dashboard
-    if (rx === 'Required' || rx === 'true') {
+    // Rx requirement filter
+    const rxFilterVal = prescriptionRequired || rx;
+    if (rxFilterVal === 'Required' || rxFilterVal === 'true' || rxFilterVal === 'rx_only') {
       query.needsRx = true;
-    } else if (rx === 'Not Required' || rx === 'false') {
+    } else if (rxFilterVal === 'Not Required' || rxFilterVal === 'false' || rxFilterVal === 'otc_only') {
       query.needsRx = false;
     }
 
-    // Support stockStatus filtering
-    if (req.query.stockStatus) {
-      const stockStatus = req.query.stockStatus;
-      if (stockStatus === 'in_stock') {
-        query.countInStock = { $gte: 10 };
-      } else if (stockStatus === 'low_stock') {
-        query.countInStock = { $gt: 0, $lt: 10 };
-      } else if (stockStatus === 'out_of_stock') {
-        query.countInStock = 0;
-      }
+    // In Stock filter
+    if (inStock === 'true' || req.query.stockStatus === 'in_stock') {
+      query.countInStock = { $gt: 0 };
+    } else if (req.query.stockStatus === 'out_of_stock') {
+      query.countInStock = 0;
     }
 
-    // DEBUG: Log the actual MongoDB query
-    console.log('--- DEBUG: getMedicines Query ---');
-    console.log('Incoming params:', req.query);
-    console.log('MongoDB Query:', JSON.stringify(query, null, 2));
+    // Price range filter
+    if (priceMin !== undefined || priceMax !== undefined) {
+      query.price = {};
+      if (priceMin !== undefined) query.price.$gte = Number(priceMin);
+      if (priceMax !== undefined) query.price.$lte = Number(priceMax);
+    }
 
-    const pageNumber = parseInt(page, 10);
-    const limitNumber = parseInt(limit, 10);
+    // Sort order
+    let sortOptions = { createdAt: -1 };
+    if (sort === 'price-low') {
+      sortOptions = { price: 1 };
+    } else if (sort === 'price-high') {
+      sortOptions = { price: -1 };
+    } else if (sort === 'newest') {
+      sortOptions = { createdAt: -1 };
+    } else if (sort === 'discount') {
+      sortOptions = { discount: -1, createdAt: -1 };
+    } else if (sort === 'popularity' || sort === 'recommended') {
+      sortOptions = { isTrending: -1, rating: -1, createdAt: -1 };
+    }
+
+    const pageNumber = Math.max(1, parseInt(page, 10));
+    const limitNumber = Math.max(1, parseInt(limit, 10));
     const skip = (pageNumber - 1) * limitNumber;
 
     const totalCount = await Medicine.countDocuments(query);
-    const totalCollectionCount = await Medicine.countDocuments({});
     
     const medicines = await Medicine.find(query)
-      .sort({ createdAt: -1 })
+      .sort(sortOptions)
       .skip(skip)
       .limit(limitNumber);
 
-    // LOG SEARCH
+    // Brands aggregation for brand filter counts
+    const brandsWithCounts = await Medicine.aggregate([
+      { $match: category && category !== 'All' ? { category: { $regex: new RegExp(`^${category.trim()}$`, 'i') } } : {} },
+      { $group: { _id: "$brand", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 20 }
+    ]);
+
+    // Log search if present
     if (search && search.trim() !== '') {
       try {
         await SearchLog.create({
@@ -87,17 +125,13 @@ export const getMedicines = async (req, res) => {
         console.error("Failed to log search:", err);
       }
     }
-      
-    // DEBUG: Log the returned counts
-    console.log(`Matched Documents: ${totalCount} | Total in Collection: ${totalCollectionCount}`);
-    console.log(`Returning ${medicines.length} documents for page ${pageNumber} (limit ${limitNumber})`);
-    console.log('---------------------------------');
 
     res.status(200).json({
       medicines,
       page: pageNumber,
-      totalPages: Math.ceil(totalCount / limitNumber),
-      total: totalCount
+      totalPages: Math.ceil(totalCount / limitNumber) || 1,
+      totalCount,
+      brandsWithCounts: brandsWithCounts.map(b => ({ name: b._id || 'Generic', count: b.count }))
     });
   } catch (error) {
     console.error('getMedicines error:', error);

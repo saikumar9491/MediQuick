@@ -42,7 +42,7 @@ const VerifyOtp = () => {
 
       if (res.ok) {
         // Log user in immediately after verification
-        await login(data.user, data.token);
+        await login(data.token, data.user);
         navigate('/');
       } else {
         alert(data.message || "Invalid OTP");

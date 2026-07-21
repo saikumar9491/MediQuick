@@ -10,7 +10,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 const CLIENT_ID = "192919291714-mgdn6nq4f8q5rj2m34243k4qffulr7vv.apps.googleusercontent.com";
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+  <>
     {/* 🛡️ This Provider allows the entire Hub to use Google Social Login */}
     <GoogleOAuthProvider clientId={CLIENT_ID}>
       <AuthProvider>
@@ -19,5 +19,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         </CartProvider>
       </AuthProvider>
     </GoogleOAuthProvider>
-  </React.StrictMode>,
+  </>,
 )

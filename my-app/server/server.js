@@ -33,6 +33,10 @@ import searchDiscoveryRoutes from './routes/searchDiscoveryRoutes.js';
 import messageRoutes from './routes/messageRoutes.js';
 import deliveryRoutes from './routes/deliveryRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
+import labTestRoutes from './routes/labTestRoutes.js';
+import doctorRoutes from './routes/doctorRoutes.js';
+import carePlanRoutes from './routes/carePlanRoutes.js';
+import pageContentRoutes from './routes/pageContentRoutes.js';
 
 // ⚙️ INITIALIZATION
 dotenv.config();
@@ -136,6 +140,10 @@ app.use('/api/admin/search-discovery', searchDiscoveryRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/delivery', deliveryRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/lab-tests', labTestRoutes);
+app.use('/api/doctors', doctorRoutes);
+app.use('/api/care-plan', carePlanRoutes);
+app.use('/api/page-content', pageContentRoutes);
 
 /**
  * 4. CLOUD HEALTH MONITOR

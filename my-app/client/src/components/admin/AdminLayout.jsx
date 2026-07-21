@@ -6,7 +6,7 @@ import {
   Tag, Zap, Megaphone, ShoppingBag, Cpu, Bell, SplitSquareHorizontal,
   Users, MessageSquare, Star, Search, LifeBuoy,
   AlertOctagon, Radio, Eye, BarChart2, Settings,
-  LogOut, Menu, ChevronRight, Home, ChevronDown
+  LogOut, Menu, ChevronRight, Home, ChevronDown, Stethoscope, Calendar, UserCheck, Layout
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
@@ -167,6 +167,21 @@ const AdminLayout = () => {
         { id: 'complaints', label: 'Complaints', icon: AlertTriangle },
         { id: 'returns', label: 'Returns & Refunds', icon: RefreshCw },
         { id: 'fleet', label: 'Fleet Console', icon: Briefcase },
+      ]
+    },
+    {
+      title: 'Diagnostics & Lab',
+      items: [
+        { id: 'lab-tests', label: 'Lab Tests', icon: Stethoscope },
+        { id: 'lab-bookings', label: 'Lab Bookings', icon: Calendar },
+      ]
+    },
+    {
+      title: 'Telemedicine & Content',
+      items: [
+        { id: 'page-management', label: 'Page Management', icon: Layout },
+        { id: 'doctors', label: 'Doctors Catalog', icon: UserCheck },
+        { id: 'doctor-appointments', label: 'Doctor Appointments', icon: Calendar },
       ]
     },
     {

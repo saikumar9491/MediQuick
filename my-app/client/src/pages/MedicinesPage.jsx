@@ -3,356 +3,558 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Filter, 
   ChevronRight, 
-  ShoppingBag, 
   Search,
   LayoutGrid,
-  ListFilter,
-  CheckCircle2
+  List as ListIcon,
+  X,
+  Star,
+  Zap,
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
+  SlidersHorizontal,
+  RotateCcw,
+  Package,
+  Pill,
+  CheckCircle,
+  ShieldAlert,
+  ChevronLeft
 } from 'lucide-react';
-import MedicineCard from '../components/medicine/MedicineCard';
-import { API_BASE } from '../utils/apiConfig';
-
-import { useLocation, useNavigate } from 'react-router-dom';
+import ProductCard from '../components/ProductCard/ProductCard';
+import { fetchProducts, fetchCategories } from '../api/products';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 const MedicinesPage = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  
-  const [medicines, setMedicines] = useState([]);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // URL state synchronization
+  const initialCategory = searchParams.get('category') || 'All';
+  const initialSearch = searchParams.get('search') || '';
+  const initialFilterParam = searchParams.get('filter') || '';
+
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('All');
-  const [subFilter, setSubFilter] = useState('');
-  const [currentBanner, setCurrentBanner] = useState(0);
+  
+  // Pagination & Counts
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const limit = 12;
 
-  const banners = useMemo(() => [
-    {
-      title: "Diabetes Care Hub",
-      desc: "Up to 30% off on premium insulin & monitors.",
-      bg: "from-[#00a2a4] to-[#008296]",
-      tag: "DIABETES",
-      icon: "💉"
-    },
-    {
-      title: "Cardiac Essentials",
-      desc: "Save big on daily heart health maintenance.",
-      bg: "from-rose-500 to-rose-700",
-      tag: "CARDIAC",
-      icon: "❤️"
-    },
-    {
-      title: "Winter Wellness",
-      desc: "Immunity boosters and vitamins at flat 25% off.",
-      bg: "from-[#ff6f61] to-[#e65a50]",
-      tag: "VITAMINS",
-      icon: "🍎"
-    },
-  ], []);
+  // Filter States
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  const [selectedSubCategory, setSelectedSubCategory] = useState('');
+  const [selectedBrands, setSelectedBrands] = useState([]);
+  const [priceMin, setPriceMin] = useState(0);
+  const [priceMax, setPriceMax] = useState(3000);
+  const [inStockOnly, setInStockOnly] = useState(false);
+  const [rxFilter, setRxFilter] = useState('All'); // 'All' | 'otc_only' | 'rx_only'
+  const [sortBy, setSortBy] = useState('recommended');
 
-  // Map slugs to readable names
-  const categoryMap = {
-    'hair-care': 'Hair Care',
-    'fitness': 'Fitness & Health',
-    'sexual-wellness': 'Sexual Wellness',
-    'vitamins': 'Vitamins & Nutrition',
-    'supports': 'Supports & Braces',
-    'immunity': 'Immunity Boosters',
-    'homeopathy': 'Homeopathy',
-    'pet-care': 'Pet Care',
-    'flash': 'Flash Deals',
-    'skin-care': 'Skin Care',
-    'oral-care': 'Oral Care',
-    'elderly-care': 'Elderly Care',
-    'baby-care': 'Baby Care',
-    'women-care': 'Women Care',
-    'men-grooming': 'Men Grooming'
-  };
+  // Mobile & Layout View State
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
+  // Handle URL filter query param (e.g. /medicines?filter=hair-care or /medicines?filter=vitamins)
   useEffect(() => {
-    const fetchMedicines = async () => {
-      setLoading(true);
-      const queryParams = new URLSearchParams(location.search);
-      const rawFilter = queryParams.get('filter');
-      const rawSub = queryParams.get('sub');
-
-      // Update state for UI
-      let displayFilter = 'All';
-      if (rawFilter) {
-        displayFilter = categoryMap[rawFilter] || rawFilter.charAt(0).toUpperCase() + rawFilter.slice(1).replace(/-/g, ' ');
+    if (initialFilterParam) {
+      const map = {
+        'hair-care': 'Hair Care',
+        'fitness': 'Fitness & Health',
+        'sexual-wellness': 'Sexual Wellness',
+        'vitamins': 'Vitamins & Nutrition',
+        'supports': 'Supports & Braces',
+        'immunity': 'Immunity Boosters',
+        'homeopathy': 'Homeopathy',
+        'pet-care': 'Pet Care'
+      };
+      if (map[initialFilterParam]) {
+        setSelectedCategory(map[initialFilterParam]);
       }
-      setFilter(displayFilter);
-      
-      let displaySub = '';
-      if (rawSub) {
-        displaySub = rawSub
-          .split('-')
-          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
-      }
-      setSubFilter(displaySub);
+    }
+  }, [initialFilterParam]);
 
+  // Debounce search input by 300ms
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
+
+  // Fetch Categories List
+  useEffect(() => {
+    const loadCategories = async () => {
       try {
-        const url = `${API_BASE}/api/medicines`;
-        const res = await fetch(url);
-        let data = await res.json();
-        
-        setMedicines(Array.isArray(data) ? data : []);
+        const data = await fetchCategories();
+        setCategories(data);
       } catch (err) {
-        console.error("Fetch failed", err);
+        console.error('Failed to load categories:', err);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  // Primary API Product Fetch
+  useEffect(() => {
+    const loadProducts = async () => {
+      setLoading(true);
+      try {
+        const params = {
+          page,
+          limit,
+          category: selectedCategory !== 'All' ? selectedCategory : undefined,
+          subCategory: selectedSubCategory || undefined,
+          search: debouncedSearch || undefined,
+          brand: selectedBrands.length > 0 ? selectedBrands.join(',') : undefined,
+          priceMin: priceMin > 0 ? priceMin : undefined,
+          priceMax: priceMax < 3000 ? priceMax : undefined,
+          inStock: inStockOnly ? 'true' : undefined,
+          prescriptionRequired: rxFilter !== 'All' ? rxFilter : undefined,
+          sort: sortBy
+        };
+
+        const res = await fetchProducts(params);
+        setProducts(res.medicines || []);
+        setTotalCount(res.totalCount || 0);
+        setTotalPages(res.totalPages || 1);
+        if (res.brandsWithCounts && res.brandsWithCounts.length > 0) {
+          setBrands(res.brandsWithCounts);
+        }
+      } catch (err) {
+        console.error('Failed to load products:', err);
       } finally {
         setLoading(false);
       }
     };
+    loadProducts();
+  }, [
+    page, 
+    selectedCategory, 
+    selectedSubCategory, 
+    debouncedSearch, 
+    selectedBrands, 
+    priceMin, 
+    priceMax, 
+    inStockOnly, 
+    rxFilter, 
+    sortBy
+  ]);
 
-    fetchMedicines();
-  }, [location.search]);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentBanner((prev) => (prev === banners.length - 1 ? 0 : prev + 1));
-    }, 6000);
-
-    return () => clearInterval(timer);
-  }, [banners.length]);
-
-  // Base categories with fallback images
-  const baseCategories = [
-    { name: 'All', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-    { name: 'Flash Deals', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-    { name: 'Hair Care', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-    { name: 'Fitness & Health', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-    { name: 'Sexual Wellness', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-    { name: 'Vitamins & Nutrition', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-    { name: 'Diabetes', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-    { name: 'Cardiac', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-    { name: 'Pain Relief', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-    { name: 'Skin Care', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-    { name: 'Oral Care', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-    { name: 'Elderly Care', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-    { name: 'Baby Care', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-    { name: 'Women Care', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-    { name: 'Men Grooming', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-    { name: 'Ayurveda', fallback: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop' },
-  ];
-
-  // Dynamically pull the last product image for each category
-  const categories = useMemo(() => {
-    return baseCategories.map(cat => {
-      let image = cat.fallback;
-      if (cat.name === 'All') {
-        const lastProd = medicines[medicines.length - 1];
-        if (lastProd) image = lastProd.image;
-      } else if (cat.name === 'Flash Deals') {
-        const lastFlash = medicines.filter(m => m.isFlashDeal).pop();
-        if (lastFlash) image = lastFlash.image;
-      } else {
-        const lastProd = medicines.filter(m => m.category === cat.name).pop();
-        if (lastProd) image = lastProd.image;
-      }
-      return { name: cat.name, image };
+  // Active filters list for removable chips
+  const activeFilters = useMemo(() => {
+    const list = [];
+    if (selectedCategory && selectedCategory !== 'All') {
+      list.push({ id: 'category', label: `Category: ${selectedCategory}`, clear: () => { setSelectedCategory('All'); setSelectedSubCategory(''); } });
+    }
+    if (selectedSubCategory) {
+      list.push({ id: 'subcategory', label: `Subcategory: ${selectedSubCategory}`, clear: () => setSelectedSubCategory('') });
+    }
+    if (debouncedSearch) {
+      list.push({ id: 'search', label: `Search: "${debouncedSearch}"`, clear: () => { setSearchQuery(''); setDebouncedSearch(''); } });
+    }
+    selectedBrands.forEach(b => {
+      list.push({ id: `brand-${b}`, label: `Brand: ${b}`, clear: () => setSelectedBrands(prev => prev.filter(item => item !== b)) });
     });
-  }, [medicines]);
+    if (inStockOnly) {
+      list.push({ id: 'stock', label: 'In Stock Only', clear: () => setInStockOnly(false) });
+    }
+    if (rxFilter !== 'All') {
+      list.push({ id: 'rx', label: rxFilter === 'rx_only' ? 'Prescription Required' : 'OTC Only', clear: () => setRxFilter('All') });
+    }
+    if (priceMax < 3000 || priceMin > 0) {
+      list.push({ id: 'price', label: `Price: ₹${priceMin} - ₹${priceMax}`, clear: () => { setPriceMin(0); setPriceMax(3000); } });
+    }
+    return list;
+  }, [selectedCategory, selectedSubCategory, debouncedSearch, selectedBrands, inStockOnly, rxFilter, priceMin, priceMax]);
 
-  // Client-side filtering
-  const filteredMedicines = useMemo(() => {
-    let result = medicines;
-    if (filter === 'Flash Deals') {
-      result = result.filter(m => m.isFlashDeal);
-    } else if (filter !== 'All') {
-      result = result.filter(m => m.category === filter);
-    }
-    if (subFilter) {
-      result = result.filter(m => m.subCategory === subFilter);
-    }
-    return result;
-  }, [medicines, filter, subFilter]); 
+  const handleClearAllFilters = () => {
+    setSelectedCategory('All');
+    setSelectedSubCategory('');
+    setSearchQuery('');
+    setDebouncedSearch('');
+    setSelectedBrands([]);
+    setPriceMin(0);
+    setPriceMax(3000);
+    setInStockOnly(false);
+    setRxFilter('All');
+    setSortBy('recommended');
+    setPage(1);
+    setSearchParams({});
+  };
+
+  const handleBrandToggle = (brandName) => {
+    setSelectedBrands(prev => {
+      if (prev.includes(brandName)) {
+        return prev.filter(b => b !== brandName);
+      } else {
+        return [...prev, brandName];
+      }
+    });
+    setPage(1);
+  };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pb-20 pt-6">
-      <div className="mx-auto max-w-7xl px-0 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#FAFBFD] pb-24 pt-4 sm:pt-6">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
-        {/* Portal Banner - Hidden on mobile to save space for grid */}
-        <section className="hidden md:block mb-10 overflow-hidden rounded-2xl bg-slate-900 shadow-sm border border-slate-100 mx-4 sm:mx-0">
-          <div className="relative h-[180px] sm:h-[240px]">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentBanner}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className={`absolute inset-0 bg-gradient-to-br ${banners[currentBanner].bg} p-8 sm:p-12`}
-              >
-                <div className="absolute right-10 top-1/2 -translate-y-1/2 text-8xl opacity-10 select-none">
-                  {banners[currentBanner].icon}
-                </div>
-                
-                <div className="relative z-10 flex h-full flex-col justify-center">
-                  <span className="mb-3 w-fit rounded bg-white/20 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-white backdrop-blur-md">
-                    {banners[currentBanner].tag} COLLECTION
-                  </span>
-                  <h1 className="max-w-xl text-2xl font-black tracking-tight text-white sm:text-4xl">
-                    {banners[currentBanner].title}
-                  </h1>
-                  <p className="mt-2 max-w-md text-xs font-bold text-white/80 sm:text-sm uppercase tracking-wider">
-                    {banners[currentBanner].desc}
-                  </p>
-                </div>
-              </motion.div>
-            </AnimatePresence>
+        {/* 1. BREADCRUMB */}
+        <nav className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-4">
+          <button onClick={() => navigate('/')} className="hover:text-slate-700 cursor-pointer">Home</button>
+          <span>/</span>
+          <span className="text-slate-800 font-bold">All Medicines</span>
+        </nav>
 
-            <div className="absolute bottom-4 left-1/2 flex -translate-x-1/2 gap-2">
-              {banners.map((_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentBanner(i)}
-                  className={`h-1 rounded-full transition-all duration-300 ${
-                    currentBanner === i ? 'w-6 bg-white' : 'w-2 bg-white/30'
-                  }`}
-                />
-              ))}
+        {/* 2. HEADER SECTION */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-200/60">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight" style={{ letterSpacing: '-0.02em' }}>
+              All Medicines & Healthcare Products
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-500 font-medium mt-1">
+              Showing <span className="font-bold text-slate-800">{totalCount}</span> genuine products from certified pharmacy partners
+            </p>
+          </div>
+
+          {/* Page-level Search Input */}
+          <div className="relative w-full md:w-80">
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search medicines, brands, salts..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white border border-slate-200/80 pl-10 pr-4 py-2.5 rounded-full text-xs font-medium text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#00a2a4] transition-all shadow-xs"
+            />
+            {searchQuery && (
+              <button 
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+              >
+                <X size={14} />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* 3. ACTIVE FILTERS BAR */}
+        {activeFilters.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2 mb-6 bg-white p-3.5 rounded-2xl border border-slate-200/70 shadow-xs">
+            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">Active Filters:</span>
+            {activeFilters.map(chip => (
+              <span 
+                key={chip.id}
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00a2a4]/10 text-[#00a2a4] text-xs font-bold border border-[#00a2a4]/20"
+              >
+                <span>{chip.label}</span>
+                <button onClick={chip.clear} className="hover:text-rose-600 cursor-pointer">
+                  <X size={13} />
+                </button>
+              </span>
+            ))}
+            <button
+              onClick={handleClearAllFilters}
+              className="ml-auto text-xs font-bold text-rose-600 hover:underline cursor-pointer flex items-center gap-1"
+            >
+              <RotateCcw size={12} /> Clear All
+            </button>
+          </div>
+        )}
+
+        {/* CONTROLS BAR: Sort & View Mode */}
+        <div className="flex items-center justify-between mb-6">
+          <button
+            onClick={() => setShowMobileFilters(true)}
+            className="lg:hidden px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 flex items-center gap-2 shadow-xs cursor-pointer"
+          >
+            <Filter size={15} className="text-[#00a2a4]" />
+            <span>Filters ({activeFilters.length})</span>
+          </button>
+
+          <div className="hidden lg:block text-xs text-slate-400 font-semibold">
+            Page <span className="font-bold text-slate-700">{page}</span> of <span className="font-bold text-slate-700">{totalPages}</span>
+          </div>
+
+          <div className="flex items-center gap-3 ml-auto">
+            {/* View Mode Toggle */}
+            <div className="flex items-center bg-white border border-slate-200 rounded-xl p-1 shadow-xs">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                  viewMode === 'grid' ? 'bg-[#00a2a4] text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'
+                }`}
+                title="Grid View"
+              >
+                <LayoutGrid size={15} />
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+                  viewMode === 'list' ? 'bg-[#00a2a4] text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'
+                }`}
+                title="List View"
+              >
+                <ListIcon size={15} />
+              </button>
+            </div>
+
+            {/* Sort Dropdown */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-slate-500 hidden sm:inline">Sort:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
+                className="bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-800 outline-none focus:border-[#00a2a4] shadow-xs cursor-pointer"
+              >
+                <option value="recommended">Recommended & Popular</option>
+                <option value="price-low">Price: Low to High</option>
+                <option value="price-high">Price: High to Low</option>
+                <option value="newest">Newest Arrivals</option>
+                <option value="discount">Biggest Discount</option>
+              </select>
             </div>
           </div>
-        </section>
+        </div>
 
-        <div className="flex flex-row gap-0 sm:gap-8 bg-white sm:bg-transparent min-h-screen sm:min-h-0">
+        {/* MAIN LAYOUT: Sidebar + Product Grid */}
+        <div className="flex gap-8 items-start">
           
-          {/* Sidebar */}
-          <aside className="w-[80px] sm:w-64 shrink-0 bg-[#f4f6f9] sm:bg-transparent border-r border-slate-100 sm:border-0 h-[calc(100vh-64px)] sm:h-auto overflow-y-auto custom-scrollbar-hidden sticky top-16 sm:top-28">
-            <div className="space-y-0 sm:space-y-6 sm:bg-white sm:p-5 sm:rounded-xl sm:shadow-sm sm:border sm:border-slate-100">
-              <div className="hidden sm:flex mb-6 items-center justify-between border-b border-slate-50 pb-4">
-                <div className="flex items-center gap-2">
-                  <ListFilter className="h-4 w-4 text-blue-600" />
-                  <h3 className="text-sm font-black uppercase tracking-widest text-slate-900">Categories</h3>
-                </div>
-              </div>
+          {/* DESKTOP FILTER SIDEBAR */}
+          <aside className="hidden lg:block w-72 flex-shrink-0 bg-white border border-slate-200/70 rounded-3xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.02)] space-y-6 sticky top-24">
+            
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <h2 className="text-xs font-bold uppercase tracking-[0.18em] text-slate-800 flex items-center gap-2">
+                <SlidersHorizontal size={15} className="text-[#00a2a4]" /> Filter Products
+              </h2>
+              {activeFilters.length > 0 && (
+                <button onClick={handleClearAllFilters} className="text-[11px] font-bold text-rose-600 hover:underline cursor-pointer">
+                  Reset
+                </button>
+              )}
+            </div>
 
-              <div className="flex flex-col gap-0 sm:gap-1">
-                {categories.map((catObj) => {
-                  const cat = catObj.name;
-                  const isActive = filter === cat;
+            {/* Category Filter */}
+            <div>
+              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">Categories</h3>
+              <div className="space-y-1.5 max-h-56 overflow-y-auto custom-scrollbar pr-1">
+                <button
+                  onClick={() => { setSelectedCategory('All'); setSelectedSubCategory(''); setPage(1); }}
+                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-between ${
+                    selectedCategory === 'All' ? 'bg-[#00a2a4] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <span>All Categories</span>
+                </button>
+
+                {categories.map(cat => {
+                  const isSelected = selectedCategory === cat.name;
                   return (
-                    <button
-                      key={cat}
-                      onClick={() => {
-                        if (cat === 'All') {
-                          navigate('/medicines');
-                        } else if (cat === 'Flash Deals') {
-                          navigate('/medicines?filter=flash');
-                        } else if (cat === 'Ayurveda') {
-                          navigate('/ayurveda');
-                        } else {
-                          const slug = cat.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
-                          navigate(`/medicines?filter=${slug}`);
-                        }
-                      }}
-                      className={`relative flex flex-col sm:flex-row items-center justify-center sm:justify-between py-3 sm:px-4 sm:py-2.5 text-center sm:text-left transition-all ${
-                        isActive
-                          ? 'bg-white sm:bg-blue-600 text-slate-900 sm:text-white shadow-sm sm:shadow-md sm:shadow-blue-100 sm:rounded-lg'
-                          : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900 sm:rounded-lg'
-                      }`}
-                    >
-                      {/* Active indicator bar on mobile */}
-                      {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-[#00a2a4] sm:hidden rounded-r-full" />}
-                      
-                      <div className="w-12 h-12 sm:hidden mb-1 bg-white rounded-xl shadow-sm overflow-hidden p-1 border border-slate-100 flex-shrink-0">
-                        <img 
-                          src={catObj.image} 
-                          alt={cat} 
-                          className="w-full h-full object-cover rounded-lg"
-                          onError={(e) => {
-                            e.target.onerror = null; 
-                            e.target.src = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100&h=100&fit=crop';
-                          }}
-                        />
-                      </div>
-                      <span className="text-[9px] sm:text-xs font-bold leading-tight">{cat}</span>
-                      {isActive && <ChevronRight className="hidden sm:block h-3 w-3" />}
-                    </button>
+                    <div key={cat._id || cat.name}>
+                      <button
+                        onClick={() => { setSelectedCategory(cat.name); setSelectedSubCategory(''); setPage(1); }}
+                        className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer flex items-center justify-between ${
+                          isSelected ? 'bg-[#00a2a4]/10 text-[#00a2a4] font-bold border border-[#00a2a4]/20' : 'text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        <span className="truncate">{cat.name}</span>
+                      </button>
+
+                      {/* Subcategories if selected */}
+                      {isSelected && cat.subOptions && (
+                        <div className="pl-3 mt-1 space-y-1 border-l-2 border-[#00a2a4]/30 ml-3">
+                          {cat.subOptions.map(sub => {
+                            const subName = typeof sub === 'object' ? sub.name : sub;
+                            const isSubSelected = selectedSubCategory === subName;
+                            return (
+                              <button
+                                key={subName}
+                                onClick={() => { setSelectedSubCategory(isSubSelected ? '' : subName); setPage(1); }}
+                                className={`w-full text-left px-2.5 py-1 rounded-lg text-[11px] transition-all cursor-pointer ${
+                                  isSubSelected ? 'text-[#00a2a4] font-extrabold bg-[#00a2a4]/10' : 'text-slate-500 hover:text-slate-800'
+                                }`}
+                              >
+                                {subName}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
                   );
                 })}
               </div>
             </div>
 
-            {/* Trust Section - Hidden on mobile */}
-            <div className="hidden sm:block mt-6 rounded-xl bg-slate-900 p-6 text-white shadow-lg relative overflow-hidden">
-                <div className="absolute -right-6 -bottom-6 h-20 w-20 rounded-full bg-blue-600/20 blur-xl" />
-                <h4 className="text-xs font-black uppercase tracking-widest mb-4 flex items-center gap-2">
-                  <CheckCircle2 size={14} className="text-blue-400" /> Guaranteed Quality
-                </h4>
-                <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
-                  All products at MediQuick are sourced from verified manufacturers and stored at optimal temperatures.
-                </p>
-              </div>
-          </aside>
-
-          {/* Grid Container */}
-          <main className="flex-1 min-w-0 bg-white sm:bg-transparent p-2 sm:p-0">
-            <div className="hidden sm:flex mb-8 flex-col sm:flex-row sm:items-end justify-between gap-4">
-              <div>
-                <h2 className="text-2xl font-black text-slate-900 tracking-tight uppercase">
-                  {filter} {subFilter && <span className="text-blue-600">› {subFilter}</span>} <span className="text-blue-600">Items</span>
-                </h2>
-                <p className="mt-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                  Showing {filteredMedicines.length} verified products
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1 rounded-lg bg-white p-1 shadow-sm border border-slate-100">
-                  <button className="rounded-md bg-slate-50 p-2 text-slate-900"><LayoutGrid size={14} /></button>
-                  <button className="rounded-md p-2 text-slate-400 hover:bg-slate-50"><Search size={14} /></button>
-                </div>
+            {/* Price Range Slider */}
+            <div>
+              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5 flex justify-between">
+                <span>Price Range</span>
+                <span className="text-[#00a2a4]">Max ₹{priceMax}</span>
+              </h3>
+              <input
+                type="range"
+                min="0"
+                max="3000"
+                step="50"
+                value={priceMax}
+                onChange={(e) => { setPriceMax(Number(e.target.value)); setPage(1); }}
+                className="w-full accent-[#00a2a4] cursor-pointer"
+              />
+              <div className="flex justify-between text-[10px] text-slate-400 font-semibold mt-1">
+                <span>₹0</span>
+                <span>₹3000+</span>
               </div>
             </div>
 
-            {loading ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
-                {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
-                  <div key={n} className="aspect-[4/5] animate-pulse rounded-xl bg-slate-100 border border-slate-100" />
+            {/* Prescription Requirement */}
+            <div>
+              <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">Prescription Type</h3>
+              <div className="space-y-1.5">
+                {[
+                  { id: 'All', label: 'All Products' },
+                  { id: 'otc_only', label: 'OTC Only (No Rx Required)' },
+                  { id: 'rx_only', label: 'Prescription Required (Rx)' }
+                ].map(item => (
+                  <label key={item.id} className="flex items-center gap-2.5 text-xs font-medium text-slate-700 cursor-pointer hover:text-slate-900">
+                    <input
+                      type="radio"
+                      name="rxFilter"
+                      checked={rxFilter === item.id}
+                      onChange={() => { setRxFilter(item.id); setPage(1); }}
+                      className="w-3.5 h-3.5 text-[#00a2a4] focus:ring-[#00a2a4]"
+                    />
+                    <span>{item.label}</span>
+                  </label>
                 ))}
               </div>
-            ) : filteredMedicines.length > 0 ? (
-              <motion.div layout className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
-                <AnimatePresence>
-                  {filteredMedicines.map((med) => (
-                    <motion.div
-                      key={med._id}
-                      layout
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                    >
-                      <MedicineCard {...med} />
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-              </motion.div>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-center bg-white rounded-2xl border border-slate-100">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-50 text-slate-300">
-                  <ShoppingBag size={32} />
+            </div>
+
+            {/* In Stock Toggle */}
+            <div className="pt-2 border-t border-slate-100">
+              <label className="flex items-center justify-between cursor-pointer">
+                <span className="text-xs font-bold text-slate-700">In Stock Only</span>
+                <input
+                  type="checkbox"
+                  checked={inStockOnly}
+                  onChange={(e) => { setInStockOnly(e.target.checked); setPage(1); }}
+                  className="w-4 h-4 rounded text-[#00a2a4] focus:ring-[#00a2a4]"
+                />
+              </label>
+            </div>
+
+            {/* Brand Filter List */}
+            {brands.length > 0 && (
+              <div>
+                <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5">Popular Brands</h3>
+                <div className="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar pr-1">
+                  {brands.map(b => {
+                    const isChecked = selectedBrands.includes(b.name);
+                    return (
+                      <label key={b.name} className="flex items-center justify-between text-xs text-slate-600 cursor-pointer hover:text-slate-900">
+                        <div className="flex items-center gap-2 truncate">
+                          <input
+                            type="checkbox"
+                            checked={isChecked}
+                            onChange={() => handleBrandToggle(b.name)}
+                            className="w-3.5 h-3.5 rounded text-[#00a2a4] focus:ring-[#00a2a4]"
+                          />
+                          <span className="truncate">{b.name}</span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-semibold bg-slate-100 px-2 py-0.5 rounded-full">{b.count}</span>
+                      </label>
+                    );
+                  })}
                 </div>
-                <h3 className="mt-6 text-sm font-black uppercase tracking-widest text-slate-900">No items found</h3>
-                <p className="mt-1 text-[10px] font-bold text-slate-400">Try adjusting your filters or search criteria.</p>
-                <button 
-                  onClick={() => setFilter('All')}
-                  className="mt-8 rounded-lg bg-slate-900 px-8 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-lg active:scale-95 transition-all"
+              </div>
+            )}
+
+          </aside>
+
+          {/* PRODUCT GRID SECTION */}
+          <div className="flex-1 min-w-0">
+            {loading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                  <div key={i} className="animate-pulse bg-white border border-slate-100 rounded-3xl h-80 p-4 space-y-4">
+                    <div className="h-40 bg-slate-100 rounded-2xl" />
+                    <div className="h-4 w-3/4 bg-slate-100 rounded" />
+                    <div className="h-3 w-1/2 bg-slate-100 rounded" />
+                    <div className="h-8 w-full bg-slate-100 rounded-full mt-4" />
+                  </div>
+                ))}
+              </div>
+            ) : products.length > 0 ? (
+              <>
+                <div className={
+                  viewMode === 'grid' 
+                    ? "grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+                    : "space-y-4"
+                }>
+                  {products.map(product => (
+                    <ProductCard key={product._id} {...product} />
+                  ))}
+                </div>
+
+                {/* 5. SERVER-SIDE PAGINATION */}
+                {totalPages > 1 && (
+                  <div className="mt-12 flex items-center justify-center gap-2 border-t border-slate-200/60 pt-8">
+                    <button
+                      onClick={() => { setPage(p => Math.max(1, p - 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                      disabled={page === 1}
+                      className="px-4 py-2 rounded-full border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-1 cursor-pointer"
+                    >
+                      <ChevronLeft size={15} /> Previous
+                    </button>
+
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(pNum => (
+                      <button
+                        key={pNum}
+                        onClick={() => { setPage(pNum); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                        className={`w-9 h-9 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                          page === pNum 
+                            ? 'bg-slate-900 text-white shadow-md' 
+                            : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        {pNum}
+                      </button>
+                    ))}
+
+                    <button
+                      onClick={() => { setPage(p => Math.min(totalPages, p + 1)); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                      disabled={page === totalPages}
+                      className="px-4 py-2 rounded-full border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center gap-1 cursor-pointer"
+                    >
+                      Next <ChevronRight size={15} />
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              /* EMPTY STATE */
+              <div className="bg-white border border-slate-200/60 rounded-3xl p-12 text-center my-6">
+                <Package size={42} className="mx-auto text-slate-300 mb-4" />
+                <h3 className="text-base font-bold text-slate-800 mb-1">No products match your filters</h3>
+                <p className="text-xs text-slate-400 max-w-sm mx-auto mb-6">Try removing some active filters or searching for another term.</p>
+                <button
+                  onClick={handleClearAllFilters}
+                  className="px-6 py-2.5 bg-slate-900 text-white rounded-full text-xs font-bold hover:bg-[#00a2a4] transition-all cursor-pointer shadow-md"
                 >
-                  Clear Filters
+                  Clear All Filters
                 </button>
               </div>
             )}
-          </main>
+          </div>
+
         </div>
+
       </div>
-      <style dangerouslySetInnerHTML={{__html: `
-        .custom-scrollbar-hidden::-webkit-scrollbar {
-          display: none;
-        }
-        .custom-scrollbar-hidden {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}} />
     </div>
   );
 };

@@ -5,7 +5,7 @@ import {
   getUserProfile,
   verifyOTP,      // Match authController.js (Case sensitive)
   forgotPassword,
-  resetPassword,
+  resetPasswordWithToken,
   updateCart,
   updateUserProfile,
   addToWishlist,
@@ -39,7 +39,7 @@ router.post('/verify-otp', verifyOTP);
 router.post('/resend-otp', resendOtp);
 router.post('/login', login);
 router.post('/forgot-password', forgotPassword);
-router.post('/reset-password', resetPassword);
+router.post('/reset-password', resetPasswordWithToken);
 router.post('/google-login', googleLogin);
 
 // --- Protected Routes (Require Token) ---

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { User, Package, MapPin, FileText, Star, Heart, Bell, Shield, LogOut, ChevronRight, Menu } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { User, Package, MapPin, FileText, Star, Heart, Bell, Shield, LogOut, ChevronRight, Menu, Activity, Stethoscope, Crown } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 import { useAuth } from '../../context/AuthContext';
@@ -14,15 +14,26 @@ import ReviewsTab from './components/ReviewsTab';
 import WishlistTab from './components/WishlistTab';
 import NotificationPreferencesTab from './components/NotificationPreferencesTab';
 import SecurityTab from './components/SecurityTab';
+import MyLabBookingsTab from './components/MyLabBookingsTab';
+import MyAppointmentsTab from './components/MyAppointmentsTab';
+import MyCarePlanTab from './components/MyCarePlanTab';
 
 const Profile = () => {
   const { token, logout } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState(() => searchParams.get('tab') || 'profile');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!token) {
@@ -53,6 +64,9 @@ const Profile = () => {
   const tabs = [
     { id: 'profile', label: 'My Profile', icon: User, component: MyProfileTab },
     { id: 'orders', label: 'My Orders', icon: Package, component: MyOrdersTab },
+    { id: 'lab-bookings', label: 'Lab Bookings', icon: Activity, component: MyLabBookingsTab },
+    { id: 'appointments', label: 'Doctor Consultations', icon: Stethoscope, component: MyAppointmentsTab },
+    { id: 'care-plan', label: 'My Care Plan', icon: Crown, component: MyCarePlanTab },
     { id: 'addresses', label: 'Addresses', icon: MapPin, component: AddressesTab },
     { id: 'prescriptions', label: 'Prescriptions', icon: FileText, component: PrescriptionsTab },
     { id: 'reviews', label: 'My Reviews', icon: Star, component: ReviewsTab },

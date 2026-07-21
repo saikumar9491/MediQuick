@@ -7,14 +7,13 @@ import { API_BASE } from '../utils/apiConfig';
  */
 export const fetchProducts = async (params = {}) => {
   try {
-    // Map 'rx' correctly (the frontend uses 'rx' and 'category' exactly as the backend expects)
     const response = await axios.get(`${API_BASE}/api/medicines`, { params });
-    // Normalize response shape to match spec requirements: { data, total, totalPages, currentPage }
     return {
-      data: response.data.medicines || response.data.data || [],
-      total: response.data.total || 0,
+      medicines: response.data.medicines || response.data.data || [],
+      totalCount: response.data.totalCount || response.data.total || 0,
       totalPages: response.data.totalPages || 1,
-      currentPage: response.data.page || 1
+      page: response.data.page || 1,
+      brandsWithCounts: response.data.brandsWithCounts || []
     };
   } catch (error) {
     console.error('Error fetching products:', error);

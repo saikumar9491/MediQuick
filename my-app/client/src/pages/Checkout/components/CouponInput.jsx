@@ -1,13 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Tag, CheckCircle, X, Loader2 } from 'lucide-react';
 import { validateCoupon } from '../../../api/checkout';
-import ConfettiExplosion from '../../../components/ConfettiExplosion';
+import confetti from 'canvas-confetti';
 
 export const CouponInput = ({ token, subtotal, cartCategories, appliedCoupon, onApply, onRemove }) => {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showConfetti, setShowConfetti] = useState(false);
+  const boxRef = useRef(null);
+  const [justApplied, setJustApplied] = useState(false);
+
+  useEffect(() => {
+    if (appliedCoupon && justApplied && boxRef.current) {
+      const rect = boxRef.current.getBoundingClientRect();
+      const x = (rect.left + rect.width / 2) / window.innerWidth;
+      const y = (rect.top + rect.height / 2) / window.innerHeight;
+
+      const duration = 2000;
+      const end = Date.now() + duration;
+
+      (function frame() {
+        // Global confetti shoots out of the box and across the screen
+        confetti({
+          particleCount: 10,
+          spread: 120,
+          startVelocity: 30,
+          origin: { x, y },
+          colors: ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'],
+          zIndex: 9999
+        });
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      }());
+      setJustApplied(false);
+    }
+  }, [appliedCoupon, justApplied]);
 
   const handleApply = async () => {
     if (!code.trim()) return;
@@ -15,9 +43,9 @@ export const CouponInput = ({ token, subtotal, cartCategories, appliedCoupon, on
     setError('');
     try {
       const result = await validateCoupon(token, { code, subtotal, cartCategories });
+      setJustApplied(true);
       onApply(result);
       setCode('');
-      setShowConfetti(true);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -27,9 +55,7 @@ export const CouponInput = ({ token, subtotal, cartCategories, appliedCoupon, on
 
   if (appliedCoupon) {
     return (
-      <>
-        {showConfetti && <ConfettiExplosion />}
-        <div className="flex items-center justify-between gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+      <div ref={boxRef} className="flex items-center justify-between gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
         <div className="flex items-center gap-2">
           <Tag size={14} className="text-emerald-600" />
           <div>
@@ -37,11 +63,10 @@ export const CouponInput = ({ token, subtotal, cartCategories, appliedCoupon, on
             <p className="text-[10px] text-emerald-600">You save ₹{appliedCoupon.discountAmount}</p>
           </div>
         </div>
-        <button onClick={onRemove} className="p-1 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+        <button onClick={onRemove} className="p-1 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors relative z-10">
           <X size={14} />
         </button>
-        </div>
-      </>
+      </div>
     );
   }
 

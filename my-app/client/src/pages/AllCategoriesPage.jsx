@@ -1,22 +1,34 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronRight, ChevronLeft, ShoppingBag } from 'lucide-react';
+import { 
+  ChevronRight, 
+  ChevronLeft, 
+  ShoppingBag, 
+  Sparkles, 
+  Layers, 
+  Grid, 
+  ArrowRight,
+  ShieldCheck
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import MedicineCard from '../components/medicine/MedicineCard';
+import ProductCard from '../components/ProductCard/ProductCard';
 import { API_BASE } from '../utils/apiConfig';
 
 const AllCategoriesPage = () => {
   const [medicines, setMedicines] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedCategoryNav, setSelectedCategoryNav] = useState('All');
   const navigate = useNavigate();
   const scrollRefs = useRef({});
 
   useEffect(() => {
     const fetchMedicines = async () => {
+      setLoading(true);
       try {
-        const res = await fetch(`${API_BASE}/api/medicines`);
+        const res = await fetch(`${API_BASE}/api/medicines?limit=1000`);
         const data = await res.json();
-        setMedicines(Array.isArray(data) ? data : []);
+        const medArray = Array.isArray(data) ? data : (data.medicines || []);
+        setMedicines(medArray);
       } catch (err) {
         console.error("Fetch failed", err);
       } finally {
@@ -27,15 +39,18 @@ const AllCategoriesPage = () => {
   }, []);
 
   const groupedMedicines = medicines.reduce((acc, med) => {
-    if (!acc[med.category]) acc[med.category] = [];
-    acc[med.category].push(med);
+    const cat = med.category || 'General';
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(med);
     return acc;
   }, {});
+
+  const categoryNames = Object.keys(groupedMedicines);
 
   const scroll = (catName, direction) => {
     const container = scrollRefs.current[catName];
     if (container) {
-      const scrollAmount = 300;
+      const scrollAmount = 340;
       container.scrollBy({
         left: direction === 'left' ? -scrollAmount : scrollAmount,
         behavior: 'smooth'
@@ -43,113 +58,173 @@ const AllCategoriesPage = () => {
     }
   };
 
+  const filteredCategories = selectedCategoryNav === 'All'
+    ? categoryNames
+    : categoryNames.filter(c => c.toLowerCase() === selectedCategoryNav.toLowerCase());
+
   return (
-    <div className="min-h-screen bg-[#f8fafc] pb-20 pt-28">
+    <div className="min-h-screen bg-[#FAFBFD] pb-24 pt-4 sm:pt-6">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
-        {/* Catalog Banner */}
-        <section className="mb-12 overflow-hidden rounded-3xl bg-slate-900 shadow-2xl border border-white/10">
-          <div className="relative h-[200px] sm:h-[260px]">
-            <div className={`absolute inset-0 bg-gradient-to-br from-teal-600 to-teal-800 p-8 sm:p-12`}>
-              <div className="absolute right-10 top-1/2 -translate-y-1/2 text-[10rem] opacity-10 select-none hidden sm:block">
-                📑
-              </div>
-              
-              <div className="relative z-10 flex h-full flex-col justify-center">
-                <span className="mb-4 w-fit rounded-full bg-white/20 px-4 py-1.5 text-[10px] font-black uppercase tracking-[3px] text-white backdrop-blur-xl border border-white/10">
-                  DIRECTORY COLLECTION
-                </span>
-                <h1 className="max-w-2xl text-3xl font-black tracking-tight text-white sm:text-5xl uppercase italic leading-none">
-                  Health & <span className="text-teal-200">Wellness</span> Catalog
-                </h1>
-                <p className="mt-4 max-w-md text-xs font-bold text-white/70 sm:text-sm uppercase tracking-[2px] leading-relaxed">
-                  Premium verified selections across all specialized medical departments.
-                </p>
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-4">
+          <button onClick={() => navigate('/')} className="hover:text-slate-700 cursor-pointer">Home</button>
+          <span>/</span>
+          <span className="text-slate-800 font-bold">All Categories</span>
+        </nav>
+
+        {/* Compact Hero Banner */}
+        <section className="mb-8 overflow-hidden rounded-[24px] shadow-[0_15px_35px_rgba(0,0,0,0.05)] border border-slate-100 relative">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_100%_100%,rgba(0,162,164,0.12)_0%,transparent_100%),linear-gradient(135deg,#0a1525_0%,#032d2e_100%)]" />
+          
+          <div className="relative z-10 p-6 sm:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div className="max-w-xl">
+              <span className="mb-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00a2a4]/20 border border-[#00a2a4]/30 text-[9px] font-black uppercase tracking-[0.2em] text-[#00d4d6]">
+                <Layers size={12} className="text-[#00d4d6]" /> Complete Department Directory
+              </span>
+
+              <h1 className="text-2xl sm:text-4xl font-normal tracking-tight text-white leading-tight" style={{ letterSpacing: '-0.02em' }}>
+                Health & Wellness Categories
+              </h1>
+
+              <p className="mt-2 text-xs sm:text-sm leading-relaxed text-slate-300 max-w-md">
+                Browse verified medicines and healthcare essentials curated by specialty medical departments.
+              </p>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-md border border-white/15 p-4 rounded-2xl text-white max-w-xs space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#00d4d6]">Platform Summary</span>
+              <p className="text-xs font-bold text-slate-100">
+                {medicines.length} Products across {categoryNames.length} Departments
+              </p>
+              <div className="flex items-center gap-1.5 text-[10px] text-slate-300 pt-1">
+                <ShieldCheck size={13} className="text-[#00d4d6]" />
+                <span>100% Genuine Certified Brands</span>
               </div>
             </div>
-            
-            {/* Decorative Elements */}
-            <div className="absolute -bottom-10 -right-10 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
-            <div className="absolute -top-10 -left-10 h-64 w-64 rounded-full bg-teal-400/10 blur-3xl" />
           </div>
         </section>
 
+        {/* Quick Category Jump Bar */}
+        <section className="mb-10">
+          <div className="flex items-center gap-2 overflow-x-auto pb-3 custom-scrollbar">
+            <button
+              onClick={() => setSelectedCategoryNav('All')}
+              className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer flex-shrink-0 ${
+                selectedCategoryNav === 'All'
+                  ? 'bg-slate-900 text-white shadow-md'
+                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              All Departments ({categoryNames.length})
+            </button>
+
+            {categoryNames.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategoryNav(cat)}
+                className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer flex-shrink-0 ${
+                  selectedCategoryNav === cat
+                    ? 'bg-[#00a2a4] text-white shadow-md'
+                    : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                }`}
+              >
+                {cat} ({groupedMedicines[cat].length})
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* Category Sections */}
         {loading ? (
-          <div className="space-y-12">
+          <div className="space-y-12 animate-pulse">
             {[1, 2, 3].map(i => (
-              <div key={i} className="animate-pulse">
-                <div className="h-8 w-48 bg-slate-200 rounded mb-6" />
+              <div key={i} className="space-y-4">
+                <div className="h-6 w-48 bg-slate-100 rounded" />
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  {[1, 2, 3, 4].map(j => <div key={j} className="h-64 bg-white rounded-xl border border-slate-100" />)}
+                  {[1, 2, 3, 4].map(j => (
+                    <div key={j} className="h-72 bg-white rounded-3xl border border-slate-100" />
+                  ))}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="space-y-16">
-            {Object.keys(groupedMedicines).map(catName => (
-              <section key={catName} className="animate-fadeIn relative group">
-                <div className="mb-6 flex items-center justify-between border-b border-slate-100 pb-4">
+          <div className="space-y-12">
+            {filteredCategories.map(catName => (
+              <section key={catName} className="relative group">
+                
+                {/* Department Header */}
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-200/70">
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-teal-50 text-[#00a2a4]">
-                      <ShoppingBag size={20} />
+                    <div className="w-9 h-9 rounded-xl bg-[#00a2a4]/10 text-[#00a2a4] flex items-center justify-center font-bold">
+                      <ShoppingBag size={18} />
                     </div>
                     <div>
-                      <h2 className="text-sm sm:text-base font-black uppercase tracking-[2px] text-slate-800">
-                        {catName}
-                      </h2>
-                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-                        {groupedMedicines[catName].length} VERIFIED PRODUCTS
+                      <h2 className="text-base font-bold text-slate-900 tracking-tight">{catName}</h2>
+                      <span className="text-[11px] font-medium text-slate-400">
+                        {groupedMedicines[catName].length} Verified Products
                       </span>
                     </div>
                   </div>
-                  <button 
-                    onClick={() => navigate(`/medicines?filter=${catName.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`)}
-                    className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-500 border border-slate-200 hover:border-[#00a2a4] hover:text-[#00a2a4] transition-all shadow-sm"
+
+                  <button
+                    onClick={() => navigate(`/medicines?category=${encodeURIComponent(catName)}`)}
+                    className="px-4 py-1.5 rounded-full bg-slate-100 hover:bg-[#00a2a4] text-slate-700 hover:text-white text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5"
                   >
-                    Enter Hub
-                    <ChevronRight size={14} />
+                    <span>View All {catName}</span>
+                    <ArrowRight size={13} />
                   </button>
                 </div>
-                
-                {/* Scroll Buttons */}
-                <button 
-                  onClick={() => scroll(catName, 'left')}
-                  className="absolute left-[-20px] top-[60%] z-10 hidden h-10 w-10 items-center justify-center rounded-full bg-white text-slate-800 shadow-xl border border-slate-100 transition-all hover:bg-[#00a2a4] hover:text-white md:flex group-hover:left-[-10px] opacity-0 group-hover:opacity-100"
-                >
-                  <ChevronLeft size={20} />
-                </button>
-                <button 
-                  onClick={() => scroll(catName, 'right')}
-                  className="absolute right-[-20px] top-[60%] z-10 hidden h-10 w-10 items-center justify-center rounded-full bg-white text-slate-800 shadow-xl border border-slate-100 transition-all hover:bg-[#00a2a4] hover:text-white md:flex group-hover:right-[-10px] opacity-0 group-hover:opacity-100"
-                >
-                  <ChevronRight size={20} />
-                </button>
 
-                <div 
+                {/* Left/Right Scroll Control Buttons */}
+                {groupedMedicines[catName].length > 3 && (
+                  <>
+                    <button
+                      onClick={() => scroll(catName, 'left')}
+                      className="absolute left-[-16px] top-[55%] -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white text-slate-800 shadow-lg border border-slate-200 flex items-center justify-center hover:bg-[#00a2a4] hover:text-white transition-all cursor-pointer"
+                      title="Scroll Left"
+                    >
+                      <ChevronLeft size={18} />
+                    </button>
+                    <button
+                      onClick={() => scroll(catName, 'right')}
+                      className="absolute right-[-16px] top-[55%] -translate-y-1/2 z-20 w-9 h-9 rounded-full bg-white text-slate-800 shadow-lg border border-slate-200 flex items-center justify-center hover:bg-[#00a2a4] hover:text-white transition-all cursor-pointer"
+                      title="Scroll Right"
+                    >
+                      <ChevronRight size={18} />
+                    </button>
+                  </>
+                )}
+
+                {/* Horizontal Scroll Product Carousel */}
+                <div
                   ref={el => scrollRefs.current[catName] = el}
-                  className="custom-scrollbar-hidden flex gap-4 overflow-x-auto pt-4 pb-6 scroll-smooth snap-x"
+                  className="flex gap-4 overflow-x-auto pt-2 pb-4 scroll-smooth custom-scrollbar-hidden snap-x"
                 >
-                  {groupedMedicines[catName].map((item) => (
-                    <div key={item._id} className="min-w-[160px] max-w-[160px] sm:min-w-[200px] sm:max-w-[200px] snap-start">
-                      <MedicineCard {...item} />
+                  {groupedMedicines[catName].map(product => (
+                    <div 
+                      key={product._id} 
+                      className="min-w-[220px] max-w-[220px] sm:min-w-[250px] sm:max-w-[250px] snap-start"
+                    >
+                      <ProductCard {...product} />
                     </div>
                   ))}
                 </div>
+
               </section>
             ))}
           </div>
         )}
 
         {!loading && medicines.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="mb-6 h-20 w-20 flex items-center justify-center rounded-full bg-slate-50 text-slate-300">
-               <ShoppingBag size={40} />
-            </div>
-            <h3 className="text-lg font-black uppercase tracking-widest text-slate-800">Hub Inventory Empty</h3>
-            <p className="mt-2 text-sm font-bold text-slate-400">Our stock update is currently in progress. Please check back shortly.</p>
+          <div className="bg-white border border-slate-200/60 rounded-3xl p-12 text-center my-6">
+            <ShoppingBag size={40} className="mx-auto text-slate-300 mb-3" />
+            <h3 className="text-base font-bold text-slate-800 mb-1">Catalog Update In Progress</h3>
+            <p className="text-xs text-slate-400">Our pharmacy inventory is currently syncing. Please check back shortly.</p>
           </div>
         )}
+
       </div>
 
       <style>{`

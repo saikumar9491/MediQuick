@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
+import { googleLogout } from '@react-oauth/google';
 
 import { API_BASE } from '../utils/apiConfig';
 
@@ -9,6 +10,10 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(() => localStorage.getItem('userToken') || null);
   const [loading, setLoading] = useState(true);
+
+  // Modal State
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authModalView, setAuthModalView] = useState('login'); // 'login', 'signup', 'forgot-password'
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -59,7 +64,7 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, [API_BASE]);
 
-  const login = async (userData, userToken) => {
+  const login = async (userToken, userData) => {
     setToken(userToken);
     localStorage.setItem('userToken', userToken);
 
@@ -90,7 +95,19 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     localStorage.removeItem('mediQuickUser');
     localStorage.removeItem('userToken');
-    window.location.href = '/login';
+    sessionStorage.removeItem('locationPrompted');
+    
+    // Aggressively clear Google One Tap cooldown cookies
+    const pastDate = "Thu, 01 Jan 1970 00:00:00 UTC";
+    document.cookie = `g_state=; expires=${pastDate}; path=/;`;
+    document.cookie = `g_state=; expires=${pastDate}; path=/; domain=localhost;`;
+    document.cookie = `g_state=; expires=${pastDate}; path=/; domain=${window.location.hostname};`;
+    
+    // Give googleLogout a tiny bit of time to execute before redirecting
+    googleLogout();
+    setTimeout(() => {
+      window.location.href = '/';
+    }, 100);
   };
 
   if (loading) {
@@ -141,6 +158,10 @@ export const AuthProvider = ({ children }) => {
         logout,
         loading,
         setUser,
+        showAuthModal,
+        setShowAuthModal,
+        authModalView,
+        setAuthModalView
       }}
     >
       {children}

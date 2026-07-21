@@ -3,7 +3,7 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { CheckCircle, Package, Truck, Clock, ChevronRight, ShoppingBag } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { API_BASE } from '../../utils/apiConfig';
-import ConfettiExplosion from '../../components/ConfettiExplosion';
+import confetti from 'canvas-confetti';
 
 const OrderConfirmation = () => {
   const { orderId } = useParams();
@@ -31,6 +31,36 @@ const OrderConfirmation = () => {
     fetchOrder();
   }, [orderId, token]);
 
+  // Trigger center blast confetti when order is fully loaded
+  useEffect(() => {
+    if (!loading && order) {
+      const duration = 2500;
+      const end = Date.now() + duration;
+
+      const frame = () => {
+        confetti({
+          particleCount: 5,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4']
+        });
+        confetti({
+          particleCount: 5,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4']
+        });
+
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      };
+      frame();
+    }
+  }, [loading]); // Run when loading completes
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
@@ -48,7 +78,6 @@ const OrderConfirmation = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pt-12 pb-20 relative overflow-hidden">
-      <ConfettiExplosion />
       <div className="max-w-2xl mx-auto px-4">
 
         {/* Success Icon + Header */}

@@ -15,6 +15,7 @@ import {
   createRazorpayOrder,
   verifyRazorpayPayment,
 } from '../../api/checkout';
+import { getMySubscription } from '../../api/carePlan';
 import { API_BASE } from '../../utils/apiConfig';
 
 const DELIVERY_FEE = 49;
@@ -90,14 +91,36 @@ const Checkout = () => {
     if (token) checkRazorpay();
   }, [token]);
 
+  const [careSubscription, setCareSubscription] = useState(null);
+
+  // Fetch active Care Plan subscription
+  useEffect(() => {
+    const fetchCareSub = async () => {
+      try {
+        const sub = await getMySubscription(token);
+        setCareSubscription(sub);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    if (token) fetchCareSub();
+  }, [token]);
+
   const rxItems = activeCart.filter(item => item.needsRx);
   const rxRequired = rxItems.length > 0;
   const isServiceable = serviceabilityResult?.isServiceable ?? null;
 
   const subtotal = activeCart.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
   const couponDiscount = appliedCoupon?.discountAmount || 0;
-  const deliveryFee = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE;
-  const total = subtotal + deliveryFee - couponDiscount;
+  
+  // Enforce Care Plan Benefits:
+  // If user has active Care Plan, delivery fee is 0 (Free Delivery)
+  const isCareMember = careSubscription && careSubscription.status === 'Active';
+  const careDiscountPct = isCareMember ? (careSubscription.tier === 'annual' ? 10 : 5) : 0;
+  const carePlanDiscount = Math.round((subtotal * careDiscountPct) / 100);
+  
+  const deliveryFee = isCareMember ? 0 : (subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE);
+  const total = Math.max(0, subtotal + deliveryFee - couponDiscount - carePlanDiscount);
 
   // Load Razorpay checkout.js script
   const loadRazorpayScript = () =>

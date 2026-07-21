@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Tag, CheckCircle, X, Loader2, ShieldCheck, RotateCcw, Award, ArrowRight, AlertCircle } from 'lucide-react';
 import { validateCoupon } from '../../../api/checkout';
-import ConfettiExplosion from '../../../components/ConfettiExplosion';
+import confetti from 'canvas-confetti';
 
 const FREE_DELIVERY_THRESHOLD = 500;
 const DELIVERY_FEE = 49;
@@ -19,7 +19,35 @@ const CartSummaryCard = ({
   const [code, setCode] = useState('');
   const [couponLoading, setCouponLoading] = useState(false);
   const [couponError, setCouponError] = useState('');
-  const [showConfetti, setShowConfetti] = useState(false);
+  const boxRef = useRef(null);
+  const [justApplied, setJustApplied] = useState(false);
+
+  useEffect(() => {
+    if (appliedCoupon && justApplied && boxRef.current) {
+      const rect = boxRef.current.getBoundingClientRect();
+      const x = (rect.left + rect.width / 2) / window.innerWidth;
+      const y = (rect.top + rect.height / 2) / window.innerHeight;
+
+      const duration = 2000;
+      const end = Date.now() + duration;
+
+      (function frame() {
+        // Global confetti shoots out of the box and across the screen
+        confetti({
+          particleCount: 10,
+          spread: 120,
+          startVelocity: 30,
+          origin: { x, y },
+          colors: ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'],
+          zIndex: 9999
+        });
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      }());
+      setJustApplied(false);
+    }
+  }, [appliedCoupon, justApplied]);
 
   // Only in-stock items count toward totals
   const activeItems = items.filter(i => !i.outOfStock);
@@ -43,10 +71,10 @@ const CartSummaryCard = ({
     setCouponError('');
     try {
       const result = await validateCoupon(token, { code, subtotal, cartCategories });
+      setJustApplied(true);
       onCouponApply(result);
       setCode('');
       setCouponOpen(false);
-      setShowConfetti(true);
     } catch (e) {
       setCouponError(e.message);
     } finally {
@@ -65,8 +93,7 @@ const CartSummaryCard = ({
 
   return (
     <>
-      {showConfetti && <ConfettiExplosion />}
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-visible relative">
       {/* Header */}
       <div className="px-5 py-4 border-b border-slate-100">
         <h3 className="text-sm font-semibold text-slate-800">Order Summary</h3>
@@ -85,7 +112,7 @@ const CartSummaryCard = ({
       {/* Coupon */}
       <div className="px-5 py-4 border-b border-slate-100">
         {appliedCoupon ? (
-          <div className="flex items-center justify-between p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+          <div ref={boxRef} className="flex items-center justify-between p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
             <div className="flex items-center gap-2">
               <Tag size={13} className="text-emerald-600" />
               <div>
