@@ -172,36 +172,32 @@ const ProductCard = ({
   return (
     <div
       onClick={() => navigate(`/product/${_id}`)}
-      className="group relative flex w-full h-full flex-col bg-white border border-slate-200 rounded-2xl p-4 transition-all duration-200 hover:border-[#00a2a4] hover:shadow-lg overflow-hidden cursor-pointer"
+      className="group relative flex w-full h-full flex-col bg-white border border-slate-200/90 rounded-2xl p-3 transition-all duration-200 hover:border-[#00a2a4] hover:shadow-md overflow-hidden cursor-pointer"
     >
       {/* Top Bar: Official Badges & Wishlist Button */}
-      <div className="flex items-start justify-between gap-2 z-10 mb-2">
-        <div className="flex items-center gap-1.5 flex-wrap">
+      <div className="flex items-start justify-between gap-1.5 z-10 mb-1.5">
+        <div className="flex items-center gap-1 flex-wrap">
           {hasDiscount && (
-            <span className="px-2 py-0.5 rounded bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wider">
+            <span className="px-1.5 py-0.5 rounded bg-emerald-600 text-white text-[9px] font-bold uppercase tracking-wider">
               {discountPercent}% OFF
             </span>
           )}
 
           {needsRx && (
-            <span className="px-2 py-0.5 rounded bg-indigo-50 border border-indigo-200 text-indigo-700 text-[10px] font-bold flex items-center gap-1">
-              <FileText size={10} /> Rx Required
+            <span className="px-1.5 py-0.5 rounded bg-indigo-50 border border-indigo-200 text-indigo-700 text-[9px] font-bold flex items-center gap-0.5">
+              <FileText size={9} /> Rx
             </span>
           )}
-
-          <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-semibold flex items-center gap-1">
-            <ShieldCheck size={10} className="text-[#00a2a4]" /> 100% Genuine
-          </span>
         </div>
 
         {/* Clean Wishlist Button */}
         <button
           onClick={handleWishlistToggle}
-          className="w-7 h-7 rounded-full bg-slate-50 border border-slate-200 hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-rose-600 transition-all cursor-pointer ml-auto flex-shrink-0"
+          className="w-6 h-6 rounded-full bg-slate-50 border border-slate-200 hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-rose-600 transition-all cursor-pointer ml-auto flex-shrink-0"
           title={isInWishlist ? 'Remove from wishlist' : 'Save to wishlist'}
         >
           <Heart
-            size={14}
+            size={13}
             className={`${
               isInWishlist ? 'fill-rose-600 stroke-rose-600 text-rose-600' : ''
             }`}
@@ -209,8 +205,8 @@ const ProductCard = ({
         </button>
       </div>
 
-      {/* Image Stage Container */}
-      <div className="relative flex h-40 w-full items-center justify-center bg-slate-50/60 rounded-xl p-3 mb-3 border border-slate-100 overflow-hidden">
+      {/* Image Stage Container - Reduced Height to h-28 */}
+      <div className="relative flex h-28 w-full items-center justify-center bg-slate-50/70 rounded-xl p-2 mb-2 border border-slate-100 overflow-hidden">
         <img
           src={image || 'https://placehold.co/300x300?text=Medicine'}
           alt={name}
