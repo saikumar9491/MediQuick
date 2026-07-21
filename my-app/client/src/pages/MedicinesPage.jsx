@@ -477,15 +477,14 @@ const MedicinesPage = () => {
           </aside>
 
           {/* PRODUCT GRID SECTION */}
-          <div className="flex-1 min-w-0">
             {loading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
-                  <div key={i} className="animate-pulse bg-white border border-slate-100 rounded-3xl h-80 p-4 space-y-4">
-                    <div className="h-40 bg-slate-100 rounded-2xl" />
-                    <div className="h-4 w-3/4 bg-slate-100 rounded" />
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3.5">
+                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => (
+                  <div key={i} className="animate-pulse bg-white border border-slate-100 rounded-2xl h-64 p-3 space-y-3">
+                    <div className="h-28 bg-slate-100 rounded-xl" />
+                    <div className="h-3 w-3/4 bg-slate-100 rounded" />
                     <div className="h-3 w-1/2 bg-slate-100 rounded" />
-                    <div className="h-8 w-full bg-slate-100 rounded-full mt-4" />
+                    <div className="h-7 w-full bg-slate-100 rounded-full mt-2" />
                   </div>
                 ))}
               </div>
@@ -493,7 +492,7 @@ const MedicinesPage = () => {
               <>
                 <div className={
                   viewMode === 'grid' 
-                    ? "grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"
+                    ? "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3.5"
                     : "space-y-4"
                 }>
                   {products.map(product => (

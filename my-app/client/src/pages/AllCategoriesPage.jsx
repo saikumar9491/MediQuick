@@ -205,7 +205,7 @@ const AllCategoriesPage = () => {
                   {groupedMedicines[catName].map(product => (
                     <div 
                       key={product._id} 
-                      className="min-w-[220px] max-w-[220px] sm:min-w-[250px] sm:max-w-[250px] snap-start"
+                      className="min-w-[170px] max-w-[170px] sm:min-w-[195px] sm:max-w-[195px] snap-start"
                     >
                       <ProductCard {...product} />
                     </div>
