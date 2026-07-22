@@ -34,6 +34,21 @@ export const ReviewsSection = ({ medicine, user, token, refreshProduct }) => {
     runEligibilityCheck();
   }, [user, token, medicine]);
 
+  useEffect(() => {
+    const hash = window.location.hash;
+    if ((hash === '#rate' || hash === '#reviews') && canSubmitReview) {
+      setTimeout(() => {
+        const el = document.getElementById('reviews-section-container');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        setShowModal(true);
+        // Remove hash cleanly without page reload
+        window.history.replaceState(null, null, window.location.pathname);
+      }, 300);
+    }
+  }, [canSubmitReview]);
+
   const totalReviewsCount = approvedReviews.length;
   const starCounts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
   approvedReviews.forEach(r => {

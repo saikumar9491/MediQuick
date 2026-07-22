@@ -187,7 +187,7 @@ const ProductCard = ({
 
   return (
     <div
-      onClick={() => navigate(`/product/${_id}`)}
+      onClick={() => navigate(`/medicines/${_id}`)}
       className="group relative flex w-full h-full flex-col bg-white border border-slate-200 rounded-2xl p-4 transition-all duration-200 hover:border-[#00a2a4] hover:shadow-lg overflow-hidden cursor-pointer"
     >
       {/* 1. TOP STATUS ROW */}

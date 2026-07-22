@@ -325,7 +325,7 @@ const ProductDetails = () => {
         </div>
 
         {/* Reviews Section */}
-        <div className="mb-10" ref={reviewsRef}>
+        <div className="mb-10" ref={reviewsRef} id="reviews-section-container">
           <ReviewsSection 
             medicine={medicine}
             user={user}

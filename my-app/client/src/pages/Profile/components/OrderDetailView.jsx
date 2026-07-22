@@ -133,7 +133,7 @@ const OrderDetailView = ({ order, onBack, token }) => {
                 <p className="text-[10px] text-slate-400 mt-0.5">Quantity: {item.quantity}</p>
                 {order.status === 'Delivered' && (item.productId || item._id) && (
                   <Link
-                    to={`/product/${item.productId || item._id}`}
+                    to={`/medicines/${item.productId || item._id}#rate`}
                     className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-teal-50 hover:bg-teal-100 text-[#00a2a4] text-[10px] font-black mt-1.5 transition-colors border border-teal-100"
                   >
                     <Star size={10} className="fill-amber-400 text-amber-400 stroke-none" />
