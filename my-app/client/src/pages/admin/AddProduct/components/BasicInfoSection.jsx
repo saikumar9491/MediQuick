@@ -57,7 +57,7 @@ const BasicInfoSection = ({ formData, onChange, errors }) => {
 
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">
-            Salt / Generic Composition <span className="text-red-500">*</span>
+            Salt / Generic Composition
           </label>
           <input
             type="text"

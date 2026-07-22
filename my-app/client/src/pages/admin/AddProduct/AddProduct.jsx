@@ -146,7 +146,6 @@ const AddProduct = () => {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = 'Product name is required';
     if (!formData.brand.trim()) newErrors.brand = 'Brand is required';
-    if (!formData.salt.trim()) newErrors.salt = 'Salt / Composition is required';
     if (!formData.category) newErrors.category = 'Category is required';
     if (!formData.subCategory) newErrors.subCategory = 'Subcategory is required';
     
@@ -158,9 +157,7 @@ const AddProduct = () => {
       newErrors.countInStock = 'Valid stock quantity is required';
     }
 
-    if (!formData.expiryDate) {
-      newErrors.expiryDate = 'Expiry date is required';
-    } else {
+    if (formData.expiryDate) {
       const exp = new Date(formData.expiryDate);
       if (exp <= new Date()) {
         newErrors.expiryDate = 'Expiry date must be in the future';

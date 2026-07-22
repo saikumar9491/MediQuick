@@ -94,7 +94,7 @@ const ComplianceSection = ({ formData, onChange, errors }) => {
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              Expiry Date <span className="text-red-500">*</span>
+              Expiry Date
             </label>
             <input
               type="date"
