@@ -22,6 +22,17 @@ const connectDB = async () => {
 
     console.log(`✅ Hub Database Linked: ${conn.connection.host}`);
 
+    // Non-blocking trigger of bestseller recalculation
+    import('../controllers/medicineController.js').then(module => {
+      module.recalculateBestsellersInternal().then(() => {
+        console.log('✅ Bestseller list successfully updated.');
+      }).catch(err => {
+        console.error('❌ Failed to compute bestsellers on connection:', err.message);
+      });
+    }).catch(err => {
+      console.error('❌ Failed to load medicine controller on connection:', err.message);
+    });
+
     // Optional: Log when the connection is lost during runtime
     mongoose.connection.on('disconnected', () => {
       console.warn('⚠️  Hub Warning: MongoDB connection lost. Retrying...');

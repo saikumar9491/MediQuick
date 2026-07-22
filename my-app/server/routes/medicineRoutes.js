@@ -13,7 +13,8 @@ import {
   generateAIDescription,
   bulkUpdateMedicines,
   bulkDeleteMedicines,
-  getSalesStats
+  getSalesStats,
+  recalculateBestsellers
 } from '../controllers/medicineController.js';
 import { verifyToken, isAdmin } from '../middleware/authMiddleware.js';
 
@@ -80,5 +81,8 @@ router.patch('/:id/trending', verifyToken, isAdmin, toggleTrending);
 
 // Generate AI product descriptions (Admin only)
 router.post('/ai-description', verifyToken, isAdmin, generateAIDescription);
+
+// Recalculate Bestsellers (Admin only)
+router.post('/admin/recalculate-bestsellers', verifyToken, isAdmin, recalculateBestsellers);
 
 export default router;

@@ -544,3 +544,98 @@ export const getSalesStats = async (req, res) => {
     res.status(500).json({ message: 'Error calculating sales stats' });
   }
 };
+
+// Internal bestseller calculation logic
+export const recalculateBestsellersInternal = async () => {
+  try {
+    const past30Days = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    
+    // 1. Get recent sales volume in last 30 days
+    let sales = await Order.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: past30Days },
+          status: { $ne: 'Cancelled' }
+        }
+      },
+      { $unwind: '$items' },
+      {
+        $group: {
+          _id: '$items.productId',
+          unitsSold: { $sum: '$items.quantity' }
+        }
+      },
+      { $sort: { unitsSold: -1 } }
+    ]);
+
+    // 2. Fallback to all-time sales if no recent sales
+    if (sales.length < 3) {
+      sales = await Order.aggregate([
+        {
+          $match: {
+            status: { $ne: 'Cancelled' }
+          }
+        },
+        { $unwind: '$items' },
+        {
+          $group: {
+            _id: '$items.productId',
+            unitsSold: { $sum: '$items.quantity' }
+          }
+        },
+        { $sort: { unitsSold: -1 } }
+      ]);
+    }
+
+    let bestsellerIds = sales.map(s => s._id ? s._id.toString() : '').filter(Boolean);
+
+    // 3. Fallback to top products by rating if still empty
+    if (bestsellerIds.length < 3) {
+      const topRated = await Medicine.find({ isActive: true })
+        .sort({ rating: -1, price: -1 })
+        .limit(5);
+      bestsellerIds = [...bestsellerIds, ...topRated.map(p => p._id.toString())];
+    }
+
+    // Uniquify
+    bestsellerIds = [...new Set(bestsellerIds)];
+
+    // Target top 20%, min 3, max 10
+    const countToMark = Math.min(Math.max(3, Math.round(bestsellerIds.length * 0.2)), 10);
+    const qualifyingIds = bestsellerIds.slice(0, countToMark);
+
+    console.log(`📡 Bestseller calculation: marking ${qualifyingIds.length} products as bestsellers:`, qualifyingIds);
+
+    // Reset all products
+    await Medicine.updateMany({}, { $set: { isBestseller: false } });
+    
+    // Mark qualifying ones
+    if (qualifyingIds.length > 0) {
+      await Medicine.updateMany(
+        { _id: { $in: qualifyingIds.map(id => new mongoose.Types.ObjectId(id)) } },
+        { $set: { isBestseller: true } }
+      );
+    }
+
+    return qualifyingIds;
+  } catch (error) {
+    console.error('Error in recalculateBestsellersInternal:', error);
+    throw error;
+  }
+};
+
+// @desc    Trigger recalculation of bestsellers based on order sales data
+// @route   POST /api/medicines/admin/recalculate-bestsellers
+export const recalculateBestsellers = async (req, res) => {
+  try {
+    const qualifying = await recalculateBestsellersInternal();
+    res.status(200).json({ 
+      success: true, 
+      message: `Bestseller recalculation successful. Marked ${qualifying.length} products.`, 
+      productsCount: qualifying.length,
+      qualifyingProducts: qualifying
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Bestseller recalculation failed', error: err.message });
+  }
+};

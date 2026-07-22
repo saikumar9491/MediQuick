@@ -112,6 +112,32 @@ const MedicalDetailsSection = ({ formData, onChange }) => {
             })}
           </div>
         </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            Key Features / Bullet Points (Max 3)
+          </label>
+          <p className="text-xs text-slate-400 mb-2">Provide brief, high-impact descriptors (e.g. Lightweight, Non-Sticky, For All Skin Types).</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {[0, 1, 2].map((index) => {
+              const feats = formData.keyFeatures || ['', '', ''];
+              return (
+                <input
+                  key={index}
+                  type="text"
+                  placeholder={`Feature Bullet ${index + 1}`}
+                  value={feats[index] || ''}
+                  onChange={(e) => {
+                    const nextFeats = [...(formData.keyFeatures || ['', '', ''])];
+                    nextFeats[index] = e.target.value;
+                    onChange('keyFeatures', nextFeats);
+                  }}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white"
+                />
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );
