@@ -57,6 +57,61 @@ const MedicalDetailsSection = ({ formData, onChange }) => {
             placeholder="Detailed salt breakdown and inactive ingredients..."
           />
         </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            Product Tagline / Short Descriptor
+          </label>
+          <input
+            type="text"
+            value={formData.tagline || ''}
+            onChange={(e) => onChange('tagline', e.target.value)}
+            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-colors text-sm"
+            placeholder="e.g., Dermatologist Recommended, Non-drowsy formulation, etc."
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">
+            Display Attributes (Max 2 for card rendering)
+          </label>
+          <p className="text-xs text-slate-400 mb-2">Provide key-value pairs appropriate for this product type (e.g. Skin Type: All, SPF: 50, Dosage: 1 Tablet, Strength: 650mg).</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[0, 1].map((index) => {
+              const attr = (formData.displayAttributes && formData.displayAttributes[index]) || { label: '', value: '' };
+              return (
+                <div key={index} className="flex gap-2 items-center bg-slate-50 p-3 rounded-lg border border-slate-100">
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      placeholder="Label (e.g. SPF)"
+                      value={attr.label || ''}
+                      onChange={(e) => {
+                        const nextAttrs = [...(formData.displayAttributes || [{ label: '', value: '' }, { label: '', value: '' }])];
+                        nextAttrs[index] = { ...nextAttrs[index], label: e.target.value };
+                        onChange('displayAttributes', nextAttrs);
+                      }}
+                      className="w-full px-3 py-1.5 border border-slate-300 rounded-md text-xs bg-white"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      placeholder="Value (e.g. 50+)"
+                      value={attr.value || ''}
+                      onChange={(e) => {
+                        const nextAttrs = [...(formData.displayAttributes || [{ label: '', value: '' }, { label: '', value: '' }])];
+                        nextAttrs[index] = { ...nextAttrs[index], value: e.target.value };
+                        onChange('displayAttributes', nextAttrs);
+                      }}
+                      className="w-full px-3 py-1.5 border border-slate-300 rounded-md text-xs bg-white"
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );

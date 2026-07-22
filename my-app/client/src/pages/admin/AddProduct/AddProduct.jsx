@@ -37,6 +37,11 @@ const initialFormState = {
   safetyInformation: '',
   ingredients: '',
   verifiedAuthentic: false,
+  tagline: '',
+  displayAttributes: [
+    { label: '', value: '' },
+    { label: '', value: '' }
+  ]
 };
 
 const AddProduct = () => {
@@ -67,6 +72,13 @@ const AddProduct = () => {
         return isNaN(d.getTime()) ? '' : d.toISOString().split('T')[0];
       };
 
+      // Populate displayAttributes with at least 2 empty records if less than 2
+      const rawAttrs = product.displayAttributes || [];
+      const formattedAttrs = [
+        { label: rawAttrs[0]?.label || '', value: rawAttrs[0]?.value || '' },
+        { label: rawAttrs[1]?.label || '', value: rawAttrs[1]?.value || '' }
+      ];
+
       setFormData({
         name: product.name || '',
         brand: product.brand || '',
@@ -93,6 +105,8 @@ const AddProduct = () => {
         safetyInformation: product.safetyInformation || '',
         ingredients: product.ingredients || '',
         verifiedAuthentic: product.verifiedAuthentic || false,
+        tagline: product.tagline || '',
+        displayAttributes: formattedAttrs
       });
     } catch (error) {
       toast.error('Failed to load product details');
@@ -154,7 +168,10 @@ const AddProduct = () => {
         price: Number(formData.price),
         discountPrice: formData.discountPrice ? Number(formData.discountPrice) : undefined,
         countInStock: Number(formData.countInStock),
-        lowStockThreshold: Number(formData.lowStockThreshold)
+        lowStockThreshold: Number(formData.lowStockThreshold),
+        displayAttributes: (formData.displayAttributes || [])
+          .map(attr => ({ label: attr.label?.trim(), value: attr.value?.trim() }))
+          .filter(attr => attr.label && attr.value)
       };
 
       if (isEditMode) {
