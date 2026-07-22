@@ -51,6 +51,7 @@ export const ProductsTable = ({
         const mappedData = rawMedicines.map(item => ({
           id: item._id,
           name: item.name,
+          image: item.image,
           generic: item.subCategory || 'N/A', 
           category: item.category,
           mfg: item.brand,                   
@@ -135,8 +136,19 @@ export const ProductsTable = ({
       accessor: 'product',
       cell: (row) => (
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0 text-slate-400">
-            <ImageIcon className="h-4 w-4" />
+          <div className="h-10 w-10 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0 overflow-hidden text-slate-400">
+            {row.image ? (
+              <img 
+                src={row.image} 
+                alt={row.name} 
+                className="h-full w-full object-contain p-1 mix-blend-multiply bg-white"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
+            ) : (
+              <ImageIcon className="h-4 w-4" />
+            )}
           </div>
           <div>
             <p className="text-xs font-black text-slate-800" title={row.name}>
