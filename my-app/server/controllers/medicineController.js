@@ -243,13 +243,11 @@ export const addMedicine = async (req, res) => {
     const missingFields = [];
     if (!name) missingFields.push('name');
     if (!brand) missingFields.push('brand');
-    if (!salt) missingFields.push('salt');
     if (!category) missingFields.push('category');
     if (!subCategory) missingFields.push('subCategory');
     if (price === undefined || price < 0) missingFields.push('price (must be >= 0)');
     if (countInStock === undefined || countInStock < 0) missingFields.push('countInStock (must be >= 0)');
     if (needsRx === undefined) missingFields.push('needsRx');
-    if (!expiryDate) missingFields.push('expiryDate');
 
     if (missingFields.length > 0) {
       return res.status(400).json({

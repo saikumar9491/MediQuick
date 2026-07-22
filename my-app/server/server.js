@@ -237,4 +237,4 @@ if (!isVercel) {
 
 // Export the app for Vercel serverless usage
 export default app;
-// Environment reload trigger: Razorpay credentials updated
+// Environment reload trigger: additionalImages schema and optional validations added
