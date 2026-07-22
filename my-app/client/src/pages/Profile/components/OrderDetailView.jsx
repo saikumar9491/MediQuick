@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowLeft, Package, Truck, Calendar, CreditCard, ShoppingBag, Download, ArrowRight, ShieldAlert, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCart } from '../../../context/CartContext';
@@ -130,6 +131,15 @@ const OrderDetailView = ({ order, onBack, token }) => {
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-slate-800 truncate">{item.name}</p>
                 <p className="text-[10px] text-slate-400 mt-0.5">Quantity: {item.quantity}</p>
+                {order.status === 'Delivered' && (item.productId || item._id) && (
+                  <Link
+                    to={`/product/${item.productId || item._id}`}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-teal-50 hover:bg-teal-100 text-[#00a2a4] text-[10px] font-black mt-1.5 transition-colors border border-teal-100"
+                  >
+                    <Star size={10} className="fill-amber-400 text-amber-400 stroke-none" />
+                    <span>Rate Product</span>
+                  </Link>
+                )}
               </div>
               <div className="text-right">
                 <p className="text-xs font-bold text-slate-800">₹{item.price * item.quantity}</p>
