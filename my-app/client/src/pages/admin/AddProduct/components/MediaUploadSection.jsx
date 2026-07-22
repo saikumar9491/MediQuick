@@ -8,6 +8,9 @@ const MediaUploadSection = ({ formData, onChange }) => {
   const [urlInput, setUrlInput] = useState('');
   const fileInputRef = useRef(null);
 
+  // Filter out any copy of the primary image from the additional images list to prevent duplication
+  const additionalImages = (formData.additionalImages || []).filter(img => img && img !== formData.image);
+
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -178,7 +181,7 @@ const MediaUploadSection = ({ formData, onChange }) => {
         
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {/* Render added thumbnails */}
-          {(formData.additionalImages || []).map((imgUrl, index) => (
+          {additionalImages.map((imgUrl, index) => (
             <div key={index} className="relative aspect-square border border-slate-200 rounded-xl overflow-hidden group bg-slate-50/50 flex items-center justify-center p-2">
               <img 
                 src={imgUrl} 
@@ -189,7 +192,7 @@ const MediaUploadSection = ({ formData, onChange }) => {
                 <button
                   type="button"
                   onClick={() => {
-                    const updated = formData.additionalImages.filter((_, i) => i !== index);
+                    const updated = additionalImages.filter((_, i) => i !== index);
                     onChange('additionalImages', updated);
                   }}
                   className="p-1.5 bg-white rounded-full text-red-600 hover:bg-red-50 cursor-pointer shadow-sm"
@@ -205,15 +208,19 @@ const MediaUploadSection = ({ formData, onChange }) => {
           ))}
 
           {/* Render blank slots */}
-          {(!formData.additionalImages || formData.additionalImages.length < 4) && (
+          {additionalImages.length < 4 && (
             <div className="border border-dashed border-slate-350 rounded-xl aspect-square flex flex-col items-center justify-center p-3 bg-slate-50/40">
               <button
                 type="button"
                 onClick={() => {
                   const inputUrl = prompt("Enter additional image URL link:");
                   if (inputUrl && inputUrl.trim()) {
-                    const current = formData.additionalImages || [];
-                    onChange('additionalImages', [...current, inputUrl.trim()]);
+                    const trimmed = inputUrl.trim();
+                    if (trimmed === formData.image) {
+                      toast.error("This is already the primary image!");
+                      return;
+                    }
+                    onChange('additionalImages', [...additionalImages, trimmed]);
                     toast.success('Gallery image added');
                   }
                 }}
@@ -240,8 +247,11 @@ const MediaUploadSection = ({ formData, onChange }) => {
                         const fullUrl = res.imageUrl.startsWith('/') 
                           ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${res.imageUrl}`
                           : res.imageUrl;
-                        const current = formData.additionalImages || [];
-                        onChange('additionalImages', [...current, fullUrl]);
+                        if (fullUrl === formData.image) {
+                          toast.error("This is already the primary image!");
+                          return;
+                        }
+                        onChange('additionalImages', [...additionalImages, fullUrl]);
                         toast.success('Gallery image uploaded successfully!');
                       }
                     } catch (err) {
