@@ -477,6 +477,7 @@ const MedicinesPage = () => {
           </aside>
 
           {/* PRODUCT GRID SECTION */}
+          <div className="flex-1 min-w-0">
             {loading ? (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3.5">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => (
