@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import BasicInfoSection from './components/BasicInfoSection';
@@ -38,6 +38,8 @@ const initialFormState = {
   ingredients: '',
   verifiedAuthentic: false,
   tagline: '',
+  isBestseller: false,
+  keyFeatures: ['', '', ''],
   displayAttributes: [
     { label: '', value: '' },
     { label: '', value: '' }
@@ -46,7 +48,10 @@ const initialFormState = {
 
 const AddProduct = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id: pathId } = useParams();
+  const [searchParams] = useSearchParams();
+  const queryId = searchParams.get('edit');
+  const id = pathId || queryId;
   const isEditMode = Boolean(id);
 
   const [formData, setFormData] = useState(initialFormState);
@@ -55,10 +60,13 @@ const AddProduct = () => {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    if (isEditMode) {
+    if (isEditMode && id) {
       loadProduct();
+    } else {
+      setFormData(initialFormState);
+      setInitialLoading(false);
     }
-  }, [id]);
+  }, [id, isEditMode]);
 
   const loadProduct = async () => {
     try {
@@ -77,6 +85,14 @@ const AddProduct = () => {
       const formattedAttrs = [
         { label: rawAttrs[0]?.label || '', value: rawAttrs[0]?.value || '' },
         { label: rawAttrs[1]?.label || '', value: rawAttrs[1]?.value || '' }
+      ];
+
+      // Populate keyFeatures to ensure exactly 3 slots
+      const rawFeats = product.keyFeatures || [];
+      const formattedFeats = [
+        rawFeats[0] || '',
+        rawFeats[1] || '',
+        rawFeats[2] || ''
       ];
 
       setFormData({
@@ -106,7 +122,9 @@ const AddProduct = () => {
         ingredients: product.ingredients || '',
         verifiedAuthentic: product.verifiedAuthentic || false,
         tagline: product.tagline || '',
-        displayAttributes: formattedAttrs
+        isBestseller: product.isBestseller || false,
+        displayAttributes: formattedAttrs,
+        keyFeatures: formattedFeats
       });
     } catch (error) {
       toast.error('Failed to load product details');
@@ -171,7 +189,10 @@ const AddProduct = () => {
         lowStockThreshold: Number(formData.lowStockThreshold),
         displayAttributes: (formData.displayAttributes || [])
           .map(attr => ({ label: attr.label?.trim(), value: attr.value?.trim() }))
-          .filter(attr => attr.label && attr.value)
+          .filter(attr => attr.label && attr.value),
+        keyFeatures: (formData.keyFeatures || [])
+          .map(feat => feat.trim())
+          .filter(Boolean)
       };
 
       if (isEditMode) {
