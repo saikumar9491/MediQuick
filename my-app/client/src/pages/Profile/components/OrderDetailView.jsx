@@ -4,10 +4,13 @@ import { ArrowLeft, Package, Truck, Calendar, CreditCard, ShoppingBag, Download,
 import toast from 'react-hot-toast';
 import { useCart } from '../../../context/CartContext';
 import { addItem } from '../../../api/cart';
+import { ReviewForm } from '../../../components/ReviewForm';
 
 const OrderDetailView = ({ order, onBack, token }) => {
   const { addToCart } = useCart();
   const [reordering, setReordering] = useState(false);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [activeProductId, setActiveProductId] = useState(null);
 
   const steps = [
     { label: 'Order Placed', done: true },
@@ -132,13 +135,16 @@ const OrderDetailView = ({ order, onBack, token }) => {
                 <p className="text-xs font-semibold text-slate-800 truncate">{item.name}</p>
                 <p className="text-[10px] text-slate-400 mt-0.5">Quantity: {item.quantity}</p>
                 {order.status === 'Delivered' && (item.productId || item._id) && (
-                  <Link
-                    to={`/medicines/${item.productId || item._id}#rate`}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-teal-50 hover:bg-teal-100 text-[#00a2a4] text-[10px] font-black mt-1.5 transition-colors border border-teal-100"
+                  <button
+                    onClick={() => {
+                      setActiveProductId(item.productId || item._id);
+                      setReviewModalOpen(true);
+                    }}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-teal-50 hover:bg-teal-100 text-[#00a2a4] text-[10px] font-black mt-1.5 transition-colors border border-teal-100 cursor-pointer"
                   >
                     <Star size={10} className="fill-amber-400 text-amber-400 stroke-none" />
                     <span>Rate Product</span>
-                  </Link>
+                  </button>
                 )}
               </div>
               <div className="text-right">
@@ -183,6 +189,24 @@ const OrderDetailView = ({ order, onBack, token }) => {
           </div>
         </div>
       </div>
+
+      {/* Product Rating Modal */}
+      {reviewModalOpen && activeProductId && (
+        <ReviewForm
+          isOpen={reviewModalOpen}
+          onClose={() => {
+            setReviewModalOpen(false);
+            setActiveProductId(null);
+          }}
+          productId={activeProductId}
+          token={token}
+          onSubmit={() => {
+            setReviewModalOpen(false);
+            setActiveProductId(null);
+            toast.success('Thank you for your rating!');
+          }}
+        />
+      )}
     </div>
   );
 };
