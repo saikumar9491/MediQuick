@@ -269,7 +269,7 @@ router.post('/', verifyToken, async (req, res) => {
       images: images || [],
       user: userId,
       orderId: deliveredOrder._id,
-      isApproved: false // Moderated by default
+      isApproved: true // Approved by default
     };
 
     medicine.reviews.push(review);
@@ -277,7 +277,7 @@ router.post('/', verifyToken, async (req, res) => {
     
     await recalculateMedicineRating(productId);
 
-    res.status(201).json({ message: 'Review submitted successfully. It is pending pharmacist approval.', review });
+    res.status(201).json({ message: 'Review submitted successfully.', review });
   } catch (err) {
     res.status(500).json({ message: 'Failed to submit review', error: err.message });
   }
@@ -312,12 +312,12 @@ router.patch('/:id', verifyToken, async (req, res) => {
     if (comment !== undefined) review.comment = comment;
     if (title !== undefined) review.title = title;
     if (images !== undefined) review.images = images;
-    review.isApproved = false; // Reset to pending approval
+    review.isApproved = true; // Keep active
 
     await medicine.save();
     await recalculateMedicineRating(medicine._id);
 
-    res.json({ message: 'Review updated successfully and is pending re-approval.', review });
+    res.json({ message: 'Review updated successfully.', review });
   } catch (err) {
     res.status(500).json({ message: 'Failed to update review', error: err.message });
   }
