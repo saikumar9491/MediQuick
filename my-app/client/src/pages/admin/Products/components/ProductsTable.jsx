@@ -43,8 +43,12 @@ export const ProductsTable = ({
 
         const response = await fetchProducts(params);
         
+        const rawMedicines = response.medicines || response.data || [];
+        const totalItemsCount = response.totalCount || response.total || 0;
+        const totalPagesCount = response.totalPages || 1;
+
         // Map the backend schema (Medicine.js) to the frontend table schema
-        const mappedData = response.data.map(item => ({
+        const mappedData = rawMedicines.map(item => ({
           id: item._id,
           name: item.name,
           generic: item.subCategory || 'N/A', 
@@ -58,8 +62,8 @@ export const ProductsTable = ({
         }));
 
         setProducts(mappedData);
-        setTotalPages(response.totalPages);
-        setTotalItems(response.total);
+        setTotalPages(totalPagesCount);
+        setTotalItems(totalItemsCount);
       } catch (err) {
         console.error('Failed to fetch products:', err);
       } finally {
