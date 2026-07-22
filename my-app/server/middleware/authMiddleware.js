@@ -25,7 +25,13 @@ export const verifyToken = async (req, res, next) => {
       return res.status(401).json({ message: "User no longer exists in Hub" });
     }
 
-    req.user = verified; // Attach payload { id, isAdmin } to req
+    req.user = {
+      ...verified,
+      _id: userExists._id,
+      name: userExists.name,
+      email: userExists.email,
+      role: userExists.role || 'user'
+    };
     next();
   } catch (error) {
     // Distinguish between expired and malformed tokens for better frontend debugging
