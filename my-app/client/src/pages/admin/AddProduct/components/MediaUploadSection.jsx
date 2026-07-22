@@ -61,12 +61,19 @@ const MediaUploadSection = ({ formData, onChange }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-900 mb-4">Product Media</h2>
+    <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-6">
+      <div>
+        <h2 className="text-lg font-semibold text-slate-900 mb-1">Product Media</h2>
+        <p className="text-xs text-slate-400">Manage the photos displayed for this product.</p>
+      </div>
       
       <div className="space-y-4">
+        <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+          Primary Product Image
+        </label>
+        
         {formData.image ? (
-          <div className="relative inline-block border border-slate-200 rounded-lg overflow-hidden group">
+          <div className="relative inline-block border border-slate-200 rounded-lg overflow-hidden group bg-slate-50/50">
             <img 
               src={formData.image} 
               alt="Product Preview" 
@@ -158,6 +165,97 @@ const MediaUploadSection = ({ formData, onChange }) => {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Additional Photos Section */}
+      <div className="mt-8 pt-6 border-t border-slate-200">
+        <div className="mb-4">
+          <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+            Additional Photos / Gallery (Max 4)
+          </label>
+          <p className="text-xs text-slate-400">These will appear in the thumbnail gallery on the product detail page.</p>
+        </div>
+        
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {/* Render added thumbnails */}
+          {(formData.additionalImages || []).map((imgUrl, index) => (
+            <div key={index} className="relative aspect-square border border-slate-200 rounded-xl overflow-hidden group bg-slate-50/50 flex items-center justify-center p-2">
+              <img 
+                src={imgUrl} 
+                alt={`Additional ${index + 1}`} 
+                className="max-h-full max-w-full object-contain p-1"
+              />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const updated = formData.additionalImages.filter((_, i) => i !== index);
+                    onChange('additionalImages', updated);
+                  }}
+                  className="p-1.5 bg-white rounded-full text-red-600 hover:bg-red-50 cursor-pointer shadow-sm"
+                  title="Remove image"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-white/95 rounded text-[8px] font-black text-slate-550 border border-slate-200/50 uppercase">
+                Slide {index + 1}
+              </div>
+            </div>
+          ))}
+
+          {/* Render blank slots */}
+          {(!formData.additionalImages || formData.additionalImages.length < 4) && (
+            <div className="border border-dashed border-slate-350 rounded-xl aspect-square flex flex-col items-center justify-center p-3 bg-slate-50/40">
+              <button
+                type="button"
+                onClick={() => {
+                  const inputUrl = prompt("Enter additional image URL link:");
+                  if (inputUrl && inputUrl.trim()) {
+                    const current = formData.additionalImages || [];
+                    onChange('additionalImages', [...current, inputUrl.trim()]);
+                    toast.success('Gallery image added');
+                  }
+                }}
+                className="text-[10px] bg-[#00a2a4] hover:bg-[#00898b] text-white px-2 py-1.5 rounded-lg font-bold transition-all w-full text-center shadow-xs cursor-pointer mb-2"
+              >
+                + Add Link
+              </button>
+              <div className="text-[9px] text-slate-400 font-bold text-center">OR</div>
+              
+              <label className="text-[10px] text-center font-bold text-slate-500 hover:text-[#00a2a4] cursor-pointer mt-1.5 underline">
+                Upload File
+                <input 
+                  type="file"
+                  onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    try {
+                      const data = new FormData();
+                      data.append('image', file);
+                      toast.loading('Uploading gallery image...', { id: 'gallery-upload' });
+                      const res = await uploadProductImage(data);
+                      toast.dismiss('gallery-upload');
+                      if (res && res.imageUrl) {
+                        const fullUrl = res.imageUrl.startsWith('/') 
+                          ? `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}${res.imageUrl}`
+                          : res.imageUrl;
+                        const current = formData.additionalImages || [];
+                        onChange('additionalImages', [...current, fullUrl]);
+                        toast.success('Gallery image uploaded successfully!');
+                      }
+                    } catch (err) {
+                      toast.dismiss('gallery-upload');
+                      toast.error('Failed to upload image');
+                    }
+                  }}
+                  accept="image/*"
+                  className="hidden"
+                />
+              </label>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -40,6 +40,7 @@ const initialFormState = {
   tagline: '',
   isBestseller: false,
   keyFeatures: ['', '', ''],
+  additionalImages: [],
   displayAttributes: [
     { label: '', value: '' },
     { label: '', value: '' }
@@ -124,7 +125,8 @@ const AddProduct = () => {
         tagline: product.tagline || '',
         isBestseller: product.isBestseller || false,
         displayAttributes: formattedAttrs,
-        keyFeatures: formattedFeats
+        keyFeatures: formattedFeats,
+        additionalImages: product.additionalImages || []
       });
     } catch (error) {
       toast.error('Failed to load product details');

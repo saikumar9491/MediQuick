@@ -53,6 +53,9 @@ const medicineSchema = mongoose.Schema({
   ingredients: { type: String, default: '' },
   verifiedAuthentic: { type: Boolean, default: false },
   tagline: { type: String, default: '' },
+  isBestseller: { type: Boolean, default: false },
+  keyFeatures: [{ type: String }],
+  additionalImages: [String],
   displayAttributes: [
     {
       label: { type: String },

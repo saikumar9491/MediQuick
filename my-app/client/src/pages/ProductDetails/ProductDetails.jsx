@@ -276,6 +276,7 @@ const ProductDetails = () => {
               name={medicine.name}
               verifiedAuthentic={medicine.verifiedAuthentic}
               needsRx={medicine.needsRx}
+              additionalImages={medicine.additionalImages}
             />
           </div>
           

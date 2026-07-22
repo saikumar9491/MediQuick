@@ -1,13 +1,18 @@
 import React, { useState, useRef } from 'react';
 import { ShieldCheck, ClipboardList } from 'lucide-react';
 
-export const ImageGallery = ({ image, name, verifiedAuthentic, needsRx }) => {
+export const ImageGallery = ({ image, name, verifiedAuthentic, needsRx, additionalImages = [] }) => {
   const [zoomPos, setZoomPos] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
   const imgRef = useRef(null);
 
-  const images = [image, image, image].filter(Boolean);
+  const images = [image, ...(additionalImages || [])].filter(Boolean);
   const [selectedImage, setSelectedImage] = useState(image);
+
+  // Sync state if image from prop changes
+  React.useEffect(() => {
+    setSelectedImage(image);
+  }, [image]);
 
   const handleMouseMove = (e) => {
     if (!imgRef.current) return;
