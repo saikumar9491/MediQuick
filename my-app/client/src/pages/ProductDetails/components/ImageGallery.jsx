@@ -6,7 +6,7 @@ export const ImageGallery = ({ image, name, verifiedAuthentic, needsRx, addition
   const [isHovering, setIsHovering] = useState(false);
   const imgRef = useRef(null);
 
-  const images = [image, ...(additionalImages || [])].filter(Boolean);
+  const images = Array.from(new Set([image, ...(additionalImages || [])])).filter(Boolean);
   const [selectedImage, setSelectedImage] = useState(image);
 
   // Sync state if image from prop changes
