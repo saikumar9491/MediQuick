@@ -8,27 +8,15 @@ import {
   Plus, 
   Minus,
   FileText,
-  ShoppingCart,
-  Sun,
-  Zap,
-  Shield,
-  Sparkles,
-  Flame
+  Lock,
+  ChevronRight,
+  ShoppingBag
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { API_BASE } from '../../utils/apiConfig';
 import { subscribeToRestock } from '../../api/wishlist';
 import toast from 'react-hot-toast';
-
-const getAttributeIcon = (label) => {
-  const l = (label || '').toLowerCase();
-  if (l.includes('spf') || l.includes('sun')) return Sun;
-  if (l.includes('strength') || l.includes('dose') || l.includes('mg') || l.includes('tablet') || l.includes('form')) return Zap;
-  if (l.includes('skin') || l.includes('type')) return Shield;
-  if (l.includes('serving') || l.includes('size') || l.includes('container') || l.includes('capsule')) return Sparkles;
-  return FileText;
-};
 
 const ProductCard = ({
   _id,
@@ -40,11 +28,7 @@ const ProductCard = ({
   countInStock,
   needsRx = false,
   tagline,
-  isBestseller = false,
-  keyFeatures = [],
   displayAttributes = [],
-  rating = 0,
-  numReviews = 0,
   category,
   onRemove,
   onUndo
@@ -141,7 +125,7 @@ const ProductCard = ({
             <button
               onClick={() => {
                 toast.dismiss(t.id);
-                onUndo({ _id, name, brand, price, image, discountPrice, countInStock, category, tagline, isBestseller, keyFeatures, displayAttributes });
+                onUndo({ _id, name, brand, price, image, discountPrice, countInStock, category, tagline, displayAttributes });
               }}
               className="text-[#00a2a4] font-bold hover:underline"
             >
@@ -183,38 +167,38 @@ const ProductCard = ({
 
   const cleanName = name ? name.split(' (')[0].split(' - ')[0] : 'Healthcare Product';
 
-  // Floating highlight badge configuration
-  const validAttributes = (displayAttributes || []).filter(attr => attr && attr.label && attr.value);
-  const firstAttr = validAttributes[0];
-  const AttrIcon = firstAttr ? getAttributeIcon(firstAttr.label) : null;
+  // Live stock pill configurations
+  let stockStatusColor = 'bg-emerald-500';
+  let stockStatusBg = 'bg-emerald-50 text-emerald-700 border-emerald-100';
+  let stockStatusText = 'In Stock';
 
-  // Key features filter
-  const validFeatures = (keyFeatures || []).map(f => f?.trim()).filter(Boolean);
+  if (isOutOfStock) {
+    stockStatusColor = 'bg-rose-500';
+    stockStatusBg = 'bg-rose-550/10 text-rose-700 border-rose-100';
+    stockStatusText = 'Out of Stock';
+  } else if (countInStock < 10) {
+    stockStatusColor = 'bg-amber-500';
+    stockStatusBg = 'bg-amber-50 text-amber-700 border-amber-100';
+    stockStatusText = `Only ${countInStock} Left`;
+  }
+
+  // Filter displayAttributes to exclude empty values
+  const activeAttributes = (displayAttributes || []).filter(attr => attr && attr.label && attr.value);
 
   return (
     <div
       onClick={() => navigate(`/product/${_id}`)}
-      className="group relative flex w-full h-full flex-col bg-white border border-slate-200 rounded-[28px] p-5 transition-all duration-300 hover:shadow-lg hover:border-slate-300 overflow-hidden cursor-pointer"
+      className="group relative flex w-full h-full flex-col bg-white border border-slate-200 rounded-2xl p-4 transition-all duration-200 hover:border-[#00a2a4] hover:shadow-lg overflow-hidden cursor-pointer"
     >
-      {/* 1. TOP ROW */}
-      <div className="flex items-center justify-between gap-2 z-10 mb-4 min-h-[30px]">
-        {/* BESTSELLER badge (left) */}
-        {isBestseller ? (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.04)] text-[9px] font-black uppercase text-[#FF7A00] tracking-wider">
-            <Flame size={12} className="fill-[#FF7A00] text-[#FF7A00] stroke-[2.5]" />
-            <span>Bestseller</span>
-          </div>
-        ) : (
-          <div /> // Spacer
-        )}
-
-        {/* Wishlist Heart Icon (right) */}
+      {/* 1. TOP STATUS ROW */}
+      <div className="flex items-center justify-between gap-2 z-10 mb-3 min-h-[30px]">
+        {/* Wishlist Heart Icon (Left) */}
         <button
           onClick={handleWishlistToggle}
-          className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors cursor-pointer bg-white shadow-sm ${
+          className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all cursor-pointer ${
             isInWishlist
-              ? 'border-rose-200 text-[#FF7A00]'
-              : 'border-slate-200 text-slate-400 hover:text-slate-650'
+              ? 'bg-rose-50 border-rose-200 text-rose-600'
+              : 'bg-slate-50 border-slate-200 text-slate-400 hover:bg-slate-100 hover:text-slate-650'
           }`}
           title={isInWishlist ? 'Remove from wishlist' : 'Save to wishlist'}
         >
@@ -223,157 +207,119 @@ const ProductCard = ({
             className={`${isInWishlist ? 'fill-rose-500 stroke-rose-500 text-rose-500' : ''}`}
           />
         </button>
+
+        {/* Stock Status Pill (Right) */}
+        <div className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-[10px] font-bold ${stockStatusBg}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${stockStatusColor} animate-pulse`} />
+          <span>{stockStatusText}</span>
+        </div>
       </div>
 
-      {/* 2. PRODUCT IMAGE AREA WITH PODESTAL & HALO BACKDROP */}
-      <div className="relative flex h-36 w-full items-center justify-center rounded-2xl mb-4 overflow-hidden bg-slate-50/20">
-        
-        {/* Soft circular backdrop halo */}
-        <div className="absolute top-2 w-32 h-32 rounded-full border-[6px] border-[#cbebec]/40 bg-gradient-to-b from-[#e3f7f7]/50 to-transparent z-0" />
-
-        {/* 3D Cylindrical Pedestal */}
-        <div className="absolute bottom-2.5 w-28 h-6 flex flex-col items-center justify-end z-0">
-          <div className="w-28 h-4.5 bg-[#00b2b5] rounded-full border-b border-teal-700/20 z-10" />
-          <div className="w-28 h-4.5 bg-[#009295] -mt-2.5 rounded-b-full shadow-[0_4px_10px_rgba(0,146,149,0.35)]" />
-        </div>
-
-        {/* Floating leaves for botantical touch */}
-        <div className="absolute left-4 top-10 opacity-30 w-2.5 h-3 bg-emerald-400 rounded-tr-[100%] rounded-bl-[100%] rotate-[15deg] z-0" />
-        <div className="absolute right-5 bottom-10 opacity-35 w-2 h-2.5 bg-emerald-400 rounded-tr-[100%] rounded-bl-[100%] rotate-[-45deg] z-0" />
-
-        {/* Product Photo */}
+      {/* 2. PRODUCT IMAGE CONTAINER */}
+      <div className="relative flex h-32 w-full items-center justify-center bg-slate-50/60 rounded-xl p-3 mb-3 border border-slate-100/50 overflow-hidden">
         <img
           src={image || 'https://placehold.co/300x300?text=Medicine'}
           alt={name}
           loading="lazy"
-          className="relative z-10 max-h-24 max-w-[80%] object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
+          className="h-full w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
           onError={(e) => {
             e.target.src = 'https://placehold.co/300x300?text=No+Image';
           }}
         />
-
-        {/* Out of Stock Overlay */}
-        {isOutOfStock && (
-          <div className="absolute inset-0 z-20 bg-slate-900/60 backdrop-blur-[1px] flex items-center justify-center p-2 rounded-2xl">
-            <span className="px-2.5 py-1 bg-white text-rose-600 rounded-full text-[9px] font-black uppercase tracking-wider shadow-md">
-              Out of Stock
-            </span>
-          </div>
-        )}
-
-        {/* Overlapping feature highlight badge (floating) */}
-        {firstAttr && (
-          <div 
-            className="absolute bottom-2 left-4 z-20 w-11 h-11 rounded-full bg-[#00a2a4] text-white flex flex-col items-center justify-center shadow-md"
-            title={`${firstAttr.label}: ${firstAttr.value}`}
-          >
-            {AttrIcon && <AttrIcon size={12} className="stroke-[2.5]" />}
-            <span className="text-[6.5px] font-black uppercase leading-none mt-0.5 max-w-[34px] truncate">{firstAttr.value}</span>
-          </div>
-        )}
       </div>
 
-      {/* 3. BRAND + PRODUCT NAME */}
+      {/* 3. BRAND + TAGLINE / DESCRIPTION */}
       <div className="space-y-1 mb-2">
-        <p className="text-[10px] font-extrabold uppercase tracking-wider text-[#00a2a4]">
+        <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
           {brand || 'Generic'}
         </p>
-        <h3 className="line-clamp-2 text-sm font-extrabold leading-snug text-[#0c1e36] min-h-[40px]">
-          {cleanName}
+        <h3 className="line-clamp-2 text-xs font-bold leading-normal text-slate-800 group-hover:text-[#00a2a4] transition-colors min-h-[36px]">
+          {tagline && tagline.trim() ? tagline : cleanName}
         </h3>
       </div>
 
-      {/* 4. FEATURE BULLETS */}
-      {validFeatures.length > 0 && (
-        <div className="text-[10px] font-medium text-slate-400 mb-2 truncate">
-          {validFeatures.slice(0, 3).join(' \u00b7 ')}
+      {/* 4. FLEXIBLE ATTRIBUTE ROW */}
+      {activeAttributes.length > 0 && (
+        <div className="grid grid-cols-2 gap-2 mb-3">
+          {activeAttributes.slice(0, 2).map((attr, idx) => (
+            <div key={idx} className="bg-slate-50 border border-slate-100 rounded-lg p-1.5 text-center flex flex-col justify-center min-h-[38px]">
+              <span className="text-[8px] uppercase font-bold text-slate-400 leading-none mb-0.5 truncate">{attr.label}</span>
+              <span className="text-[10px] font-extrabold text-slate-700 leading-tight truncate">{attr.value}</span>
+            </div>
+          ))}
         </div>
       )}
 
-      {/* 5. RATING ROW */}
-      <div className="flex items-center gap-1 mb-4 text-xs font-semibold text-slate-600">
-        {rating && rating > 0 ? (
-          <div className="flex items-center gap-1">
-            <Star size={12} className="fill-amber-400 text-amber-400 stroke-none" />
-            <span className="text-slate-800 font-bold">{rating.toFixed(1)}</span>
-            <span className="text-slate-400 text-[11px]">({numReviews} reviews)</span>
-          </div>
-        ) : (
-          <span className="px-1.5 py-0.5 bg-sky-50 text-sky-700 rounded text-[9px] font-black uppercase tracking-wider border border-sky-100">
-            New
-          </span>
-        )}
-      </div>
-
-      {/* 6. PRICE + CIRCULAR CART BUTTON ROW */}
-      <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-        {/* Price & Discount */}
-        <div className="flex flex-col">
+      {/* Push everything below to the bottom */}
+      <div className="mt-auto pt-2.5 border-t border-slate-100 space-y-3.5">
+        {/* 5. PRICE SECTION */}
+        <div className="flex items-center justify-between">
           <div className="flex items-baseline gap-1.5">
-            <span className="text-xl font-black text-[#0c1e36] tracking-tight">₹{finalPrice}</span>
+            <span className="text-base font-extrabold text-slate-900">₹{finalPrice}</span>
             {hasDiscount && (
-              <span className="text-xs text-slate-400 line-through font-semibold">₹{mrp}</span>
+              <span className="text-xs text-slate-450 line-through">MRP ₹{mrp}</span>
             )}
           </div>
           {hasDiscount && (
-            <div className="mt-1">
-              <span className="text-[9px] font-bold text-[#00a2a4] bg-teal-50 border border-teal-200/50 px-2 py-0.5 rounded-full">
-                {discountPercent}% OFF
-              </span>
-            </div>
+            <span className="px-2 py-0.5 rounded bg-emerald-600 text-white text-[9px] font-bold uppercase tracking-wider">
+              {discountPercent}% OFF
+            </span>
           )}
         </div>
 
-        {/* Action Button */}
+        {/* 6. CTA BUTTON ROW */}
         <div>
           {isOutOfStock ? (
             <button
               onClick={handleSubscribe}
               disabled={subscribing || isSubscribed}
-              className="w-11 h-11 rounded-full border border-slate-200 bg-slate-50 text-slate-500 hover:bg-slate-100 flex items-center justify-center cursor-pointer transition-all shadow-xs"
-              title="Notify when back in stock"
+              className="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl border border-slate-350 text-xs font-bold text-slate-600 bg-slate-50 hover:bg-slate-100 transition-all cursor-pointer shadow-xs"
             >
               {subscribing ? (
                 <Loader2 size={13} className="animate-spin text-[#00a2a4]" />
               ) : isSubscribed ? (
                 <CheckCircle2 size={13} className="text-emerald-600" />
               ) : (
-                <Bell size={13} />
+                <Bell size={13} className="text-slate-500" />
               )}
+              <span>{isSubscribed ? 'Alert Set' : 'Notify Me'}</span>
             </button>
           ) : currentQuantity > 0 ? (
-            /* Circular Quantity Controller */
-            <div className="flex items-center gap-1.5 bg-[#00a2a4] text-white rounded-full p-0.5 shadow-md">
+            /* Quantity Modifier counter */
+            <div className="w-full flex items-center justify-between bg-[#00a2a4] text-white rounded-xl p-1 shadow-sm">
               <button
                 onClick={handleDecrement}
-                className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/35 flex items-center justify-center text-white cursor-pointer transition-colors"
+                className="w-7.5 h-7.5 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center text-white cursor-pointer transition-colors"
                 title="Decrease"
               >
-                <Minus size={12} className="stroke-[3]" />
+                <Minus size={13} className="stroke-[3]" />
               </button>
 
-              <span className="text-xs font-black px-1">{currentQuantity}</span>
+              <span className="text-xs font-bold px-2">{currentQuantity} in cart</span>
 
               <button
                 onClick={handleIncrement}
-                className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/35 flex items-center justify-center text-white cursor-pointer transition-colors"
+                className="w-7.5 h-7.5 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center text-white cursor-pointer transition-colors"
                 title="Increase"
               >
-                <Plus size={12} className="stroke-[3]" />
+                <Plus size={13} className="stroke-[3]" />
               </button>
             </div>
           ) : (
-            /* Circular Cart Button */
+            /* Full-width primary CTA button with right-arrow */
             <button
               onClick={handleAdd}
               disabled={addingToCart}
-              className="w-11 h-11 rounded-full bg-[#00a2a4] hover:bg-[#00898b] text-white flex items-center justify-center cursor-pointer transition-all shadow-[0_4px_12px_rgba(0,162,164,0.25)] hover:shadow-[#00a2a4]/40 hover:-translate-y-0.5 active:scale-95"
-              title={needsRx ? "Add to Cart (Rx Required)" : "Add to Cart"}
+              className="w-full flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-[#00a2a4] hover:bg-[#00898b] text-white text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-98"
             >
               {addingToCart ? (
                 <Loader2 size={14} className="animate-spin text-white" />
               ) : (
-                <ShoppingCart size={14} className="stroke-[2.5]" />
+                <>
+                  {needsRx && <Lock size={12} className="text-white/90" />}
+                  <span>{needsRx ? 'Add to Cart (Rx Required)' : 'Add to Cart'}</span>
+                  <ChevronRight size={14} className="ml-auto text-white/80" />
+                </>
               )}
             </button>
           )}
