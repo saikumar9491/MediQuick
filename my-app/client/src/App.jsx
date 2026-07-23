@@ -71,7 +71,6 @@ import WhatsAppSupport from './components/common/WhatsAppSupport';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import ErrorBoundary from './components/common/ErrorBoundary';
-import BottomNav from './components/common/BottomNav';
 import ScrollToTop from './components/common/ScrollToTop';
 
 const ProtectedRoute = () => {
@@ -260,7 +259,6 @@ function AppLayout({ medicines, featured, loading }) {
       </main>
 
       {!shouldHideFooter && <Footer />}
-      {!shouldHideFooter && <BottomNav />}
       {!shouldHideWhatsApp && <WhatsAppSupport />}
     </>
   );
