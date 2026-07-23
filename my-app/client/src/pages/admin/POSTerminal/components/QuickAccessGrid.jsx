@@ -11,9 +11,15 @@ export const QuickAccessGrid = ({ onAdd }) => {
     const fetchQuickAccess = async () => {
       try {
         // Fetch trending items to use as quick access
-        const res = await axios.get(`${API_BASE}/api/medicines?trending=true&limit=8`);
-        // Filter out items with 0 stock to make it more useful
-        const available = (res.data.medicines || res.data).filter(m => m.countInStock > 0);
+        const res = await axios.get(`${API_BASE}/api/medicines?trending=true&limit=12`);
+        let available = (res.data.medicines || res.data || []).filter(m => m.countInStock > 0);
+        
+        // Fallback to general medicines if no trending medicines are available in stock
+        if (available.length === 0) {
+          const fallbackRes = await axios.get(`${API_BASE}/api/medicines?limit=20`);
+          available = (fallbackRes.data.medicines || fallbackRes.data || []).filter(m => m.countInStock > 0);
+        }
+        
         setItems(available.slice(0, 8)); // Ensure max 8
       } catch (err) {
         console.error('Failed to fetch quick access items', err);
