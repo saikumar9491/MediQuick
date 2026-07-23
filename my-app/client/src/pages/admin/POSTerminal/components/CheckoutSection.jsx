@@ -195,6 +195,114 @@ export const CheckoutSection = ({
         </div>
       </div>
 
+      {/* Dynamic Payment Method Details */}
+      {cartItems.length > 0 && paymentMethod === 'UPI' && (
+        <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-4 text-center animate-in fade-in duration-300">
+          <div className="flex flex-col items-center justify-center space-y-2">
+            <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">
+              UPI Static QR Code (Scan to Pay)
+            </span>
+            
+            {/* Styled Animated QR Code Container */}
+            <div className="relative w-40 h-40 bg-white border border-slate-200 rounded-2xl flex items-center justify-center p-3 shadow-inner overflow-hidden group">
+              {/* Scan Line Animation */}
+              <div className="absolute left-0 right-0 h-0.5 bg-emerald-500 shadow-md shadow-emerald-400" 
+                   style={{
+                     animation: 'scanAnimation 2s infinite ease-in-out',
+                     top: '0%'
+                   }} />
+              
+              <svg className="w-full h-full text-slate-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                {/* Outer borders */}
+                <path d="M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6" strokeLinecap="round" strokeLinejoin="round" />
+                {/* Top-left position block */}
+                <rect x="5" y="5" width="4" height="4" rx="0.5" fill="currentColor" />
+                {/* Top-right position block */}
+                <rect x="15" y="5" width="4" height="4" rx="0.5" fill="currentColor" />
+                {/* Bottom-left position block */}
+                <rect x="5" y="15" width="4" height="4" rx="0.5" fill="currentColor" />
+                {/* Inside details */}
+                <path d="M12 7v5h3M12 15h.01M16 12h2v3M9 12H7" strokeLinecap="round" />
+                <rect x="15" y="15" width="2" height="2" rx="0.2" fill="currentColor" />
+              </svg>
+            </div>
+            
+            <p className="text-xs font-bold text-slate-700">₹{total} (Inclusive of Taxes)</p>
+            <p className="text-[10px] text-slate-400">MediQuick Merchant ID: <span className="font-mono text-slate-500">mediquick@upi</span></p>
+          </div>
+          <div className="text-[10px] bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg p-2 font-bold flex items-center justify-center gap-1.5">
+            <Smartphone className="w-3.5 h-3.5 animate-pulse" />
+            Awaiting payment confirmation...
+          </div>
+          
+          {/* Keyframe style injection inside component */}
+          <style>{`
+            @keyframes scanAnimation {
+              0% { top: 5%; }
+              50% { top: 95%; }
+              100% { top: 5%; }
+            }
+          `}</style>
+        </div>
+      )}
+
+      {cartItems.length > 0 && paymentMethod === 'Card' && (
+        <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-4 animate-in fade-in duration-300">
+          <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">
+            Swipe or Enter Card Details
+          </span>
+          
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Cardholder Name</label>
+              <input 
+                type="text" 
+                placeholder="Name on Card"
+                className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs focus:ring-1 focus:ring-blue-500 text-slate-800 font-bold"
+              />
+            </div>
+            
+            <div className="space-y-1">
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Card Number</label>
+              <div className="relative">
+                <input 
+                  type="text" 
+                  placeholder="0000 0000 0000 0000"
+                  maxLength="19"
+                  className="w-full bg-white border border-slate-200 rounded-lg py-2 pl-3 pr-8 text-xs focus:ring-1 focus:ring-blue-500 text-slate-850 font-bold font-mono"
+                />
+                <CreditCard className="absolute right-2.5 top-2.5 h-4 w-4 text-slate-400" />
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-slate-500 uppercase tracking-wider">Expiry Date</label>
+                <input 
+                  type="text" 
+                  placeholder="MM/YY"
+                  maxLength="5"
+                  className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs focus:ring-1 focus:ring-blue-500 text-slate-850 font-bold font-mono"
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-slate-500 uppercase tracking-wider">CVV</label>
+                <input 
+                  type="password" 
+                  placeholder="•••"
+                  maxLength="3"
+                  className="w-full bg-white border border-slate-200 rounded-lg py-2 px-3 text-xs focus:ring-1 focus:ring-blue-500 text-slate-850 font-bold font-mono"
+                />
+              </div>
+            </div>
+          </div>
+          
+          <div className="text-[9px] text-slate-400 font-bold flex items-center justify-center gap-1">
+            🔒 POS Terminal PCI-DSS Compliant Connection
+          </div>
+        </div>
+      )}
+
       {/* Actions */}
       <div className="flex gap-3">
         <button 
