@@ -56,6 +56,7 @@ import Coupons from './pages/admin/Coupons/Coupons';
 import AbandonedCart from './pages/admin/AbandonedCart/AbandonedCart';
 import Marketing from './pages/admin/Marketing/Marketing';
 import DoctorDetailsPage from './pages/DoctorDetailsPage';
+import RaiseComplaint from './pages/RaiseComplaint';
 import LabTestsHome from './pages/LabTests/LabTestsHome';
 import LabTestDetail from './pages/LabTests/LabTestDetail';
 import LabTestBooking from './pages/LabTests/LabTestBooking';
@@ -196,6 +197,7 @@ function AppLayout({ medicines, featured, loading }) {
             <Route path="/lab_tests/:id/book" element={<LabTestBooking />} />
             <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
             <Route path="/my-orders" element={<MyOrders />} />
+            <Route path="/raise-complaint" element={<RaiseComplaint />} />
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/profile" element={<Profile />} />
           </Route>

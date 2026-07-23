@@ -5,6 +5,36 @@ import User from '../models/User.js';
 
 const router = express.Router();
 
+// POST /api/complaints - Create a new complaint (Customer)
+router.post('/', verifyToken, async (req, res) => {
+  try {
+    const { orderId, category, priority, description, images } = req.body;
+    
+    if (!category || !description) {
+      return res.status(400).json({ message: "Category and description are required" });
+    }
+
+    const complaint = new Complaint({
+      customerId: req.user._id,
+      orderId: orderId || undefined,
+      category,
+      priority: priority || 'Medium',
+      description,
+      images: images || []
+    });
+
+    complaint.statusHistory.push({
+      status: 'New',
+      changedBy: req.user._id
+    });
+
+    await complaint.save();
+    res.status(201).json({ message: "Complaint raised successfully", complaint });
+  } catch (err) {
+    res.status(500).json({ message: "Error raising complaint", error: err.message });
+  }
+});
+
 // GET /api/complaints - Paginated list with filters
 router.get('/', verifyToken, isAdmin, async (req, res) => {
   try {

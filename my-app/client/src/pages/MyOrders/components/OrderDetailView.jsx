@@ -17,7 +17,7 @@ const OrderDetailView = ({ order, onBack, token }) => {
   };
 
   const handleHelpRedirect = () => {
-    navigate('/complaints', { state: { orderId: order._id } });
+    navigate('/raise-complaint', { state: { orderId: order._id } });
   };
 
   // Simple timeline helper
