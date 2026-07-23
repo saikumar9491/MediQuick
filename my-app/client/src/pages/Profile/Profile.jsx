@@ -91,10 +91,10 @@ const Profile = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
         {/* MOBILE PROFILE HEADER (Mockup style) */}
-        <div className="block md:hidden bg-white border border-slate-100 rounded-2xl p-5 mb-4 shadow-3xs">
+        <div className="block md:hidden bg-white border border-slate-100 rounded-3xl p-5 mb-4 shadow-xs">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center font-black text-sm select-none">
-              {profile?.name ? profile.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+            <div className="w-14 h-14 rounded-full bg-[#0c2340] text-[#4895ef] flex items-center justify-center font-black text-lg select-none shadow-xs">
+              {profile?.name ? profile.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'RK'}
             </div>
             <div>
               <h2 className="text-base font-black text-slate-800 leading-tight">{profile?.name || 'Ravi Kumar'}</h2>
@@ -102,8 +102,8 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Tab selections */}
-          <div className="flex gap-6 mt-5 pt-4 border-t border-slate-100">
+          {/* Tab selections (Mockup Screen 5 Pill Tabs) */}
+          <div className="flex items-center gap-4 mt-5 pt-3">
             {[
               { id: 'orders', label: 'Orders' },
               { id: 'addresses', label: 'Address' },
@@ -114,22 +114,16 @@ const Profile = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`text-xs font-black uppercase tracking-wider transition-colors ${
-                    isSelected ? 'text-[#00a2a4] border-b-2 border-[#00a2a4] pb-1' : 'text-slate-450 hover:text-slate-650 pb-1'
+                  className={`text-xs font-black uppercase tracking-wider transition-all ${
+                    isSelected 
+                      ? 'bg-[#0c2340] text-white px-5 py-2 rounded-full shadow-xs' 
+                      : 'text-slate-400 hover:text-slate-800 px-2'
                   }`}
                 >
                   {tab.label}
                 </button>
               );
             })}
-            
-            {/* Quick Logout */}
-            <button 
-              onClick={handleLogout}
-              className="ml-auto text-xs font-black uppercase tracking-wider text-rose-500 hover:text-rose-700"
-            >
-              Logout
-            </button>
           </div>
         </div>
 

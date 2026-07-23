@@ -766,26 +766,22 @@ const Navbar = () => {
         )}
       </AnimatePresence>
 
-      {/* Mobile Bottom Navigation (Mockup Pill Style) */}
-      <nav className="fixed bottom-4 left-4 right-4 z-50 flex items-center justify-around bg-[#111111] px-2 h-14 rounded-full lg:hidden shadow-[0_12px_32px_rgba(0,0,0,0.3)] border border-white/5">
+      {/* Mobile Bottom Navigation (Exact Mockup Style) */}
+      <nav className="fixed bottom-4 left-5 right-5 z-50 flex items-center justify-around bg-[#181d28] h-14 rounded-full lg:hidden shadow-[0_12px_32px_rgba(0,0,0,0.4)] border border-white/10 px-4">
         {[
-          { icon: <Home size={18} />, label: 'Home', path: '/' },
-          { icon: <ShoppingBag size={18} />, label: 'Shop', path: '/medicines' },
-          { icon: <FlaskConical size={18} />, label: 'Labs', path: '/lab-tests' },
-          { icon: <Stethoscope size={18} />, label: 'Consult', path: '/consult' },
-          { icon: <User size={18} />, label: 'Account', path: '/profile' },
-        ].map((item) => (
+          { icon: <Home size={20} />, path: '/' },
+          { icon: <LayoutGrid size={20} />, path: '/medicines' },
+          { icon: <ShoppingBag size={20} />, path: '/cart' },
+          { icon: <User size={20} />, path: '/profile' },
+        ].map((item, idx) => (
           <Link
-            key={item.label}
+            key={idx}
             to={item.path}
-            className={`flex flex-col items-center justify-center transition-all ${
-              location.pathname === item.path ? 'text-white' : 'text-white/40 hover:text-white/80'
+            className={`flex items-center justify-center p-2 transition-all ${
+              location.pathname === item.path ? 'text-white scale-110' : 'text-slate-400 hover:text-white'
             }`}
           >
-            <span className={`${location.pathname === item.path ? 'scale-105' : ''} transition-transform`}>
-              {item.icon}
-            </span>
-            <span className="text-[8px] font-black uppercase tracking-wider mt-0.5" style={{ letterSpacing: '0.05em' }}>{item.label}</span>
+            {item.icon}
           </Link>
         ))}
       </nav>

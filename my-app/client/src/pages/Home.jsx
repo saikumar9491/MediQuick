@@ -109,29 +109,38 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   return (
     <div className="min-h-screen bg-[#f8fafc] pb-24">
       {/* MOBILE HERO Mockup Style */}
-      <div className="block sm:hidden px-4 py-12 text-center bg-white">
-        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Winter Wellness</h2>
-        <h1 className="text-2xl font-black text-slate-900 mt-1">Flat 25% off</h1>
-        <button onClick={() => navigate('/medicines')} className="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-800 border-b border-slate-800 pb-0.5">
-          Shop Now
-        </button>
+      <div className="block sm:hidden px-4 pt-4 pb-2">
+        {/* Dark Hero Banner Box */}
+        <div className="bg-[#181d28] rounded-3xl p-6 text-left shadow-lg relative overflow-hidden">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#7ba9e0]">WINTER WELLNESS</p>
+          <h1 className="text-2xl font-black text-white mt-1 leading-tight">Flat 25% off</h1>
+          <button 
+            onClick={() => navigate('/medicines')} 
+            className="mt-4 bg-white hover:bg-slate-100 h-7 px-5 rounded-full text-[10px] font-black uppercase tracking-widest text-[#181d28] flex items-center justify-center shadow-xs transition-transform active:scale-95"
+          >
+            Shop
+          </button>
+        </div>
       </div>
 
-      {/* MOBILE CATEGORIES BAR */}
-      <div className="block sm:hidden bg-white py-4 px-4 border-b border-slate-100">
-        <div className="flex gap-8 justify-center">
+      {/* MOBILE CATEGORIES BAR (Mockup Dark Boxes) */}
+      <div className="block sm:hidden py-4 px-4">
+        <div className="grid grid-cols-4 gap-3 max-w-xs mx-auto">
           {[
-            { label: 'Skin', path: '/medicines?filter=skin-care' },
-            { label: 'Hair', path: '/medicines?filter=hair-care' },
-            { label: 'Meds', path: '/medicines?filter=prescription' },
-            { label: 'Fit', path: '/medicines?filter=fitness' }
+            { label: 'Skin', path: '/medicines?filter=skin-care', icon: '✨' },
+            { label: 'Hair', path: '/medicines?filter=hair-care', icon: '🌿' },
+            { label: 'Meds', path: '/medicines?filter=prescription', icon: '💊' },
+            { label: 'Fit', path: '/medicines?filter=fitness', icon: '⚡' }
           ].map((cat, idx) => (
             <button
               key={idx}
               onClick={() => navigate(cat.path)}
-              className="text-[11px] font-black text-slate-700 uppercase tracking-widest hover:text-slate-900 transition-colors"
+              className="flex flex-col items-center gap-1.5 group cursor-pointer"
             >
-              {cat.label}
+              <div className="w-14 h-14 bg-[#181d28] rounded-2xl flex items-center justify-center shadow-xs text-lg group-active:scale-95 transition-transform">
+                <span>{cat.icon}</span>
+              </div>
+              <span className="text-[11px] font-black text-slate-500 uppercase tracking-wider">{cat.label}</span>
             </button>
           ))}
         </div>

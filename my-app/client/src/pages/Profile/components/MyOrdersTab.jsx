@@ -70,40 +70,44 @@ const MyOrdersTab = ({ token }) => {
           <p className="text-sm text-slate-500 font-medium">You haven't placed any orders yet</p>
         </div>
       ) : (
-        <div className="divide-y divide-slate-100/60">
-          {orders.map((order) => (
-            <div 
-              key={order._id} 
-              onClick={() => setSelectedOrder(order)}
-              className="py-3.5 flex flex-row items-center justify-between hover:bg-slate-50/45 px-2 rounded-xl transition-all cursor-pointer"
-            >
-              <div className="space-y-0.5">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs sm:text-sm font-black text-slate-800">
-                    #{order._id.substring(order._id.length - 6).toUpperCase()}
-                  </span>
-                  <span className="text-[10px] text-slate-400 hidden sm:inline">
-                    ({new Date(order.createdAt).toLocaleDateString()})
-                  </span>
-                </div>
-                <div className="text-[10.5px] sm:text-xs text-slate-400 font-bold">
-                  <span>{order.items?.length || 0} items</span>
-                  <span className="mx-1.5 font-normal">·</span>
-                  <span className="font-extrabold text-slate-700">₹{order.totalAmount}</span>
-                </div>
-              </div>
+        <div className="space-y-3">
+          {orders.map((order) => {
+            const statusBadgeClass = order.status === 'Delivered' 
+              ? 'bg-[#0c381e] text-[#22c55e]' 
+              : order.status === 'Cancelled' 
+              ? 'bg-[#380c0c] text-[#ef4444]' 
+              : 'bg-[#0c2340] text-[#3b82f6]';
 
-              <div className="flex items-center gap-1.5">
-                <span className={`text-[11px] sm:text-xs font-black uppercase tracking-wider ${
-                  order.status === 'Delivered' ? 'text-emerald-600' :
-                  order.status === 'Cancelled' ? 'text-rose-600' : 'text-amber-600'
-                }`}>
-                  {order.status}
-                </span>
-                <ChevronRight size={13} className="text-slate-350 sm:hidden flex-shrink-0" />
+            return (
+              <div 
+                key={order._id} 
+                onClick={() => setSelectedOrder(order)}
+                className="bg-[#181d28] sm:bg-white border border-white/5 sm:border-slate-200 p-4 rounded-2xl sm:rounded-xl flex items-center justify-between shadow-md sm:shadow-none text-white sm:text-slate-800 transition-all cursor-pointer hover:opacity-95"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-black text-white sm:text-slate-800">
+                      #{order._id.substring(order._id.length - 6).toUpperCase()}
+                    </span>
+                    <span className="text-[10px] text-slate-400 hidden sm:inline">
+                      ({new Date(order.createdAt).toLocaleDateString()})
+                    </span>
+                  </div>
+                  <div className="text-xs text-slate-400 font-bold">
+                    <span>{order.items?.length || 0} items</span>
+                    <span className="mx-1 font-normal">·</span>
+                    <span className="text-slate-300 sm:text-slate-700">₹{order.totalAmount}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className={`px-3 py-1 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider ${statusBadgeClass}`}>
+                    {order.status}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

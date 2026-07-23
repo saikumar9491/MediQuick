@@ -153,34 +153,30 @@ const Cart = () => {
                     </div>
                   </div>
 
-                  {/* Mobile Item Layout (Mockup Style) */}
-                  <div className="flex sm:hidden justify-between items-center w-full py-4 px-4 bg-white">
-                    <div className="max-w-[65%]">
-                      <h4 className="text-xs font-black text-slate-800 leading-snug truncate">{item.name}</h4>
-                      <p className="text-[11px] font-black text-slate-900 mt-1">₹{item.price}</p>
+                  {/* Mobile Item Layout (Mockup Screen 4 Dark Card Style) */}
+                  <div className="flex sm:hidden justify-between items-center w-full p-4 mb-3 bg-[#181d28] rounded-2xl text-white shadow-md border border-white/5">
+                    <div className="flex items-center gap-3 max-w-[65%]">
+                      <div className="w-12 h-12 rounded-xl bg-[#272e3d] flex items-center justify-center p-1 shrink-0">
+                        <img src={item.image} alt={item.name} className="max-h-full max-w-full object-contain mix-blend-lighten" />
+                      </div>
+                      <div className="truncate">
+                        <h4 className="text-xs font-black text-white leading-snug truncate">{item.name}</h4>
+                        <p className="text-xs font-bold text-slate-300 mt-0.5">₹{item.price}</p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-2.5 text-xs font-black text-white bg-[#272e3d] px-3 py-1.5 rounded-xl border border-white/10">
                       <button 
                         onClick={() => updateQuantity(item._id, Math.max(1, item.quantity - 1))} 
-                        className="text-slate-400 font-bold p-1 text-sm select-none"
+                        className="text-slate-300 hover:text-white px-1 select-none font-bold"
                       >
                         -
                       </button>
-                      <span className="text-xs font-black text-slate-800 min-w-[12px] text-center">{item.quantity}</span>
+                      <span className="min-w-[12px] text-center">{item.quantity}</span>
                       <button 
                         onClick={() => updateQuantity(item._id, item.quantity + 1)} 
-                        className="text-slate-400 font-bold p-1 text-sm select-none"
+                        className="text-slate-300 hover:text-white px-1 select-none font-bold"
                       >
                         +
-                      </button>
-                      <button 
-                        onClick={() => {
-                          removeFromCart(item._id);
-                          toast.success('Removed');
-                        }}
-                        className="text-[10px] text-rose-500 font-bold ml-1.5"
-                      >
-                        Remove
                       </button>
                     </div>
                   </div>
@@ -198,19 +194,20 @@ const Cart = () => {
               </div>
             </div>
 
-            {/* MOBILE SUMMARY (Mockup style) */}
-            <div className="block sm:hidden bg-white p-5 border border-slate-100 rounded-2xl shadow-3xs space-y-4">
-              <div className="flex justify-between text-xs font-bold text-slate-500">
+            {/* MOBILE SUMMARY (Mockup Screen 4 Dark Sheet Style) */}
+            <div className="block sm:hidden bg-[#181d28] p-6 rounded-t-3xl text-white shadow-2xl space-y-3 mt-6 border-t border-white/10">
+              <div className="w-8 h-1 bg-slate-600 rounded-full mx-auto mb-3" />
+              <div className="flex justify-between text-xs font-bold text-slate-400">
                 <span>Subtotal</span>
                 <span>₹{subtotal}</span>
               </div>
-              <div className="flex justify-between text-sm font-black text-slate-800 pt-2 border-t border-slate-100">
+              <div className="flex justify-between text-base font-black text-white pt-2 border-t border-slate-700/50">
                 <span>Total</span>
                 <span>₹{totalAmount}</span>
               </div>
               <button
                 onClick={() => navigate('/checkout')}
-                className="w-full py-3.5 bg-black hover:bg-slate-900 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all shadow-md active:scale-95"
+                className="w-full py-3.5 bg-white hover:bg-slate-100 text-[#181d28] text-xs font-black uppercase tracking-widest rounded-full transition-all shadow-md active:scale-95 mt-4"
               >
                 Proceed to checkout
               </button>

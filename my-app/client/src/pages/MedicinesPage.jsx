@@ -207,19 +207,20 @@ const MedicinesPage = () => {
         {/* MOBILE HEADER (Mockup style) */}
         <div className="block sm:hidden mb-4">
           <div className="flex items-center justify-between py-2">
-            <h1 className="text-base font-black text-slate-900 tracking-tight">
+            <h1 className="text-base font-black text-slate-400 tracking-tight">
               {totalCount} products
             </h1>
             <button
               onClick={() => setShowMobileFilters(true)}
-              className="text-xs font-black text-slate-800 uppercase tracking-widest hover:underline"
+              className="bg-[#181d28] text-white px-4 py-1.5 rounded-full flex items-center gap-1.5 text-xs font-black shadow-xs active:scale-95 transition-transform"
             >
-              Filters
+              <SlidersHorizontal size={13} />
+              <span>Filters</span>
             </button>
           </div>
 
           {/* Horizontal scroll category categories bar */}
-          <div className="flex gap-2.5 overflow-x-auto py-2.5 scrollbar-none">
+          <div className="flex gap-4 items-center overflow-x-auto py-2.5 scrollbar-none">
             {[
               { id: 'All', label: 'All' },
               { id: 'Skin Care', label: 'Skin' },
@@ -232,10 +233,10 @@ const MedicinesPage = () => {
                 <button
                   key={cat.id}
                   onClick={() => { setSelectedCategory(cat.id); setSelectedSubCategory(''); setPage(1); }}
-                  className={`text-xs font-black uppercase tracking-wider whitespace-nowrap px-4 py-2 rounded-full border transition-all ${
+                  className={`text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all ${
                     isSelected 
-                      ? 'bg-black border-transparent text-white shadow-xs' 
-                      : 'bg-white border-slate-200 text-slate-650'
+                      ? 'bg-[#0c1930] text-white px-4 py-1.5 rounded-full shadow-xs' 
+                      : 'text-slate-400 hover:text-slate-800 px-1'
                   }`}
                 >
                   {cat.label}
