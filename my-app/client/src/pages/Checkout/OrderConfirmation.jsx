@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { CheckCircle, Package, Truck, Clock, ChevronRight, ShoppingBag } from 'lucide-react';
+import { CheckCircle, Package, Truck, Clock, ChevronRight, ShoppingBag, Copy } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../../context/AuthContext';
 import { API_BASE } from '../../utils/apiConfig';
 import confetti from 'canvas-confetti';
+import toast from 'react-hot-toast';
 
 const OrderConfirmation = () => {
   const { orderId } = useParams();
@@ -77,22 +79,49 @@ const OrderConfirmation = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pt-12 pb-20 relative overflow-hidden">
+    <div className="min-h-screen bg-[#F8FAFC] pt-8 sm:pt-12 pb-24 relative overflow-hidden">
       <div className="max-w-2xl mx-auto px-4">
 
         {/* Success Icon + Header */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 mb-5">
-            <CheckCircle size={40} className="text-emerald-600" strokeWidth={1.5} />
+        <motion.div 
+          initial={{ scale: 0.85, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.4 }}
+          className="text-center mb-8"
+        >
+          <div className="relative inline-flex items-center justify-center w-24 h-24 rounded-full bg-emerald-50 border-4 border-emerald-100 mb-4 shadow-lg shadow-emerald-500/10">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.15, type: 'spring', stiffness: 200 }}
+            >
+              <CheckCircle size={52} className="text-emerald-600 fill-emerald-500/20" strokeWidth={2} />
+            </motion.div>
           </div>
-          <h1 className="text-2xl font-semibold text-slate-900">Order Confirmed!</h1>
-          <p className="text-slate-500 mt-2 text-sm">Thank you for your order. We'll get it ready for dispatch soon.</p>
-          {order?.deliveryDateString && (
-            <div className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-100 rounded-full text-sm text-blue-700 font-medium">
-              <Clock size={14} /> Estimated delivery: {order.deliveryDateString}
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Order Placed Successfully! 🎉</h1>
+          <p className="text-slate-500 mt-2 text-xs sm:text-sm font-medium max-w-md mx-auto">
+            Thank you for ordering with MediQuick. We've received your order and sent a confirmation to your registered email & phone.
+          </p>
+          
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2.5">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-50 border border-emerald-200/60 rounded-full text-xs text-emerald-700 font-bold">
+              <Clock size={14} /> Expected Delivery: {order?.deliveryDateString || 'Tomorrow, 10:00 AM'}
             </div>
-          )}
-        </div>
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-100 border border-slate-200 rounded-full text-xs text-slate-700 font-mono font-bold">
+              <span>#{order?._id?.substring(order?._id?.length - 8).toUpperCase() || order?._id}</span>
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText(order?._id || '');
+                  toast.success('Order ID copied!');
+                }}
+                title="Copy Order ID"
+                className="hover:text-[#00a2a4] text-slate-400 ml-1 cursor-pointer"
+              >
+                <Copy size={12} />
+              </button>
+            </div>
+          </div>
+        </motion.div>
 
         {/* Order Card */}
         <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-5">
@@ -100,16 +129,16 @@ const OrderConfirmation = () => {
           <div className="px-6 py-5 border-b border-slate-100 flex flex-wrap gap-4 justify-between">
             <div>
               <p className="text-[11px] text-slate-400 uppercase tracking-wider font-medium">Order ID</p>
-              <p className="text-sm font-mono text-slate-700 mt-0.5">{order?._id}</p>
+              <p className="text-sm font-mono text-slate-700 mt-0.5">#{order?._id}</p>
             </div>
             <div>
               <p className="text-[11px] text-slate-400 uppercase tracking-wider font-medium">Payment</p>
-              <p className="text-sm font-medium text-slate-700 mt-0.5">{order?.paymentMethod}</p>
+              <p className="text-sm font-medium text-slate-700 mt-0.5">{order?.paymentMethod || 'Cash on Delivery'}</p>
             </div>
             <div>
               <p className="text-[11px] text-slate-400 uppercase tracking-wider font-medium">Status</p>
-              <span className="inline-block mt-0.5 px-2.5 py-1 text-xs font-medium bg-emerald-100 text-emerald-700 rounded-full">
-                {order?.status}
+              <span className="inline-block mt-0.5 px-2.5 py-1 text-xs font-bold bg-emerald-100 text-emerald-700 rounded-full">
+                {order?.status || 'Placed'}
               </span>
             </div>
           </div>
@@ -184,16 +213,16 @@ const OrderConfirmation = () => {
         {/* Actions */}
         <div className="grid grid-cols-2 gap-3">
           <button
-            onClick={() => navigate('/my-orders')}
-            className="flex items-center justify-center gap-2 py-3 rounded-xl border border-slate-200 bg-white text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
+            onClick={() => navigate('/profile')}
+            className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl border border-slate-200 bg-white text-xs sm:text-sm font-black uppercase tracking-wider text-slate-800 hover:bg-slate-50 shadow-xs transition-all active:scale-95 cursor-pointer"
           >
-            <Package size={15} /> Track Order
+            <Package size={16} className="text-[#00a2a4]" /> Track Order
           </button>
           <button
-            onClick={() => navigate('/')}
-            className="flex items-center justify-center gap-2 py-3 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition-colors"
+            onClick={() => navigate('/medicines')}
+            className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl bg-slate-900 text-white text-xs sm:text-sm font-black uppercase tracking-wider hover:bg-[#00a2a4] shadow-md transition-all active:scale-95 cursor-pointer"
           >
-            <ShoppingBag size={15} /> Continue Shopping
+            <ShoppingBag size={16} /> Continue Shopping
           </button>
         </div>
       </div>

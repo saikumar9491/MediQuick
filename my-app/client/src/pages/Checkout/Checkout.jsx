@@ -56,6 +56,7 @@ const Checkout = () => {
   const [prescriptionUrl, setPrescriptionUrl] = useState(null);
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [orderPlaced, setOrderPlaced] = useState(false);
   const [razorpayAvailable, setRazorpayAvailable] = useState(false);
   const [razorpayChecked, setRazorpayChecked] = useState(false);
 
@@ -67,11 +68,13 @@ const Checkout = () => {
     }
   }, [user]);
 
-  // Redirect if cart is empty
+  // Redirect if cart is empty (unless order was placed)
   useEffect(() => {
-    if (activeCart.length === 0) navigate('/cart');
+    if (activeCart.length === 0 && !orderPlaced) {
+      navigate('/cart');
+    }
     window.scrollTo(0, 0);
-  }, [activeCart.length]);
+  }, [activeCart.length, orderPlaced]);
 
   // Check if Razorpay is configured on the server
   useEffect(() => {
@@ -196,6 +199,7 @@ const Checkout = () => {
         const order = await createOrder(token, {
           ...buildOrderPayload({ paymentMethod: 'Cash on Delivery', paymentStatus: 'Pending', status: 'Placed' }),
         });
+        setOrderPlaced(true);
         if (!isDirectBuy) clearCart();
         navigate(`/order-confirmation/${order._id}`, { state: { order } });
         return;
@@ -235,6 +239,7 @@ const Checkout = () => {
                     status: 'Confirmed',
                   }),
                 });
+                setOrderPlaced(true);
                 if (!isDirectBuy) clearCart();
                 navigate(`/order-confirmation/${order._id}`, { state: { order } });
                 resolve();
