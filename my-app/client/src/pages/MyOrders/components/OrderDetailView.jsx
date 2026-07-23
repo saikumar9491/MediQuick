@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Package, Truck, Calendar, CreditCard, ShoppingBag, Download, AlertTriangle, FileText, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Package, Truck, Calendar, CreditCard, ShoppingBag, Download, AlertTriangle, FileText, CheckCircle2, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import StatusTimeline from './StatusTimeline';
 import ReorderButton from './ReorderButton';
 import { getInvoiceUrl } from '../../../api/myOrders';
 import { useNavigate } from 'react-router-dom';
+import { ReviewForm } from '../../../components/ReviewForm';
 
 const OrderDetailView = ({ order, onBack, token }) => {
   const navigate = useNavigate();
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [activeProductId, setActiveProductId] = useState(null);
+
   const isDelivered = order.status === 'Delivered';
   const isCancelled = order.status === 'Cancelled';
   const invoiceUrl = getInvoiceUrl(order._id);
@@ -41,7 +45,7 @@ const OrderDetailView = ({ order, onBack, token }) => {
             <Download size={13} /> Invoice
           </button>
           {(isDelivered || isCancelled) && (
-            <ReorderButton orderId={order._id} token={token} />
+            <ReorderButton orderId={order._id} token={token} order={order} />
           )}
         </div>
       </div>
@@ -50,7 +54,7 @@ const OrderDetailView = ({ order, onBack, token }) => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50 border border-slate-200 rounded-2xl p-5 text-xs">
         <div>
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Order ID</span>
-          <p className="font-mono text-slate-700 mt-1">{order._id}</p>
+          <p className="font-mono text-slate-700 mt-1">#{order._id}</p>
         </div>
         <div>
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Order Date</span>
@@ -79,22 +83,37 @@ const OrderDetailView = ({ order, onBack, token }) => {
         <div className="md:col-span-2 space-y-4">
           <span className="text-xs font-bold text-slate-400 uppercase tracking-widest block">Ordered Items</span>
           <div className="space-y-3">
-            {order.items?.map((item, i) => (
-              <div key={i} className="flex gap-4 items-center bg-white rounded-2xl border border-slate-200 p-4">
-                {item.image && (
-                  <img src={item.image} alt={item.name} className="w-14 h-14 rounded-xl object-contain bg-slate-50 border border-slate-100 flex-shrink-0" />
-                )}
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-xs font-semibold text-slate-800 truncate">{item.name}</h4>
-                  <p className="text-[10px] text-slate-400 mt-0.5">{item.brand}</p>
-                  <p className="text-[10px] text-slate-400 mt-1">Qty: {item.quantity}</p>
+            {order.items?.map((item, i) => {
+              const pId = item.productId?._id || item.productId || item._id;
+              return (
+                <div key={i} className="flex gap-4 items-center bg-white rounded-2xl border border-slate-200 p-4">
+                  {item.image && (
+                    <img src={item.image} alt={item.name} className="w-14 h-14 rounded-xl object-contain bg-slate-50 border border-slate-100 flex-shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="text-xs font-semibold text-slate-800 truncate">{item.name}</h4>
+                    <p className="text-[10px] text-slate-400 mt-0.5">{item.brand}</p>
+                    <p className="text-[10px] text-slate-400 mt-1">Qty: {item.quantity}</p>
+                    {isDelivered && pId && (
+                      <button
+                        onClick={() => {
+                          setActiveProductId(pId);
+                          setReviewModalOpen(true);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 text-[11px] font-black mt-2 transition-colors border border-amber-200 shadow-2xs cursor-pointer active:scale-95"
+                      >
+                        <Star size={11} className="fill-amber-400 text-amber-500" />
+                        <span>Rate Product</span>
+                      </button>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-bold text-slate-800">₹{item.price * item.quantity}</p>
+                    <p className="text-[9px] text-slate-400 mt-0.5">₹{item.price} each</p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-xs font-bold text-slate-800">₹{item.price * item.quantity}</p>
-                  <p className="text-[9px] text-slate-400 mt-0.5">₹{item.price} each</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Rx info */}
@@ -146,12 +165,23 @@ const OrderDetailView = ({ order, onBack, token }) => {
           {/* Need help option */}
           <button
             onClick={handleHelpRedirect}
-            className="w-full py-3 rounded-xl border border-dashed border-slate-250 hover:bg-slate-50 text-slate-600 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+            className="w-full py-3 rounded-xl border border-dashed border-slate-250 hover:bg-slate-50 text-slate-600 text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
           >
             Need Help with this Order?
           </button>
         </div>
       </div>
+
+      {/* Review Form Modal */}
+      <ReviewForm
+        isOpen={reviewModalOpen}
+        onClose={() => setReviewModalOpen(false)}
+        productId={activeProductId}
+        token={token}
+        onSubmit={() => {
+          toast.success('Thank you for rating this product!');
+        }}
+      />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Eye, Download, Info, CheckCircle2, Clock, AlertTriangle } from 'lucide-react';
+import { Calendar, Eye, Download, Info, CheckCircle2, Clock, AlertTriangle, Star } from 'lucide-react';
 import ReorderButton from './ReorderButton';
 import { getInvoiceUrl } from '../../../api/myOrders';
 
@@ -81,6 +81,17 @@ const OrderCard = ({ order, token, onViewDetails }) => {
           <Eye size={12} /> Details
         </button>
 
+        {isDelivered && (
+          <button
+            onClick={onViewDetails}
+            className="flex items-center justify-center gap-1 px-3 py-2 border border-amber-200 bg-amber-50/70 hover:bg-amber-100 rounded-xl text-amber-800 text-xs font-bold transition-all active:scale-95"
+            title="Rate Products"
+          >
+            <Star size={12} className="fill-amber-400 text-amber-500" />
+            <span>Rate</span>
+          </button>
+        )}
+
         <button
           onClick={handleInvoiceClick}
           className="p-2 border border-slate-200 rounded-xl text-slate-500 hover:text-blue-600 hover:bg-blue-50 transition-colors"
@@ -90,7 +101,7 @@ const OrderCard = ({ order, token, onViewDetails }) => {
         </button>
 
         {(isDelivered || isCancelled) && (
-          <ReorderButton orderId={order._id} token={token} />
+          <ReorderButton orderId={order._id} token={token} order={order} />
         )}
       </div>
     </div>
