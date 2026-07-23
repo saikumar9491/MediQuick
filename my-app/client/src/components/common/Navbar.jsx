@@ -35,7 +35,7 @@ import { useCart } from '../../context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { API_BASE } from '../../utils/apiConfig';
 
-const Navbar = () => {
+const Navbar = ({ medicines = [] }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout, setShowAuthModal, setAuthModalView } = useAuth();
@@ -133,25 +133,37 @@ const Navbar = () => {
 
   useEffect(() => {
     const timer = setTimeout(async () => {
-      if (searchQuery.length > 0) {
+      const q = searchQuery.trim().toLowerCase();
+      if (q.length > 0) {
+        let results = [];
         try {
-          const res = await fetch(`${API_BASE}/api/medicines?search=${searchQuery}`);
+          const res = await fetch(`${API_BASE}/api/medicines?search=${encodeURIComponent(searchQuery)}`);
           const data = await res.json();
-          if (Array.isArray(data)) {
-            setSearchResults(data.slice(0, 6)); // Show top 6 results
-            setShowSearchSuggestions(true);
-          }
+          results = Array.isArray(data) ? data : (data?.medicines || []);
         } catch (error) {
-          console.error("Search error:", error);
+          console.error("Search API error:", error);
         }
+
+        // If API search returned 0 items, fallback to client-side filtering on medicines prop
+        if (results.length === 0 && Array.isArray(medicines) && medicines.length > 0) {
+          results = medicines.filter(m => 
+            m.name?.toLowerCase().includes(q) || 
+            m.brand?.toLowerCase().includes(q) ||
+            m.category?.toLowerCase().includes(q) ||
+            m.salt?.toLowerCase().includes(q)
+          );
+        }
+
+        setSearchResults(results.slice(0, 6)); // Show top 6 results
+        setShowSearchSuggestions(results.length > 0);
       } else {
         setSearchResults([]);
         setShowSearchSuggestions(false);
       }
-    }, 150); // Faster response
+    }, 150);
 
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [searchQuery, medicines]);
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -341,7 +353,7 @@ const Navbar = () => {
                     {searchResults.map((product) => (
                       <Link
                         key={product._id}
-                        to={`/product/${product._id}`}
+                        to={`/medicines/${product._id}`}
                         onClick={() => {
                           setShowSearchSuggestions(false);
                           setSearchQuery('');
@@ -561,27 +573,81 @@ const Navbar = () => {
              <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Fast Delivery</span>
            </div>
            
-           {/* Collapsible Mobile Search Input */}
-           {isMobileSearchExpanded && (
-             <form onSubmit={handleSearch} className="relative w-full mb-2 animate-in slide-in-from-top duration-200">
-               <input
-                 type="text"
-                 placeholder="Search for medicines..."
-                 className="w-full rounded-xl bg-slate-50 border border-slate-200 px-10 py-3 text-[14px] font-medium outline-none transition-all focus:border-[#00a2a4] focus:bg-white focus:ring-2 focus:ring-teal-50"
-                 value={searchQuery}
-                 onChange={(e) => setSearchQuery(e.target.value)}
-                 autoFocus
-               />
-               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-               <button 
-                 type="button" 
-                 onClick={() => setIsMobileSearchExpanded(false)}
-                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-650 p-1"
-               >
-                 <X size={16} />
-               </button>
-             </form>
-           )}
+            {/* Collapsible Mobile Search Input */}
+            {isMobileSearchExpanded && (
+              <div className="relative w-full mb-2 animate-in slide-in-from-top duration-200">
+                <form onSubmit={handleSearch} className="relative w-full">
+                  <input
+                    type="text"
+                    placeholder="Search for medicines..."
+                    className="w-full rounded-xl bg-slate-50 border border-slate-200 px-10 py-3 text-[14px] font-medium outline-none transition-all focus:border-[#00a2a4] focus:bg-white focus:ring-2 focus:ring-teal-50"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => searchQuery.length > 0 && setShowSearchSuggestions(true)}
+                    autoFocus
+                  />
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                  <button 
+                    type="button" 
+                    onClick={() => setIsMobileSearchExpanded(false)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-650 p-1"
+                  >
+                    <X size={16} />
+                  </button>
+                </form>
+
+                {/* Mobile Suggestions Dropdown */}
+                <AnimatePresence>
+                  {showSearchSuggestions && searchResults.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute left-0 right-0 top-full z-[80] mt-1 overflow-hidden rounded-xl bg-white shadow-2xl border border-slate-100"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="bg-slate-50 px-4 py-2 border-b border-slate-100">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Products</span>
+                      </div>
+                      <div className="max-h-[300px] overflow-y-auto">
+                        {searchResults.map((product) => (
+                          <Link
+                            key={product._id}
+                            to={`/medicines/${product._id}`}
+                            onClick={() => {
+                              setShowSearchSuggestions(false);
+                              setIsMobileSearchExpanded(false);
+                              setSearchQuery('');
+                            }}
+                            className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0 group"
+                          >
+                            <div className="h-9 w-9 shrink-0 rounded bg-white border border-slate-100 p-1">
+                              <img src={product.image} alt="" className="h-full w-full object-contain" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[12px] font-bold text-slate-800 group-hover:text-[#00a2a4] truncate">{product.name}</p>
+                              <p className="text-[10px] text-slate-500 uppercase tracking-tighter">{product.category}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-[11px] font-black text-[#00a2a4]">₹{product.price}</p>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                      <button 
+                        onClick={(e) => {
+                          setIsMobileSearchExpanded(false);
+                          handleSearch(e);
+                        }}
+                        className="w-full bg-slate-900 py-2.5 text-[11px] font-bold text-white hover:bg-[#00a2a4] transition-colors uppercase tracking-widest"
+                      >
+                        View All Results
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
         </div>
       </div>
 
