@@ -114,26 +114,60 @@ export const CartProvider = ({ children }) => {
   const addToCart = (product) => {
     blockSave.current = false; // Enable saving for this user action
     setCart(prev => {
-      const exists = prev.find(item => item._id === product._id);
+      const exists = prev.find(item => (item._id || item.productId) === (product._id || product.productId));
       if (exists) {
         return prev.map(item => 
-          item._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
+          (item._id || item.productId) === (product._id || product.productId) 
+            ? { ...item, quantity: item.quantity + 1 } 
+            : item
         );
       }
-      return [...prev, { ...product, quantity: 1 }];
+      return [...prev, { ...product, _id: product._id || product.productId, quantity: product.quantity || 1 }];
+    });
+  };
+
+  const addToCartMultiple = (itemsList) => {
+    if (!Array.isArray(itemsList) || itemsList.length === 0) return;
+    blockSave.current = false;
+    setCart(prev => {
+      let updated = [...prev];
+      itemsList.forEach(product => {
+        const pId = product.productId?._id || product.productId || product._id;
+        if (!pId) return;
+        const existsIndex = updated.findIndex(item => (item._id || item.productId) === pId);
+        const addQty = product.quantity || 1;
+        if (existsIndex > -1) {
+          updated[existsIndex] = {
+            ...updated[existsIndex],
+            quantity: updated[existsIndex].quantity + addQty
+          };
+        } else {
+          updated.push({
+            _id: pId,
+            productId: pId,
+            name: product.name,
+            price: product.price,
+            image: product.image,
+            brand: product.brand,
+            needsRx: product.needsRx || false,
+            quantity: addQty
+          });
+        }
+      });
+      return updated;
     });
   };
 
   const removeFromCart = (productId) => {
     blockSave.current = false;
-    setCart(prev => prev.filter(item => item._id !== productId));
+    setCart(prev => prev.filter(item => (item._id || item.productId) !== productId));
   };
 
   const updateQuantity = (productId, newQty) => {
     if (newQty < 1) return;
     blockSave.current = false;
     setCart(prev => prev.map(item => 
-      item._id === productId ? { ...item, quantity: newQty } : item
+      (item._id || item.productId) === productId ? { ...item, quantity: newQty } : item
     ));
   };
 
@@ -149,6 +183,7 @@ export const CartProvider = ({ children }) => {
       cartItems: cart, 
       setCartItems: setCart,
       addToCart, 
+      addToCartMultiple,
       removeFromCart, 
       updateQuantity, 
       clearCart, 

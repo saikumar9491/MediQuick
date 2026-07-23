@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Package, Truck, Calendar, CreditCard, ShoppingBag, Download, ArrowRight, ShieldAlert, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCart } from '../../../context/CartContext';
@@ -7,7 +7,8 @@ import { addItem } from '../../../api/cart';
 import { ReviewForm } from '../../../components/ReviewForm';
 
 const OrderDetailView = ({ order, onBack, token }) => {
-  const { addToCart } = useCart();
+  const navigate = useNavigate();
+  const { addToCartMultiple } = useCart();
   const [reordering, setReordering] = useState(false);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [activeProductId, setActiveProductId] = useState(null);
@@ -22,15 +23,25 @@ const OrderDetailView = ({ order, onBack, token }) => {
   const handleReorder = async () => {
     setReordering(true);
     try {
-      let count = 0;
-      for (const item of order.items) {
-        const id = item.productId || item._id;
-        if (id) {
-          await addItem(token, id, item.quantity || 1);
-          count++;
+      if (order?.items?.length > 0) {
+        // 1. Sync React local state & localStorage
+        addToCartMultiple(order.items);
+        
+        // 2. Also sync to backend API if logged in
+        if (token) {
+          for (const item of order.items) {
+            const id = item.productId?._id || item.productId || item._id;
+            if (id) {
+              await addItem(token, id, item.quantity || 1).catch(err => console.error(err));
+            }
+          }
         }
+
+        toast.success(`Added ${order.items.length} items to your cart!`);
+        navigate('/cart');
+      } else {
+        toast.error('No items found to reorder');
       }
-      toast.success(`Added ${count} items back to your cart!`);
     } catch (err) {
       toast.error(err.message || 'Could not add items to cart');
     } finally {
