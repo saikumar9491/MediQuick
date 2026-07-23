@@ -107,11 +107,39 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] pb-12">
-      {/* Hero Section */}
-      {/* Hero Section */}
+    <div className="min-h-screen bg-[#f8fafc] pb-24">
+      {/* MOBILE HERO Mockup Style */}
+      <div className="block sm:hidden px-4 py-12 text-center bg-white">
+        <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Winter Wellness</h2>
+        <h1 className="text-2xl font-black text-slate-900 mt-1">Flat 25% off</h1>
+        <button onClick={() => navigate('/medicines')} className="mt-3 text-[10px] font-black uppercase tracking-widest text-slate-800 border-b border-slate-800 pb-0.5">
+          Shop Now
+        </button>
+      </div>
+
+      {/* MOBILE CATEGORIES BAR */}
+      <div className="block sm:hidden bg-white py-4 px-4 border-b border-slate-100">
+        <div className="flex gap-8 justify-center">
+          {[
+            { label: 'Skin', path: '/medicines?filter=skin-care' },
+            { label: 'Hair', path: '/medicines?filter=hair-care' },
+            { label: 'Meds', path: '/medicines?filter=prescription' },
+            { label: 'Fit', path: '/medicines?filter=fitness' }
+          ].map((cat, idx) => (
+            <button
+              key={idx}
+              onClick={() => navigate(cat.path)}
+              className="text-[11px] font-black text-slate-700 uppercase tracking-widest hover:text-slate-900 transition-colors"
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Hero Section (Desktop Only) */}
       {displayBanners.length > 0 && (
-        <section className="bg-white px-4 py-4 sm:px-6 lg:px-8">
+        <section className="hidden sm:block bg-white px-4 py-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-[1400px]">
           <div className="relative h-[160px] overflow-hidden rounded-2xl bg-slate-900 sm:h-[320px] group">
             <AnimatePresence mode="wait">
@@ -210,8 +238,10 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
       </section>
       )}
 
-      {/* Featured Brands Section - Replaced Service Hub */}
-      <FeaturedBrands />
+      {/* Featured Brands Section - Replaced Service Hub (Desktop Only) */}
+      <div className="hidden sm:block">
+        <FeaturedBrands />
+      </div>
 
       {/* Quick Order with Prescription */}
       <section className="mx-auto max-w-[1400px] px-4 py-4 sm:px-6 lg:px-8">
@@ -430,12 +460,12 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
           <div className="flex items-end justify-between mb-8">
             <div>
               <h2 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight uppercase">
-                Trending Products
+                Trending
               </h2>
               <p className="hidden md:block text-slate-400 mt-1 text-xs font-bold uppercase tracking-wider">Top rated picks by our community</p>
             </div>
             <button 
-              onClick={() => navigate('/all-medicines')} 
+              onClick={() => navigate('/medicines')} 
               className="flex items-center gap-1 text-[#00a2a4] hover:text-[#007b7d] font-bold text-xs md:text-sm transition-colors uppercase tracking-wider"
             >
               See all <ChevronRight size={16} />
@@ -444,25 +474,25 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
 
           <div className="relative group">
             {loading ? (
-              <div className="flex gap-4 md:gap-6 overflow-hidden">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="min-w-[150px] md:min-w-[200px] h-56 md:h-72 animate-pulse rounded-xl bg-slate-100" />
+              <div className="grid grid-cols-2 gap-3.5 sm:flex sm:gap-6 overflow-hidden">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="h-56 md:h-72 animate-pulse rounded-xl bg-slate-100" />
                 ))}
               </div>
             ) : (
               <div 
                 ref={trendingScrollRef}
-                className="custom-scrollbar-hidden flex items-stretch gap-4 md:gap-6 overflow-x-auto md:pt-4 pb-4 md:pb-8 scroll-smooth md:px-2"
+                className="grid grid-cols-2 gap-3.5 sm:flex sm:items-stretch sm:gap-6 sm:overflow-x-auto md:pt-4 pb-4 md:pb-8 scroll-smooth md:px-2"
               >
                 {medicines.filter(m => m.isTrending).length > 0 ? (
                   medicines.filter(m => m.isTrending).map((med) => (
-                    <div key={med._id} className="min-w-[140px] max-w-[140px] md:min-w-[220px] md:max-w-[220px] flex">
+                    <div key={med._id} className="w-full sm:min-w-[220px] sm:max-w-[220px] flex">
                       <MedicineCard {...med} />
                     </div>
                   ))
                 ) : (
                   medicines.slice(0, 10).map((med) => (
-                    <div key={med._id} className="min-w-[140px] max-w-[140px] md:min-w-[220px] md:max-w-[220px] flex">
+                    <div key={med._id} className="w-full sm:min-w-[220px] sm:max-w-[220px] flex">
                       <MedicineCard {...med} />
                     </div>
                   ))
@@ -482,8 +512,8 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
         </div>
       </section>
 
-      {/* Skin Care Products */}
-      <section className="bg-white py-6 md:py-12">
+      {/* Skin Care Products (Desktop Only) */}
+      <section className="hidden sm:block bg-white py-6 md:py-12">
         <div className="mx-auto max-w-[1400px] px-4 md:px-5">
           <div className="flex items-end justify-between mb-8">
             <div>
@@ -538,9 +568,9 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
         </div>
       </section>
 
-      {/* Middle Banner (Ayurveda Promo) */}
+      {/* Middle Banner (Ayurveda Promo - Desktop Only) */}
       {ayurBanners.length > 0 && (
-        <section className="bg-white py-10">
+        <section className="hidden sm:block bg-white py-10">
           <div className="mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
             <div className="relative h-[150px] overflow-hidden rounded-2xl bg-slate-900 sm:h-[240px] group">
               <AnimatePresence mode="wait">
@@ -604,8 +634,8 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
         </section>
       )}
 
-      {/* Ayurveda Products */}
-      <section className="bg-white py-6 md:py-12">
+      {/* Ayurveda Products (Desktop Only) */}
+      <section className="hidden sm:block bg-white py-6 md:py-12">
         <div className="mx-auto max-w-[1400px] px-4 md:px-5">
           <div className="flex items-end justify-between mb-8">
             <div>

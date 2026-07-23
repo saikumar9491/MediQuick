@@ -204,15 +204,56 @@ const MedicinesPage = () => {
     <div className="min-h-screen bg-[#FAFBFD] pb-24 pt-4 sm:pt-6">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
-        {/* 1. BREADCRUMB */}
-        <nav className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-4">
+        {/* MOBILE HEADER (Mockup style) */}
+        <div className="block sm:hidden mb-4">
+          <div className="flex items-center justify-between py-2">
+            <h1 className="text-base font-black text-slate-900 tracking-tight">
+              {totalCount} products
+            </h1>
+            <button
+              onClick={() => setShowMobileFilters(true)}
+              className="text-xs font-black text-slate-800 uppercase tracking-widest hover:underline"
+            >
+              Filters
+            </button>
+          </div>
+
+          {/* Horizontal scroll category categories bar */}
+          <div className="flex gap-2.5 overflow-x-auto py-2.5 scrollbar-none">
+            {[
+              { id: 'All', label: 'All' },
+              { id: 'Skin Care', label: 'Skin' },
+              { id: 'Hair Care', label: 'Hair' },
+              { id: 'Ayurveda', label: 'Ayurveda' },
+              { id: 'Fitness & Health', label: 'Fitness' }
+            ].map(cat => {
+              const isSelected = selectedCategory === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => { setSelectedCategory(cat.id); setSelectedSubCategory(''); setPage(1); }}
+                  className={`text-xs font-black uppercase tracking-wider whitespace-nowrap px-4 py-2 rounded-full border transition-all ${
+                    isSelected 
+                      ? 'bg-black border-transparent text-white shadow-xs' 
+                      : 'bg-white border-slate-200 text-slate-650'
+                  }`}
+                >
+                  {cat.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 1. BREADCRUMB (Desktop Only) */}
+        <nav className="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-400 mb-4">
           <button onClick={() => navigate('/')} className="hover:text-slate-700 cursor-pointer">Home</button>
           <span>/</span>
           <span className="text-slate-800 font-bold">All Medicines</span>
         </nav>
 
-        {/* 2. HEADER SECTION */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-200/60">
+        {/* 2. HEADER SECTION (Desktop Only) */}
+        <div className="hidden sm:flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-6 border-b border-slate-200/60">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight" style={{ letterSpacing: '-0.02em' }}>
               All Medicines & Healthcare Products
@@ -243,9 +284,9 @@ const MedicinesPage = () => {
           </div>
         </div>
 
-        {/* 3. ACTIVE FILTERS BAR */}
+        {/* 3. ACTIVE FILTERS BAR (Desktop Only) */}
         {activeFilters.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 mb-6 bg-white p-3.5 rounded-2xl border border-slate-200/70 shadow-xs">
+          <div className="hidden sm:flex flex-wrap items-center gap-2 mb-6 bg-white p-3.5 rounded-2xl border border-slate-200/70 shadow-xs">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mr-1">Active Filters:</span>
             {activeFilters.map(chip => (
               <span 
@@ -267,8 +308,8 @@ const MedicinesPage = () => {
           </div>
         )}
 
-        {/* CONTROLS BAR: Sort & View Mode */}
-        <div className="flex items-center justify-between mb-6">
+        {/* CONTROLS BAR: Sort & View Mode (Desktop Only) */}
+        <div className="hidden sm:flex items-center justify-between mb-6">
           <button
             onClick={() => setShowMobileFilters(true)}
             className="lg:hidden px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 flex items-center gap-2 shadow-xs cursor-pointer"

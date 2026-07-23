@@ -188,10 +188,10 @@ const ProductCard = ({
   return (
     <div
       onClick={() => navigate(`/medicines/${_id}`)}
-      className="group relative flex w-full h-full flex-col bg-white border border-slate-200 rounded-2xl p-2.5 sm:p-4 transition-all duration-200 hover:border-[#00a2a4] hover:shadow-lg overflow-hidden cursor-pointer"
+      className="group relative flex w-full h-full flex-col bg-white border border-slate-100/60 sm:border-slate-200 rounded-2xl p-2 sm:p-4 transition-all duration-200 hover:border-[#00a2a4] hover:shadow-lg overflow-hidden cursor-pointer"
     >
-      {/* 1. TOP STATUS ROW */}
-      <div className="flex items-center justify-between gap-1 z-10 mb-2 min-h-[26px]">
+      {/* 1. TOP STATUS ROW (Desktop Only) */}
+      <div className="hidden sm:flex items-center justify-between gap-1 z-10 mb-2 min-h-[26px]">
         {/* Wishlist Heart Icon (Left) */}
         <button
           onClick={handleWishlistToggle}
@@ -217,7 +217,7 @@ const ProductCard = ({
       </div>
 
       {/* 2. PRODUCT IMAGE CONTAINER */}
-      <div className="relative flex h-24 sm:h-32 w-full items-center justify-center bg-slate-50/60 rounded-xl p-2 mb-2 border border-slate-100/50 overflow-hidden">
+      <div className="relative flex h-24 sm:h-32 w-full items-center justify-center bg-transparent sm:bg-slate-50/60 rounded-xl p-0 sm:p-2 mb-2 border-0 sm:border border-slate-100/50 overflow-hidden">
         <img
           src={image || 'https://placehold.co/300x300?text=Medicine'}
           alt={name}
@@ -234,7 +234,7 @@ const ProductCard = ({
         <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400">
           {brand || 'Generic'}
         </p>
-        <h3 className="line-clamp-2 text-[11px] sm:text-xs font-bold leading-normal text-slate-800 group-hover:text-[#00a2a4] transition-colors min-h-[30px] sm:min-h-[36px]">
+        <h3 className="line-clamp-2 text-[10px] sm:text-xs font-black leading-snug text-slate-800 group-hover:text-[#00a2a4] transition-colors min-h-[30px] sm:min-h-[36px]">
           {tagline && tagline.trim() ? tagline : cleanName}
         </h3>
       </div>
@@ -252,24 +252,24 @@ const ProductCard = ({
       )}
 
       {/* Push everything below to the bottom */}
-      <div className="mt-auto pt-2 border-t border-slate-100 space-y-2.5">
+      <div className="mt-auto pt-2 border-t border-slate-50 sm:border-slate-100 space-y-2">
         {/* 5. PRICE SECTION */}
         <div className="flex items-center justify-between gap-1 flex-wrap">
           <div className="flex items-baseline gap-1">
-            <span className="text-sm sm:text-base font-extrabold text-slate-900">₹{finalPrice}</span>
+            <span className="text-xs sm:text-base font-black text-slate-900">₹{finalPrice}</span>
             {hasDiscount && (
-              <span className="text-[10px] sm:text-xs text-slate-450 line-through">₹{mrp}</span>
+              <span className="text-[9px] sm:text-xs text-slate-400 line-through">₹{mrp}</span>
             )}
           </div>
           {hasDiscount && (
-            <span className="px-1 py-0.5 rounded bg-emerald-600 text-white text-[8px] font-bold uppercase tracking-wider">
+            <span className="text-[9px] sm:text-[10px] font-bold text-[#00a2a4]">
               {discountPercent}% OFF
             </span>
           )}
         </div>
 
-        {/* 6. CTA BUTTON ROW */}
-        <div>
+        {/* 6. CTA BUTTON ROW (Desktop Only) */}
+        <div className="hidden sm:block pt-1">
           {isOutOfStock ? (
             <button
               onClick={handleSubscribe}

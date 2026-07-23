@@ -766,26 +766,26 @@ const Navbar = () => {
         )}
       </AnimatePresence>
 
-      {/* Mobile Bottom Navigation (Native App Feel) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 flex items-center justify-around border-t border-slate-100 bg-white/95 px-2 py-3 backdrop-blur-xl lg:hidden shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+      {/* Mobile Bottom Navigation (Mockup Pill Style) */}
+      <nav className="fixed bottom-4 left-4 right-4 z-50 flex items-center justify-around bg-[#111111] px-2 h-14 rounded-full lg:hidden shadow-[0_12px_32px_rgba(0,0,0,0.3)] border border-white/5">
         {[
-          { icon: <Home size={20} />, label: 'Home', path: '/' },
-          { icon: <ShoppingBag size={20} />, label: 'Medicines', path: '/medicines' },
-          { icon: <FlaskConical size={20} />, label: 'Lab Tests', path: '/lab-tests' },
-          { icon: <Stethoscope size={20} />, label: 'Consult', path: '/consult' },
-          { icon: <User size={20} />, label: 'Account', path: '/profile' },
+          { icon: <Home size={18} />, label: 'Home', path: '/' },
+          { icon: <ShoppingBag size={18} />, label: 'Shop', path: '/medicines' },
+          { icon: <FlaskConical size={18} />, label: 'Labs', path: '/lab-tests' },
+          { icon: <Stethoscope size={18} />, label: 'Consult', path: '/consult' },
+          { icon: <User size={18} />, label: 'Account', path: '/profile' },
         ].map((item) => (
           <Link
             key={item.label}
             to={item.path}
-            className={`flex flex-col items-center gap-1 transition-colors ${
-              location.pathname === item.path ? 'text-[#00a2a4]' : 'text-slate-400 hover:text-slate-900'
+            className={`flex flex-col items-center justify-center transition-all ${
+              location.pathname === item.path ? 'text-white' : 'text-white/40 hover:text-white/80'
             }`}
           >
-            <span className={`${location.pathname === item.path ? 'scale-110' : ''} transition-transform`}>
+            <span className={`${location.pathname === item.path ? 'scale-105' : ''} transition-transform`}>
               {item.icon}
             </span>
-            <span className="text-[10px] font-black uppercase tracking-[1px]">{item.label}</span>
+            <span className="text-[8px] font-black uppercase tracking-wider mt-0.5" style={{ letterSpacing: '0.05em' }}>{item.label}</span>
           </Link>
         ))}
       </nav>

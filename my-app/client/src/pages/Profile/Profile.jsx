@@ -90,25 +90,52 @@ const Profile = () => {
     <div className="min-h-screen bg-[#F8FAFC] py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
-        {/* Header mobile menu toggle */}
-        <div className="md:hidden flex items-center justify-between bg-white border border-slate-200 rounded-2xl p-4 mb-4">
-          <div className="flex items-center gap-2">
-            {currentTab && <currentTab.icon size={18} className="text-blue-600" />}
-            <span className="text-sm font-semibold text-slate-800">{currentTab?.label}</span>
+        {/* MOBILE PROFILE HEADER (Mockup style) */}
+        <div className="block md:hidden bg-white border border-slate-100 rounded-2xl p-5 mb-4 shadow-3xs">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-slate-900 text-white flex items-center justify-center font-black text-sm select-none">
+              {profile?.name ? profile.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'U'}
+            </div>
+            <div>
+              <h2 className="text-base font-black text-slate-800 leading-tight">{profile?.name || 'Ravi Kumar'}</h2>
+              <p className="text-xs font-bold text-slate-400 mt-0.5">{profile?.addresses?.[0]?.city || 'Kapurthala'}</p>
+            </div>
           </div>
-          <button
-            onClick={() => setMobileMenuOpen(o => !o)}
-            className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50"
-          >
-            <Menu size={16} />
-          </button>
+
+          {/* Tab selections */}
+          <div className="flex gap-6 mt-5 pt-4 border-t border-slate-100">
+            {[
+              { id: 'orders', label: 'Orders' },
+              { id: 'addresses', label: 'Address' },
+              { id: 'prescriptions', label: 'Rx' }
+            ].map(tab => {
+              const isSelected = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`text-xs font-black uppercase tracking-wider transition-colors ${
+                    isSelected ? 'text-[#00a2a4] border-b-2 border-[#00a2a4] pb-1' : 'text-slate-450 hover:text-slate-650 pb-1'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+            
+            {/* Quick Logout */}
+            <button 
+              onClick={handleLogout}
+              className="ml-auto text-xs font-black uppercase tracking-wider text-rose-500 hover:text-rose-700"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-col md:flex-row gap-6 items-start">
-          {/* SIDEBAR NAVIGATION */}
-          <aside className={`w-full md:w-60 flex-shrink-0 bg-white rounded-2xl border border-slate-200 overflow-hidden ${
-            mobileMenuOpen ? 'block' : 'hidden md:block'
-          }`}>
+          {/* SIDEBAR NAVIGATION (Desktop Only) */}
+          <aside className="hidden md:block w-60 flex-shrink-0 bg-white rounded-2xl border border-slate-200 overflow-hidden">
             <div className="p-4 border-b border-slate-100 bg-slate-50/50">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Account Portal</p>
               <h3 className="text-sm font-bold text-slate-800 mt-1 truncate">{profile?.name}</h3>
@@ -121,7 +148,7 @@ const Profile = () => {
                 return (
                   <button
                     key={tab.id}
-                    onClick={() => { setActiveTab(tab.id); setMobileMenuOpen(false); }}
+                    onClick={() => { setActiveTab(tab.id); }}
                     className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                       activeTab === tab.id
                         ? 'bg-blue-50 text-blue-600'

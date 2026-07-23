@@ -70,34 +70,37 @@ const MyOrdersTab = ({ token }) => {
           <p className="text-sm text-slate-500 font-medium">You haven't placed any orders yet</p>
         </div>
       ) : (
-        <div className="divide-y divide-slate-100">
+        <div className="divide-y divide-slate-100/60">
           {orders.map((order) => (
-            <div key={order._id} className="py-4 flex flex-wrap gap-4 items-center justify-between hover:bg-slate-50/40 px-2 rounded-xl transition-all">
-              <div className="space-y-1">
+            <div 
+              key={order._id} 
+              onClick={() => setSelectedOrder(order)}
+              className="py-3.5 flex flex-row items-center justify-between hover:bg-slate-50/45 px-2 rounded-xl transition-all cursor-pointer"
+            >
+              <div className="space-y-0.5">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-mono text-slate-500">#{order._id.substring(order._id.length - 8).toUpperCase()}</span>
-                  <span className={`px-2.5 py-0.5 border text-[10px] font-semibold rounded-full ${STATUS_COLORS[order.status] || 'bg-slate-50 text-slate-600'}`}>
-                    {order.status}
+                  <span className="text-xs sm:text-sm font-black text-slate-800">
+                    #{order._id.substring(order._id.length - 6).toUpperCase()}
+                  </span>
+                  <span className="text-[10px] text-slate-400 hidden sm:inline">
+                    ({new Date(order.createdAt).toLocaleDateString()})
                   </span>
                 </div>
-                <div className="flex items-center gap-3 text-[11px] text-slate-400">
-                  <span className="flex items-center gap-1">
-                    <Calendar size={11} /> {new Date(order.createdAt).toLocaleDateString()}
-                  </span>
-                  <span>·</span>
-                  <span>{order.items?.length || 0} Item{order.items?.length !== 1 ? 's' : ''}</span>
-                  <span>·</span>
-                  <span className="font-semibold text-slate-700">₹{order.totalAmount}</span>
+                <div className="text-[10.5px] sm:text-xs text-slate-400 font-bold">
+                  <span>{order.items?.length || 0} items</span>
+                  <span className="mx-1.5 font-normal">·</span>
+                  <span className="font-extrabold text-slate-700">₹{order.totalAmount}</span>
                 </div>
               </div>
 
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setSelectedOrder(order)}
-                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-semibold text-slate-600"
-                >
-                  <Eye size={13} /> View Order
-                </button>
+              <div className="flex items-center gap-1.5">
+                <span className={`text-[11px] sm:text-xs font-black uppercase tracking-wider ${
+                  order.status === 'Delivered' ? 'text-emerald-600' :
+                  order.status === 'Cancelled' ? 'text-rose-600' : 'text-amber-600'
+                }`}>
+                  {order.status}
+                </span>
+                <ChevronRight size={13} className="text-slate-350 sm:hidden flex-shrink-0" />
               </div>
             </div>
           ))}
