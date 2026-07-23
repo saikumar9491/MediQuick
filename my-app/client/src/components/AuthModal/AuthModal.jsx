@@ -30,11 +30,10 @@ const AuthModal = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.93, y: 30 }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="relative w-full max-w-4xl overflow-hidden flex flex-col md:flex-row"
+            className="relative w-full max-w-4xl overflow-hidden flex flex-col md:flex-row min-h-0 md:min-h-[620px]"
             style={{
               borderRadius: '24px',
               boxShadow: '0 40px 120px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)',
-              minHeight: '620px',
               maxHeight: '92vh',
             }}
           >

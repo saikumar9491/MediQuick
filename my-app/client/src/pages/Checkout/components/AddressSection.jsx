@@ -157,7 +157,7 @@ export const AddressSection = ({ user, token, selectedAddress, onAddressSelect, 
           <div className="grid grid-cols-2 gap-3">
             {[
               { key: 'name', label: 'Full Name', span: 2 },
-              { key: 'phone', label: 'Phone Number' },
+              { key: 'phone', label: 'Phone Number', type: 'tel' },
               { key: 'pincode', label: 'Pincode', type: 'tel', onChange: handleFormPincodeChange },
               { key: 'addressLine1', label: 'Address Line 1', span: 2, placeholder: 'House/Flat No, Building' },
               { key: 'addressLine2', label: 'Address Line 2 (optional)', span: 2, placeholder: 'Street, Colony' },

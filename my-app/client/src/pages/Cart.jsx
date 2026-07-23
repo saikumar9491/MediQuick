@@ -72,10 +72,10 @@ const Cart = () => {
             {/* Cart Items */}
             <div className="bg-white shadow-sm border border-slate-100 divide-y divide-slate-100">
               {cartItems.map((item) => (
-                <div key={item._id} className="p-6 flex flex-col sm:flex-row gap-6">
+                <div key={item._id} className="p-4 sm:p-6 flex flex-row gap-4 sm:gap-6">
                   {/* Image Column */}
-                  <div className="w-full sm:w-32 flex flex-col items-center gap-4">
-                    <div className="h-28 w-28 flex items-center justify-center p-2">
+                  <div className="w-20 sm:w-32 shrink-0 flex flex-col items-center gap-3">
+                    <div className="h-20 w-20 sm:h-28 sm:w-28 flex items-center justify-center p-1 bg-slate-50/50 rounded-lg border border-slate-100">
                       <img 
                         src={item.image} 
                         alt={item.name} 
@@ -83,24 +83,26 @@ const Cart = () => {
                       />
                     </div>
                     {/* Quantity Selector - Flipkart Style */}
-                    <div className="flex items-center border border-slate-200 rounded-sm">
+                    <div className="flex items-center border border-slate-200 rounded-md bg-white shadow-3xs">
                       <button 
                         onClick={() => updateQuantity(item._id, Math.max(1, item.quantity - 1))}
-                        className="w-8 h-8 flex items-center justify-center bg-white hover:bg-slate-50 transition-colors"
+                        className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center hover:bg-slate-50 transition-colors"
+                        style={{ minWidth: '28px', minHeight: '28px' }}
                       >
-                        <Minus size={12} strokeWidth={3} />
+                        <Minus size={10} strokeWidth={3} />
                       </button>
                       <input 
                         type="text" 
                         readOnly 
                         value={item.quantity} 
-                        className="w-10 h-8 text-center text-sm font-bold border-x border-slate-200 focus:outline-none"
+                        className="w-8 h-7 sm:w-10 sm:h-8 text-center text-xs sm:text-sm font-black border-x border-slate-200 focus:outline-none"
                       />
                       <button 
                         onClick={() => updateQuantity(item._id, item.quantity + 1)}
-                        className="w-8 h-8 flex items-center justify-center bg-white hover:bg-slate-50 transition-colors"
+                        className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center hover:bg-slate-50 transition-colors"
+                        style={{ minWidth: '28px', minHeight: '28px' }}
                       >
-                        <Plus size={12} strokeWidth={3} />
+                        <Plus size={10} strokeWidth={3} />
                       </button>
                     </div>
                   </div>

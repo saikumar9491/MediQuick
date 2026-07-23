@@ -43,6 +43,7 @@ const Navbar = () => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isMobileSearchExpanded, setIsMobileSearchExpanded] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [locationName, setLocationName] = useState(() => localStorage.getItem('locationName') || 'New Delhi');
@@ -495,38 +496,92 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Header (Blinkit Style) */}
-        <div className="flex flex-col lg:hidden w-full pt-1 pb-2">
-           <div className="flex justify-between items-center w-full mb-3">
-              <div className="flex flex-col cursor-pointer" onClick={() => handleDetectLocation()}>
-                 <span className="text-[20px] font-black text-slate-900 leading-tight">Delivery in 10 minutes</span>
-                 <div className="flex items-center gap-1 text-slate-600 mt-0.5">
-                     <span className="text-[13px] truncate max-w-[220px]">Near, {isDetecting ? 'Detecting...' : `${locationName} (${userPincode})`}</span>
-                     <ChevronDown size={14}/>
-                 </div>
+        {/* Mobile Header (Optimized for Mobile Viewports) */}
+        <div className="flex flex-col lg:hidden w-full pt-1 pb-1">
+           {/* Top bar with Hamburger, Logo, Search Toggle, and Cart */}
+           <div className="flex justify-between items-center w-full mb-2">
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsMenuOpen(true)}
+                  className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-800 focus:outline-none transition-colors"
+                  style={{ minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  title="Menu"
+                >
+                  <Menu size={24} />
+                </button>
+                <Link to="/" className="flex items-center gap-1.5">
+                  <div className="flex h-7 w-7 items-center justify-center rounded bg-[#00a2a4] text-white">
+                    <ShoppingBag size={14} strokeWidth={3} />
+                  </div>
+                  <span className="text-sm font-black tracking-tighter text-slate-900 uppercase">
+                    MEDI<span className="text-[#00a2a4]">QUICK</span>
+                  </span>
+                </Link>
               </div>
-              <div 
-                className="h-9 w-9 rounded-full bg-white flex items-center justify-center border-2 border-slate-900 overflow-hidden shadow-sm"
-                onClick={() => setIsMenuOpen(true)}
-              >
-                 {user?.image ? (
-                   <img src={user.image} className="h-full w-full object-cover" alt="" />
-                 ) : (
-                   <User size={20} className="text-slate-800" />
-                 )}
+
+              <div className="flex items-center gap-2">
+                {/* Search Toggle Icon */}
+                <button
+                  type="button"
+                  onClick={() => setIsMobileSearchExpanded(!isMobileSearchExpanded)}
+                  className="p-1.5 hover:bg-slate-100 rounded-lg text-slate-750 transition-colors"
+                  style={{ minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  title="Search"
+                >
+                  <Search size={22} />
+                </button>
+                
+                {/* Cart Icon with badge */}
+                <Link 
+                  to="/cart" 
+                  className="relative p-1.5 hover:bg-slate-100 rounded-lg text-slate-750 transition-colors"
+                  style={{ minWidth: '44px', minHeight: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <ShoppingCart size={22} />
+                  {cartItems.length > 0 && (
+                    <span className="absolute top-1.5 right-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-[#ff6f61] text-[9px] font-black text-white shadow-sm ring-2 ring-white">
+                      {cartItems.length}
+                    </span>
+                  )}
+                </Link>
               </div>
            </div>
+
+           {/* Location Selector Pill Bar */}
+           <div className="flex items-center justify-between gap-2 border-t border-b border-slate-100 py-1.5 mb-1.5">
+             <div 
+               onClick={() => handleDetectLocation()}
+               className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-250 rounded-full text-xs font-bold text-slate-650 cursor-pointer shadow-xs active:scale-95 transition-all"
+             >
+               <MapPin size={12} className="text-[#00a2a4]" />
+               <span className="truncate max-w-[200px]">Near, {isDetecting ? 'Detecting...' : `${locationName} (${userPincode})`}</span>
+               <ChevronDown size={10} className="text-slate-450" />
+             </div>
+             <span className="text-[9px] font-black text-slate-400 uppercase tracking-wider">Fast Delivery</span>
+           </div>
            
-           <form onSubmit={handleSearch} className="relative w-full">
-             <input
-               type="text"
-               placeholder="Search for medicines..."
-               className="w-full rounded-xl bg-slate-50 border border-slate-100 px-10 py-3 text-[14px] font-medium outline-none transition-all focus:border-[#00a2a4] focus:bg-white"
-               value={searchQuery}
-               onChange={(e) => setSearchQuery(e.target.value)}
-             />
-             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-           </form>
+           {/* Collapsible Mobile Search Input */}
+           {isMobileSearchExpanded && (
+             <form onSubmit={handleSearch} className="relative w-full mb-2 animate-in slide-in-from-top duration-200">
+               <input
+                 type="text"
+                 placeholder="Search for medicines..."
+                 className="w-full rounded-xl bg-slate-50 border border-slate-200 px-10 py-3 text-[14px] font-medium outline-none transition-all focus:border-[#00a2a4] focus:bg-white focus:ring-2 focus:ring-teal-50"
+                 value={searchQuery}
+                 onChange={(e) => setSearchQuery(e.target.value)}
+                 autoFocus
+               />
+               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+               <button 
+                 type="button" 
+                 onClick={() => setIsMobileSearchExpanded(false)}
+                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-650 p-1"
+               >
+                 <X size={16} />
+               </button>
+             </form>
+           )}
         </div>
       </div>
 

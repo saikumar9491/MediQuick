@@ -143,7 +143,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
                     initial={{ x: -50, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
-                    className="text-2xl font-black italic tracking-tighter text-white sm:text-6xl uppercase"
+                    className="text-lg sm:text-4xl md:text-5xl lg:text-6xl font-black italic tracking-tighter text-white uppercase"
                   >
                     {displayBanners[currentBanner]?.title}
                   </motion.h1>
@@ -152,7 +152,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
                     initial={{ x: -50, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ duration: 0.6, delay: 0.3 }}
-                    className="mt-2 max-w-md text-[10px] font-bold text-purple-100 uppercase tracking-[0.2em] sm:text-sm"
+                    className="mt-1.5 max-w-md text-[9px] font-bold text-purple-100 uppercase tracking-[0.2em] sm:text-sm"
                   >
                     {displayBanners[currentBanner]?.desc || "Healthcare delivered to your doorstep."}
                   </motion.p>
@@ -162,7 +162,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.6, delay: 0.4 }}
                     onClick={() => navigate(displayBanners[currentBanner]?.link || '/medicines')}
-                    className="mt-6 flex w-fit items-center gap-2 rounded-full bg-blue-600 px-6 py-2.5 text-[10px] font-black text-white shadow-xl hover:bg-white hover:text-blue-600 sm:mt-10 sm:px-12 sm:py-4 sm:text-xs transition-all active:scale-95"
+                    className="mt-3.5 flex w-fit items-center gap-2 rounded-full bg-blue-600 px-5 py-2 text-[9px] font-black text-white shadow-xl hover:bg-white hover:text-blue-600 sm:mt-10 sm:px-12 sm:py-4 sm:text-xs transition-all active:scale-95"
                   >
                     SHOP NOW <ArrowRight size={14} />
                   </motion.button>
@@ -563,18 +563,18 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
 
                   {/* Left Side Content */}
                   <div className="relative z-10 w-full px-8 sm:w-1/2 sm:px-16">
-                    <span className="mb-2 inline-block rounded-full bg-white/20 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-white backdrop-blur-md">
+                    <span className="mb-1.5 inline-block rounded-full bg-white/20 px-2.5 py-0.5 text-[8px] font-black uppercase tracking-widest text-white backdrop-blur-md">
                       SPECIAL OFFER
                     </span>
-                    <h2 className="text-2xl font-black italic tracking-tighter text-white sm:text-5xl uppercase line-clamp-1">
+                    <h2 className="text-lg sm:text-4xl md:text-5xl font-black italic tracking-tighter text-white uppercase line-clamp-1">
                       {ayurBanners[currentAyurBanner]?.title}
                     </h2>
-                    <p className="mt-2 max-w-md text-[10px] font-bold uppercase tracking-[0.2em] text-white/80 sm:text-sm line-clamp-2">
+                    <p className="mt-1 max-w-md text-[9px] font-bold uppercase tracking-[0.2em] text-white/80 sm:text-sm line-clamp-2">
                       {ayurBanners[currentAyurBanner]?.desc || "Redefine the way you live with Ayurveda."}
                     </p>
                     <button 
                       onClick={() => navigate(ayurBanners[currentAyurBanner]?.link || '/ayurveda')}
-                      className="mt-4 flex items-center gap-2 rounded-full bg-blue-600 px-6 py-2.5 text-[10px] font-black text-white shadow-xl hover:bg-blue-700 transition-all active:scale-95 sm:mt-6 sm:px-10 sm:py-3.5 sm:text-xs"
+                      className="mt-2.5 flex items-center gap-2 rounded-full bg-blue-600 px-5 py-2 text-[9px] font-black text-white shadow-xl hover:bg-blue-750 transition-all active:scale-95 sm:mt-6 sm:px-10 sm:py-3.5 sm:text-xs"
                     >
                       SHOP NOW <ArrowRight size={14} />
                     </button>
