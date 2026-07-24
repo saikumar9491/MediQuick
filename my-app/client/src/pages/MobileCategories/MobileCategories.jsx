@@ -65,9 +65,9 @@ const MobileCategories = () => {
   const activeCategory = categories.find(c => c._id === activeCategoryId || c.name === activeCategoryId) || categories[0];
 
   return (
-    <div className="w-full min-h-screen bg-slate-50 flex flex-col font-sans select-none md:hidden">
-      {/* ─── 1. HEADER (Fixed above split view) ─── */}
-      <header className="bg-white border-b border-slate-200/80 px-4 py-2.5 sticky top-0 z-30 shadow-3xs flex flex-col gap-2">
+    <div className="w-full h-screen overflow-hidden bg-slate-50 flex flex-col font-sans select-none md:hidden">
+      {/* ─── 1. HEADER (Fixed at top) ─── */}
+      <header className="bg-white border-b border-slate-200/80 px-4 py-2 shrink-0 z-30 shadow-3xs flex flex-col gap-2">
         {/* Title Row */}
         <div className="flex items-center justify-between">
           <h1 className="text-base font-black text-slate-900 tracking-tight">
@@ -99,8 +99,8 @@ const MobileCategories = () => {
         </div>
       </header>
 
-      {/* ─── 2. MAIN CONTENT AREA (Two-Panel Split Layout) ─── */}
-      <main className="flex-1 flex overflow-hidden h-[calc(100vh-130px)]">
+      {/* ─── 2. MAIN CONTENT AREA (Two-Panel Split View: Fixed Left, Scrollable Right) ─── */}
+      <main className="flex-1 flex overflow-hidden min-h-0 relative">
         {loading ? (
           /* Skeleton Loader */
           <div className="flex-1 flex items-center justify-center bg-white py-16">
@@ -130,8 +130,10 @@ const MobileCategories = () => {
         )}
       </main>
 
-      {/* ─── 3. SHARED MOBILE BOTTOM TAB BAR ─── */}
-      <MobileBottomTabBar />
+      {/* ─── 3. SHARED MOBILE BOTTOM TAB BAR (Fixed at bottom) ─── */}
+      <div className="shrink-0 z-30">
+        <MobileBottomTabBar />
+      </div>
     </div>
   );
 };
