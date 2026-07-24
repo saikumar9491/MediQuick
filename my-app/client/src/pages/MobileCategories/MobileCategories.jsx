@@ -67,7 +67,7 @@ const MobileCategories = () => {
     : (categories.find(c => c._id === activeCategoryId || c.name === activeCategoryId) || categories[0]);
 
   return (
-    <div className="w-full h-screen overflow-hidden bg-slate-50 flex flex-col font-sans select-none md:hidden">
+    <div className="w-full h-screen overflow-hidden bg-slate-50 flex flex-col font-sans select-none">
       {/* ─── 1. HEADER (Fixed at top) ─── */}
       <header className="bg-white border-b border-slate-200/80 px-4 py-2 shrink-0 z-30 shadow-3xs flex flex-col gap-2">
         {/* Title Row */}

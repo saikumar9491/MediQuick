@@ -7,6 +7,7 @@ import { API_BASE } from '../../utils/apiConfig';
 import toast from 'react-hot-toast';
 
 export const MobileProductCard = ({ product }) => {
+  if (!product) return null;
   const navigate = useNavigate();
   const { cartItems, addToCart, updateQuantity, removeFromCart } = useCart();
   const { token } = useAuth();
