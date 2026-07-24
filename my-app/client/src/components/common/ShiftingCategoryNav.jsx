@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ChevronDown, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -16,13 +16,15 @@ export const ShiftingCategoryNav = ({ categories = [] }) => {
 };
 
 const FlyoutCategoryLink = ({ category, isFirst, isLast }) => {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
   const name = category.name || '';
-  const path = category.path || '#';
   const subOptions = category.subOptions || [];
 
-  // Align leftmost dropdowns slightly right and rightmost dropdowns slightly left
+  const mainCategoryUrl = `/medicines?category=${encodeURIComponent(name)}`;
+
+  // Position alignment for edge tabs
   const positionClass = isFirst 
     ? 'left-0 translate-x-0' 
     : isLast 
@@ -35,6 +37,11 @@ const FlyoutCategoryLink = ({ category, isFirst, isLast }) => {
       ? 'right-8' 
       : 'left-1/2 -translate-x-1/2';
 
+  const handleNavigation = (url) => {
+    setOpen(false);
+    navigate(url);
+  };
+
   return (
     <div
       onMouseEnter={() => setOpen(true)}
@@ -42,7 +49,11 @@ const FlyoutCategoryLink = ({ category, isFirst, isLast }) => {
       className="relative w-fit h-fit py-2.5"
     >
       <Link
-        to={path && !path.includes('/skin-care') ? path : `/medicines?category=${encodeURIComponent(name)}`}
+        to={mainCategoryUrl}
+        onClick={(e) => {
+          e.preventDefault();
+          handleNavigation(mainCategoryUrl);
+        }}
         className={`relative flex items-center gap-1 text-[12.5px] font-bold transition-all px-2.5 py-1 rounded-full cursor-pointer ${
           open ? 'text-[#0057FF]' : 'text-slate-700 hover:text-[#0057FF]'
         }`}
@@ -79,13 +90,17 @@ const FlyoutCategoryLink = ({ category, isFirst, isLast }) => {
             {/* Top Pointer Triangle */}
             <div className={`absolute top-0 h-3.5 w-3.5 -translate-y-1/2 rotate-45 border-t border-l border-slate-200 bg-white ${nubClass}`} />
 
-            {/* Vertical Flyout Card Content (Matching User Design) */}
+            {/* Vertical Flyout Card Content */}
             <div className="text-left">
               {/* Category Header */}
               <div className="mb-3 border-b border-slate-100 pb-2">
-                <h3 className="text-xs font-black text-[#0057FF] uppercase tracking-wider">
+                <button
+                  type="button"
+                  onClick={() => handleNavigation(mainCategoryUrl)}
+                  className="text-xs font-black text-[#0057FF] uppercase tracking-wider hover:underline text-left"
+                >
                   {name}
-                </h3>
+                </button>
               </div>
 
               {/* Subcategories List */}
@@ -93,7 +108,7 @@ const FlyoutCategoryLink = ({ category, isFirst, isLast }) => {
                 <div className="space-y-1 mb-4 max-h-[220px] overflow-y-auto pr-1 no-scrollbar">
                   {subOptions.map((sub, i) => {
                     const subName = typeof sub === 'object' ? sub.name : sub;
-                    const subPath = typeof sub === 'object' 
+                    const subPath = typeof sub === 'object' && sub.path 
                       ? sub.path 
                       : `/medicines?category=${encodeURIComponent(name)}&subCategory=${encodeURIComponent(subName)}`;
 
@@ -101,7 +116,11 @@ const FlyoutCategoryLink = ({ category, isFirst, isLast }) => {
                       <Link
                         key={i}
                         to={subPath}
-                        className="block text-xs font-semibold text-slate-650 hover:text-[#0057FF] hover:translate-x-0.5 transition-all py-1"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleNavigation(subPath);
+                        }}
+                        className="block text-xs font-semibold text-slate-650 hover:text-[#0057FF] hover:translate-x-0.5 transition-all py-1 cursor-pointer"
                       >
                         {subName}
                       </Link>
@@ -115,13 +134,14 @@ const FlyoutCategoryLink = ({ category, isFirst, isLast }) => {
               )}
 
               {/* Bottom CTA Button */}
-              <Link
-                to={path || `/medicines?category=${encodeURIComponent(name)}`}
+              <button
+                type="button"
+                onClick={() => handleNavigation(mainCategoryUrl)}
                 className="w-full mt-2 rounded-xl border-2 border-slate-950 text-slate-950 hover:bg-slate-950 hover:text-white px-4 py-2 text-xs font-extrabold transition-all text-center flex items-center justify-center gap-1 active:scale-95 shadow-2xs"
               >
                 <span>View All Products</span>
                 <ArrowRight size={12} />
-              </Link>
+              </button>
             </div>
           </motion.div>
         )}
