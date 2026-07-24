@@ -51,7 +51,7 @@ const RecommendedProducts = ({ cartCategories = [] }) => {
   if (!loading && products.length === 0) return null;
 
   return (
-    <div className="mt-6 relative group/carousel">
+    <div className="mt-6 relative group/carousel w-full max-w-full overflow-hidden">
       <h3 className="text-sm font-semibold text-slate-700 mb-4">You May Also Like</h3>
 
       {/* Navigation Arrows (Visible on hover on desktop, hidden on mobile) */}

@@ -239,7 +239,7 @@ const Cart = () => {
         <div className="flex flex-col md:flex-row gap-6 items-start">
 
           {/* LEFT — Cart Items */}
-          <div className="flex-1 min-w-0 space-y-3">
+          <div className="flex-1 min-w-0 w-full space-y-3 overflow-hidden">
             {visibleItems.map(item => (
               <CartItemRow
                 key={item.productId || item._id}
