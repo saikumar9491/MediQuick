@@ -120,17 +120,26 @@ const MobileHeader = () => {
             <Bell size={20} />
           </button>
           
-          <Link 
-            to="/profile" 
-            className="h-7 w-7 rounded-full bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center"
-            title="Account"
-          >
-            {user?.image ? (
-              <img src={user.image} className="h-full w-full object-cover" alt="" />
-            ) : (
-              <User size={15} className="text-slate-500" />
-            )}
-          </Link>
+          {user ? (
+            <Link 
+              to="/profile" 
+              className="h-7 w-7 rounded-full bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center"
+              title="Account"
+            >
+              {user?.image ? (
+                <img src={user.image} className="h-full w-full object-cover" alt="" />
+              ) : (
+                <User size={15} className="text-slate-500" />
+              )}
+            </Link>
+          ) : (
+            <Link
+              to="/login"
+              className="bg-[#0057FF] hover:bg-[#003BB5] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-2xs transition-all active:scale-95 flex items-center gap-1"
+            >
+              <span>Login</span>
+            </Link>
+          )}
         </div>
       </header>
 

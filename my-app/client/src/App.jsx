@@ -38,6 +38,7 @@ import AdminTrendingProducts from './pages/AdminTrendingProducts';
 import AllCategoriesPage from './pages/Categories/AllCategoriesPage';
 import HomeHealthMonitors from './pages/Categories/HomeHealthMonitors';
 import MobileCategories from './pages/MobileCategories/MobileCategories';
+import AuthPage from './pages/Auth/AuthPage';
 import AdminLayout from './components/admin/AdminLayout';
 import CommandCenter from './pages/admin/CommandCenter/CommandCenter';
 import Products from './pages/admin/Products/Products';
@@ -178,6 +179,9 @@ function AppLayout({ medicines, featured, loading }) {
         <Routes>
           <Route element={<MobileAppLayout />}>
             <Route path="/" element={<Home medicines={medicines} featured={featured} loading={loading} />} />
+            <Route path="/login" element={<AuthPage />} />
+            <Route path="/signup" element={<AuthPage />} />
+            <Route path="/forgot-password" element={<AuthPage />} />
             <Route path="/verify-otp" element={<VerifyOtp />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />
             <Route path="/brand/:brandName" element={<BrandPage />} />
@@ -293,6 +297,9 @@ function AppLayout({ medicines, featured, loading }) {
       <main className={!shouldHideNavbar ? 'min-h-[80vh]' : ''}>
         <Routes>
           <Route path="/" element={<Home medicines={medicines} featured={featured} loading={loading} />} />
+          <Route path="/login" element={<AuthPage />} />
+          <Route path="/signup" element={<AuthPage />} />
+          <Route path="/forgot-password" element={<AuthPage />} />
           <Route path="/verify-otp" element={<VerifyOtp />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/brand/:brandName" element={<BrandPage />} />
