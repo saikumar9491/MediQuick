@@ -72,11 +72,32 @@ const MyOrdersTab = ({ token }) => {
       ) : (
         <div className="space-y-3">
           {orders.map((order) => {
-            const statusBadgeClass = order.status === 'Delivered' 
-              ? 'bg-[#0c381e] text-[#22c55e]' 
-              : order.status === 'Cancelled' 
-              ? 'bg-[#380c0c] text-[#ef4444]' 
-              : 'bg-[#0c2340] text-[#3b82f6]';
+            const getStatusBadgeClass = (status) => {
+              switch (status) {
+                case 'Delivered':
+                case 'In Stock':
+                case 'Paid':
+                case 'Active':
+                  return 'bg-green-50 text-[#16A34A] border border-green-200';
+                case 'Processing':
+                case 'Pending':
+                case 'Low Stock':
+                case 'Shipped':
+                case 'Out for Delivery':
+                  return 'bg-orange-50 text-[#FF6B00] border border-orange-200';
+                case 'Cancelled':
+                case 'Out of Stock':
+                case 'Failed':
+                case 'Urgent':
+                  return 'bg-red-50 text-[#EF4444] border border-red-200';
+                case 'Placed':
+                case 'New':
+                case 'Scheduled':
+                default:
+                  return 'bg-blue-50 text-[#0057FF] border border-blue-200';
+              }
+            };
+            const statusBadgeClass = getStatusBadgeClass(order.status);
 
             return (
               <div 

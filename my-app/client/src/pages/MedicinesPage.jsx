@@ -272,12 +272,12 @@ const MedicinesPage = () => {
               placeholder="Search medicines, brands, salts..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border border-slate-200/80 pl-10 pr-4 py-2.5 rounded-full text-xs font-medium text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#00a2a4] transition-all shadow-xs"
+              className="w-full bg-white border border-slate-200/80 pl-10 pr-4 py-2.5 rounded-full text-xs font-medium text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#0057FF] transition-all shadow-xs"
             />
             {searchQuery && (
               <button 
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-650"
               >
                 <X size={14} />
               </button>
@@ -292,7 +292,7 @@ const MedicinesPage = () => {
             {activeFilters.map(chip => (
               <span 
                 key={chip.id}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00a2a4]/10 text-[#00a2a4] text-xs font-bold border border-[#00a2a4]/20"
+                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0057FF]/10 text-[#0057FF] text-xs font-bold border border-[#0057FF]/20"
               >
                 <span>{chip.label}</span>
                 <button onClick={chip.clear} className="hover:text-rose-600 cursor-pointer">
@@ -315,7 +315,7 @@ const MedicinesPage = () => {
             onClick={() => setShowMobileFilters(true)}
             className="lg:hidden px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 flex items-center gap-2 shadow-xs cursor-pointer"
           >
-            <Filter size={15} className="text-[#00a2a4]" />
+            <Filter size={15} className="text-[#0057FF]" />
             <span>Filters ({activeFilters.length})</span>
           </button>
 
@@ -329,7 +329,7 @@ const MedicinesPage = () => {
               <button
                 onClick={() => setViewMode('grid')}
                 className={`p-1.5 rounded-lg transition-all cursor-pointer ${
-                  viewMode === 'grid' ? 'bg-[#00a2a4] text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'
+                  viewMode === 'grid' ? 'bg-[#0057FF] text-white shadow-xs' : 'text-slate-400 hover:text-slate-650'
                 }`}
                 title="Grid View"
               >
@@ -338,7 +338,7 @@ const MedicinesPage = () => {
               <button
                 onClick={() => setViewMode('list')}
                 className={`p-1.5 rounded-lg transition-all cursor-pointer ${
-                  viewMode === 'list' ? 'bg-[#00a2a4] text-white shadow-xs' : 'text-slate-400 hover:text-slate-600'
+                  viewMode === 'list' ? 'bg-[#0057FF] text-white shadow-xs' : 'text-slate-400 hover:text-slate-650'
                 }`}
                 title="List View"
               >
@@ -352,7 +352,7 @@ const MedicinesPage = () => {
               <select
                 value={sortBy}
                 onChange={(e) => { setSortBy(e.target.value); setPage(1); }}
-                className="bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-800 outline-none focus:border-[#00a2a4] shadow-xs cursor-pointer"
+                className="bg-white border border-slate-200 rounded-xl px-3.5 py-2 text-xs font-bold text-slate-800 outline-none focus:border-[#0057FF] shadow-xs cursor-pointer"
               >
                 <option value="recommended">Recommended & Popular</option>
                 <option value="price-low">Price: Low to High</option>
@@ -372,7 +372,7 @@ const MedicinesPage = () => {
             
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <h2 className="text-xs font-bold uppercase tracking-[0.18em] text-slate-800 flex items-center gap-2">
-                <SlidersHorizontal size={15} className="text-[#00a2a4]" /> Filter Products
+                <SlidersHorizontal size={15} className="text-[#0057FF]" /> Filter Products
               </h2>
               {activeFilters.length > 0 && (
                 <button onClick={handleClearAllFilters} className="text-[11px] font-bold text-rose-600 hover:underline cursor-pointer">
@@ -388,7 +388,7 @@ const MedicinesPage = () => {
                 <button
                   onClick={() => { setSelectedCategory('All'); setSelectedSubCategory(''); setPage(1); }}
                   className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-between ${
-                    selectedCategory === 'All' ? 'bg-[#00a2a4] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50'
+                    selectedCategory === 'All' ? 'bg-[#0057FF] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50'
                   }`}
                 >
                   <span>All Categories</span>
@@ -401,7 +401,7 @@ const MedicinesPage = () => {
                       <button
                         onClick={() => { setSelectedCategory(cat.name); setSelectedSubCategory(''); setPage(1); }}
                         className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium transition-all cursor-pointer flex items-center justify-between ${
-                          isSelected ? 'bg-[#00a2a4]/10 text-[#00a2a4] font-bold border border-[#00a2a4]/20' : 'text-slate-600 hover:bg-slate-50'
+                          isSelected ? 'bg-[#0057FF]/10 text-[#0057FF] font-bold border border-[#0057FF]/20' : 'text-slate-600 hover:bg-slate-50'
                         }`}
                       >
                         <span className="truncate">{cat.name}</span>
@@ -409,7 +409,7 @@ const MedicinesPage = () => {
 
                       {/* Subcategories if selected */}
                       {isSelected && cat.subOptions && (
-                        <div className="pl-3 mt-1 space-y-1 border-l-2 border-[#00a2a4]/30 ml-3">
+                        <div className="pl-3 mt-1 space-y-1 border-l-2 border-[#0057FF]/30 ml-3">
                           {cat.subOptions.map(sub => {
                             const subName = typeof sub === 'object' ? sub.name : sub;
                             const isSubSelected = selectedSubCategory === subName;
@@ -418,7 +418,7 @@ const MedicinesPage = () => {
                                 key={subName}
                                 onClick={() => { setSelectedSubCategory(isSubSelected ? '' : subName); setPage(1); }}
                                 className={`w-full text-left px-2.5 py-1 rounded-lg text-[11px] transition-all cursor-pointer ${
-                                  isSubSelected ? 'text-[#00a2a4] font-extrabold bg-[#00a2a4]/10' : 'text-slate-500 hover:text-slate-800'
+                                  isSubSelected ? 'text-[#0057FF] font-extrabold bg-[#0057FF]/10' : 'text-slate-550 hover:text-slate-800'
                                 }`}
                               >
                                 {subName}
@@ -437,7 +437,7 @@ const MedicinesPage = () => {
             <div>
               <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2.5 flex justify-between">
                 <span>Price Range</span>
-                <span className="text-[#00a2a4]">Max ₹{priceMax}</span>
+                <span className="text-[#0057FF]">Max ₹{priceMax}</span>
               </h3>
               <input
                 type="range"
@@ -446,7 +446,7 @@ const MedicinesPage = () => {
                 step="50"
                 value={priceMax}
                 onChange={(e) => { setPriceMax(Number(e.target.value)); setPage(1); }}
-                className="w-full accent-[#00a2a4] cursor-pointer"
+                className="w-full accent-[#0057FF] cursor-pointer"
               />
               <div className="flex justify-between text-[10px] text-slate-400 font-semibold mt-1">
                 <span>₹0</span>
@@ -469,7 +469,7 @@ const MedicinesPage = () => {
                       name="rxFilter"
                       checked={rxFilter === item.id}
                       onChange={() => { setRxFilter(item.id); setPage(1); }}
-                      className="w-3.5 h-3.5 text-[#00a2a4] focus:ring-[#00a2a4]"
+                      className="w-3.5 h-3.5 text-[#0057FF] focus:ring-[#0057FF]"
                     />
                     <span>{item.label}</span>
                   </label>
@@ -485,7 +485,7 @@ const MedicinesPage = () => {
                   type="checkbox"
                   checked={inStockOnly}
                   onChange={(e) => { setInStockOnly(e.target.checked); setPage(1); }}
-                  className="w-4 h-4 rounded text-[#00a2a4] focus:ring-[#00a2a4]"
+                  className="w-4 h-4 rounded text-[#0057FF] focus:ring-[#0057FF]"
                 />
               </label>
             </div>
@@ -504,7 +504,7 @@ const MedicinesPage = () => {
                             type="checkbox"
                             checked={isChecked}
                             onChange={() => handleBrandToggle(b.name)}
-                            className="w-3.5 h-3.5 rounded text-[#00a2a4] focus:ring-[#00a2a4]"
+                            className="w-3.5 h-3.5 rounded text-[#0057FF] focus:ring-[#0057FF]"
                           />
                           <span className="truncate">{b.name}</span>
                         </div>
@@ -586,7 +586,7 @@ const MedicinesPage = () => {
                 <p className="text-xs text-slate-400 max-w-sm mx-auto mb-6">Try removing some active filters or searching for another term.</p>
                 <button
                   onClick={handleClearAllFilters}
-                  className="px-6 py-2.5 bg-slate-900 text-white rounded-full text-xs font-bold hover:bg-[#00a2a4] transition-all cursor-pointer shadow-md"
+                  className="px-6 py-2.5 bg-slate-900 text-white rounded-full text-xs font-bold hover:bg-[#0057FF] transition-all cursor-pointer shadow-md"
                 >
                   Clear All Filters
                 </button>
@@ -621,7 +621,7 @@ const MedicinesPage = () => {
               {/* Header */}
               <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
                 <h2 className="text-sm font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                  <SlidersHorizontal size={16} className="text-[#00a2a4]" /> Filters
+                  <SlidersHorizontal size={16} className="text-[#0057FF]" /> Filters
                 </h2>
                 <div className="flex items-center gap-4">
                   {activeFilters.length > 0 && (
@@ -652,7 +652,7 @@ const MedicinesPage = () => {
                       onClick={() => { setSelectedCategory('All'); setSelectedSubCategory(''); setPage(1); }}
                       className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
                         selectedCategory === 'All' 
-                          ? 'bg-[#00a2a4] text-white border-transparent shadow-xs' 
+                          ? 'bg-[#0057FF] text-white border-transparent shadow-xs' 
                           : 'bg-slate-50 text-slate-650 border-slate-200 hover:bg-slate-100'
                       }`}
                     >
@@ -664,7 +664,7 @@ const MedicinesPage = () => {
                         onClick={() => { setSelectedCategory(c.name); setSelectedSubCategory(''); setPage(1); }}
                         className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border ${
                           selectedCategory === c.name 
-                            ? 'bg-[#00a2a4] text-white border-transparent shadow-xs' 
+                            ? 'bg-[#0057FF] text-white border-transparent shadow-xs' 
                             : 'bg-slate-50 text-slate-650 border-slate-200 hover:bg-slate-100'
                         }`}
                       >
@@ -683,7 +683,7 @@ const MedicinesPage = () => {
                         onClick={() => { setSelectedSubCategory(''); setPage(1); }}
                         className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
                           selectedSubCategory === '' 
-                            ? 'bg-[#00a2a4]/10 text-[#00a2a4] border-[#00a2a4]/30' 
+                            ? 'bg-[#0057FF]/10 text-[#0057FF] border-[#0057FF]/30' 
                             : 'bg-slate-50 text-slate-550 border-slate-200 hover:bg-slate-100'
                         }`}
                       >
@@ -695,7 +695,7 @@ const MedicinesPage = () => {
                           onClick={() => { setSelectedSubCategory(sub); setPage(1); }}
                           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
                             selectedSubCategory === sub 
-                              ? 'bg-[#00a2a4]/10 text-[#00a2a4] border-[#00a2a4]/30' 
+                              ? 'bg-[#0057FF]/10 text-[#0057FF] border-[#0057FF]/30' 
                               : 'bg-slate-50 text-slate-550 border-slate-200 hover:bg-slate-100'
                           }`}
                         >
@@ -739,7 +739,7 @@ const MedicinesPage = () => {
                       type="checkbox"
                       checked={inStockOnly}
                       onChange={() => { setInStockOnly(!inStockOnly); setPage(1); }}
-                      className="w-4 h-4 rounded text-[#00a2a4] focus:ring-[#00a2a4]"
+                      className="w-4 h-4 rounded text-[#0057FF] focus:ring-[#0057FF]"
                     />
                   </label>
                 </div>
@@ -757,7 +757,7 @@ const MedicinesPage = () => {
                             onClick={() => { handleBrandToggle(b.name); setPage(1); }}
                             className={`py-2 px-3 rounded-xl border text-xs font-bold transition-all text-left truncate flex items-center justify-between ${
                               isChecked 
-                                ? 'bg-teal-50 border-teal-300 text-[#00a2a4]' 
+                                ? 'bg-blue-50 border-blue-200 text-[#0057FF]' 
                                 : 'bg-white border-slate-200 text-slate-650'
                             }`}
                           >

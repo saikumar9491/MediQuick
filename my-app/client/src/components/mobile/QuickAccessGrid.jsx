@@ -6,10 +6,10 @@ const QuickAccessGrid = () => {
   const navigate = useNavigate();
 
   const services = [
-    { name: 'Lab Tests', icon: FlaskConical, path: '/lab-tests', color: 'bg-indigo-50 text-indigo-600 border-indigo-100' },
-    { name: 'Consult Doctor', icon: Stethoscope, path: '/consult', color: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
-    { name: 'Ayurveda', icon: Leaf, path: '/ayurveda', color: 'bg-amber-50 text-amber-600 border-amber-100' },
-    { name: 'Care Plan', icon: ShieldCheck, path: '/care-plan', color: 'bg-teal-50 text-teal-600 border-teal-100' }
+    { name: 'Lab Tests', icon: FlaskConical, path: '/lab-tests', color: 'bg-blue-50 text-[#0057FF] border-blue-100' },
+    { name: 'Consult Doctor', icon: Stethoscope, path: '/consult', color: 'bg-orange-50 text-[#FF6B00] border-orange-100' },
+    { name: 'Ayurveda', icon: Leaf, path: '/ayurveda', color: 'bg-green-50 text-[#16A34A] border-green-100' },
+    { name: 'Care Plan', icon: ShieldCheck, path: '/care-plan', color: 'bg-red-50 text-[#EF4444] border-red-100' }
   ];
 
   return (

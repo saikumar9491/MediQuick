@@ -127,7 +127,7 @@ const ProductCard = ({
                 toast.dismiss(t.id);
                 onUndo({ _id, name, brand, price, image, discountPrice, countInStock, category, tagline, displayAttributes });
               }}
-              className="text-[#00a2a4] font-bold hover:underline"
+              className="text-[#0057FF] font-bold hover:underline"
             >
               Undo
             </button>
@@ -168,17 +168,17 @@ const ProductCard = ({
   const cleanName = name ? name.split(' (')[0].split(' - ')[0] : 'Healthcare Product';
 
   // Live stock pill configurations
-  let stockStatusColor = 'bg-emerald-500';
-  let stockStatusBg = 'bg-emerald-50 text-emerald-700 border-emerald-100';
+  let stockStatusColor = 'bg-[#16A34A]';
+  let stockStatusBg = 'bg-green-50 text-[#16A34A] border-green-200';
   let stockStatusText = 'In Stock';
 
   if (isOutOfStock) {
-    stockStatusColor = 'bg-rose-500';
-    stockStatusBg = 'bg-rose-550/10 text-rose-700 border-rose-100';
+    stockStatusColor = 'bg-[#EF4444]';
+    stockStatusBg = 'bg-red-50 text-[#EF4444] border-red-200';
     stockStatusText = 'Out of Stock';
   } else if (countInStock < 10) {
-    stockStatusColor = 'bg-amber-500';
-    stockStatusBg = 'bg-amber-50 text-amber-700 border-amber-100';
+    stockStatusColor = 'bg-[#FF6B00]';
+    stockStatusBg = 'bg-orange-50 text-[#FF6B00] border-orange-200';
     stockStatusText = `Only ${countInStock} Left`;
   }
 
@@ -188,7 +188,7 @@ const ProductCard = ({
   return (
     <div
       onClick={() => navigate(`/medicines/${_id}`)}
-      className="group relative flex w-full h-full flex-col bg-white border border-slate-100/60 sm:border-slate-200 rounded-2xl p-2 sm:p-4 transition-all duration-200 hover:border-[#00a2a4] hover:shadow-lg overflow-hidden cursor-pointer"
+      className="group relative flex w-full h-full flex-col bg-white border border-slate-100/60 sm:border-slate-200 rounded-2xl p-2 sm:p-4 transition-all duration-200 hover:border-[#0057FF] hover:shadow-lg overflow-hidden cursor-pointer"
     >
       {/* 1. TOP STATUS ROW (Desktop Only) */}
       <div className="hidden sm:flex items-center justify-between gap-1 z-10 mb-2 min-h-[26px]">
@@ -236,7 +236,7 @@ const ProductCard = ({
         <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400">
           {brand || 'Generic'}
         </p>
-        <h3 className="line-clamp-2 text-[10px] sm:text-xs font-black leading-snug text-slate-800 group-hover:text-[#00a2a4] transition-colors min-h-[30px] sm:min-h-[36px]">
+        <h3 className="line-clamp-2 text-[10px] sm:text-xs font-black leading-snug text-slate-800 group-hover:text-[#0057FF] transition-colors min-h-[30px] sm:min-h-[36px]">
           {tagline && tagline.trim() ? tagline : cleanName}
         </h3>
       </div>
@@ -264,7 +264,7 @@ const ProductCard = ({
             )}
           </div>
           {hasDiscount && (
-            <span className="text-[9px] sm:text-[10px] font-bold text-[#00a2a4]">
+            <span className="text-[9px] sm:text-[10px] font-bold text-[#16A34A]">
               {discountPercent}% OFF
             </span>
           )}
@@ -280,9 +280,9 @@ const ProductCard = ({
               style={{ minHeight: '36px' }}
             >
               {subscribing ? (
-                <Loader2 size={12} className="animate-spin text-[#00a2a4]" />
+                <Loader2 size={12} className="animate-spin text-[#0057FF]" />
               ) : isSubscribed ? (
-                <CheckCircle2 size={12} className="text-emerald-600" />
+                <CheckCircle2 size={12} className="text-[#16A34A]" />
               ) : (
                 <Bell size={12} className="text-slate-500" />
               )}
@@ -290,7 +290,7 @@ const ProductCard = ({
             </button>
           ) : currentQuantity > 0 ? (
             /* Quantity Modifier counter */
-            <div className="w-full flex items-center justify-between bg-[#00a2a4] text-white rounded-xl p-0.5 sm:p-1 shadow-sm" style={{ minHeight: '36px' }}>
+            <div className="w-full flex items-center justify-between bg-[#0057FF] text-white rounded-xl p-0.5 sm:p-1 shadow-sm" style={{ minHeight: '36px' }}>
               <button
                 onClick={handleDecrement}
                 className="w-7 h-7 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center text-white cursor-pointer transition-colors"
@@ -314,7 +314,7 @@ const ProductCard = ({
             <button
               onClick={handleAdd}
               disabled={addingToCart}
-              className="w-full flex items-center justify-center gap-1 py-2 px-2.5 rounded-xl bg-[#00a2a4] hover:bg-[#00898b] text-white text-[10px] sm:text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-98"
+              className="w-full flex items-center justify-center gap-1 py-2 px-2.5 rounded-xl bg-[#0057FF] hover:bg-[#003BB5] text-white text-[10px] sm:text-xs font-bold transition-all cursor-pointer shadow-sm active:scale-98"
               style={{ minHeight: '36px' }}
             >
               {addingToCart ? (

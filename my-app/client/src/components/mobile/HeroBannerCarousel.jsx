@@ -28,7 +28,7 @@ const HeroBannerCarousel = ({ banners = [], loading = false }) => {
       title: 'Monsoon Wellness Sale',
       desc: 'Flat 25% Off on Prescriptions',
       image: 'https://img.freepik.com/free-vector/flat-medical-healthcare-sales-banner-template_23-2149511116.jpg',
-      bg: 'from-teal-600 to-cyan-700',
+      bg: 'from-[#0057FF] to-blue-800',
       link: '/medicines'
     },
     {
@@ -36,7 +36,7 @@ const HeroBannerCarousel = ({ banners = [], loading = false }) => {
       title: 'Free Diagnostic Lab Tests',
       desc: 'Free Consultation with Doctor',
       image: 'https://img.freepik.com/free-vector/medical-healthcare-banner-design_23-2149488424.jpg',
-      bg: 'from-blue-600 to-indigo-700',
+      bg: 'from-[#0057FF] to-indigo-800',
       link: '/lab-tests'
     }
   ];
@@ -84,10 +84,10 @@ const HeroBannerCarousel = ({ banners = [], loading = false }) => {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className={`w-full h-full bg-gradient-to-r ${banner.bg || 'from-teal-600 to-cyan-700'} p-4 flex flex-col justify-center text-white`}>
-                <span className="text-[10px] font-black uppercase tracking-widest text-teal-100">Special Offer</span>
+              <div className={`w-full h-full bg-gradient-to-r ${banner.bg || 'from-[#0057FF] to-blue-800'} p-4 flex flex-col justify-center text-white`}>
+                <span className="text-[10px] font-black uppercase tracking-widest text-orange-200">Special Offer</span>
                 <h4 className="text-sm font-black mt-1">{banner.title}</h4>
-                <p className="text-[10px] text-teal-50/80 font-medium mt-0.5">{banner.desc}</p>
+                <p className="text-[10px] text-blue-50/80 font-medium mt-0.5">{banner.desc}</p>
               </div>
             )}
           </Link>
@@ -102,7 +102,7 @@ const HeroBannerCarousel = ({ banners = [], loading = false }) => {
               key={i}
               onClick={() => setActiveIndex(i)}
               className={`h-1.5 rounded-full transition-all duration-300 ${
-                i === activeIndex ? 'w-4 bg-[#00a2a4]' : 'w-1.5 bg-slate-300/80'
+                i === activeIndex ? 'w-4 bg-[#0057FF]' : 'w-1.5 bg-slate-300/80'
               }`}
               title={`Slide ${i + 1}`}
             />

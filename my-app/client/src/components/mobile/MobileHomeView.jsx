@@ -185,14 +185,14 @@ const MobileHomeView = ({ medicines = [], featured = [], loading = false }) => {
               <h2 className="text-xs font-black uppercase tracking-wider text-slate-400">
                 Browsing {activeTab.replace('-', ' ')}
               </h2>
-              <span className="text-[10px] font-black bg-teal-50 text-[#00a2a4] px-2 py-0.5 rounded-full">
+              <span className="text-[10px] font-black bg-blue-50 text-[#0057FF] px-2 py-0.5 rounded-full">
                 {catProducts.length} Items Found
               </span>
             </div>
 
             {isCatLoading ? (
               <div className="flex flex-col items-center justify-center py-20 gap-3">
-                <Loader2 className="animate-spin text-[#00a2a4]" size={28} />
+                <Loader2 className="animate-spin text-[#0057FF]" size={28} />
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Loading Products...</span>
               </div>
             ) : catProducts.length === 0 ? (

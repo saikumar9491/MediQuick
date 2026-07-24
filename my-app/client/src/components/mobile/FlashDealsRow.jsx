@@ -76,24 +76,24 @@ const FlashDealsRow = () => {
   if (loading || !activeFlashCoupon || flashProducts.length === 0) return null;
 
   return (
-    <div className="bg-rose-50/50 py-4 px-4 border-b border-rose-100/60 space-y-4">
+    <div className="bg-white py-4 px-4 border-b border-slate-100 space-y-4">
       {/* Header with Title and Countdown */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <div className="bg-red-500 text-white p-1 rounded-md">
+          <div className="bg-[#FF6B00] text-white p-1.5 rounded-xl">
             <Zap size={15} className="fill-current" />
           </div>
           <div className="flex flex-col">
-            <h3 className="text-xs font-black text-rose-950 uppercase tracking-wider">Flash Deals</h3>
-            <span className="text-[9px] font-black text-red-500 uppercase tracking-widest bg-red-100/80 px-1 rounded w-fit mt-0.5">
+            <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider">Flash Deals</h3>
+            <span className="text-[9px] font-black text-[#FF6B00] uppercase tracking-widest bg-orange-50 border border-orange-100/60 px-1.5 py-0.5 rounded-md w-fit mt-0.5">
               Code: {activeFlashCoupon.code}
             </span>
           </div>
         </div>
 
         {/* Timer */}
-        <div className="flex items-center gap-1.5 bg-rose-950 text-rose-50 px-2.5 py-1.5 rounded-xl text-[10px] font-mono font-black shadow-xs">
-          <Clock size={11} className="text-red-400" />
+        <div className="flex items-center gap-1.5 bg-[#FF6B00] text-white px-2.5 py-1.5 rounded-xl text-[10px] font-mono font-black shadow-xs">
+          <Clock size={11} className="text-white" />
           <span>{timeLeft}</span>
         </div>
       </div>

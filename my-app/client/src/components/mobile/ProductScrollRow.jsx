@@ -103,7 +103,7 @@ export const MobileProductCard = ({ product }) => {
     >
       {/* Badges (Flipkart style Bestseller) */}
       {isBestseller && (
-        <span className="absolute top-2 left-2 z-10 bg-amber-500 text-white font-extrabold text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-md shadow-3xs">
+        <span className="absolute top-2 left-2 z-10 bg-[#FF6B00] text-white font-extrabold text-[8px] uppercase tracking-wider px-1.5 py-0.5 rounded-md shadow-3xs">
           Bestseller
         </span>
       )}
@@ -140,26 +140,34 @@ export const MobileProductCard = ({ product }) => {
             <div className="flex items-center gap-1">
               <span className="text-xs font-black text-slate-900">₹{finalPrice}</span>
               {discountPercent > 0 && (
-                <span className="text-[9px] font-black text-[#00a2a4]">{discountPercent}% Off</span>
+                <span className="text-[9px] font-black text-[#16A34A]">{discountPercent}% Off</span>
               )}
             </div>
           </div>
 
           {/* Add to Cart button */}
           {isOutOfStock ? (
-            <span className="text-[9px] font-black text-red-500 uppercase">OOS</span>
+            <div className="flex flex-col items-end">
+              <span className="text-[8px] font-black text-[#EF4444] uppercase leading-none">Out of Stock</span>
+              <button 
+                onClick={(e) => { e.stopPropagation(); toast.success("We will notify you when in stock!"); }}
+                className="text-[8px] font-bold text-[#EF4444] underline hover:text-red-600 mt-0.5"
+              >
+                Notify me
+              </button>
+            </div>
           ) : currentQuantity > 0 ? (
-            <div className="flex items-center bg-[#00a2a4] rounded-full text-white overflow-hidden shadow-sm h-6">
+            <div className="flex items-center bg-[#0057FF] rounded-full text-white overflow-hidden shadow-sm h-6">
               <button 
                 onClick={handleDecrement}
-                className="w-5 flex items-center justify-center text-xs font-bold active:bg-teal-700 h-full"
+                className="w-5 flex items-center justify-center text-xs font-bold active:bg-[#003BB5] h-full"
               >
                 -
               </button>
               <span className="text-[10px] font-black w-4 text-center">{currentQuantity}</span>
               <button 
                 onClick={handleIncrement}
-                className="w-5 flex items-center justify-center text-xs font-bold active:bg-teal-700 h-full"
+                className="w-5 flex items-center justify-center text-xs font-bold active:bg-[#003BB5] h-full"
               >
                 +
               </button>
@@ -168,7 +176,7 @@ export const MobileProductCard = ({ product }) => {
             <button
               onClick={handleAddToCart}
               disabled={loading}
-              className="h-6 w-6 rounded-full bg-[#00a2a4] active:bg-teal-700 hover:scale-105 flex items-center justify-center text-white transition-all shadow-3xs"
+              className="h-6 w-6 rounded-full bg-[#0057FF] active:bg-[#003BB5] hover:scale-105 flex items-center justify-center text-white transition-all shadow-3xs"
               title="Add to Cart"
             >
               {loading ? (
@@ -194,7 +202,7 @@ const ProductScrollRow = ({ title, products = [], seeAllLink }) => {
         {seeAllLink && (
           <Link 
             to={seeAllLink} 
-            className="text-xs font-black text-[#00a2a4] uppercase tracking-wider flex items-center gap-0.5 hover:underline"
+            className="text-xs font-black text-[#FF6B00] hover:text-[#E55A00] uppercase tracking-wider flex items-center gap-0.5 hover:underline"
           >
             See All
           </Link>

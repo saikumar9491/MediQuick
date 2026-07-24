@@ -205,7 +205,7 @@ const MobileSearchBar = ({ isExpandedExternal, onCloseExternal }) => {
                 placeholder="Search medicines, wellness items..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 rounded-full bg-slate-50 border border-slate-250 pl-4 pr-10 text-[14px] font-semibold outline-none focus:border-[#00a2a4] focus:bg-white focus:ring-4 focus:ring-teal-50"
+                className="w-full h-10 rounded-full bg-slate-50 border border-slate-250 pl-4 pr-10 text-[14px] font-semibold outline-none focus:border-[#0057FF] focus:bg-white focus:ring-4 focus:ring-blue-50"
               />
               {searchQuery && (
                 <button
@@ -257,7 +257,7 @@ const MobileSearchBar = ({ isExpandedExternal, onCloseExternal }) => {
                           <p className="text-[12px] font-bold text-slate-800 truncate">{product.name}</p>
                           <p className="text-[9px] text-slate-400 uppercase tracking-tight">{product.brand}</p>
                         </div>
-                        <span className="text-xs font-black text-[#00a2a4]">₹{product.price}</span>
+                        <span className="text-xs font-black text-[#0057FF]">₹{product.price}</span>
                       </Link>
                     ))}
                   </div>
@@ -316,7 +316,7 @@ const MobileSearchBar = ({ isExpandedExternal, onCloseExternal }) => {
                           onClick={() => handleSearchSubmit(null, term)}
                           className="text-left px-4 py-3 bg-white border border-slate-200 rounded-2xl hover:border-slate-300 text-xs font-semibold text-slate-700 truncate active:scale-[0.98] transition-all flex items-center gap-2"
                         >
-                          <span className="text-[10px] font-black text-[#00a2a4] bg-teal-50 h-5 w-5 rounded-full flex items-center justify-center shrink-0">
+                          <span className="text-[10px] font-black text-[#0057FF] bg-blue-50 h-5 w-5 rounded-full flex items-center justify-center shrink-0">
                             {i + 1}
                           </span>
                           <span className="truncate">{term}</span>

@@ -92,11 +92,11 @@ const MobileHeader = () => {
       <header className="fixed top-0 left-0 right-0 z-40 bg-white border-b border-slate-150 h-14 px-4 flex items-center justify-between">
         {/* Left: Compact Logo */}
         <Link to="/" className="flex items-center gap-1.5 shrink-0">
-          <div className="flex h-6 w-6 items-center justify-center rounded bg-[#00a2a4] text-white">
+          <div className="flex h-6 w-6 items-center justify-center rounded bg-[#0057FF] text-white">
             <span className="text-[10px] font-black">M</span>
           </div>
-          <span className="text-xs font-black tracking-tight text-slate-900 uppercase">
-            MEDI<span className="text-[#00a2a4]">Q</span>
+          <span className="text-xs font-black tracking-tight uppercase">
+            <span className="text-[#0057FF]">MEDI</span><span className="text-[#FF6B00]">QUICK</span>
           </span>
         </Link>
 
@@ -105,7 +105,7 @@ const MobileHeader = () => {
           onClick={() => setShowLocationModal(true)}
           className="flex items-center gap-1 max-w-[50%] bg-slate-50 border border-slate-200 px-3 py-1 rounded-full text-xs font-bold text-slate-700 shadow-3xs active:scale-95 transition-all hover:bg-slate-100"
         >
-          <MapPin size={11} className="text-[#00a2a4]" />
+          <MapPin size={11} className="text-[#0057FF]" />
           <span className="truncate">{locationName} {userPincode}</span>
           <ChevronDown size={10} className="text-slate-400" />
         </button>
@@ -152,7 +152,7 @@ const MobileHeader = () => {
             <button
               onClick={handleDetectLocation}
               disabled={isDetecting}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-teal-50 hover:bg-teal-100 text-[#00a2a4] text-xs font-bold transition-all border border-teal-100 mb-6 disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-blue-50 hover:bg-blue-100 text-[#0057FF] text-xs font-bold transition-all border border-blue-100 mb-6 disabled:opacity-50"
             >
               {isDetecting ? (
                 <>
@@ -180,11 +180,11 @@ const MobileHeader = () => {
                 placeholder="Enter 6-digit Pincode (e.g. 144411)"
                 value={pincodeInput}
                 onChange={(e) => setPincodeInput(e.target.value.replace(/\D/g, ''))}
-                className="w-full text-center tracking-widest text-lg font-black rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3.5 focus:border-[#00a2a4] focus:ring-4 focus:ring-teal-50 outline-none"
+                className="w-full text-center tracking-widest text-lg font-black rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3.5 focus:border-[#0057FF] focus:ring-4 focus:ring-blue-50 outline-none"
               />
               <button
                 type="submit"
-                className="w-full py-4 bg-slate-900 hover:bg-[#00a2a4] text-white text-xs font-extrabold uppercase tracking-widest rounded-2xl transition-colors shadow-lg shadow-slate-900/10 active:scale-[0.98]"
+                className="w-full py-4 bg-[#0057FF] hover:bg-[#003BB5] text-white text-xs font-extrabold uppercase tracking-widest rounded-2xl transition-colors shadow-lg shadow-blue-500/10 active:scale-[0.98]"
               >
                 Set Location
               </button>

@@ -4,9 +4,9 @@ import toast from 'react-hot-toast';
 import { fetchPrescriptions, uploadPrescription } from '../../../api/profile';
 
 const STATUS_BADGES = {
-  'Pending Review': 'bg-amber-50 text-amber-700 border-amber-100',
-  Approved: 'bg-emerald-50 text-emerald-700 border-emerald-100',
-  Rejected: 'bg-red-50 text-red-700 border-red-100'
+  'Pending Review': 'bg-orange-50 text-[#FF6B00] border-orange-200',
+  Approved: 'bg-green-50 text-[#16A34A] border-green-200',
+  Rejected: 'bg-red-50 text-[#EF4444] border-red-200'
 };
 
 const PrescriptionsTab = ({ token }) => {

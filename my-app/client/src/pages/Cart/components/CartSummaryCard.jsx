@@ -112,12 +112,12 @@ const CartSummaryCard = ({
       {/* Coupon */}
       <div className="px-5 py-4 border-b border-slate-100">
         {appliedCoupon ? (
-          <div ref={boxRef} className="flex items-center justify-between p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+          <div ref={boxRef} className="flex items-center justify-between p-3 bg-orange-50 border border-orange-200 rounded-xl">
             <div className="flex items-center gap-2">
-              <Tag size={13} className="text-emerald-600" />
+              <Tag size={13} className="text-[#FF6B00]" />
               <div>
-                <p className="text-xs font-semibold text-emerald-700">{appliedCoupon.code}</p>
-                <p className="text-[10px] text-emerald-600">You save ₹{appliedCoupon.discountAmount}</p>
+                <p className="text-xs font-semibold text-[#FF6B00]">{appliedCoupon.code}</p>
+                <p className="text-[10px] text-orange-600">You save ₹{appliedCoupon.discountAmount}</p>
               </div>
             </div>
             <button
@@ -131,7 +131,7 @@ const CartSummaryCard = ({
           <div>
             <button
               onClick={() => setCouponOpen(o => !o)}
-              className="flex items-center gap-2 text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+              className="flex items-center gap-2 text-xs font-medium text-[#0057FF] hover:text-[#003BB5] transition-colors"
             >
               <Tag size={13} />
               Have a coupon code?
@@ -140,7 +140,7 @@ const CartSummaryCard = ({
             {couponOpen && (
               <div className="mt-3 space-y-2">
                 <div className="flex gap-2">
-                  <div className="flex-1 flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus-within:border-blue-400 transition-colors">
+                  <div className="flex-1 flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus-within:border-[#0057FF] transition-colors">
                     <input
                       type="text"
                       placeholder="Enter code"
@@ -153,7 +153,7 @@ const CartSummaryCard = ({
                   <button
                     onClick={handleApplyCoupon}
                     disabled={couponLoading || !code.trim() || !isLoggedIn}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-semibold hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center gap-1.5"
+                    className="px-4 py-2 bg-[#0057FF] text-white rounded-xl text-xs font-semibold hover:bg-[#003BB5] disabled:opacity-50 transition-colors flex items-center gap-1.5"
                   >
                     {couponLoading ? <Loader2 size={12} className="animate-spin" /> : 'Apply'}
                   </button>
@@ -180,12 +180,12 @@ const CartSummaryCard = ({
         </div>
         <div className="flex justify-between text-xs text-slate-600">
           <span>Delivery</span>
-          <span className={deliveryFee === 0 && subtotal > 0 ? 'text-emerald-600 font-medium' : 'text-slate-500'}>
+          <span className={deliveryFee === 0 && subtotal > 0 ? 'text-[#16A34A] font-medium' : 'text-slate-500'}>
             {subtotal === 0 ? '—' : deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}
           </span>
         </div>
         {couponDiscount > 0 && (
-          <div className="flex justify-between text-xs text-emerald-600 font-medium">
+          <div className="flex justify-between text-xs text-[#16A34A] font-medium">
             <span>Coupon ({appliedCoupon.code})</span>
             <span>−₹{couponDiscount}</span>
           </div>
@@ -222,7 +222,7 @@ const CartSummaryCard = ({
         <button
           onClick={onProceed}
           disabled={!canProceed || !isLoggedIn}
-          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 active:scale-[0.98] disabled:bg-slate-100 disabled:text-slate-400 transition-all"
+          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#0057FF] text-white text-sm font-semibold hover:bg-[#003BB5] active:scale-[0.98] disabled:bg-slate-100 disabled:text-slate-400 transition-all"
         >
           Proceed to Checkout <ArrowRight size={15} />
         </button>

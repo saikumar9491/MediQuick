@@ -74,7 +74,7 @@ const OrderDetailView = ({ order, onBack, token }) => {
           <button
             onClick={handleReorder}
             disabled={reordering}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#0057FF] text-white text-xs font-semibold hover:bg-[#003BB5] disabled:opacity-50"
           >
             <ShoppingBag size={13} /> {reordering ? 'Reordering...' : 'Reorder Items'}
           </button>
@@ -108,25 +108,25 @@ const OrderDetailView = ({ order, onBack, token }) => {
               <React.Fragment key={step.label}>
                 <div className="flex flex-col items-center gap-1.5">
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-semibold ${
-                    step.done ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400'
+                    step.done ? 'bg-green-50 text-[#16A34A] border border-green-200' : 'bg-slate-100 text-slate-400'
                   }`}>
                     {i + 1}
                   </div>
                   <span className={`text-[10px] font-medium text-center ${
-                    step.done ? 'text-emerald-700 font-semibold' : 'text-slate-400'
+                    step.done ? 'text-[#16A34A] font-semibold' : 'text-slate-400'
                   }`}>
                     {step.label}
                   </span>
                 </div>
                 {i < steps.length - 1 && (
-                  <div className={`flex-1 h-0.5 ${steps[i + 1].done ? 'bg-emerald-350 bg-emerald-400' : 'bg-slate-200'}`} />
+                  <div className={`flex-1 h-0.5 ${steps[i + 1].done ? 'bg-green-200' : 'bg-slate-200'}`} />
                 )}
               </React.Fragment>
             ))}
           </div>
         </div>
       ) : (
-        <div className="p-4 bg-red-50 border border-red-100 text-red-700 rounded-2xl text-xs flex items-center gap-2">
+        <div className="p-4 bg-red-50 border border-red-100 text-[#EF4444] rounded-2xl text-xs flex items-center gap-2">
           <ShieldAlert size={15} />
           This order was cancelled.
         </div>
@@ -151,7 +151,7 @@ const OrderDetailView = ({ order, onBack, token }) => {
                       setActiveProductId(item.productId || item._id);
                       setReviewModalOpen(true);
                     }}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-teal-50 hover:bg-teal-100 text-[#00a2a4] text-[10px] font-black mt-1.5 transition-colors border border-teal-100 cursor-pointer"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-blue-50 hover:bg-blue-100 text-[#0057FF] text-[10px] font-black mt-1.5 transition-colors border border-blue-100 cursor-pointer"
                   >
                     <Star size={10} className="fill-amber-400 text-amber-400 stroke-none" />
                     <span>Rate Product</span>
@@ -195,7 +195,16 @@ const OrderDetailView = ({ order, onBack, token }) => {
             </p>
             <div className="text-xs">
               <p className="font-semibold text-slate-800">{order.paymentMethod}</p>
-              <p className="text-slate-400 mt-0.5">Status: <span className="font-semibold text-slate-700">{order.isPaid ? 'Paid' : 'Pending'}</span></p>
+              <div className="flex items-center gap-1.5 mt-1.5">
+                <span className="text-slate-400">Status:</span>
+                <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded border ${
+                  order.isPaid 
+                    ? 'text-[#16A34A] bg-green-50 border-green-200' 
+                    : 'text-[#FF6B00] bg-orange-50 border-orange-200'
+                }`}>
+                  {order.isPaid ? 'Paid' : 'Pending'}
+                </span>
+              </div>
             </div>
           </div>
         </div>

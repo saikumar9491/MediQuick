@@ -94,7 +94,7 @@ const MyAppointmentsTab = () => {
             return (
               <div 
                 key={apt._id}
-                className="bg-white border border-slate-200/70 rounded-3xl p-6 shadow-xs hover:border-[#00a2a4]/40 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
+                className="bg-white border border-slate-200/70 rounded-3xl p-6 shadow-xs hover:border-[#0057FF]/40 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6"
               >
                 <div className="flex items-start gap-4 flex-1">
                   <img 
@@ -106,10 +106,10 @@ const MyAppointmentsTab = () => {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold text-slate-900">{doctor.name || "Doctor"}</span>
-                      <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
-                        isCompleted ? 'bg-emerald-100 text-emerald-700' :
-                        isCancelled ? 'bg-rose-100 text-rose-700' :
-                        'bg-blue-100 text-blue-700'
+                      <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                        isCompleted ? 'bg-green-50 text-[#16A34A] border-green-200' :
+                        isCancelled ? 'bg-red-50 text-[#EF4444] border-red-200' :
+                        'bg-blue-50 text-[#0057FF] border-blue-200'
                       }`}>
                         {apt.status}
                       </span>
@@ -119,16 +119,16 @@ const MyAppointmentsTab = () => {
 
                     <div className="flex flex-wrap items-center gap-3 text-xs text-slate-600 font-medium pt-1">
                       <span className="flex items-center gap-1">
-                        <Calendar size={13} className="text-[#00a2a4]" />
+                        <Calendar size={13} className="text-[#0057FF]" />
                         {apt.scheduledDate}
                       </span>
                       <span>•</span>
                       <span className="flex items-center gap-1">
-                        <Clock size={13} className="text-[#00a2a4]" />
+                        <Clock size={13} className="text-[#0057FF]" />
                         {apt.scheduledTimeSlot}
                       </span>
                       <span>•</span>
-                      <span className="capitalize text-[#00a2a4] font-bold">
+                      <span className="capitalize text-[#0057FF] font-bold">
                         {apt.mode} Session
                       </span>
                     </div>

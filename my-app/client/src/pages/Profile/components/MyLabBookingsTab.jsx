@@ -59,18 +59,22 @@ const MyLabBookingsTab = () => {
 
   const getStatusStyle = (status) => {
     switch (status) {
-      case 'Scheduled':
-        return 'text-blue-600 bg-blue-50 border-blue-100';
-      case 'Sample Collected':
-        return 'text-amber-600 bg-amber-50 border-amber-100';
-      case 'Processing':
-        return 'text-indigo-600 bg-indigo-50 border-indigo-100';
       case 'Report Ready':
-        return 'text-emerald-600 bg-emerald-50 border-emerald-100';
+      case 'Completed':
+      case 'Delivered':
+        return 'text-[#16A34A] bg-green-50 border-green-250';
+      case 'Sample Collected':
+      case 'Processing':
+      case 'Pending':
+        return 'text-[#FF6B00] bg-orange-50 border-orange-200';
       case 'Cancelled':
-        return 'text-slate-400 bg-slate-50 border-slate-100';
+      case 'Failed':
+        return 'text-[#EF4444] bg-red-50 border-red-250';
+      case 'Scheduled':
+      case 'Placed':
+      case 'New':
       default:
-        return 'text-slate-600 bg-slate-50 border-slate-200';
+        return 'text-[#0057FF] bg-blue-50 border-blue-200';
     }
   };
 

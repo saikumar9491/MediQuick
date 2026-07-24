@@ -77,7 +77,7 @@ const CartItemRow = ({ item, onQuantityChange, onRemove, disabled }) => {
       {/* Out-of-stock overlay label */}
       {isOos && (
         <div className="absolute top-3 right-3 z-10">
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-red-100 text-red-600 text-[10px] font-semibold rounded-full uppercase tracking-wider">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-red-50 border border-red-200 text-[#EF4444] text-[10px] font-black rounded-full uppercase tracking-wider shadow-2xs">
             <AlertCircle size={10} /> Out of Stock
           </span>
         </div>
@@ -125,13 +125,20 @@ const CartItemRow = ({ item, onQuantityChange, onRemove, disabled }) => {
             {hasDiscount && (
               <>
                 <span className="text-xs text-slate-400 line-through">₹{mrp}</span>
-                <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">
+                <span className="text-[10px] font-bold text-[#16A34A] bg-green-50 px-1.5 py-0.5 rounded">
                   {discountPct}% OFF
                 </span>
               </>
             )}
             <span className="text-[10px] text-slate-400">per unit</span>
           </div>
+
+          {/* In Stock check badge */}
+          {!isOos && (
+            <div className="flex items-center gap-1.5 mt-2 bg-green-50 text-[#16A34A] border border-green-200/50 px-2 py-0.5 rounded-full w-fit text-[9px] font-black uppercase tracking-wider">
+              In Stock
+            </div>
+          )}
 
           {/* Rx tag */}
           {item.needsRx && (
@@ -158,7 +165,7 @@ const CartItemRow = ({ item, onQuantityChange, onRemove, disabled }) => {
                   disabled={item.quantity <= 1 || updating || disabled}
                   className="w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-slate-50 disabled:opacity-30 transition-colors"
                 >
-                  <Minus size={13} />
+                  <Minus size={13} className="text-[#0057FF]" />
                 </button>
                 <span className="w-9 text-center text-sm font-semibold text-slate-800 border-x border-slate-200">
                   {item.quantity}
@@ -169,7 +176,7 @@ const CartItemRow = ({ item, onQuantityChange, onRemove, disabled }) => {
                   title={atStockLimit ? `Only ${item.countInStock} available` : ''}
                   className="w-8 h-8 flex items-center justify-center text-slate-500 hover:bg-slate-50 disabled:opacity-30 transition-colors"
                 >
-                  <Plus size={13} />
+                  <Plus size={13} className="text-[#0057FF]" />
                 </button>
               </div>
             ) : (
@@ -180,7 +187,7 @@ const CartItemRow = ({ item, onQuantityChange, onRemove, disabled }) => {
             <button
               onClick={handleRemove}
               disabled={removing || disabled}
-              className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-red-500 transition-colors disabled:opacity-40"
+              className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-[#EF4444] transition-colors disabled:opacity-40"
             >
               <Trash2 size={13} />
               Remove
