@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { ShoppingCart, RefreshCw, AlertTriangle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -19,6 +19,8 @@ const Cart = () => {
   const { token } = useAuth();
   const { cartItems, removeFromCart, updateQuantity, setCartItems } = useCart();
   const navigate = useNavigate();
+  const outletCtx = useOutletContext();
+  const shouldHideBottomBar = outletCtx?.shouldHideBottomBar ?? false;
 
   const [validating, setValidating] = useState(false);
   const [validationIssues, setValidationIssues] = useState([]);
@@ -269,7 +271,7 @@ const Cart = () => {
 
       {/* STICKY MOBILE BOTTOM CART BAR (Flipkart Style) */}
       {visibleItems.length > 0 && (
-        <div className="fixed bottom-16 left-0 right-0 z-40 bg-white border-t border-slate-200 px-6 py-3 flex items-center justify-between md:hidden shadow-[0_-4px_15px_rgba(0,0,0,0.06)] animate-in slide-in-from-bottom duration-300">
+        <div className={`fixed ${shouldHideBottomBar ? 'bottom-0' : 'bottom-16'} left-0 right-0 z-40 bg-white border-t border-slate-200 px-6 py-3 flex items-center justify-between md:hidden shadow-[0_-4px_15px_rgba(0,0,0,0.06)] animate-in slide-in-from-bottom duration-300`}>
           <div className="flex flex-col">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Total Amount</span>
             <div className="flex items-baseline gap-1.5">

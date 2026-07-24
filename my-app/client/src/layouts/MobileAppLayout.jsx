@@ -21,12 +21,25 @@ const MobileAppLayout = () => {
   // Detect keyboard visibility to hide bottom tab bar when typing
   useEffect(() => {
     const handleResize = () => {
-      const isKeyboard = window.innerHeight < window.screen.height * 0.75;
-      setIsKeyboardOpen(isKeyboard);
+      if (window.visualViewport) {
+        const isKeyboard = window.visualViewport.height < window.innerHeight * 0.85;
+        setIsKeyboardOpen(isKeyboard);
+      } else {
+        const isKeyboard = window.innerHeight < window.screen.height * 0.5;
+        setIsKeyboardOpen(isKeyboard);
+      }
     };
 
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleResize);
+    }
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleResize);
+      }
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   return (
@@ -50,7 +63,7 @@ const MobileAppLayout = () => {
             ? 'pt-28' // Offset for Header (14) + SearchBar (14) = 28 (7rem or 112px)
             : 'pt-14' // Offset for Header only
       } ${shouldHideBottomBar ? '' : 'pb-16'}`}>
-        <Outlet context={{ isSearchExpanded, setIsSearchExpanded }} />
+        <Outlet context={{ isSearchExpanded, setIsSearchExpanded, shouldHideBottomBar }} />
       </main>
 
       {/* 2. Search Overlay Triggered from other pages */}

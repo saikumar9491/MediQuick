@@ -86,7 +86,7 @@ const RecommendedProducts = ({ cartCategories = [] }) => {
           onMouseLeave={handleMouseLeave}
           onMouseUp={handleMouseUp}
           onMouseMove={handleMouseMove}
-          className="flex gap-3 overflow-x-auto pb-4 scroll-smooth snap-x snap-mandatory select-none cursor-grab active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex gap-3 overflow-x-auto pb-4 scroll-smooth select-none cursor-grab active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {products.map(product => {
             const salePrice = product.discountPrice && product.discountPrice < product.price
@@ -98,7 +98,7 @@ const RecommendedProducts = ({ cartCategories = [] }) => {
             return (
               <div
                 key={product._id}
-                className="flex-shrink-0 w-36 snap-start rounded-2xl border border-slate-200 bg-white overflow-hidden hover:border-slate-300 hover:shadow-sm transition-all"
+                className="flex-shrink-0 w-36 rounded-2xl border border-slate-200 bg-white overflow-hidden hover:border-slate-300 hover:shadow-sm transition-all"
               >
                 {/* Image */}
                 <button
