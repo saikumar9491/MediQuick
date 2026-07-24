@@ -34,6 +34,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { API_BASE } from '../../utils/apiConfig';
+import ShiftingCategoryNav from './ShiftingCategoryNav';
 
 const Navbar = ({ medicines = [] }) => {
   const navigate = useNavigate();
@@ -651,63 +652,8 @@ const Navbar = ({ medicines = [] }) => {
         </div>
       </div>
 
-      {/* Sub Row: Categories (Desktop Only) */}
-      <nav className="hidden border-b border-slate-100 bg-white sm:block px-4 sm:px-6 lg:px-8 relative z-40">
-        <div className="mx-auto flex max-w-[1440px] items-center justify-center gap-8 flex-nowrap">
-          {categories.map((cat) => (
-            <div
-              key={cat.name}
-              className="relative py-3"
-              onMouseEnter={() => setHoveredCategory(cat.name)}
-              onMouseLeave={() => setHoveredCategory(null)}
-            >
-              <Link
-                to={cat.path}
-                className="group flex items-center gap-1 text-[13px] font-normal text-slate-700 transition-all hover:text-[#00a2a4] whitespace-nowrap"
-              >
-                <span>{cat.name}</span>
-                <ChevronDown 
-                  size={12} 
-                  className={`text-slate-400 transition-transform ${
-                    hoveredCategory === cat.name ? 'rotate-180 text-[#00a2a4]' : ''
-                  }`} 
-                />
-              </Link>
-
-              <AnimatePresence>
-                {hoveredCategory === cat.name && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute left-0 top-full z-[100] mt-0 w-64 rounded-b-xl bg-white p-2 shadow-2xl border border-slate-100 border-t-0"
-                  >
-                    <div className="space-y-1">
-                      {cat.subOptions.map((option) => {
-                        const isObject = typeof option === 'object';
-                        const name = isObject ? option.name : option;
-                        const linkTo = isObject 
-                          ? option.path 
-                          : `${cat.path}${cat.path.includes('?') ? '&' : '?'}sub=${encodeURIComponent(option.toLowerCase().replace(/ /g, '-'))}`;
-                        
-                        return (
-                          <Link
-                            key={name}
-                            to={linkTo}
-                            className="block rounded-lg px-4 py-2.5 text-[12px] font-bold text-slate-700 hover:bg-slate-50 hover:text-[#00a2a4] transition-colors"
-                          >
-                            {name}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          ))}
-        </div>
-      </nav>
+      {/* Sub Row: Shifting Dropdown Categories (Desktop Only) */}
+      <ShiftingCategoryNav categories={categories} />
 
       {/* Mobile Drawer */}
       <AnimatePresence>
