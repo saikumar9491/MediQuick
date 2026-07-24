@@ -125,6 +125,22 @@ const Checkout = () => {
   const deliveryFee = isCareMember ? 0 : (subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE);
   const total = Math.max(0, subtotal + deliveryFee - couponDiscount - carePlanDiscount);
 
+  const isAddressOk = !!selectedAddress;
+  const isZoneOk = isServiceable === true;
+  const isPaymentOk = !!paymentMethod;
+  const isRxOk = !rxRequired || !!prescriptionUrl;
+  const canPlace = isAddressOk && isZoneOk && isPaymentOk && isRxOk && !isPlacingOrder;
+
+  const disabledReason = !isAddressOk
+    ? 'Select a delivery address'
+    : !isZoneOk
+    ? 'Delivery not available to this pincode'
+    : !isPaymentOk
+    ? 'Select a payment method'
+    : !isRxOk
+    ? 'Upload required prescription'
+    : null;
+
   // Load Razorpay checkout.js script
   const loadRazorpayScript = () =>
     new Promise(resolve => {

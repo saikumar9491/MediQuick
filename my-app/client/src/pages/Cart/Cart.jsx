@@ -12,6 +12,9 @@ import CartSummaryCard from './components/CartSummaryCard';
 import EmptyCartState from './components/EmptyCartState';
 import RecommendedProducts from './components/RecommendedProducts';
 
+const FREE_DELIVERY_THRESHOLD = 500;
+const DELIVERY_FEE = 49;
+
 const Cart = () => {
   const { token } = useAuth();
   const { cartItems, removeFromCart, updateQuantity, setCartItems } = useCart();
@@ -163,6 +166,15 @@ const Cart = () => {
   });
   const cartCategories = [...new Set(visibleItems.map(i => i.category).filter(Boolean))];
 
+  const activeItems = visibleItems.filter(i => !i.outOfStock);
+  const subtotal = activeItems.reduce((sum, i) => {
+    const p = i.discountPrice && i.discountPrice < i.price ? i.discountPrice : i.price;
+    return sum + p * (i.quantity || 1);
+  }, 0);
+  const couponDiscount = appliedCoupon?.discountAmount || 0;
+  const deliveryFee = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : (subtotal === 0 ? 0 : DELIVERY_FEE);
+  const totalAmount = subtotal + deliveryFee - couponDiscount;
+
   // ─── Render ──────────────────────────────────────────────────────────────
 
   if (visibleItems.length === 0 && Object.keys(pendingRemovals).length === 0) {
@@ -176,7 +188,7 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pt-8 pb-20 overflow-x-hidden">
+    <div className="min-h-screen bg-[#F8FAFC] pt-8 pb-36 md:pb-20 overflow-x-hidden">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
         {/* Page Header */}
@@ -254,6 +266,28 @@ const Cart = () => {
           </div>
         </div>
       </div>
+
+      {/* STICKY MOBILE BOTTOM CART BAR (Flipkart Style) */}
+      {visibleItems.length > 0 && (
+        <div className="fixed bottom-16 left-0 right-0 z-40 bg-white border-t border-slate-200 px-6 py-3 flex items-center justify-between md:hidden shadow-[0_-4px_15px_rgba(0,0,0,0.06)] animate-in slide-in-from-bottom duration-300">
+          <div className="flex flex-col">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Total Amount</span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-lg font-black text-slate-900">₹{totalAmount}</span>
+              {couponDiscount > 0 && (
+                <span className="text-[9px] font-bold text-[#16A34A]">Saved ₹{couponDiscount}</span>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={handleProceed}
+            disabled={activeItems.length === 0}
+            className="bg-[#0057FF] hover:bg-[#003BB5] disabled:bg-slate-100 disabled:text-slate-400 text-white text-xs font-black uppercase tracking-wider px-6 py-3 rounded-full shadow-md active:scale-95 transition-transform"
+          >
+            Place Order
+          </button>
+        </div>
+      )}
     </div>
   );
 };
