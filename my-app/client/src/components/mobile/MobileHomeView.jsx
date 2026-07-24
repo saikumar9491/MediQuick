@@ -72,29 +72,33 @@ const MobileHomeView = ({ medicines = [], featured = [], loading = false }) => {
     fetchRecommendations();
   }, [token]);
 
-  // Fetch or filter products when active tab changes
+  // Fetch or filter products when active tab changes on mobile
   useEffect(() => {
     if (activeTab === 'for-you') return;
 
-    // Map activeTab to category search key
-    let catQuery = activeTab;
-    if (activeTab === 'wellness') catQuery = 'immunity'; // Map wellness to immunity/boosters
+    // Normalize activeTab to category search string (handling hyphens vs spaces)
+    let catKey = activeTab.replace(/-/g, ' ').trim();
+    if (activeTab === 'wellness') catKey = 'immunity';
+    if (activeTab === 'medicines') catKey = '';
 
     setIsCatLoading(true);
     const fetchCategoryProducts = async () => {
       try {
-        // Try searching in localized medicines prop first to make it instant
-        const matched = medicines.filter(m => 
-          m.category?.toLowerCase() === catQuery || 
-          m.category?.toLowerCase().includes(catQuery)
-        );
+        const cleanKey = catKey.toLowerCase();
+        
+        // Match against localized medicines array
+        const matched = medicines.filter(m => {
+          if (!cleanKey) return true; // 'medicines' tab shows all items
+          const cat = (m.category || '').toLowerCase().replace(/-/g, ' ');
+          return cat.includes(cleanKey) || cleanKey.includes(cat);
+        });
 
         if (matched.length > 0) {
           setCatProducts(matched);
           setIsCatLoading(false);
         } else {
-          // Fallback to API call
-          const res = await fetch(`${API_BASE}/api/medicines?category=${encodeURIComponent(catQuery)}`);
+          // Fallback to API call with properly formatted category parameter
+          const res = await fetch(`${API_BASE}/api/medicines?category=${encodeURIComponent(catKey || 'All')}`);
           if (res.ok) {
             const data = await res.json();
             const results = Array.isArray(data) ? data : (data?.medicines || []);
