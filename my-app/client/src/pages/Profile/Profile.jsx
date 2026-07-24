@@ -90,37 +90,50 @@ const Profile = () => {
     <div className="min-h-screen bg-[#F8FAFC] py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         
-        {/* MOBILE PROFILE HEADER (Mockup style) */}
-        <div className="block md:hidden bg-white border border-slate-100 rounded-3xl p-5 mb-4 shadow-xs">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-full bg-[#0c2340] text-[#4895ef] flex items-center justify-center font-black text-lg select-none shadow-xs">
-              {profile?.name ? profile.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'RK'}
+        {/* MOBILE PROFILE HEADER (Full 11-Tab Navigation & Identity) */}
+        <div className="block md:hidden bg-white border border-slate-200/80 rounded-3xl p-4 mb-5 shadow-2xs">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3.5 min-w-0">
+              <div className="w-12 h-12 rounded-full bg-[#0057FF] text-white flex items-center justify-center font-black text-base select-none shadow-xs shrink-0">
+                {profile?.name ? profile.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'ME'}
+              </div>
+              <div className="min-w-0">
+                <h2 className="text-sm font-black text-slate-900 leading-tight truncate">
+                  {profile?.name || 'User Profile'}
+                </h2>
+                <p className="text-[11px] font-medium text-slate-400 truncate mt-0.5">
+                  {profile?.email || profile?.addresses?.[0]?.city || 'MediQuick Member'}
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-base font-black text-slate-800 leading-tight">{profile?.name || 'Ravi Kumar'}</h2>
-              <p className="text-xs font-bold text-slate-400 mt-0.5">{profile?.addresses?.[0]?.city || 'Kapurthala'}</p>
-            </div>
+
+            <button
+              onClick={handleLogout}
+              className="px-2.5 py-1.5 rounded-xl bg-rose-50 border border-rose-100 text-[#EF4444] text-[10px] font-black uppercase tracking-wider flex items-center gap-1 active:scale-95 transition-all shrink-0"
+              title="Logout"
+            >
+              <LogOut size={12} />
+              <span>Exit</span>
+            </button>
           </div>
 
-          {/* Tab selections (Mockup Screen 5 Pill Tabs) */}
-          <div className="flex items-center gap-4 mt-5 pt-3">
-            {[
-              { id: 'orders', label: 'Orders' },
-              { id: 'addresses', label: 'Address' },
-              { id: 'prescriptions', label: 'Rx' }
-            ].map(tab => {
+          {/* Horizontal Scrollable Tab Pills for ALL 11 Sections */}
+          <div className="flex items-center gap-2 mt-4 pt-3 border-t border-slate-100 overflow-x-auto no-scrollbar pb-1">
+            {tabs.map(tab => {
+              const Icon = tab.icon;
               const isSelected = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`text-xs font-black uppercase tracking-wider transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-extrabold shrink-0 transition-all active:scale-95 ${
                     isSelected 
-                      ? 'bg-[#0c2340] text-white px-5 py-2 rounded-full shadow-xs' 
-                      : 'text-slate-400 hover:text-slate-800 px-2'
+                      ? 'bg-[#0057FF] text-white shadow-2xs' 
+                      : 'bg-slate-50 text-slate-600 border border-slate-200/60 hover:bg-slate-100'
                   }`}
                 >
-                  {tab.label}
+                  <Icon size={12} className={isSelected ? 'text-white' : 'text-slate-400'} />
+                  <span>{tab.label}</span>
                 </button>
               );
             })}
