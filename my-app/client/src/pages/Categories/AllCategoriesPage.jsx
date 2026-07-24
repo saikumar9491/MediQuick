@@ -8,10 +8,115 @@ import {
   ShieldCheck, 
   ArrowRight, 
   LayoutGrid,
-  Package
+  Package,
+  ChevronRight,
+  Pill,
+  Leaf,
+  Activity,
+  Apple,
+  Heart,
+  Shield,
+  Baby,
+  Dog,
+  BookOpen,
+  Stethoscope,
+  Dumbbell,
+  FlaskConical,
+  Scissors,
+  Smile,
+  ShoppingBag
 } from 'lucide-react';
 import CategoryCard from './components/CategoryCard';
 import { API_BASE } from '../../utils/apiConfig';
+
+const iconMap = {
+  Pill, Leaf, Activity, Apple, Heart, Shield, Baby, Dog,
+  BookOpen, Stethoscope, Dumbbell, Sparkles, FlaskConical,
+  Scissors, Smile, Layers, LayoutGrid, ShoppingBag
+};
+
+const cardGradients = [
+  {
+    bg: 'from-violet-600 via-purple-600 to-indigo-700',
+    light: 'from-violet-50 to-purple-50',
+    accent: '#7c3aed',
+    badge: 'bg-white/20 text-white',
+    iconBg: 'bg-white/20',
+    hover: 'hover:shadow-violet-200'
+  },
+  {
+    bg: 'from-teal-500 via-[#00a2a4] to-emerald-600',
+    light: 'from-teal-50 to-emerald-50',
+    accent: '#00a2a4',
+    badge: 'bg-white/20 text-white',
+    iconBg: 'bg-white/20',
+    hover: 'hover:shadow-teal-200'
+  },
+  {
+    bg: 'from-rose-500 via-pink-600 to-red-500',
+    light: 'from-rose-50 to-pink-50',
+    accent: '#e11d48',
+    badge: 'bg-white/20 text-white',
+    iconBg: 'bg-white/20',
+    hover: 'hover:shadow-rose-200'
+  },
+  {
+    bg: 'from-amber-500 via-orange-500 to-yellow-500',
+    light: 'from-amber-50 to-orange-50',
+    accent: '#d97706',
+    badge: 'bg-white/20 text-white',
+    iconBg: 'bg-white/20',
+    hover: 'hover:shadow-amber-200'
+  },
+  {
+    bg: 'from-blue-600 via-sky-500 to-cyan-500',
+    light: 'from-blue-50 to-sky-50',
+    accent: '#0284c7',
+    badge: 'bg-white/20 text-white',
+    iconBg: 'bg-white/20',
+    hover: 'hover:shadow-blue-200'
+  },
+  {
+    bg: 'from-green-500 via-emerald-500 to-teal-500',
+    light: 'from-green-50 to-emerald-50',
+    accent: '#10b981',
+    badge: 'bg-white/20 text-white',
+    iconBg: 'bg-white/20',
+    hover: 'hover:shadow-emerald-200'
+  },
+  {
+    bg: 'from-slate-700 via-slate-600 to-slate-800',
+    light: 'from-slate-50 to-slate-100',
+    accent: '#475569',
+    badge: 'bg-white/20 text-white',
+    iconBg: 'bg-white/20',
+    hover: 'hover:shadow-slate-200'
+  },
+  {
+    bg: 'from-fuchsia-500 via-purple-500 to-pink-500',
+    light: 'from-fuchsia-50 to-pink-50',
+    accent: '#a21caf',
+    badge: 'bg-white/20 text-white',
+    iconBg: 'bg-white/20',
+    hover: 'hover:shadow-fuchsia-200'
+  },
+  {
+    bg: 'from-lime-500 via-green-500 to-emerald-600',
+    light: 'from-lime-50 to-green-50',
+    accent: '#65a30d',
+    badge: 'bg-white/20 text-white',
+    iconBg: 'bg-white/20',
+    hover: 'hover:shadow-lime-200'
+  },
+];
+
+const THEMED_ROUTES = {
+  'ayurveda': '/ayurveda',
+  'lab tests': '/lab-tests',
+  'diagnostics': '/lab-tests',
+  'doctor consultations': '/consult',
+  'consult top doctors': '/consult',
+};
 
 const AllCategoriesPage = () => {
   const navigate = useNavigate();
@@ -19,6 +124,16 @@ const AllCategoriesPage = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [totalCount, setTotalCount] = useState(0);
+  const [activeCategoryIdx, setActiveCategoryIdx] = useState(0);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchCategoriesData = async () => {
@@ -53,6 +168,141 @@ const AllCategoriesPage = () => {
   const activeCategories = filteredCategories.filter(c => c.count > 0);
   const totalDepts = categories.filter(c => c.count > 0).length;
 
+  const handleCategoryClick = (category) => {
+    const nameLower = (category.name || '').toLowerCase().trim();
+    const themed = THEMED_ROUTES[nameLower];
+    if (themed) {
+      navigate(themed);
+    } else {
+      navigate(`/medicines?category=${encodeURIComponent(category.name)}`);
+    }
+  };
+
+  const handleSubClick = (catName, subName) => {
+    navigate(`/medicines?category=${encodeURIComponent(catName)}&subCategory=${encodeURIComponent(subName)}`);
+  };
+
+  // Render Mobile Viewport Explorer
+  if (isMobile) {
+    const selectedCategory = activeCategories[activeCategoryIdx] || activeCategories[0];
+    const palette = cardGradients[activeCategoryIdx % cardGradients.length] || cardGradients[0];
+
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col pt-0 pb-16">
+        {/* Header Bar */}
+        <div className="bg-white border-b border-slate-100 px-4 py-3 flex items-center justify-between sticky top-14 z-20 shadow-3xs">
+          <h1 className="text-sm font-black text-slate-800 tracking-tight">Departments</h1>
+          <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider font-[IBM_Plex_Mono]">
+            {totalDepts} categories
+          </span>
+        </div>
+
+        {/* Categories Explorer Content Grid */}
+        {loading ? (
+          <div className="flex-1 flex items-center justify-center py-20 bg-white">
+            <span className="w-8 h-8 border-3 border-[#0057FF] border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : activeCategories.length > 0 ? (
+          <div className="flex flex-1 h-[calc(100vh-180px)] overflow-hidden">
+            
+            {/* Left Sidebar */}
+            <div className="w-24 bg-slate-100 border-r border-slate-200/50 overflow-y-auto flex-shrink-0 flex flex-col h-full">
+              {activeCategories.map((cat, idx) => {
+                const isActive = idx === activeCategoryIdx;
+                const IconComponent = iconMap[cat.iconName] || ShoppingBag;
+                return (
+                  <button
+                    key={cat._id || cat.name}
+                    onClick={() => setActiveCategoryIdx(idx)}
+                    className={`py-3.5 px-2 flex flex-col items-center text-center justify-center border-b border-slate-150/40 transition-all select-none focus:outline-none ${
+                      isActive 
+                        ? 'bg-white border-l-4 border-[#0057FF] text-[#0057FF] font-bold' 
+                        : 'text-slate-500 hover:bg-slate-100/50'
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center mb-1 ${
+                      isActive ? 'bg-[#0057FF]/10 text-[#0057FF]' : 'bg-slate-200/60 text-slate-400'
+                    }`}>
+                      <IconComponent size={16} />
+                    </div>
+                    <span className="text-[8.5px] font-bold leading-tight tracking-tight uppercase break-words w-full px-0.5">
+                      {cat.name.replace('Consultations', 'Consult')}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Right Active Panel */}
+            {selectedCategory && (
+              <div className="flex-1 bg-white overflow-y-auto p-4 flex flex-col h-full">
+                {/* Category Banner Card */}
+                <div className={`rounded-2xl p-4 bg-gradient-to-br ${palette.bg} text-white mb-4 relative overflow-hidden shadow-xs flex-shrink-0`}>
+                  <div className="absolute -right-6 -top-6 w-20 h-20 rounded-full bg-white/10 blur-md" />
+                  <span className="text-[8px] font-black uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-full border border-white/20 inline-block font-[IBM_Plex_Mono]">
+                    {selectedCategory.count} Products
+                  </span>
+                  <h2 className="text-base font-black tracking-tight mt-1.5 leading-tight">{selectedCategory.name}</h2>
+                  
+                  <button 
+                    onClick={() => handleCategoryClick(selectedCategory)}
+                    className="mt-3.5 inline-flex items-center gap-1.5 bg-white text-slate-900 font-extrabold text-[9px] uppercase tracking-wider px-3.5 py-2 rounded-full hover:scale-102 active:scale-98 transition-all"
+                  >
+                    <span>View All</span>
+                    <ChevronRight size={10} />
+                  </button>
+                </div>
+
+                {/* Subcategories Header Label */}
+                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2.5 block font-[IBM_Plex_Mono]">
+                  Subcategories
+                </span>
+
+                {/* Subcategories list grid */}
+                {selectedCategory.subOptions && selectedCategory.subOptions.length > 0 ? (
+                  <div className="grid grid-cols-2 gap-2 pb-8">
+                    {selectedCategory.subOptions.map((sub, i) => {
+                      const subName = typeof sub === 'object' ? sub.name : sub;
+                      const subCount = typeof sub === 'object' ? sub.count : 0;
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => handleSubClick(selectedCategory.name, subName)}
+                          className="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col justify-between text-left hover:border-[#0057FF]/30 hover:bg-[#0057FF]/5 active:scale-[0.98] transition-all min-h-[76px]"
+                        >
+                          <span className="text-[10px] font-bold text-slate-800 leading-snug line-clamp-2 w-full">{subName}</span>
+                          {subCount > 0 ? (
+                            <span className="text-[8px] font-extrabold text-slate-400 bg-slate-100 border border-slate-200/50 px-1.5 py-0.5 rounded-md inline-block max-w-max mt-2 font-[IBM_Plex_Mono]">
+                              {subCount} items
+                            </span>
+                          ) : (
+                            <span className="text-[8px] font-extrabold text-[#0057FF] uppercase tracking-wider mt-2 font-[IBM_Plex_Mono]">
+                              Explore
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="py-10 text-center border border-dashed border-slate-200 rounded-xl">
+                    <span className="text-xs font-semibold text-slate-400">No subcategories listed.</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+          </div>
+        ) : (
+          <div className="py-16 text-center">
+            <span className="text-xs font-semibold text-slate-400">No categories found.</span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Render Desktop Layout (original design)
   return (
     <div className="min-h-screen pb-24 pt-4 sm:pt-6" style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%)' }}>
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -66,16 +316,11 @@ const AllCategoriesPage = () => {
 
         {/* ─── HERO SECTION ─── */}
         <section className="relative mb-12 overflow-hidden rounded-[32px]">
-          {/* Background gradient */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(0,162,164,0.15)_0%,transparent_70%),radial-gradient(circle_at_20%_80%,rgba(124,58,237,0.1)_0%,transparent_60%),linear-gradient(135deg,#0a1628_0%,#0c2340_40%,#062a2b_100%)]" />
-          
-          {/* Decorative blob shapes */}
           <div className="absolute top-6 right-20 w-48 h-48 rounded-full bg-[#00a2a4]/10 blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 left-40 w-64 h-32 rounded-full bg-violet-600/10 blur-3xl pointer-events-none" />
 
           <div className="relative z-10 px-8 py-12 sm:px-14 sm:py-16 flex flex-col lg:flex-row items-center lg:items-start gap-8 justify-between">
-            
-            {/* Hero Left Text */}
             <div className="max-w-xl text-center lg:text-left">
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#00a2a4]/20 border border-[#00a2a4]/30 text-[10px] font-black uppercase tracking-[0.18em] text-[#00d4d6] mb-4">
                 <Layers size={12} /> Complete Health Directory
@@ -92,7 +337,6 @@ const AllCategoriesPage = () => {
                 Browse our complete range of health & wellness products. Every department stocked with 100% genuine certified brands.
               </p>
 
-              {/* Stats Row */}
               <div className="flex flex-wrap items-center gap-6 justify-center lg:justify-start">
                 <div className="text-center">
                   <p className="text-2xl font-black text-white">{totalCount}+</p>
@@ -111,7 +355,6 @@ const AllCategoriesPage = () => {
               </div>
             </div>
 
-            {/* Hero Right — decorative grid preview */}
             <div className="hidden lg:grid grid-cols-3 gap-3 flex-shrink-0">
               {['Vitamins', 'Skin Care', 'Diabetes', 'Heart Health', 'Ayurveda', 'Fitness'].map((name, i) => {
                 const colors = [
@@ -133,7 +376,6 @@ const AllCategoriesPage = () => {
                 );
               })}
             </div>
-
           </div>
         </section>
 
