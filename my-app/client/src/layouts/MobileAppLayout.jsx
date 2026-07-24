@@ -42,16 +42,30 @@ const MobileAppLayout = () => {
     };
   }, []);
 
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Track window scroll position to collapse top header and pin search bar on home page
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 25);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800">
-      {/* 1. Header Bar (Fixed, Always Visible except on immersive screens) */}
-      {!shouldHideHeader && <MobileHeader />}
+      {/* 1. Header Bar (Fixed, Slides up when scrolled on home page) */}
+      {!shouldHideHeader && (
+        <MobileHeader isHidden={currentPath === '/' && isScrolled} />
+      )}
 
-      {/* Search Bar (Only shown in static header layout on the home page) */}
+      {/* Search Bar (Pins to top-0 when scrolled on home page) */}
       {currentPath === '/' && !shouldHideHeader && (
         <MobileSearchBar 
           isExpandedExternal={isSearchExpanded} 
           onCloseExternal={() => setIsSearchExpanded(false)} 
+          isScrolled={isScrolled}
         />
       )}
 

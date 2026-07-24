@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { API_BASE } from '../../utils/apiConfig';
 import toast from 'react-hot-toast';
 
-const MobileHeader = () => {
+const MobileHeader = ({ isHidden = false }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -95,7 +95,9 @@ const MobileHeader = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-40 bg-white border-b border-slate-200/80 h-13 px-2.5 sm:px-4 flex items-center justify-between gap-1 select-none">
+      <header className={`fixed top-0 left-0 right-0 z-40 bg-white border-b border-slate-200/80 h-13 px-2.5 sm:px-4 flex items-center justify-between gap-1 select-none transition-transform duration-300 ease-in-out ${
+        isHidden ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'
+      }`}>
         {/* 1. Left: Compact Logo */}
         <Link to="/" className="flex items-center gap-1 shrink-0">
           <div className="flex h-5.5 w-5.5 items-center justify-center rounded-md bg-[#0057FF] text-white shadow-2xs">

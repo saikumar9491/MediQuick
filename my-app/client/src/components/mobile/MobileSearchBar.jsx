@@ -4,7 +4,7 @@ import { Search, Mic, Scan, ArrowLeft, X, Trash2, Clock, Zap } from 'lucide-reac
 import { API_BASE } from '../../utils/apiConfig';
 import toast from 'react-hot-toast';
 
-const MobileSearchBar = ({ isExpandedExternal, onCloseExternal }) => {
+const MobileSearchBar = ({ isExpandedExternal, onCloseExternal, isScrolled = false }) => {
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -154,8 +154,10 @@ const MobileSearchBar = ({ isExpandedExternal, onCloseExternal }) => {
 
   return (
     <>
-      {/* Standard closed state bar - fixed below header */}
-      <div className="fixed top-14 left-0 right-0 z-35 bg-white px-4 py-2 border-b border-slate-150 h-14 flex items-center">
+      {/* Standard closed state bar - fixed below header or at top when scrolled */}
+      <div className={`fixed left-0 right-0 z-40 bg-white px-3.5 py-1.5 border-b border-slate-200/80 h-13 flex items-center transition-all duration-300 ease-in-out shadow-2xs ${
+        isScrolled ? 'top-0 border-b border-slate-300' : 'top-13'
+      }`}>
         <div 
           onClick={handleOpenSearch}
           className="w-full h-10 rounded-full bg-slate-100/90 border border-slate-200/80 px-4 flex items-center justify-between cursor-pointer"
