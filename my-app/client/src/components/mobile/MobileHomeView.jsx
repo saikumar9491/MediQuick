@@ -32,7 +32,7 @@ const MobileHomeView = ({ medicines = [], featured = [], loading = false }) => {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/banners`);
+        const res = await fetch(`${API_BASE}/api/admin/banners`);
         if (res.ok) {
           const data = await res.json();
           if (Array.isArray(data)) {

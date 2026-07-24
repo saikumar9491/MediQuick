@@ -120,6 +120,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/banners', bannerRoutes);
+app.use('/api/admin/banners', bannerRoutes);
 app.use('/api/brands', brandRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/coupons', couponRoutes);
