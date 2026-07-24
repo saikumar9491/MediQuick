@@ -177,6 +177,8 @@ function AppLayout({ medicines, featured, loading }) {
         {!user && <GoogleOneTapPrompt />}
 
         <Routes>
+          <Route path="/categories" element={<MobileCategories />} />
+
           <Route element={<MobileAppLayout />}>
             <Route path="/" element={<Home medicines={medicines} featured={featured} loading={loading} />} />
             <Route path="/login" element={<AuthPage />} />
@@ -187,7 +189,6 @@ function AppLayout({ medicines, featured, loading }) {
             <Route path="/brand/:brandName" element={<BrandPage />} />
 
             <Route path="/medicines" element={<MedicinesPage />} />
-            <Route path="/categories" element={<MobileCategories />} />
             <Route path="/category/home-health-monitors" element={<HomeHealthMonitors />} />
             <Route path="/categories/home-health-monitors" element={<HomeHealthMonitors />} />
             <Route path="/lab-tests" element={<LabTestsHome />} />
