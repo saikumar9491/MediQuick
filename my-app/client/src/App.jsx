@@ -37,6 +37,7 @@ import Orders from './pages/admin/Orders/Orders';
 import AdminTrendingProducts from './pages/AdminTrendingProducts';
 import AllCategoriesPage from './pages/Categories/AllCategoriesPage';
 import HomeHealthMonitors from './pages/Categories/HomeHealthMonitors';
+import MobileCategories from './pages/MobileCategories/MobileCategories';
 import AdminLayout from './components/admin/AdminLayout';
 import CommandCenter from './pages/admin/CommandCenter/CommandCenter';
 import Products from './pages/admin/Products/Products';
@@ -182,7 +183,7 @@ function AppLayout({ medicines, featured, loading }) {
             <Route path="/brand/:brandName" element={<BrandPage />} />
 
             <Route path="/medicines" element={<MedicinesPage />} />
-            <Route path="/categories" element={<AllCategoriesPage />} />
+            <Route path="/categories" element={<MobileCategories />} />
             <Route path="/category/home-health-monitors" element={<HomeHealthMonitors />} />
             <Route path="/categories/home-health-monitors" element={<HomeHealthMonitors />} />
             <Route path="/lab-tests" element={<LabTestsHome />} />
