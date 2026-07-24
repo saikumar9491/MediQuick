@@ -41,32 +41,6 @@ const RecommendedProducts = ({ cartCategories = [] }) => {
     }
   };
 
-  const isDown = useRef(false);
-  const startX = useRef(0);
-  const scrollLeft = useRef(0);
-
-  const handleMouseDown = (e) => {
-    isDown.current = true;
-    startX.current = e.pageX - scrollRef.current.offsetLeft;
-    scrollLeft.current = scrollRef.current.scrollLeft;
-  };
-
-  const handleMouseLeave = () => {
-    isDown.current = false;
-  };
-
-  const handleMouseUp = () => {
-    isDown.current = false;
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isDown.current) return;
-    e.preventDefault();
-    const x = e.pageX - scrollRef.current.offsetLeft;
-    const walk = (x - startX.current) * 1.5; // Scroll speed multiplier
-    scrollRef.current.scrollLeft = scrollLeft.current - walk;
-  };
-
   if (!loading && products.length === 0) return null;
 
   return (
@@ -82,11 +56,7 @@ const RecommendedProducts = ({ cartCategories = [] }) => {
       ) : (
         <div
           ref={scrollRef}
-          onMouseDown={handleMouseDown}
-          onMouseLeave={handleMouseLeave}
-          onMouseUp={handleMouseUp}
-          onMouseMove={handleMouseMove}
-          className="flex gap-3 overflow-x-auto pb-4 scroll-smooth select-none cursor-grab active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex gap-3 overflow-x-auto pb-4 scroll-smooth touch-pan-x [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {products.map(product => {
             const salePrice = product.discountPrice && product.discountPrice < product.price
