@@ -110,14 +110,23 @@ const MobileHeader = () => {
           <ChevronDown size={10} className="text-slate-400" />
         </button>
 
-        {/* Right: Notification and Profile */}
-        <div className="flex items-center gap-3">
+        {/* Right: Flash Sale, Notification and Profile */}
+        <div className="flex items-center gap-2">
+          <Link 
+            to="/medicines?filter=flash"
+            className="flex items-center gap-1 bg-gradient-to-r from-[#FF6B00] to-[#EF4444] text-white text-[9.5px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-2xs animate-pulse active:scale-95 transition-all"
+            title="Flash Deals"
+          >
+            <Zap size={11} className="fill-current" />
+            <span>Flash</span>
+          </Link>
+
           <button 
             onClick={() => navigate('/notifications')} 
             className="p-1 text-slate-500 hover:text-slate-800 transition-colors"
             title="Notifications"
           >
-            <Bell size={20} />
+            <Bell size={19} />
           </button>
           
           {user ? (

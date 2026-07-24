@@ -62,7 +62,9 @@ const MobileCategories = () => {
     }
   };
 
-  const activeCategory = categories.find(c => c._id === activeCategoryId || c.name === activeCategoryId) || categories[0];
+  const activeCategory = activeCategoryId === 'flash-deals-special' 
+    ? { _id: 'flash-deals-special', name: 'Flash Deals', subOptions: ['All Flash Deals', '⚡ 25% OFF'] }
+    : (categories.find(c => c._id === activeCategoryId || c.name === activeCategoryId) || categories[0]);
 
   return (
     <div className="w-full h-screen overflow-hidden bg-slate-50 flex flex-col font-sans select-none md:hidden">

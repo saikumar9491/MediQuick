@@ -39,24 +39,34 @@ const SubcategoryRightPanel = ({
       if (!categoryName) return;
       setLoading(true);
       try {
-        let url = `${API_BASE}/api/medicines?limit=50&category=${encodeURIComponent(categoryName)}`;
-        if (activeSubChip && activeSubChip !== 'All') {
-          url += `&subCategory=${encodeURIComponent(activeSubChip)}`;
+        const isFlashCategory = activeCategory?._id === 'flash-deals-special' || categoryName === 'Flash Deals';
+
+        if (isFlashCategory) {
+          const res = await fetch(`${API_BASE}/api/medicines?limit=50`);
+          const data = await res.json();
+          const list = Array.isArray(data) ? data : (data.medicines || []);
+          const flashItems = list.filter(m => m.isFlashDeal && m.isActive !== false);
+          setProducts(flashItems);
+        } else {
+          let url = `${API_BASE}/api/medicines?limit=50&category=${encodeURIComponent(categoryName)}`;
+          if (activeSubChip && activeSubChip !== 'All') {
+            url += `&subCategory=${encodeURIComponent(activeSubChip)}`;
+          }
+
+          const res = await fetch(url);
+          const data = await res.json();
+          let items = data.medicines || data || [];
+
+          // Fallback: If subcategory query yields 0 items, fetch all products for parent category
+          if (items.length === 0 && activeSubChip !== 'All') {
+            const fallbackUrl = `${API_BASE}/api/medicines?limit=50&category=${encodeURIComponent(categoryName)}`;
+            const fallbackRes = await fetch(fallbackUrl);
+            const fallbackData = await fallbackRes.json();
+            items = fallbackData.medicines || fallbackData || [];
+          }
+
+          setProducts(items);
         }
-
-        const res = await fetch(url);
-        const data = await res.json();
-        let items = data.medicines || data || [];
-
-        // Fallback: If subcategory query yields 0 items, fetch all products for parent category
-        if (items.length === 0 && activeSubChip !== 'All') {
-          const fallbackUrl = `${API_BASE}/api/medicines?limit=50&category=${encodeURIComponent(categoryName)}`;
-          const fallbackRes = await fetch(fallbackUrl);
-          const fallbackData = await fallbackRes.json();
-          items = fallbackData.medicines || fallbackData || [];
-        }
-
-        setProducts(items);
       } catch (err) {
         console.error('Failed to load category products:', err);
       } finally {

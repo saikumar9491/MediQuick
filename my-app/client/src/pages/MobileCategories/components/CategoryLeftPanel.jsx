@@ -20,13 +20,14 @@ import {
   ShoppingBag,
   Flame,
   Sun,
-  Crosshair
+  Crosshair,
+  Zap
 } from 'lucide-react';
 
 const iconMap = {
   Pill, Leaf, Activity, Apple, Heart, Shield, Baby, Dog,
   BookOpen, Stethoscope, Dumbbell, Sparkles, FlaskConical,
-  Scissors, Smile, Layers, LayoutGrid, ShoppingBag, Flame, Sun, Crosshair
+  Scissors, Smile, Layers, LayoutGrid, ShoppingBag, Flame, Sun, Crosshair, Zap
 };
 
 // Preset colors for category icon tiles matching MediQuick color system
@@ -72,45 +73,49 @@ const CategoryLeftPanel = ({
     (cat.name || '').toLowerCase().includes(searchQuery.toLowerCase().trim())
   );
 
+  const flashTile = { _id: 'flash-deals-special', name: 'Flash Deals', iconName: 'Zap' };
+  const displayCategories = [flashTile, ...filteredCategories];
+
   return (
     <div className="w-[68px] sm:w-[72px] bg-[#F8F9FA] border-r border-slate-200/70 overflow-y-auto flex-shrink-0 flex flex-col h-full no-scrollbar select-none">
-      {filteredCategories.length === 0 ? (
-        <div className="p-2 text-center text-[8px] font-bold text-slate-400 mt-4">
-          No category
-        </div>
-      ) : (
-        filteredCategories.map((cat, index) => {
-          const isActive = cat._id === activeCategoryId || cat.name === activeCategoryId;
-          const IconComponent = iconMap[cat.iconName] || LayoutGrid;
-          const style = getCategoryColorStyle(cat.name, index, isActive);
+      {displayCategories.map((cat, index) => {
+        const isFlashTile = cat._id === 'flash-deals-special';
+        const isActive = cat._id === activeCategoryId || cat.name === activeCategoryId;
+        const IconComponent = isFlashTile ? Zap : (iconMap[cat.iconName] || LayoutGrid);
+        
+        let style = getCategoryColorStyle(cat.name, index, isActive);
+        if (isFlashTile) {
+          style = isActive 
+            ? { tileBg: 'bg-[#FF6B00]', iconColor: 'text-white' } 
+            : { tileBg: 'bg-orange-100/80', iconColor: 'text-[#FF6B00]' };
+        }
 
-          return (
-            <button
-              key={cat._id || cat.name}
-              onClick={() => onSelectCategory(cat._id || cat.name)}
-              className={`py-3 px-1 flex flex-col items-center justify-center text-center transition-all cursor-pointer relative ${
-                isActive 
-                  ? 'bg-white border-l-[2.5px] border-[#0057FF]' 
-                  : 'bg-[#F8F9FA] border-l-[2.5px] border-transparent hover:bg-slate-100/60'
-              }`}
-            >
-              {/* 28x28px Icon Tile */}
-              <div className={`w-[28px] h-[28px] rounded-lg flex items-center justify-center mb-1 shadow-2xs transition-transform ${style.tileBg} ${isActive ? 'scale-105' : ''}`}>
-                <IconComponent className={`w-3.5 h-3.5 ${style.iconColor}`} />
-              </div>
+        return (
+          <button
+            key={cat._id || cat.name}
+            onClick={() => onSelectCategory(cat._id || cat.name)}
+            className={`py-3 px-1 flex flex-col items-center justify-center text-center transition-all cursor-pointer relative ${
+              isActive 
+                ? 'bg-white border-l-[2.5px] border-[#0057FF]' 
+                : 'bg-[#F8F9FA] border-l-[2.5px] border-transparent hover:bg-slate-100/60'
+            }`}
+          >
+            {/* 28x28px Icon Tile */}
+            <div className={`w-[28px] h-[28px] rounded-lg flex items-center justify-center mb-1 shadow-2xs transition-transform ${style.tileBg} ${isActive ? 'scale-105' : ''}`}>
+              <IconComponent className={`w-3.5 h-3.5 ${style.iconColor}`} />
+            </div>
 
-              {/* Category Name below */}
-              <span className={`text-[7.5px] leading-tight text-center break-words w-full px-0.5 line-clamp-2 ${
-                isActive 
-                  ? 'font-bold text-[#0057FF]' 
-                  : 'font-medium text-slate-500'
-              }`}>
-                {cat.name}
-              </span>
-            </button>
-          );
-        })
-      )}
+            {/* Category Name below */}
+            <span className={`text-[7.5px] leading-tight text-center break-words w-full px-0.5 line-clamp-2 ${
+              isActive 
+                ? 'font-bold text-[#0057FF]' 
+                : 'font-medium text-slate-500'
+            }`}>
+              {cat.name}
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 };
