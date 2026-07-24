@@ -147,8 +147,8 @@ const MobileHomeView = ({ medicines = [], featured = [], loading = false }) => {
       {/* Category Tab Bar (Horizontal Scroll, Below Search) */}
       <CategoryTabBar activeTab={activeTab} setActiveTab={handleTabChange} />
 
-      {/* Main content body with top padding to clear category tab bar */}
-      <div className="pt-16">
+      {/* Main content body */}
+      <div>
         {activeTab === 'for-you' ? (
           <div className="space-y-3 pb-8">
             {/* Carousel */}

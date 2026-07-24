@@ -24,7 +24,7 @@ const CategoryTabBar = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <div className="fixed top-28 left-0 right-0 z-30 bg-white border-b border-slate-150 h-16 flex items-center overflow-x-auto whitespace-nowrap scrollbar-none px-4 gap-5">
+    <div className="w-full bg-white border-b border-slate-200/80 h-14 flex items-center overflow-x-auto whitespace-nowrap scrollbar-none px-4 gap-4 shrink-0 shadow-2xs">
       {tabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeTab === tab.id;
