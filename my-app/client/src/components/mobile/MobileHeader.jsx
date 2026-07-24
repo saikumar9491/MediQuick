@@ -48,35 +48,41 @@ const MobileHeader = () => {
         setUserPincode(detectedPincode);
         window.dispatchEvent(new Event('locationChanged'));
         setShowLocationModal(false);
-        toast.success(`Detected location: ${city} (${detectedPincode})`);
-      } catch (error) {
-        console.error("Error detecting location:", error);
-        toast.error('Failed to resolve address. Please enter a pincode.');
+        toast.success(`Location updated to ${city}`);
+      } catch (err) {
+        toast.error('Could not auto-detect location');
       } finally {
         setIsDetecting(false);
       }
-    }, (error) => {
-      console.error(error);
+    }, (err) => {
       setIsDetecting(false);
-      toast.error('Permission denied or location unavailable');
+      toast.error('Location permission denied or unavailable');
     });
   };
 
-  const handlePincodeSubmit = (e) => {
+  const handleManualPincode = async (e) => {
     e.preventDefault();
-    if (!/^\d{6}$/.test(pincodeInput)) {
-      toast.error('Please enter a valid 6-digit Pincode');
+    if (!pincodeInput || pincodeInput.trim().length !== 6) {
+      toast.error('Please enter a valid 6-digit PIN code');
       return;
     }
 
-    let area = 'Delhi Area';
-    if (pincodeInput.startsWith('11')) area = 'New Delhi';
-    else if (pincodeInput.startsWith('40')) area = 'Mumbai';
-    else if (pincodeInput.startsWith('56')) area = 'Bengaluru';
-    else if (pincodeInput.startsWith('60')) area = 'Chennai';
-    else if (pincodeInput.startsWith('14')) area = 'Kapurthala';
-    else area = `Pincode ${pincodeInput}`;
+    try {
+      const res = await fetch(`https://api.postalpincode.in/pincode/${pincodeInput.trim()}`);
+      const data = await res.json();
+      if (data && data[0] && data[0].Status === 'Success' && data[0].PostOffice?.length > 0) {
+        const po = data[0].PostOffice[0];
+        const area = po.District || po.Name || 'Area';
+        saveLocation(area);
+      } else {
+        saveLocation('Pincode Area');
+      }
+    } catch (err) {
+      saveLocation('Pincode Area');
+    }
+  };
 
+  const saveLocation = (area) => {
     localStorage.setItem('locationName', area);
     localStorage.setItem('userPincode', pincodeInput);
     
@@ -89,122 +95,130 @@ const MobileHeader = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-40 bg-white border-b border-slate-150 h-14 px-4 flex items-center justify-between">
-        {/* Left: Compact Logo */}
-        <Link to="/" className="flex items-center gap-1.5 shrink-0">
-          <div className="flex h-6 w-6 items-center justify-center rounded bg-[#0057FF] text-white">
+      <header className="fixed top-0 left-0 right-0 z-40 bg-white border-b border-slate-200/80 h-13 px-2.5 sm:px-4 flex items-center justify-between gap-1 select-none">
+        {/* 1. Left: Compact Logo */}
+        <Link to="/" className="flex items-center gap-1 shrink-0">
+          <div className="flex h-5.5 w-5.5 items-center justify-center rounded-md bg-[#0057FF] text-white shadow-2xs">
             <span className="text-[10px] font-black">M</span>
           </div>
-          <span className="text-xs font-black tracking-tight uppercase">
+          <span className="text-[11px] sm:text-xs font-black tracking-tight uppercase">
             <span className="text-[#0057FF]">MEDI</span><span className="text-[#FF6B00]">QUICK</span>
           </span>
         </Link>
 
-        {/* Center: Location Pill */}
+        {/* 2. Center: Compact Location Pill */}
         <button
           onClick={() => setShowLocationModal(true)}
-          className="flex items-center gap-1 max-w-[50%] bg-slate-50 border border-slate-200 px-3 py-1 rounded-full text-xs font-bold text-slate-700 shadow-3xs active:scale-95 transition-all hover:bg-slate-100"
+          className="flex items-center gap-1 max-w-[105px] xs:max-w-[125px] sm:max-w-[160px] bg-slate-50 border border-slate-200/80 px-2 py-0.5 rounded-full text-[10.5px] font-bold text-slate-700 shadow-3xs active:scale-95 transition-all hover:bg-slate-100 shrink-1 overflow-hidden"
+          title="Select Location"
         >
-          <MapPin size={11} className="text-[#0057FF]" />
+          <MapPin size={10} className="text-[#0057FF] shrink-0" />
           <span className="truncate">{locationName} {userPincode}</span>
-          <ChevronDown size={10} className="text-slate-400" />
+          <ChevronDown size={9} className="text-slate-400 shrink-0" />
         </button>
 
-        {/* Right: Flash Sale, Notification and Profile */}
-        <div className="flex items-center gap-2">
+        {/* 3. Right: Flash Sale, Notification and Profile Icons */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {/* Flash Sale Pill */}
           <Link 
             to="/medicines?filter=flash"
-            className="flex items-center gap-1 bg-gradient-to-r from-[#FF6B00] to-[#EF4444] text-white text-[9.5px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full shadow-2xs animate-pulse active:scale-95 transition-all"
+            className="flex items-center gap-0.5 bg-gradient-to-r from-[#FF6B00] to-[#EF4444] text-white text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full shadow-2xs animate-pulse active:scale-95 transition-all"
             title="Flash Deals"
           >
-            <Zap size={11} className="fill-current" />
-            <span>Flash</span>
+            <Zap size={10} className="fill-current" />
+            <span>FLASH</span>
           </Link>
 
+          {/* Notification Bell */}
           <button 
             onClick={() => navigate('/notifications')} 
-            className="p-1 text-slate-500 hover:text-slate-800 transition-colors"
+            className="p-1 text-slate-600 hover:text-slate-900 transition-colors active:scale-95"
             title="Notifications"
           >
-            <Bell size={19} />
+            <Bell size={17} />
           </button>
           
-          {user ? (
-            <Link 
-              to="/profile" 
-              className="h-7 w-7 rounded-full bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center"
-              title="Account"
-            >
-              {user?.image ? (
-                <img src={user.image} className="h-full w-full object-cover" alt="" />
-              ) : (
-                <User size={15} className="text-slate-500" />
-              )}
-            </Link>
-          ) : (
-            <Link
-              to="/login"
-              className="bg-[#0057FF] hover:bg-[#003BB5] text-white text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-2xs transition-all active:scale-95 flex items-center gap-1"
-            >
-              <span>Login</span>
-            </Link>
-          )}
+          {/* Profile / Account Icon */}
+          <Link 
+            to={user ? "/profile" : "/login"} 
+            className="h-6.5 w-6.5 rounded-full bg-slate-100 border border-slate-200/90 overflow-hidden flex items-center justify-center active:scale-95 shrink-0"
+            title={user ? "Account" : "Login"}
+          >
+            {user?.image ? (
+              <img src={user.image} className="h-full w-full object-cover" alt="Profile" />
+            ) : (
+              <User size={14} className="text-slate-600" />
+            )}
+          </Link>
         </div>
       </header>
 
-      {/* Location Picker Drawer/Modal */}
+      {/* Location Modal */}
       {showLocationModal && (
-        <div className="fixed inset-0 z-[150] bg-slate-900/60 backdrop-blur-xs flex items-end justify-center">
-          <div className="bg-white w-full rounded-t-3xl p-6 pb-8 animate-in slide-in-from-bottom duration-300 max-w-md">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">Choose your Delivery Location</h3>
-              <button 
-                onClick={() => setShowLocationModal(false)} 
-                className="p-1 hover:bg-slate-100 rounded-full"
-              >
-                <X size={20} className="text-slate-400" />
-              </button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-5 shadow-2xl animate-fadeIn relative">
+            <button
+              onClick={() => setShowLocationModal(false)}
+              className="absolute right-4 top-4 p-1 text-slate-400 hover:text-slate-600 rounded-lg"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="flex items-center gap-2 mb-4">
+              <div className="p-2 rounded-xl bg-blue-50 text-[#0057FF]">
+                <MapPin size={18} />
+              </div>
+              <div>
+                <h3 className="text-sm font-black uppercase tracking-tight text-slate-900">Select Delivery Location</h3>
+                <p className="text-[10px] font-bold text-slate-400">Pincode determines medicine availability</p>
+              </div>
             </div>
 
-            {/* GPS Detection button */}
+            {/* Auto Detect Button */}
             <button
               onClick={handleDetectLocation}
               disabled={isDetecting}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-blue-50 hover:bg-blue-100 text-[#0057FF] text-xs font-bold transition-all border border-blue-100 mb-6 disabled:opacity-50"
+              className="w-full mb-4 flex items-center justify-center gap-2 rounded-xl bg-[#0057FF] hover:bg-[#0046CC] text-white py-2.5 text-xs font-black uppercase tracking-wider shadow-xs transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               {isDetecting ? (
                 <>
-                  <Loader2 size={15} className="animate-spin" />
+                  <Loader2 size={14} className="animate-spin" />
                   <span>Detecting GPS Location...</span>
                 </>
               ) : (
                 <>
-                  <MapPin size={15} />
-                  <span>Detect My Location using GPS</span>
+                  <MapPin size={14} />
+                  <span>Use Current GPS Location</span>
                 </>
               )}
             </button>
 
-            <div className="relative flex items-center justify-center mb-6">
-              <div className="absolute inset-x-0 h-px bg-slate-200"></div>
-              <span className="relative bg-white px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest">Or enter pincode</span>
+            <div className="relative flex items-center justify-center mb-4">
+              <div className="border-t border-slate-200 w-full" />
+              <span className="bg-white px-2 text-[10px] font-black uppercase tracking-widest text-slate-400 absolute">OR</span>
             </div>
 
-            {/* Pincode Input Form */}
-            <form onSubmit={handlePincodeSubmit} className="space-y-4">
-              <input
-                type="text"
-                maxLength={6}
-                placeholder="Enter 6-digit Pincode (e.g. 144411)"
-                value={pincodeInput}
-                onChange={(e) => setPincodeInput(e.target.value.replace(/\D/g, ''))}
-                className="w-full text-center tracking-widest text-lg font-black rounded-2xl bg-slate-50 border border-slate-200 px-4 py-3.5 focus:border-[#0057FF] focus:ring-4 focus:ring-blue-50 outline-none"
-              />
+            {/* Manual Pincode Input */}
+            <form onSubmit={handleManualPincode} className="space-y-3">
+              <div>
+                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1">
+                  Enter 6-Digit Pincode
+                </label>
+                <input
+                  type="text"
+                  maxLength={6}
+                  placeholder="e.g. 144411"
+                  value={pincodeInput}
+                  onChange={(e) => setPincodeInput(e.target.value.replace(/\D/g, ''))}
+                  className="w-full rounded-xl border border-slate-200 px-3.5 py-2 text-xs font-bold text-slate-800 outline-none focus:border-[#0057FF] transition-all"
+                />
+              </div>
+
               <button
                 type="submit"
-                className="w-full py-4 bg-[#0057FF] hover:bg-[#003BB5] text-white text-xs font-extrabold uppercase tracking-widest rounded-2xl transition-colors shadow-lg shadow-blue-500/10 active:scale-[0.98]"
+                className="w-full rounded-xl bg-slate-900 hover:bg-slate-800 text-white py-2.5 text-xs font-black uppercase tracking-wider transition-all active:scale-95 cursor-pointer"
               >
-                Set Location
+                Apply Pincode
               </button>
             </form>
           </div>
