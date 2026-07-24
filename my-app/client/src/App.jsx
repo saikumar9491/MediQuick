@@ -32,6 +32,7 @@ import CarePlanPage from './pages/CarePlanPage';
 import SkinCarePage from './pages/SkinCarePage';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminFlashDeals from './pages/AdminFlashDeals';
+import AdminBanners from './pages/AdminBanners';
 import AddProduct from './pages/admin/AddProduct/AddProduct';
 import Orders from './pages/admin/Orders/Orders';
 import AdminTrendingProducts from './pages/AdminTrendingProducts';
@@ -239,6 +240,7 @@ function AppLayout({ medicines, featured, loading }) {
                 <Route path="complaints" element={<Complaints />} />
                 <Route path="returns" element={<ReturnsRefunds />} />
                 <Route path="flash-sales" element={<AdminFlashDeals />} />
+                <Route path="banners" element={<AdminBanners />} />
                 <Route path="ai-pricing" element={<AIPricing />} />
                 <Route path="notifications-composer" element={<NotificationComposer />} />
                 <Route path="ab-testing" element={<ABTesting />} />

@@ -22,21 +22,36 @@ const MobileHomeView = ({ medicines = [], featured = [], loading = false }) => {
   const [isCatLoading, setIsCatLoading] = useState(false);
 
   // Banners from API
-  const [dbBanners, setDbBanners] = useState([]);
-  const [isBannerLoading, setIsBannerLoading] = useState(true);
+  const [dbBanners, setDbBanners] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('mq_cached_banners');
+      return cached ? JSON.parse(cached) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+  const [isBannerLoading, setIsBannerLoading] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('mq_cached_banners');
+      return !cached || JSON.parse(cached).length === 0;
+    } catch (e) {
+      return true;
+    }
+  });
 
   // Recommendation products
   const [orderBasedRecs, setOrderBasedRecs] = useState([]);
 
-  // Fetch Banners
+  // Fetch Banners with background revalidation
   useEffect(() => {
     const fetchBanners = async () => {
       try {
         const res = await fetch(`${API_BASE}/api/admin/banners`);
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data)) {
+          if (Array.isArray(data) && data.length > 0) {
             setDbBanners(data);
+            sessionStorage.setItem('mq_cached_banners', JSON.stringify(data));
           }
         }
       } catch (err) {

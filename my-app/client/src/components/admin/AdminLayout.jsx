@@ -187,6 +187,7 @@ const AdminLayout = () => {
     {
       title: 'Marketing & Growth',
       items: [
+        { id: 'banners', label: 'Banners Manager', icon: Image },
         { id: 'coupons', label: 'Coupons', icon: Tag },
         { id: 'flash-sales', label: 'Flash Sales', icon: Zap },
         { id: 'marketing', label: 'Marketing', icon: Megaphone },
