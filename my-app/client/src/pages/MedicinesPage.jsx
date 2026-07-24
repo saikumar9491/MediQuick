@@ -71,7 +71,7 @@ const MedicinesPage = () => {
         'supports': 'Supports & Braces',
         'immunity': 'Immunity Boosters',
         'homeopathy': 'Homeopathy',
-        'pet-care': 'Pet Care'
+        'skin-care': 'Skin Care'
       };
       if (map[initialFilterParam]) {
         setSelectedCategory(map[initialFilterParam]);

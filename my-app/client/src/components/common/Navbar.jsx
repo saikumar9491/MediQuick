@@ -228,10 +228,10 @@ const Navbar = ({ medicines = [] }) => {
       subOptions: ['Cough & Cold', 'Digestion', 'Skin Care', 'Hair Care']
     },
     { 
-      name: 'Pet Care', 
-      iconName: 'Dog', 
-      path: '/medicines?filter=pet-care',
-      subOptions: ['Dog Food', 'Cat Food', 'Pet Grooming', 'Pet Medicines']
+      name: 'Skin Care', 
+      iconName: 'Smile', 
+      path: '/skin-care',
+      subOptions: ['Face Wash & Cleansers', 'Sunscreen & SPF', 'Moisturizers & Lotions', 'Serums & Treatments', 'Anti-Aging Creams', 'Lip Care', 'Acne Care']
     },
   ];
 

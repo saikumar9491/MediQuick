@@ -9,7 +9,7 @@ const CATEGORIES = {
   'Supports & Braces': ['Knee Supports', 'Back Supports', 'Ankle Supports', 'Wrist Supports'],
   'Immunity Boosters': ['Chyawanprash', 'Herbal Juices', 'Vitamin C', 'Zinc'],
   'Homeopathy': ['Cough & Cold', 'Digestion', 'Skin Care', 'Hair Care'],
-  'Pet Care': ['Dog Food', 'Cat Food', 'Pet Grooming', 'Pet Medicines']
+  'Skin Care': ['Face Wash & Cleansers', 'Sunscreen & SPF', 'Moisturizers & Lotions', 'Serums & Treatments', 'Anti-Aging Creams', 'Lip Care', 'Acne Care']
 };
 
 const BasicInfoSection = ({ formData, onChange, errors }) => {

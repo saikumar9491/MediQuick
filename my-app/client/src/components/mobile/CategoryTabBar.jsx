@@ -20,8 +20,7 @@ const CategoryTabBar = ({ activeTab, setActiveTab }) => {
     { id: 'ayurveda', label: 'Ayurveda', icon: Leaf, filter: 'ayurveda', tint: 'bg-[#16A34A]/10 text-[#16A34A]' },
     { id: 'fitness', label: 'Fitness', icon: Dumbbell, filter: 'fitness', tint: 'bg-[#FF6B00]/10 text-[#FF6B00]' },
     { id: 'wellness', label: 'Wellness', icon: Activity, filter: 'immunity', tint: 'bg-[#16A34A]/10 text-[#16A34A]' },
-    { id: 'sexual-wellness', label: 'Sexual', icon: Heart, filter: 'sexual-wellness', tint: 'bg-[#EF4444]/10 text-[#EF4444]' },
-    { id: 'pet-care', label: 'Pet Care', icon: Dog, filter: 'pet-care', tint: 'bg-[#FF6B00]/10 text-[#FF6B00]' },
+    { id: 'sexual-wellness', label: 'Sexual', icon: Heart, filter: 'sexual-wellness', tint: 'bg-[#EF4444]/10 text-[#EF4444]' }
   ];
 
   return (

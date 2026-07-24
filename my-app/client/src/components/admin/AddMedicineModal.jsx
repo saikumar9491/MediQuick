@@ -15,7 +15,7 @@ const AddMedicineModal = ({ isOpen, onClose, onAdd, initialData }) => {
     { name: 'Diabetes', subOptions: ['Insulin', 'Glucose Monitors', 'Diabetic Diet', 'Supplements'] },
     { name: 'Cardiac', subOptions: ['Blood Pressure', 'Cholesterol', 'Heart Support', 'Aspirin'] },
     { name: 'Ayurveda', subOptions: ['Chyawanprash', 'Ashwagandha', 'Herbal Tea', 'Triphala'] },
-    { name: 'Pet Care', subOptions: ['Dog Food', 'Cat Food', 'Pet Grooming', 'Pet Medicines'] }
+    { name: 'Skin Care', subOptions: ['Face Wash & Cleansers', 'Sunscreen & SPF', 'Moisturizers & Lotions', 'Serums & Treatments', 'Anti-Aging Creams', 'Lip Care', 'Acne Care'] }
   ]);
 
   const [formData, setFormData] = useState({
