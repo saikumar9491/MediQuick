@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Star, Plus, Minus, ShoppingCart, Loader2 } from 'lucide-react';
+import { Star, Plus, Minus, ShoppingCart, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { API_BASE } from '../../utils/apiConfig';
@@ -194,24 +194,56 @@ export const MobileProductCard = ({ product }) => {
 };
 
 const ProductScrollRow = ({ title, products = [], seeAllLink }) => {
+  const rowRef = React.useRef(null);
   if (!products || products.length === 0) return null;
+
+  const scrollLeft = () => {
+    if (rowRef.current) rowRef.current.scrollBy({ left: -260, behavior: 'smooth' });
+  };
+
+  const scrollRight = () => {
+    if (rowRef.current) rowRef.current.scrollBy({ left: 260, behavior: 'smooth' });
+  };
 
   return (
     <div className="space-y-3.5 bg-white py-4 px-4 border-b border-slate-100">
       <div className="flex justify-between items-center">
         <h3 className="text-sm font-black text-slate-800 uppercase tracking-wider">{title}</h3>
-        {seeAllLink && (
-          <Link 
-            to={seeAllLink} 
-            className="text-xs font-black text-[#FF6B00] hover:text-[#E55A00] uppercase tracking-wider flex items-center gap-0.5 hover:underline"
-          >
-            See All
-          </Link>
-        )}
+        
+        <div className="flex items-center gap-2">
+          {/* Side Scroll Arrow Controls (< >) */}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={scrollLeft}
+              className="p-1 rounded-lg bg-slate-100 hover:bg-[#0057FF] hover:text-white text-slate-600 transition-all cursor-pointer active:scale-95 border border-slate-200/80"
+              title="Scroll Left"
+            >
+              <ChevronLeft size={15} strokeWidth={2.5} />
+            </button>
+            <button
+              type="button"
+              onClick={scrollRight}
+              className="p-1 rounded-lg bg-slate-100 hover:bg-[#0057FF] hover:text-white text-slate-600 transition-all cursor-pointer active:scale-95 border border-slate-200/80"
+              title="Scroll Right"
+            >
+              <ChevronRight size={15} strokeWidth={2.5} />
+            </button>
+          </div>
+
+          {seeAllLink && (
+            <Link 
+              to={seeAllLink} 
+              className="text-xs font-black text-[#FF6B00] hover:text-[#E55A00] uppercase tracking-wider flex items-center gap-0.5 hover:underline"
+            >
+              See All
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* Horizontal scrolling wrapper */}
-      <div className="flex overflow-x-auto gap-3.5 pb-2.5 scrollbar-none snap-x">
+      <div ref={rowRef} className="flex overflow-x-auto gap-3.5 pb-2.5 scrollbar-none snap-x scroll-smooth">
         {products.map((product) => (
           <div key={product._id} className="snap-start">
             <MobileProductCard product={product} />

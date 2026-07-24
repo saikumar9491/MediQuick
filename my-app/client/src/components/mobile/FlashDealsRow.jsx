@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Zap, Clock, ChevronRight } from 'lucide-react';
+import { Zap, Clock, ChevronRight, ChevronLeft } from 'lucide-react';
 import { API_BASE } from '../../utils/apiConfig';
 import { MobileProductCard } from './ProductScrollRow';
 
 const FlashDealsRow = () => {
+  const rowRef = React.useRef(null);
   const [flashProducts, setFlashProducts] = useState([]);
+
+  const scrollLeft = () => {
+    if (rowRef.current) rowRef.current.scrollBy({ left: -260, behavior: 'smooth' });
+  };
+
+  const scrollRight = () => {
+    if (rowRef.current) rowRef.current.scrollBy({ left: 260, behavior: 'smooth' });
+  };
   const [activeFlashCoupon, setActiveFlashCoupon] = useState(null);
   const [timeLeft, setTimeLeft] = useState('08h : 42m : 15s');
   const [loading, setLoading] = useState(true);
@@ -91,20 +100,42 @@ const FlashDealsRow = () => {
           </div>
         </div>
 
-        {/* Ticking Countdown Timer */}
-        <Link 
-          to="/medicines?filter=flash"
-          className="flex items-center gap-2"
-        >
-          <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#FF6B00] to-[#EF4444] text-white px-2.5 py-1.5 rounded-xl text-[10px] font-mono font-black shadow-2xs">
-            <Clock size={12} className="text-white" />
-            <span>{timeLeft}</span>
+        <div className="flex items-center gap-2">
+          {/* Side Scroll Arrow Controls (< >) */}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={scrollLeft}
+              className="p-1 rounded-lg bg-orange-50 hover:bg-[#FF6B00] hover:text-white text-[#FF6B00] transition-all cursor-pointer active:scale-95 border border-orange-100"
+              title="Scroll Left"
+            >
+              <ChevronLeft size={14} strokeWidth={2.5} />
+            </button>
+            <button
+              type="button"
+              onClick={scrollRight}
+              className="p-1 rounded-lg bg-orange-50 hover:bg-[#FF6B00] hover:text-white text-[#FF6B00] transition-all cursor-pointer active:scale-95 border border-orange-100"
+              title="Scroll Right"
+            >
+              <ChevronRight size={14} strokeWidth={2.5} />
+            </button>
           </div>
-        </Link>
+
+          {/* Ticking Countdown Timer */}
+          <Link 
+            to="/medicines?filter=flash"
+            className="flex items-center gap-2"
+          >
+            <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#FF6B00] to-[#EF4444] text-white px-2 py-1 rounded-xl text-[10px] font-mono font-black shadow-2xs">
+              <Clock size={12} className="text-white" />
+              <span>{timeLeft}</span>
+            </div>
+          </Link>
+        </div>
       </div>
 
-      {/* Product List Horizontal Scroll */}
-      <div className="flex overflow-x-auto gap-3 pb-1 scrollbar-none snap-x">
+      {/* Product List Horizontal Scroll with hidden scrollbars */}
+      <div ref={rowRef} className="flex overflow-x-auto gap-3 pb-1 no-scrollbar scrollbar-none snap-x scroll-smooth">
         {flashProducts.map((product) => (
           <div key={product._id} className="snap-start shrink-0">
             <MobileProductCard product={product} />

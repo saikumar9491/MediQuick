@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { 
   Sparkles, 
   ShoppingBag, 
@@ -8,10 +8,22 @@ import {
   Activity, 
   Heart, 
   Dog,
-  ShieldCheck
+  ShieldCheck,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 
 const CategoryTabBar = ({ activeTab, setActiveTab }) => {
+  const barRef = useRef(null);
+
+  const scrollLeft = () => {
+    if (barRef.current) barRef.current.scrollBy({ left: -180, behavior: 'smooth' });
+  };
+
+  const scrollRight = () => {
+    if (barRef.current) barRef.current.scrollBy({ left: 180, behavior: 'smooth' });
+  };
+
   const tabs = [
     { id: 'for-you', label: 'For You', icon: Sparkles, tint: 'bg-[#0057FF]/10 text-[#0057FF]' },
     { id: 'medicines', label: 'Medicines', icon: ShoppingBag, filter: '', tint: 'bg-[#0057FF]/10 text-[#0057FF]' },
@@ -24,33 +36,53 @@ const CategoryTabBar = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <div className="w-full bg-white border-b border-slate-200/80 h-14 flex items-center overflow-x-auto whitespace-nowrap scrollbar-none px-4 gap-4 shrink-0 shadow-2xs">
-      {tabs.map((tab) => {
-        const Icon = tab.icon;
-        const isActive = activeTab === tab.id;
-        
-        return (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id, tab.filter)}
-            className="flex flex-col items-center gap-1 shrink-0 h-full justify-center relative px-1 transition-all"
-          >
-            <div className={`p-1.5 rounded-full transition-colors ${
-              isActive ? tab.tint : 'bg-slate-100 text-slate-500'
-            }`}>
-              <Icon size={18} className={isActive ? 'fill-current' : ''} />
-            </div>
-            <span className={`text-[10px] font-bold tracking-tight uppercase ${
-              isActive ? 'text-[#0057FF] font-black' : 'text-slate-500'
-            }`}>
-              {tab.label}
-            </span>
-            {isActive && (
-              <div className="absolute bottom-0 inset-x-0 h-0.5 bg-[#0057FF] rounded-t-full" />
-            )}
-          </button>
-        );
-      })}
+    <div className="w-full bg-white border-b border-slate-200/80 h-14 flex items-center shrink-0 shadow-2xs relative group px-2">
+      <button
+        type="button"
+        onClick={scrollLeft}
+        className="p-1 rounded-full bg-white/90 shadow-sm border border-slate-200 text-slate-600 hover:text-[#0057FF] transition-all cursor-pointer shrink-0 z-10 mr-1 active:scale-95"
+        title="Scroll Left"
+      >
+        <ChevronLeft size={14} strokeWidth={2.5} />
+      </button>
+
+      <div ref={barRef} className="flex-1 flex items-center overflow-x-auto whitespace-nowrap no-scrollbar scrollbar-none gap-4 h-full scroll-smooth">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id, tab.filter)}
+              className="flex flex-col items-center gap-1 shrink-0 h-full justify-center relative px-1 transition-all cursor-pointer"
+            >
+              <div className={`p-1.5 rounded-full transition-colors ${
+                isActive ? tab.tint : 'bg-slate-100 text-slate-500'
+              }`}>
+                <Icon size={16} className={isActive ? 'fill-current' : ''} />
+              </div>
+              <span className={`text-[9.5px] font-bold tracking-tight uppercase ${
+                isActive ? 'text-[#0057FF] font-black' : 'text-slate-500'
+              }`}>
+                {tab.label}
+              </span>
+              {isActive && (
+                <div className="absolute bottom-0 inset-x-0 h-0.5 bg-[#0057FF] rounded-t-full" />
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      <button
+        type="button"
+        onClick={scrollRight}
+        className="p-1 rounded-full bg-white/90 shadow-sm border border-slate-200 text-slate-600 hover:text-[#0057FF] transition-all cursor-pointer shrink-0 z-10 ml-1 active:scale-95"
+        title="Scroll Right"
+      >
+        <ChevronRight size={14} strokeWidth={2.5} />
+      </button>
     </div>
   );
 };
