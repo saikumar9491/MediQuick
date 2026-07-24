@@ -86,6 +86,23 @@ router.post('/validate', verifyToken, async (req, res) => {
   }
 });
 
+// @route   GET /api/coupons/public/active
+// @desc    Get active coupons (public)
+// @access  Public
+router.get('/public/active', async (req, res) => {
+  try {
+    const now = new Date();
+    const activeCoupons = await Coupon.find({
+      isActive: true,
+      validFrom: { $lte: now },
+      validTo: { $gte: now }
+    });
+    res.json(activeCoupons);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // GET /api/coupons
 router.get('/', verifyToken, isAdmin, async (req, res) => {
   try {

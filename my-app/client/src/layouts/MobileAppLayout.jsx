@@ -1,0 +1,74 @@
+import React, { useState, useEffect } from 'react';
+import { useLocation, Outlet } from 'react-router-dom';
+import MobileHeader from '../components/mobile/MobileHeader';
+import MobileSearchBar from '../components/mobile/MobileSearchBar';
+import MobileBottomTabBar from '../components/mobile/MobileBottomTabBar';
+
+const MobileAppLayout = () => {
+  const location = useLocation();
+  const currentPath = location.pathname;
+
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
+  // Immersive screens where the bottom tab bar or header should be hidden
+  const hideHeaderRoutes = ['/verify-otp', '/reset-password', '/checkout', '/order-confirmation'];
+  const hideBottomBarRoutes = ['/verify-otp', '/reset-password', '/checkout', '/order-confirmation'];
+
+  const shouldHideHeader = hideHeaderRoutes.some(r => currentPath.startsWith(r));
+  const shouldHideBottomBar = hideBottomBarRoutes.some(r => currentPath.startsWith(r)) || isKeyboardOpen;
+
+  // Detect keyboard visibility to hide bottom tab bar when typing
+  useEffect(() => {
+    const handleResize = () => {
+      const isKeyboard = window.innerHeight < window.screen.height * 0.75;
+      setIsKeyboardOpen(isKeyboard);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800">
+      {/* 1. Header Bar (Fixed, Always Visible except on immersive screens) */}
+      {!shouldHideHeader && <MobileHeader />}
+
+      {/* Search Bar (Only shown in static header layout on the home page) */}
+      {currentPath === '/' && !shouldHideHeader && (
+        <MobileSearchBar 
+          isExpandedExternal={isSearchExpanded} 
+          onCloseExternal={() => setIsSearchExpanded(false)} 
+        />
+      )}
+
+      {/* Main Content Area (Scrollable with proper padding offsets) */}
+      <main className={`flex-1 flex flex-col ${
+        shouldHideHeader 
+          ? '' 
+          : currentPath === '/' 
+            ? 'pt-28' // Offset for Header (14) + SearchBar (14) = 28 (7rem or 112px)
+            : 'pt-14' // Offset for Header only
+      } ${shouldHideBottomBar ? '' : 'pb-16'}`}>
+        <Outlet context={{ isSearchExpanded, setIsSearchExpanded }} />
+      </main>
+
+      {/* 2. Search Overlay Triggered from other pages */}
+      {currentPath !== '/' && isSearchExpanded && (
+        <MobileSearchBar 
+          isExpandedExternal={isSearchExpanded} 
+          onCloseExternal={() => setIsSearchExpanded(false)} 
+        />
+      )}
+
+      {/* 3. Bottom Tab Bar (Fixed, Docked at Bottom) */}
+      {!shouldHideBottomBar && (
+        <MobileBottomTabBar 
+          onSearchTabClick={() => setIsSearchExpanded(true)} 
+        />
+      )}
+    </div>
+  );
+};
+
+export default MobileAppLayout;

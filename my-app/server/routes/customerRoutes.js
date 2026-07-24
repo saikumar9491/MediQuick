@@ -7,6 +7,9 @@ import Prescription from '../models/Prescription.js';
 import { verifyToken } from '../middleware/authMiddleware.js';
 import Wishlist from '../models/Wishlist.js';
 import RestockSubscription from '../models/RestockSubscription.js';
+import ViewHistory from '../models/ViewHistory.js';
+import Medicine from '../models/Medicine.js';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 
@@ -524,6 +527,167 @@ router.post('/me/delete-account', verifyToken, async (req, res) => {
 
     await user.save();
     res.json({ message: 'Your account has been deleted successfully.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+// Helper to optionally get user from auth token
+const getOptionalUser = async (req) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.split(" ")[1] : authHeader;
+  if (!token) return null;
+  try {
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    return verified;
+  } catch (error) {
+    return null;
+  }
+};
+
+/**
+ * @route   POST /api/customers/recently-viewed
+ * @desc    Track recently viewed product
+ * @access  Public
+ */
+router.post('/recently-viewed', async (req, res) => {
+  try {
+    const { productId, sessionId } = req.body;
+    if (!productId) {
+      return res.status(400).json({ message: 'Product ID is required' });
+    }
+    const verifiedUser = await getOptionalUser(req);
+    const userId = verifiedUser ? verifiedUser.id : null;
+    const finalSessionId = sessionId || 'guest-session';
+
+    // Find if viewed recently (within 5 minutes) to update instead of creating duplicates
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    let view = await ViewHistory.findOne({
+      productId,
+      $or: [
+        ...(userId ? [{ userId }] : []),
+        { sessionId: finalSessionId }
+      ],
+      viewedAt: { $gte: fiveMinutesAgo }
+    });
+
+    if (view) {
+      view.viewedAt = new Date();
+      if (userId && !view.userId) {
+        view.userId = userId;
+      }
+      await view.save();
+    } else {
+      view = new ViewHistory({
+        userId,
+        sessionId: finalSessionId,
+        productId,
+        viewedAt: new Date()
+      });
+      await view.save();
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+/**
+ * @route   GET /api/customers/recently-viewed
+ * @desc    Get recently viewed products for the current user/session
+ * @access  Public
+ */
+router.get('/recently-viewed', async (req, res) => {
+  try {
+    const { sessionId } = req.query;
+    const verifiedUser = await getOptionalUser(req);
+    const userId = verifiedUser ? verifiedUser.id : null;
+    const finalSessionId = sessionId || 'guest-session';
+
+    // Build query
+    const query = {};
+    if (userId) {
+      query.$or = [{ userId }, { sessionId: finalSessionId }];
+    } else {
+      query.sessionId = finalSessionId;
+    }
+
+    // Get unique product views (last 10 unique product IDs)
+    const views = await ViewHistory.find(query)
+      .sort({ viewedAt: -1 })
+      .populate('productId')
+      .exec();
+
+    // Filter out duplicate productIds and ensure product still exists (is not null)
+    const seen = new Set();
+    const uniqueProducts = [];
+    for (const view of views) {
+      if (view.productId && !seen.has(view.productId._id.toString())) {
+        seen.add(view.productId._id.toString());
+        uniqueProducts.push(view.productId);
+        if (uniqueProducts.length >= 10) break;
+      }
+    }
+
+    res.json(uniqueProducts);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
+/**
+ * @route   GET /api/customers/recommendations/based-on-orders
+ * @desc    Get recommendations based on past order categories
+ * @access  Private (Logged-in only)
+ */
+router.get('/recommendations/based-on-orders', verifyToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    
+    // Find all past orders for the user
+    const orders = await Order.find({ userId });
+    
+    if (!orders || orders.length === 0) {
+      return res.json([]); // return empty array if no past orders
+    }
+
+    // Collect all purchased product IDs and their categories
+    const purchasedProductIds = new Set();
+    const categories = new Set();
+
+    for (const order of orders) {
+      if (order.items && Array.isArray(order.items)) {
+        for (const item of order.items) {
+          if (item.productId) {
+            purchasedProductIds.add(item.productId.toString());
+          }
+        }
+      }
+    }
+
+    // Retrieve categories of these purchased products
+    const purchasedProducts = await Medicine.find({ _id: { $in: Array.from(purchasedProductIds) } });
+    for (const prod of purchasedProducts) {
+      if (prod.category) {
+        categories.add(prod.category);
+      }
+    }
+
+    if (categories.size === 0) {
+      return res.json([]);
+    }
+
+    // Query products from these same categories that have NOT already been purchased
+    const recommended = await Medicine.find({
+      category: { $in: Array.from(categories) },
+      _id: { $nin: Array.from(purchasedProductIds) },
+      isActive: { $ne: false } // ensure they are active products
+    })
+    .limit(10)
+    .exec();
+
+    res.json(recommended);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }

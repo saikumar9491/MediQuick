@@ -26,6 +26,7 @@ import { API_BASE } from '../utils/apiConfig';
 import toast from 'react-hot-toast';
 
 import FeaturedBrands from '../components/common/FeaturedBrands';
+import MobileHomeView from '../components/mobile/MobileHomeView';
 
 
 const Home = ({ medicines = [], featured = [], loading = true }) => {
@@ -33,6 +34,21 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   const { addToCart } = useCart();
   const { token, user } = useAuth();
   const fileInputRef = useRef(null);
+  
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  if (isMobile) {
+    return <MobileHomeView medicines={medicines} featured={featured} loading={loading} />;
+  }
+
   const categoryScrollRef = useRef(null);
   const trendingScrollRef = useRef(null);
   const skinCareScrollRef = useRef(null);

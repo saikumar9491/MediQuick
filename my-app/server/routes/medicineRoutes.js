@@ -17,6 +17,7 @@ import {
   recalculateBestsellers
 } from '../controllers/medicineController.js';
 import { verifyToken, isAdmin } from '../middleware/authMiddleware.js';
+import SearchLog from '../models/SearchLog.js';
 
 const router = express.Router();
 
@@ -39,6 +40,30 @@ router.get('/related/:id', getRelatedMedicines);
 
 // 3.5. Fetch sales stats for a medicine
 router.get('/:id/sales-stats', getSalesStats);
+
+// 3.7. Fetch public trending search terms
+router.get('/trending-searches', async (req, res) => {
+  try {
+    const logs = await SearchLog.find({ createdAt: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } });
+    const termCounts = {};
+    logs.forEach(l => {
+      const q = l.query?.trim().toLowerCase();
+      if (q) {
+        termCounts[q] = (termCounts[q] || 0) + 1;
+      }
+    });
+    const topSearches = Object.keys(termCounts)
+      .map(term => ({ term, count: termCounts[term] }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 10)
+      .map(x => x.term);
+    
+    const defaultTrending = ['paracetamol', 'cough syrup', 'vitamin c', 'face wash', 'shampoo', 'pain relief'];
+    res.json(topSearches.length > 0 ? topSearches : defaultTrending);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // 4. Fetch a single medicine by its specific MongoDB _id
 router.get('/:id', getMedicineById);

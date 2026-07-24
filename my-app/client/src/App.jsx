@@ -72,6 +72,7 @@ import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import ScrollToTop from './components/common/ScrollToTop';
+import MobileAppLayout from './layouts/MobileAppLayout';
 
 const ProtectedRoute = () => {
   const { user, loading } = useAuth();
@@ -133,6 +134,16 @@ function AppLayout({ medicines, featured, loading }) {
   const location = useLocation();
   const { user } = useAuth();
 
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // 🛡️ Added /verify-otp to hidden routes to maintain focus
   const hideNavbarRoutes = ['/verify-otp', '/reset-password', '/admin'];
   const hideWhatsAppRoutes = ['/admin', '/verify-otp', '/reset-password'];
@@ -147,6 +158,118 @@ function AppLayout({ medicines, featured, loading }) {
     hideFooterRoutes.some(r => location.pathname.startsWith(r)) || 
     location.pathname.startsWith('/admin') || 
     location.pathname.endsWith('/book');
+
+  if (isMobile) {
+    return (
+      <>
+        <Toaster
+          position="top-center"
+          reverseOrder={false}
+          toastOptions={{
+            style: { fontSize: '12px', fontWeight: '700' },
+          }}
+        />
+        
+        <AuthModal />
+        {!user && <GoogleOneTapPrompt />}
+
+        <Routes>
+          <Route element={<MobileAppLayout />}>
+            <Route path="/" element={<Home medicines={medicines} featured={featured} loading={loading} />} />
+            <Route path="/verify-otp" element={<VerifyOtp />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route path="/brand/:brandName" element={<BrandPage />} />
+
+            <Route path="/medicines" element={<MedicinesPage />} />
+            <Route path="/categories" element={<AllCategoriesPage />} />
+            <Route path="/lab-tests" element={<LabTestsHome />} />
+            <Route path="/lab-tests/:id" element={<LabTestDetail />} />
+            <Route path="/lab_tests" element={<LabTestsHome />} />
+            <Route path="/lab_tests/:id" element={<LabTestDetail />} />
+            <Route path="/consult" element={<ConsultPage />} />
+            <Route path="/consult-doctor" element={<ConsultPage />} />
+            <Route path="/consult-doctor/:id" element={<DoctorDetailsPage />} />
+            <Route path="/doctor-details/:id" element={<DoctorDetailsPage />} />
+            <Route path="/ayurveda" element={<AyurvedaPage />} />
+            <Route path="/category/ayurveda" element={<AyurvedaPage />} />
+            <Route path="/care-plan" element={<CarePlanPage />} />
+            <Route path="/skin-care" element={<SkinCarePage />} />
+            <Route path="/offers" element={<div className="pt-24 p-4 text-center font-bold">Offers coming soon!</div>} />
+
+            <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/medicines/:id" element={<ProductDetails />} />
+
+            <Route element={<ProtectedRoute />}>
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/lab-tests/:id/book" element={<LabTestBooking />} />
+              <Route path="/lab_tests/:id/book" element={<LabTestBooking />} />
+              <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+              <Route path="/my-orders" element={<MyOrders />} />
+              <Route path="/raise-complaint" element={<RaiseComplaint />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/profile" element={<Profile />} />
+            </Route>
+
+            <Route element={<AdminRoute />}>
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<Navigate to="overview" replace />} />
+                <Route path="overview" element={<CommandCenter />} />
+                <Route path="products" element={<Products />} />
+                <Route path="add-product" element={<AddProduct />} />
+                <Route path="edit-product/:id" element={<AddProduct />} />
+                <Route path="orders" element={<Orders />} />
+                <Route path="lab-tests" element={<LabTestsAdmin />} />
+                <Route path="lab-bookings" element={<LabBookingsAdmin />} />
+                <Route path="doctors" element={<DoctorsAdmin />} />
+                <Route path="doctor-appointments" element={<DoctorAppointmentsAdmin />} />
+                <Route path="page-management" element={<PageManagementAdmin />} />
+                <Route path="pos-terminal" element={<POSTerminal />} />
+                <Route path="logistics" element={<Logistics />} />
+                <Route path="live-radar" element={<LiveRadar />} />
+                <Route path="complaints" element={<Complaints />} />
+                <Route path="returns" element={<ReturnsRefunds />} />
+                <Route path="flash-sales" element={<AdminFlashDeals />} />
+                <Route path="ai-pricing" element={<AIPricing />} />
+                <Route path="notifications-composer" element={<NotificationComposer />} />
+                <Route path="ab-testing" element={<ABTesting />} />
+                <Route path="customers" element={<AdminPlaceholder pageName="Customers" />} />
+                <Route path="search-discovery" element={<SearchDiscovery />} />
+                <Route path="reviews" element={<Reviews />} />
+                <Route path="messages" element={<Messages />} />
+                <Route path="returns" element={<ReturnsRefunds />} />
+
+                {/* Marketing & Growth */}
+                <Route path="marketing" element={<Marketing />} />
+                <Route path="coupons" element={<Coupons />} />
+                <Route path="abandoned-cart" element={<AbandonedCart />} />
+                
+                {/* Analytics & Reports */}
+                <Route path="sales-report" element={<AdminPlaceholder pageName="Sales Report" />} />
+                
+                {/* Operations & Logistics */}
+                <Route path="logistics" element={<Logistics />} />
+                <Route path="fleet" element={<Fleet />} />
+                <Route path="live-radar" element={<LiveRadar />} />
+                
+                {/* System & Settings */}
+                <Route path="search-discovery" element={<AdminPlaceholder pageName="Search & Discovery" />} />
+                <Route path="support-console" element={<AdminPlaceholder pageName="Support Console" />} />
+                <Route path="inventory-alerts" element={<AdminPlaceholder pageName="Inventory Alerts" />} />
+                <Route path="live-ops" element={<AdminPlaceholder pageName="Live Ops" />} />
+                <Route path="xray-monitor" element={<AdminPlaceholder pageName="X-Ray Monitor" />} />
+                <Route path="analytics" element={<AdminPlaceholder pageName="Analytics" />} />
+                <Route path="settings" element={<AdminPlaceholder pageName="Settings" />} />
+                <Route path="trending" element={<AdminTrendingProducts />} />
+              </Route>
+            </Route>
+
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </>
+    );
+  }
 
   return (
     <>
