@@ -46,7 +46,16 @@ const SubcategoryProductListing = ({
 
         const res = await fetch(url);
         const data = await res.json();
-        const items = data.medicines || data || [];
+        let items = data.medicines || data || [];
+
+        // Fallback: If specific subcategory query returns 0 items, fetch all products for the parent category
+        if (items.length === 0 && categoryName && categoryName !== 'All') {
+          const fallbackUrl = `${API_BASE}/api/medicines?limit=50&category=${encodeURIComponent(categoryName)}`;
+          const fallbackRes = await fetch(fallbackUrl);
+          const fallbackData = await fallbackRes.json();
+          items = fallbackData.medicines || fallbackData || [];
+        }
+
         setProducts(items);
 
         // Derive sub-filter chips (e.g. Brands or Rx status)

@@ -28,11 +28,19 @@ export const getMedicines = async (req, res) => {
     let query = {};
 
     if (category && category !== 'All') {
-      query.category = { $regex: new RegExp(`^${category.trim()}$`, 'i') };
+      const catClean = category.trim();
+      const primaryCat = catClean.split('&')[0].trim().split(' ')[0];
+      query.category = { $regex: new RegExp(primaryCat, 'i') };
     }
 
-    if (subCategory) {
-      query.subCategory = { $regex: new RegExp(subCategory.trim(), 'i') };
+    if (subCategory && subCategory !== 'All') {
+      const subClean = subCategory.trim();
+      const primarySub = subClean.split('&')[0].trim().split(' ')[0];
+      query.$or = [
+        { subCategory: { $regex: new RegExp(subClean, 'i') } },
+        { subCategory: { $regex: new RegExp(primarySub, 'i') } },
+        { name: { $regex: new RegExp(primarySub, 'i') } }
+      ];
     }
 
     if (brand && brand !== 'All') {
