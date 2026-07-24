@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { MapPin, ChevronDown, User, Bell, MapPinIcon, Loader2, X } from 'lucide-react';
+import { MapPin, ChevronDown, User, Bell, Loader2, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { API_BASE } from '../../utils/apiConfig';
 import toast from 'react-hot-toast';
@@ -161,7 +161,7 @@ const MobileHeader = () => {
                 </>
               ) : (
                 <>
-                  <MapPinIcon size={15} />
+                  <MapPin size={15} />
                   <span>Detect My Location using GPS</span>
                 </>
               )}
