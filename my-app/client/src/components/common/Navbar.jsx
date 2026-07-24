@@ -231,7 +231,7 @@ const Navbar = ({ medicines = [] }) => {
     { 
       name: 'Skin Care', 
       iconName: 'Smile', 
-      path: '/skin-care',
+      path: '/medicines?category=Skin Care',
       subOptions: ['Face Wash & Cleansers', 'Sunscreen & SPF', 'Moisturizers & Lotions', 'Serums & Treatments', 'Anti-Aging Creams', 'Lip Care', 'Acne Care']
     },
   ];

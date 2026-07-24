@@ -42,7 +42,7 @@ const FlyoutCategoryLink = ({ category, isFirst, isLast }) => {
       className="relative w-fit h-fit py-2.5"
     >
       <Link
-        to={path}
+        to={path && !path.includes('/skin-care') ? path : `/medicines?category=${encodeURIComponent(name)}`}
         className={`relative flex items-center gap-1 text-[12.5px] font-bold transition-all px-2.5 py-1 rounded-full cursor-pointer ${
           open ? 'text-[#0057FF]' : 'text-slate-700 hover:text-[#0057FF]'
         }`}

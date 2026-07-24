@@ -587,7 +587,7 @@ const categoriesList = [
   { name: 'Supports & Braces', iconName: 'Heart', path: '/medicines?filter=supports', subOptions: ['Knee Supports', 'Back Supports', 'Ankle Supports', 'Wrist Supports'] },
   { name: 'Immunity Boosters', iconName: 'Shield', path: '/medicines?filter=immunity', subOptions: ['Chyawanprash', 'Herbal Juices', 'Vitamin C', 'Zinc'] },
   { name: 'Homeopathy', iconName: 'Leaf', path: '/medicines?filter=homeopathy', subOptions: ['Cough & Cold', 'Digestion', 'Skin Care', 'Hair Care'] },
-  { name: 'Skin Care', iconName: 'Smile', path: '/skin-care', subOptions: ['Face Wash & Cleansers', 'Sunscreen & SPF', 'Moisturizers & Lotions', 'Serums & Treatments', 'Anti-Aging Creams', 'Lip Care', 'Acne Care'] }
+  { name: 'Skin Care', iconName: 'Smile', path: '/medicines?category=Skin Care', subOptions: ['Face Wash & Cleansers', 'Sunscreen & SPF', 'Moisturizers & Lotions', 'Serums & Treatments', 'Anti-Aging Creams', 'Lip Care', 'Acne Care'] }
 ];
 
 const labTestsList = [
