@@ -217,18 +217,31 @@ const ProductCard = ({
       </div>
 
       {/* 2. PRODUCT IMAGE CONTAINER */}
-      <div className="relative flex h-28 sm:h-32 w-full items-center justify-center bg-[#181d28] sm:bg-slate-50/60 rounded-2xl sm:rounded-xl p-2 mb-2 border-0 sm:border border-slate-100/50 overflow-hidden">
+      <div className="relative flex h-28 sm:h-32 w-full items-center justify-center bg-slate-50/60 rounded-2xl sm:rounded-xl p-2 mb-2 border border-slate-100/50 overflow-hidden">
         <img
           src={image || 'https://placehold.co/300x300?text=Medicine'}
           alt={name}
           loading="lazy"
-          className="h-full w-full object-contain mix-blend-lighten sm:mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
+          className="h-full w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
           onError={(e) => {
             e.target.src = 'https://placehold.co/300x300?text=No+Image';
           }}
         />
-        {/* Mockup bottom-right white circle badge on mobile */}
-        <div className="sm:hidden absolute bottom-2 right-2 w-5 h-5 rounded-full bg-white shadow-xs pointer-events-none" />
+        {/* Wishlist Heart Button on Mobile (Replaces empty mockup circle) */}
+        <button
+          onClick={handleWishlistToggle}
+          className={`sm:hidden absolute bottom-2 right-2 w-7 h-7 rounded-full bg-white shadow-md flex items-center justify-center transition-all active:scale-[0.88] z-20 ${
+            isInWishlist
+              ? 'text-rose-600 border border-rose-100'
+              : 'text-slate-400 border border-slate-100'
+          }`}
+          title={isInWishlist ? 'Remove from wishlist' : 'Save to wishlist'}
+        >
+          <Heart
+            size={12}
+            className={`${isInWishlist ? 'fill-rose-500 stroke-rose-500 text-rose-500' : ''}`}
+          />
+        </button>
       </div>
 
       {/* 3. BRAND + TAGLINE / DESCRIPTION */}
@@ -270,8 +283,8 @@ const ProductCard = ({
           )}
         </div>
 
-        {/* 6. CTA BUTTON ROW (Desktop Only) */}
-        <div className="hidden sm:block pt-1">
+        {/* 6. CTA BUTTON ROW */}
+        <div className="pt-1">
           {isOutOfStock ? (
             <button
               onClick={handleSubscribe}
