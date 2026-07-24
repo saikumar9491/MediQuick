@@ -77,7 +77,8 @@ const RecommendedProducts = ({ cartCategories = [] }) => {
       ) : (
         <div
           ref={scrollRef}
-          className="flex gap-3 overflow-x-auto pb-4 scroll-smooth touch-pan-x no-scrollbar"
+          className="flex gap-3 overflow-x-auto pb-4 no-scrollbar"
+          style={{ WebkitOverflowScrolling: 'touch' }}
         >
           {products.map(product => {
             const salePrice = product.discountPrice && product.discountPrice < product.price
