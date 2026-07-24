@@ -36,6 +36,7 @@ import AddProduct from './pages/admin/AddProduct/AddProduct';
 import Orders from './pages/admin/Orders/Orders';
 import AdminTrendingProducts from './pages/AdminTrendingProducts';
 import AllCategoriesPage from './pages/Categories/AllCategoriesPage';
+import HomeHealthMonitors from './pages/Categories/HomeHealthMonitors';
 import AdminLayout from './components/admin/AdminLayout';
 import CommandCenter from './pages/admin/CommandCenter/CommandCenter';
 import Products from './pages/admin/Products/Products';
@@ -182,6 +183,8 @@ function AppLayout({ medicines, featured, loading }) {
 
             <Route path="/medicines" element={<MedicinesPage />} />
             <Route path="/categories" element={<AllCategoriesPage />} />
+            <Route path="/category/home-health-monitors" element={<HomeHealthMonitors />} />
+            <Route path="/categories/home-health-monitors" element={<HomeHealthMonitors />} />
             <Route path="/lab-tests" element={<LabTestsHome />} />
             <Route path="/lab-tests/:id" element={<LabTestDetail />} />
             <Route path="/lab_tests" element={<LabTestsHome />} />
@@ -295,6 +298,8 @@ function AppLayout({ medicines, featured, loading }) {
 
           <Route path="/medicines" element={<MedicinesPage />} />
           <Route path="/categories" element={<AllCategoriesPage />} />
+          <Route path="/category/home-health-monitors" element={<HomeHealthMonitors />} />
+          <Route path="/categories/home-health-monitors" element={<HomeHealthMonitors />} />
           <Route path="/lab-tests" element={<LabTestsHome />} />
           <Route path="/lab-tests/:id" element={<LabTestDetail />} />
           <Route path="/lab_tests" element={<LabTestsHome />} />
