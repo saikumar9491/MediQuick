@@ -60,9 +60,16 @@ const MedicinesPage = () => {
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
   const [showMobileFilters, setShowMobileFilters] = useState(false);
 
-  // Handle URL filter query param (e.g. /medicines?filter=hair-care or /medicines?filter=vitamins)
+  // Handle URL query parameters dynamically (e.g. category, subCategory, filter, search)
   useEffect(() => {
-    if (initialFilterParam) {
+    const cat = searchParams.get('category');
+    const filterParam = searchParams.get('filter');
+    const sub = searchParams.get('subCategory') || searchParams.get('sub');
+    const search = searchParams.get('search');
+
+    if (cat) {
+      setSelectedCategory(cat);
+    } else if (filterParam) {
       const map = {
         'hair-care': 'Hair Care',
         'fitness': 'Fitness & Health',
@@ -73,11 +80,22 @@ const MedicinesPage = () => {
         'homeopathy': 'Homeopathy',
         'skin-care': 'Skin Care'
       };
-      if (map[initialFilterParam]) {
-        setSelectedCategory(map[initialFilterParam]);
-      }
+      if (map[filterParam]) setSelectedCategory(map[filterParam]);
+    } else {
+      setSelectedCategory('All');
     }
-  }, [initialFilterParam]);
+
+    if (sub) {
+      setSelectedSubCategory(decodeURIComponent(sub));
+    } else {
+      setSelectedSubCategory('');
+    }
+
+    if (search !== null && search !== undefined) {
+      setSearchQuery(search);
+      setDebouncedSearch(search);
+    }
+  }, [searchParams]);
 
   // Debounce search input by 300ms
   useEffect(() => {
