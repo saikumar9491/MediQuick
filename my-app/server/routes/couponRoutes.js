@@ -267,4 +267,45 @@ router.delete('/:id', verifyToken, isAdmin, async (req, res) => {
   }
 });
 
+// POST /api/coupons/flash-sale-timer
+router.post('/flash-sale-timer', verifyToken, isAdmin, async (req, res) => {
+  try {
+    const { code = 'FLASH25', discountValue = 25, durationHours = 24, customValidTo } = req.body;
+    
+    let validToDate;
+    if (customValidTo) {
+      validToDate = new Date(customValidTo);
+    } else {
+      validToDate = new Date(Date.now() + Number(durationHours) * 60 * 60 * 1000);
+    }
+
+    const cleanCode = code.toUpperCase().trim();
+
+    let coupon = await Coupon.findOne({ code: cleanCode });
+    if (coupon) {
+      coupon.discountType = 'Percentage';
+      coupon.discountValue = Number(discountValue);
+      coupon.validFrom = new Date();
+      coupon.validTo = validToDate;
+      coupon.isActive = true;
+      await coupon.save();
+    } else {
+      coupon = new Coupon({
+        code: cleanCode,
+        discountType: 'Percentage',
+        discountValue: Number(discountValue),
+        minOrderValue: 0,
+        validFrom: new Date(),
+        validTo: validToDate,
+        isActive: true
+      });
+      await coupon.save();
+    }
+
+    res.json({ message: 'Flash sale timer updated successfully', coupon });
+  } catch (err) {
+    res.status(500).json({ message: 'Error setting flash sale timer', error: err.message });
+  }
+});
+
 export default router;

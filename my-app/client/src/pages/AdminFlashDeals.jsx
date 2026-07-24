@@ -15,7 +15,10 @@ import {
   Percent, 
   Sparkles,
   TrendingUp,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Clock,
+  Calendar,
+  Save
 } from 'lucide-react';
 
 const AdminFlashDeals = ({ embedded }) => {
@@ -27,6 +30,15 @@ const AdminFlashDeals = ({ embedded }) => {
   const [bannerFile, setBannerFile] = useState(null);
   const [bannerPreview, setBannerPreview] = useState('');
   
+  // Timer State
+  const [activeCoupon, setActiveCoupon] = useState(null);
+  const [couponCode, setCouponCode] = useState('FLASH25');
+  const [couponDiscount, setCouponDiscount] = useState('25');
+  const [durationHours, setDurationHours] = useState('24');
+  const [customDateTime, setCustomDateTime] = useState('');
+  const [liveCountdown, setLiveCountdown] = useState('');
+  const [savingTimer, setSavingTimer] = useState(false);
+
   // Edit/Add state
   const [selectedMedicine, setSelectedMedicine] = useState(null);
   const [discountPrice, setDiscountPrice] = useState('');
@@ -35,15 +47,33 @@ const AdminFlashDeals = ({ embedded }) => {
 
   const fetchMedicinesAndBanners = useCallback(async () => {
     try {
-      const [medRes, bannerRes] = await Promise.all([
+      const [medRes, bannerRes, couponRes] = await Promise.all([
         fetch(`${API_BASE}/api/medicines`),
-        fetch(`${API_BASE}/api/banners`)
+        fetch(`${API_BASE}/api/banners`),
+        fetch(`${API_BASE}/api/coupons/public/active`)
       ]);
-      if (!medRes.ok || !bannerRes.ok) throw new Error("Could not reach Hub");
-      const medData = await medRes.json();
-      const bannerData = await bannerRes.json();
-      setMedicines(Array.isArray(medData) ? medData : (medData.medicines || []));
-      setBanners(Array.isArray(bannerData) ? bannerData : []);
+      
+      if (medRes.ok) {
+        const medData = await medRes.json();
+        setMedicines(Array.isArray(medData) ? medData : (medData.medicines || []));
+      }
+      if (bannerRes.ok) {
+        const bannerData = await bannerRes.json();
+        setBanners(Array.isArray(bannerData) ? bannerData : []);
+      }
+      if (couponRes.ok) {
+        const coupons = await couponRes.json();
+        const flashC = (coupons || []).find(c => 
+          (c.code || '').includes('FLASH') || 
+          (c.code || '').includes('SALE') || 
+          (c.code || '').includes('DEAL')
+        );
+        if (flashC) {
+          setActiveCoupon(flashC);
+          setCouponCode(flashC.code);
+          setCouponDiscount(String(flashC.discountValue || 25));
+        }
+      }
     } catch (err) {
       console.error(err);
       toast.error('Failed to sync data');
@@ -55,6 +85,62 @@ const AdminFlashDeals = ({ embedded }) => {
   useEffect(() => {
     fetchMedicinesAndBanners();
   }, [fetchMedicinesAndBanners]);
+
+  // Live ticking countdown for active timer preview
+  useEffect(() => {
+    if (!activeCoupon?.validTo) return;
+
+    const timer = setInterval(() => {
+      const diff = new Date(activeCoupon.validTo).getTime() - Date.now();
+      if (diff <= 0) {
+        setLiveCountdown('Expired');
+        return;
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+      const pad = (n) => String(n).padStart(2, '0');
+
+      setLiveCountdown(`${pad(hours)}h : ${pad(minutes)}m : ${pad(seconds)}s`);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [activeCoupon]);
+
+  // Handle setting Flash Sale Timer
+  const handleSaveTimer = async (hoursPreset = null) => {
+    setSavingTimer(true);
+    const toastId = toast.loading('Saving Flash Sale Timer...');
+    try {
+      const payload = {
+        code: couponCode || 'FLASH25',
+        discountValue: Number(couponDiscount) || 25,
+        durationHours: hoursPreset || Number(durationHours) || 24,
+        ...(customDateTime ? { customValidTo: customDateTime } : {})
+      };
+
+      const res = await fetch(`${API_BASE}/api/coupons/flash-sale-timer`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error('Failed to save timer');
+      const data = await res.json();
+      
+      setActiveCoupon(data.coupon);
+      toast.success('Flash Sale Timer Started! ⚡', { id: toastId });
+      setCustomDateTime('');
+    } catch (err) {
+      toast.error(err.message, { id: toastId });
+    } finally {
+      setSavingTimer(false);
+    }
+  };
 
   const flashDeals = medicines.filter(m => m.isFlashDeal);
   const availableForFlash = medicines.filter(m => 
@@ -185,7 +271,7 @@ const AdminFlashDeals = ({ embedded }) => {
                 <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-slate-900">
                   Flash Deals Manager
                 </h1>
-                <p className="text-xs font-bold text-slate-400">Configure daily flash sales, discounts, and promotional banners</p>
+                <p className="text-xs font-bold text-slate-400">Set flash sale countdown timers, product discounts, and promotional banners</p>
               </div>
             </div>
           </div>
@@ -203,6 +289,81 @@ const AdminFlashDeals = ({ embedded }) => {
               <Plus size={16} />
               <span>Add Flash Deal</span>
             </button>
+          </div>
+        </div>
+
+        {/* ─── 1. FLASH SALE TIMER CONTROL PANEL (ADMIN TIMER CONFIG) ─── */}
+        <div className="mb-8 bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 text-white shadow-xl border border-slate-700/60 relative overflow-hidden">
+          <div className="absolute right-0 top-0 translate-x-4 -translate-y-4 opacity-10 pointer-events-none">
+            <Zap size={200} className="fill-current text-[#FF6B00]" />
+          </div>
+
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+            {/* Left: Active Timer Status */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="bg-[#FF6B00] text-white p-1.5 rounded-lg">
+                  <Clock size={16} />
+                </span>
+                <h2 className="text-sm font-black uppercase tracking-widest text-orange-400">
+                  Live Flash Sale Countdown Timer
+                </h2>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white bg-slate-800/80 border border-slate-700 px-4 py-2 rounded-xl">
+                  {liveCountdown || '00h : 00m : 00s'}
+                </div>
+                <div className="flex flex-col text-xs text-slate-300">
+                  <span className="font-bold text-orange-300 uppercase tracking-wider">
+                    Coupon: {activeCoupon?.code || 'FLASH25'}
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    Expires: {activeCoupon?.validTo ? new Date(activeCoupon.validTo).toLocaleString() : 'Not Set'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Timer Duration Controls & Presets */}
+            <div className="bg-slate-800/90 border border-slate-700 p-4 rounded-xl space-y-3.5 max-w-md w-full">
+              <p className="text-[10px] font-black uppercase tracking-wider text-slate-300">Quick Timer Presets</p>
+
+              {/* Quick Preset Buttons */}
+              <div className="grid grid-cols-4 gap-2">
+                {[6, 12, 24, 48].map((h) => (
+                  <button
+                    key={h}
+                    disabled={savingTimer}
+                    onClick={() => {
+                      setDurationHours(String(h));
+                      handleSaveTimer(h);
+                    }}
+                    className="py-1.5 px-2 bg-slate-700 hover:bg-[#FF6B00] text-white rounded-lg text-xs font-black transition-all cursor-pointer border border-slate-600 hover:border-orange-500 active:scale-95"
+                  >
+                    + {h} Hours
+                  </button>
+                ))}
+              </div>
+
+              {/* Custom Date Time Inputs */}
+              <div className="flex items-center gap-2 pt-1">
+                <input
+                  type="datetime-local"
+                  value={customDateTime}
+                  onChange={(e) => setCustomDateTime(e.target.value)}
+                  className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 outline-none focus:border-[#FF6B00]"
+                />
+                <button
+                  disabled={savingTimer}
+                  onClick={() => handleSaveTimer()}
+                  className="bg-[#FF6B00] hover:bg-[#E55A00] text-white px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all flex items-center gap-1 cursor-pointer shrink-0"
+                >
+                  <Save size={13} />
+                  <span>Set</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
