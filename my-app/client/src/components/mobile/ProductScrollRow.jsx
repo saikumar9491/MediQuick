@@ -109,12 +109,12 @@ export const MobileProductCard = ({ product }) => {
         </span>
       )}
 
-      {/* Image container */}
-      <div className="w-full aspect-square bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center p-1.5 mb-2.5">
+      {/* Uniform 1:1 Aspect Ratio Image Container */}
+      <div className="w-full aspect-square bg-slate-50/90 border border-slate-100 rounded-xl flex items-center justify-center p-2 mb-2 relative overflow-hidden shrink-0">
         <img 
           src={image} 
           alt={name} 
-          className="max-h-full max-w-full object-contain mix-blend-multiply" 
+          className="h-full w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300" 
           loading="lazy"
         />
       </div>

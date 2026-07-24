@@ -134,7 +134,9 @@ const MobileHomeView = ({ medicines = [], featured = [], loading = false }) => {
 
   // Group real products for horizontal scroll rows
   const trendingProducts = medicines.filter(m => m.isTrending && m.isActive !== false);
-  const skinCareProducts = medicines.filter(m => m.category?.toLowerCase() === 'skin-care' && m.isActive !== false);
+  const skinCareProducts = medicines.filter(m => (m.category?.toLowerCase() === 'skin-care' || m.category?.toLowerCase() === 'skin care') && m.isActive !== false);
+  const ayurvedaProducts = medicines.filter(m => m.category?.toLowerCase() === 'ayurveda' && m.isActive !== false);
+  const hairCareProducts = medicines.filter(m => (m.category?.toLowerCase() === 'hair-care' || m.category?.toLowerCase() === 'hair care') && m.isActive !== false);
   const immunityProducts = medicines.filter(m => (m.category?.toLowerCase() === 'immunity' || m.category?.toLowerCase() === 'wellness') && m.isActive !== false);
 
   const handleTabChange = (tabId, filter) => {
@@ -151,21 +153,28 @@ const MobileHomeView = ({ medicines = [], featured = [], loading = false }) => {
       <div>
         {activeTab === 'for-you' ? (
           <div className="space-y-3 pb-8">
-            {/* Carousel */}
+            {/* 1. Hero Carousel */}
             <div className="px-4 pt-3">
               <HeroBannerCarousel banners={mainBanners} loading={isBannerLoading} />
             </div>
 
-            {/* Quick Access Tiles */}
+            {/* 2. Quick Access Grid */}
             <QuickAccessGrid />
 
-            {/* Flash Deals with Countdown */}
+            {/* 3. Flash Deals with Countdown */}
             <FlashDealsRow />
 
-            {/* Still looking for these? (Personalized section) */}
+            {/* 4. Trending Products Section (Right below Flash Deals) */}
+            <ProductScrollRow 
+              title="Trending Products" 
+              products={trendingProducts.length > 0 ? trendingProducts : medicines.slice(0, 8)}
+              seeAllLink="/medicines?filter=trending"
+            />
+
+            {/* 5. Still looking for these? (Personalized section right below Trending) */}
             <PersonalizedSection />
 
-            {/* Based on past orders recommendations */}
+            {/* 6. Based on past orders recommendations */}
             {orderBasedRecs.length > 0 && (
               <ProductScrollRow 
                 title="Based on your orders" 
@@ -176,23 +185,31 @@ const MobileHomeView = ({ medicines = [], featured = [], loading = false }) => {
             {/* Recently Viewed */}
             <RecentlyViewed />
 
-            {/* Trending medicines row */}
+            {/* 7. Category-wise Products Sections */}
+            {/* Skin Care Products */}
             <ProductScrollRow 
-              title="Trending Medicines" 
-              products={trendingProducts.length > 0 ? trendingProducts : medicines.slice(0, 8)}
-              seeAllLink="/medicines?filter=trending"
-            />
-
-            {/* Skin Care picks row */}
-            <ProductScrollRow 
-              title="Skin Care Picks" 
+              title="Skin Care Products" 
               products={skinCareProducts.length > 0 ? skinCareProducts : medicines.filter(m => m.category === 'Skin care').slice(0, 8)}
               seeAllLink="/medicines?filter=skin-care"
             />
 
-            {/* Immunity boosters row */}
+            {/* Ayurveda & Herbal */}
             <ProductScrollRow 
-              title="Immunity Boosters" 
+              title="Ayurveda & Herbal" 
+              products={ayurvedaProducts.length > 0 ? ayurvedaProducts : medicines.filter(m => m.category === 'Ayurveda').slice(0, 8)}
+              seeAllLink="/medicines?filter=ayurveda"
+            />
+
+            {/* Hair Care Specials */}
+            <ProductScrollRow 
+              title="Hair Care Specials" 
+              products={hairCareProducts.length > 0 ? hairCareProducts : medicines.filter(m => m.category === 'Hair care').slice(0, 8)}
+              seeAllLink="/medicines?filter=hair-care"
+            />
+
+            {/* Immunity & Wellness */}
+            <ProductScrollRow 
+              title="Immunity & Wellness" 
               products={immunityProducts.length > 0 ? immunityProducts : medicines.filter(m => m.category === 'Immunity Boosters').slice(0, 8)}
               seeAllLink="/medicines?filter=immunity"
             />
