@@ -53,7 +53,7 @@ const Cart = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f1f3f6] pb-20 pt-8">
+    <div className="min-h-screen bg-[#f1f3f6] pb-36 sm:pb-20 pt-4 sm:pt-8">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         <div className="flex flex-col lg:flex-row gap-4">
@@ -153,30 +153,58 @@ const Cart = () => {
                     </div>
                   </div>
 
-                  {/* Mobile Item Layout (Mockup Screen 4 Dark Card Style) */}
-                  <div className="flex sm:hidden justify-between items-center w-full p-4 mb-3 bg-[#181d28] rounded-2xl text-white shadow-md border border-white/5">
-                    <div className="flex items-center gap-3 max-w-[65%]">
-                      <div className="w-12 h-12 rounded-xl bg-[#272e3d] flex items-center justify-center p-1 shrink-0">
-                        <img src={item.image} alt={item.name} className="max-h-full max-w-full object-contain mix-blend-lighten" />
+                  {/* Mobile Item Layout (Flipkart Style Clean Card) */}
+                  <div className="flex sm:hidden flex-col w-full p-4 mb-3 bg-white rounded-2xl border border-slate-200/70 shadow-2xs">
+                    <div className="flex gap-4">
+                      {/* Image */}
+                      <div className="w-20 h-20 flex-shrink-0 flex items-center justify-center p-1.5 bg-slate-50 border border-slate-100 rounded-xl">
+                        <img 
+                          src={item.image} 
+                          alt={item.name} 
+                          className="max-h-full max-w-full object-contain mix-blend-multiply" 
+                        />
                       </div>
-                      <div className="truncate">
-                        <h4 className="text-xs font-black text-white leading-snug truncate">{item.name}</h4>
-                        <p className="text-xs font-bold text-slate-300 mt-0.5">₹{item.price}</p>
+                      {/* Name & Prices */}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-xs font-bold text-slate-800 leading-snug line-clamp-2">{item.name}</h4>
+                        <p className="text-[10px] text-slate-400 font-semibold mt-0.5">{item.brand}</p>
+                        <div className="flex items-baseline gap-2 mt-1.5">
+                          <span className="text-xs text-slate-400 line-through">₹{Math.round(item.price * 1.3)}</span>
+                          <span className="text-sm font-black text-slate-900">₹{item.price}</span>
+                          <span className="text-[10px] font-bold text-[#16A34A]">25% Off</span>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2.5 text-xs font-black text-white bg-[#272e3d] px-3 py-1.5 rounded-xl border border-white/10">
+                    {/* Bottom Actions Row */}
+                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100">
+                      {/* Quantity Selector */}
+                      <div className="flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden shadow-3xs">
+                        <button 
+                          onClick={() => updateQuantity(item._id, Math.max(1, item.quantity - 1))}
+                          className="w-7 h-7 flex items-center justify-center hover:bg-slate-50 text-slate-555 font-bold active:bg-slate-100 transition-colors"
+                        >
+                          -
+                        </button>
+                        <span className="w-8 text-center text-xs font-bold text-slate-800 select-none">
+                          {item.quantity}
+                        </span>
+                        <button 
+                          onClick={() => updateQuantity(item._id, item.quantity + 1)}
+                          className="w-7 h-7 flex items-center justify-center hover:bg-slate-50 text-slate-555 font-bold active:bg-slate-100 transition-colors"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      {/* Remove Button */}
                       <button 
-                        onClick={() => updateQuantity(item._id, Math.max(1, item.quantity - 1))} 
-                        className="text-slate-300 hover:text-white px-1 select-none font-bold"
+                        onClick={() => {
+                          removeFromCart(item._id);
+                          toast.success('Removed from cart');
+                        }}
+                        className="text-xs font-bold text-[#EF4444] uppercase tracking-wider hover:text-red-700 active:scale-95 transition-transform px-2 py-1"
                       >
-                        -
-                      </button>
-                      <span className="min-w-[12px] text-center">{item.quantity}</span>
-                      <button 
-                        onClick={() => updateQuantity(item._id, item.quantity + 1)} 
-                        className="text-slate-300 hover:text-white px-1 select-none font-bold"
-                      >
-                        +
+                        Remove
                       </button>
                     </div>
                   </div>
@@ -187,29 +215,29 @@ const Cart = () => {
               <div className="hidden sm:flex p-4 justify-end sticky bottom-0 bg-white border-t border-slate-100 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
                 <button 
                   onClick={() => navigate('/checkout')}
-                  className="w-full sm:w-60 bg-[#fb641b] text-white py-3.5 px-8 font-black uppercase tracking-wider rounded-sm shadow-md hover:bg-[#e65a15] transition-all active:scale-95"
+                  className="w-full sm:w-60 bg-[#0057FF] hover:bg-[#003BB5] text-white py-3.5 px-8 font-black uppercase tracking-wider rounded-sm shadow-md transition-all active:scale-95"
                 >
                   Place Order
                 </button>
               </div>
             </div>
 
-            {/* MOBILE SUMMARY (Mockup Screen 4 Dark Sheet Style) */}
-            <div className="block sm:hidden bg-[#181d28] p-6 rounded-t-3xl text-white shadow-2xl space-y-3 mt-6 border-t border-white/10">
-              <div className="w-8 h-1 bg-slate-600 rounded-full mx-auto mb-3" />
-              <div className="flex justify-between text-xs font-bold text-slate-400">
-                <span>Subtotal</span>
-                <span>₹{subtotal}</span>
-              </div>
-              <div className="flex justify-between text-base font-black text-white pt-2 border-t border-slate-700/50">
-                <span>Total</span>
-                <span>₹{totalAmount}</span>
+            {/* STICKY MOBILE BOTTOM CART BAR (Flipkart Style) */}
+            <div className="fixed bottom-16 left-0 right-0 z-40 bg-white border-t border-slate-200 px-6 py-3 flex items-center justify-between sm:hidden shadow-[0_-4px_15px_rgba(0,0,0,0.06)] animate-in slide-in-from-bottom duration-300">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Total Amount</span>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-lg font-black text-slate-900">₹{totalAmount}</span>
+                  {discount > 0 && (
+                    <span className="text-[9px] font-bold text-[#16A34A]">You save ₹{discount}</span>
+                  )}
+                </div>
               </div>
               <button
                 onClick={() => navigate('/checkout')}
-                className="w-full py-3.5 bg-white hover:bg-slate-100 text-[#181d28] text-xs font-black uppercase tracking-widest rounded-full transition-all shadow-md active:scale-95 mt-4"
+                className="bg-[#0057FF] hover:bg-[#003BB5] text-white text-xs font-black uppercase tracking-wider px-6 py-3 rounded-full shadow-md active:scale-95 transition-transform"
               >
-                Proceed to checkout
+                Place Order
               </button>
             </div>
           </div>

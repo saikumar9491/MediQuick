@@ -273,7 +273,7 @@ const Checkout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pt-8 pb-20">
+    <div className="min-h-screen bg-[#F8FAFC] pt-8 pb-32 lg:pb-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Page Header */}
         <div className="mb-8">
@@ -346,6 +346,30 @@ const Checkout = () => {
               onPlaceOrder={handlePlaceOrder}
             />
           </div>
+        </div>
+      </div>
+
+      {/* STICKY MOBILE BOTTOM CHECKOUT BAR (Flipkart Style) */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 px-6 py-3 flex items-center justify-between lg:hidden shadow-[0_-4px_15px_rgba(0,0,0,0.06)] animate-in slide-in-from-bottom duration-300">
+        <div className="flex flex-col">
+          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Total Amount</span>
+          <span className="text-lg font-black text-slate-900">₹{total}</span>
+        </div>
+
+        <div className="flex flex-col items-end gap-1">
+          <button
+            onClick={handlePlaceOrder}
+            disabled={!canPlace}
+            className="bg-[#0057FF] hover:bg-[#003BB5] disabled:bg-slate-100 disabled:text-slate-400 text-white text-xs font-black uppercase tracking-wider px-6 py-3 rounded-full shadow-md active:scale-95 transition-all duration-150 flex items-center gap-1.5"
+          >
+            {isPlacingOrder ? (
+              <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : null}
+            <span>Place Order</span>
+          </button>
+          {disabledReason && (
+            <span className="text-[9px] text-[#EF4444] font-bold max-w-[150px] truncate">{disabledReason}</span>
+          )}
         </div>
       </div>
     </div>

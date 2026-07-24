@@ -154,7 +154,7 @@ export const AddressSection = ({ user, token, selectedAddress, onAddressSelect, 
         <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 space-y-3">
           <p className="text-xs font-semibold text-slate-700 uppercase tracking-wider">New Address</p>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {[
               { key: 'name', label: 'Full Name', span: 2 },
               { key: 'phone', label: 'Phone Number', type: 'tel' },
@@ -165,7 +165,7 @@ export const AddressSection = ({ user, token, selectedAddress, onAddressSelect, 
               { key: 'city', label: 'City' },
               { key: 'state', label: 'State' },
             ].map(({ key, label, span, placeholder, type, onChange }) => (
-              <div key={key} className={span === 2 ? 'col-span-2' : ''}>
+              <div key={key} className={span === 2 ? 'col-span-1 sm:col-span-2' : ''}>
                 <label className="block text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-1">{label}</label>
                 <input
                   type={type || 'text'}
