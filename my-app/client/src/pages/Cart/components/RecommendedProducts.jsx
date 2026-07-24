@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { fetchRecommendations, addItem } from '../../../api/cart';
 import { useAuth } from '../../../context/AuthContext';
@@ -41,11 +41,32 @@ const RecommendedProducts = ({ cartCategories = [] }) => {
     }
   };
 
+  const handleScroll = (direction) => {
+    if (scrollRef.current) {
+      const scrollAmount = direction === 'left' ? -240 : 240;
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
   if (!loading && products.length === 0) return null;
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 relative group/carousel">
       <h3 className="text-sm font-semibold text-slate-700 mb-4">You May Also Like</h3>
+
+      {/* Navigation Arrows (Visible on hover on desktop, hidden on mobile) */}
+      <button
+        onClick={() => handleScroll('left')}
+        className="absolute left-1 top-[110px] -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-md flex items-center justify-center text-slate-600 hover:bg-slate-50 active:scale-95 transition-all md:flex hidden opacity-0 group-hover/carousel:opacity-100"
+      >
+        <ChevronLeft size={16} />
+      </button>
+      <button
+        onClick={() => handleScroll('right')}
+        className="absolute right-1 top-[110px] -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white border border-slate-200 shadow-md flex items-center justify-center text-slate-600 hover:bg-slate-50 active:scale-95 transition-all md:flex hidden opacity-0 group-hover/carousel:opacity-100"
+      >
+        <ChevronRight size={16} />
+      </button>
 
       {loading ? (
         <div className="flex gap-3 overflow-x-auto pb-2">
@@ -56,7 +77,7 @@ const RecommendedProducts = ({ cartCategories = [] }) => {
       ) : (
         <div
           ref={scrollRef}
-          className="flex gap-3 overflow-x-auto pb-4 scroll-smooth touch-pan-x [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex gap-3 overflow-x-auto pb-4 scroll-smooth touch-pan-x no-scrollbar"
         >
           {products.map(product => {
             const salePrice = product.discountPrice && product.discountPrice < product.price
