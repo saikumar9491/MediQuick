@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { 
   User, 
   Package, 
@@ -40,9 +40,12 @@ import { toast } from 'react-hot-toast';
 
 const Profile = () => {
   const { user, token, logout, setUser, loading } = useAuth();
-  const navigate = useNavigate();
-
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(() => {
+    if (tabParam === 'orders' || tabParam === 'my-orders') return 'dashboard';
+    return tabParam || 'dashboard';
+  });
   const [isEditing, setIsEditing] = useState(false);
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(true);

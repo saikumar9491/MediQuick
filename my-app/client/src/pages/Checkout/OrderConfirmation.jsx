@@ -213,7 +213,7 @@ const OrderConfirmation = () => {
         {/* Actions */}
         <div className="grid grid-cols-2 gap-3">
           <button
-            onClick={() => navigate('/profile')}
+            onClick={() => navigate('/my-orders')}
             className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl border border-slate-200 bg-white text-xs sm:text-sm font-black uppercase tracking-wider text-slate-800 hover:bg-slate-50 shadow-xs transition-all active:scale-95 cursor-pointer"
           >
             <Package size={16} className="text-[#00a2a4]" /> Track Order
