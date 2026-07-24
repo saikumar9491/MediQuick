@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   ChevronDown, 
@@ -11,6 +11,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 export const ShiftingCategoryNav = ({ categories = [] }) => {
   const [selected, setSelected] = useState(null);
   const [dir, setDir] = useState(null);
+  const [contentLeft, setContentLeft] = useState(0);
+  const [nubLeft, setNubLeft] = useState(0);
+
+  const navRef = useRef(null);
 
   const handleSetSelected = (val) => {
     if (typeof selected === 'number' && typeof val === 'number') {
@@ -21,11 +25,39 @@ export const ShiftingCategoryNav = ({ categories = [] }) => {
     setSelected(val);
   };
 
+  // Recalculate dropdown contentLeft and nubLeft dynamically on hover/resize
+  useEffect(() => {
+    if (selected && navRef.current) {
+      const hoveredTab = document.getElementById(`shift-tab-${selected}`);
+      const navContainer = navRef.current;
+
+      if (hoveredTab && navContainer) {
+        const tabRect = hoveredTab.getBoundingClientRect();
+        const navRect = navContainer.getBoundingClientRect();
+
+        const tabCenter = tabRect.left + tabRect.width / 2 - navRect.left;
+        const dropdownWidth = 520; // overlay width in px
+
+        // Center dropdown under tab center, bounded by nav padding
+        const targetLeft = tabCenter - dropdownWidth / 2;
+        const maxLeft = Math.max(16, navRect.width - dropdownWidth - 16);
+        const clampedLeft = Math.max(16, Math.min(targetLeft, maxLeft));
+
+        // Nub position relative to the dropdown content box
+        const calculatedNubLeft = tabCenter - clampedLeft;
+
+        setContentLeft(clampedLeft);
+        setNubLeft(calculatedNubLeft);
+      }
+    }
+  }, [selected]);
+
   return (
     <nav className="hidden border-b border-slate-100 bg-white sm:block px-4 sm:px-6 lg:px-8 relative z-40">
       <div 
+        ref={navRef}
         onMouseLeave={() => handleSetSelected(null)}
-        className="mx-auto flex max-w-[1440px] items-center justify-center gap-4 relative"
+        className="mx-auto flex max-w-[1440px] items-center justify-center gap-2 relative"
       >
         {categories.map((cat, idx) => {
           const tabId = idx + 1;
@@ -48,6 +80,8 @@ export const ShiftingCategoryNav = ({ categories = [] }) => {
               categories={categories} 
               dir={dir} 
               selected={selected} 
+              contentLeft={contentLeft}
+              nubLeft={nubLeft}
             />
           )}
         </AnimatePresence>
@@ -66,7 +100,7 @@ const Tab = ({ children, tabId, handleSetSelected, selected, path }) => {
     >
       <Link
         to={path || '#'}
-        className={`flex items-center gap-1 text-[12.5px] font-bold transition-all px-3 py-1 rounded-full cursor-pointer ${
+        className={`flex items-center gap-1 text-[12px] font-bold transition-all px-2.5 py-1 rounded-full cursor-pointer ${
           isSelected 
             ? 'bg-[#0057FF]/10 text-[#0057FF]' 
             : 'text-slate-700 hover:text-[#0057FF]'
@@ -74,7 +108,7 @@ const Tab = ({ children, tabId, handleSetSelected, selected, path }) => {
       >
         <span>{children}</span>
         <ChevronDown
-          size={13}
+          size={12}
           className={`transition-transform duration-250 ${
             isSelected ? 'rotate-180 text-[#0057FF]' : 'text-slate-400'
           }`}
@@ -84,18 +118,19 @@ const Tab = ({ children, tabId, handleSetSelected, selected, path }) => {
   );
 };
 
-const Content = ({ selected, dir, categories }) => {
+const Content = ({ selected, dir, categories, contentLeft, nubLeft }) => {
   return (
     <motion.div
       id="overlay-content"
       initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
+      animate={{ opacity: 1, y: 0, left: contentLeft }}
       exit={{ opacity: 0, y: 8 }}
-      transition={{ duration: 0.2 }}
+      transition={{ duration: 0.22, ease: 'easeOut' }}
+      style={{ left: contentLeft }}
       className="absolute top-full z-[100] mt-0 w-[520px] rounded-2xl border border-slate-200/80 bg-white p-5 shadow-2xl"
     >
       <Bridge />
-      <Nub selected={selected} />
+      <Nub nubLeft={nubLeft} />
 
       {categories.map((cat, idx) => {
         const tabId = idx + 1;
@@ -120,7 +155,7 @@ const Content = ({ selected, dir, categories }) => {
                   <span className="text-[10px] font-black uppercase tracking-wider text-[#0057FF]">
                     {cat.name}
                   </span>
-                  <span className="text-[9px] font-bold text-slate-400">
+                  <span className="text-[9px] font-bold text-slate-400 font-[IBM_Plex_Mono]">
                     {subOptions.length} options
                   </span>
                 </div>
@@ -187,36 +222,14 @@ const Bridge = () => (
   <div className="absolute -top-[16px] left-0 right-0 h-[16px]" />
 );
 
-const Nub = ({ selected }) => {
-  const [left, setLeft] = useState(0);
-
-  useEffect(() => {
-    moveNub();
-  }, [selected]);
-
-  const moveNub = () => {
-    if (selected) {
-      const hoveredTab = document.getElementById(`shift-tab-${selected}`);
-      const overlayContent = document.getElementById('overlay-content');
-
-      if (!hoveredTab || !overlayContent) return;
-
-      const tabRect = hoveredTab.getBoundingClientRect();
-      const { left: contentLeft } = overlayContent.getBoundingClientRect();
-
-      const tabCenter = tabRect.left + tabRect.width / 2 - contentLeft;
-
-      setLeft(tabCenter);
-    }
-  };
-
+const Nub = ({ nubLeft }) => {
   return (
     <motion.span
       style={{
         clipPath: 'polygon(0 0, 100% 0, 50% 50%, 0% 100%)',
       }}
-      animate={{ left }}
-      transition={{ duration: 0.22, ease: 'easeInOut' }}
+      animate={{ left: nubLeft }}
+      transition={{ duration: 0.22, ease: 'easeOut' }}
       className="absolute top-0 h-4 w-4 -translate-x-1/2 -translate-y-1/2 rotate-45 rounded-tl border border-slate-200 bg-white"
     />
   );
