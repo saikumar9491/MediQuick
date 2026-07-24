@@ -41,6 +41,32 @@ const RecommendedProducts = ({ cartCategories = [] }) => {
     }
   };
 
+  const isDown = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0);
+
+  const handleMouseDown = (e) => {
+    isDown.current = true;
+    startX.current = e.pageX - scrollRef.current.offsetLeft;
+    scrollLeft.current = scrollRef.current.scrollLeft;
+  };
+
+  const handleMouseLeave = () => {
+    isDown.current = false;
+  };
+
+  const handleMouseUp = () => {
+    isDown.current = false;
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDown.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX.current) * 1.5; // Scroll speed multiplier
+    scrollRef.current.scrollLeft = scrollLeft.current - walk;
+  };
+
   if (!loading && products.length === 0) return null;
 
   return (
@@ -56,7 +82,11 @@ const RecommendedProducts = ({ cartCategories = [] }) => {
       ) : (
         <div
           ref={scrollRef}
-          className="flex gap-3 overflow-x-auto pb-3 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent"
+          onMouseDown={handleMouseDown}
+          onMouseLeave={handleMouseLeave}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+          className="flex gap-3 overflow-x-auto pb-4 scroll-smooth snap-x snap-mandatory select-none cursor-grab active:cursor-grabbing [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {products.map(product => {
             const salePrice = product.discountPrice && product.discountPrice < product.price
@@ -68,7 +98,7 @@ const RecommendedProducts = ({ cartCategories = [] }) => {
             return (
               <div
                 key={product._id}
-                className="flex-shrink-0 w-36 rounded-2xl border border-slate-200 bg-white overflow-hidden hover:border-slate-300 hover:shadow-sm transition-all"
+                className="flex-shrink-0 w-36 snap-start rounded-2xl border border-slate-200 bg-white overflow-hidden hover:border-slate-300 hover:shadow-sm transition-all"
               >
                 {/* Image */}
                 <button

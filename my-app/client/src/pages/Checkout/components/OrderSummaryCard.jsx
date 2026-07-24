@@ -141,7 +141,7 @@ export const OrderSummaryCard = ({
       </div>
 
       {/* Place Order CTA */}
-      <div className="px-5 py-4 space-y-3">
+      <div className="px-5 py-4 space-y-3 lg:block hidden">
         {disabledReason && (
           <p className="text-[11px] text-center text-slate-400">{disabledReason}</p>
         )}
