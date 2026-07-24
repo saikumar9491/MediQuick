@@ -12,8 +12,8 @@ const MobileAppLayout = () => {
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
 
   // Immersive screens where the bottom tab bar or header should be hidden
-  const hideHeaderRoutes = ['/verify-otp', '/reset-password', '/checkout', '/order-confirmation'];
-  const hideBottomBarRoutes = ['/verify-otp', '/reset-password', '/checkout', '/order-confirmation'];
+  const hideHeaderRoutes = ['/verify-otp', '/reset-password', '/checkout', '/order-confirmation', '/categories'];
+  const hideBottomBarRoutes = ['/verify-otp', '/reset-password', '/checkout', '/order-confirmation', '/categories'];
 
   const shouldHideHeader = hideHeaderRoutes.some(r => currentPath.startsWith(r));
   const shouldHideBottomBar = hideBottomBarRoutes.some(r => currentPath.startsWith(r)) || isKeyboardOpen;
