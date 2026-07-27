@@ -38,18 +38,18 @@ const CartItemRow = ({ item, onQuantityChange, onRemove, disabled }) => {
 
   const handleRemove = async () => {
     setRemoving(true);
-    // Optimistic: notify parent immediately
-    onRemove(prodId, 'optimistic');
+    // Execute removal immediately in context & DB
+    onRemove(item, 'commit');
 
-    const toastId = toast(
+    toast(
       (t) => (
         <div className="flex items-center gap-3">
-          <span className="text-sm text-slate-700">Removed <strong>{item.name.split(' ').slice(0, 3).join(' ')}</strong></span>
+          <span className="text-sm text-slate-700">Removed <strong>{item.name?.split(' ').slice(0, 3).join(' ')}</strong></span>
           <button
             className="text-xs font-semibold text-blue-600 underline"
             onClick={() => {
               toast.dismiss(t.id);
-              onRemove(prodId, 'undo');
+              onRemove(item, 'undo');
               setRemoving(false);
             }}
           >
@@ -59,13 +59,6 @@ const CartItemRow = ({ item, onQuantityChange, onRemove, disabled }) => {
       ),
       { duration: UNDO_DURATION, icon: null }
     );
-
-    // Commit after undo window
-    setTimeout(async () => {
-      try {
-        await onRemove(prodId, 'commit');
-      } catch (_) {}
-    }, UNDO_DURATION + 200);
   };
 
   return (

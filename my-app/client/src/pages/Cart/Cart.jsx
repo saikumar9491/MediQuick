@@ -17,7 +17,7 @@ const DELIVERY_FEE = 49;
 
 const Cart = () => {
   const { token } = useAuth();
-  const { cartItems, removeFromCart, updateQuantity, setCartItems } = useCart();
+  const { cartItems, addToCart, removeFromCart, updateQuantity, setCartItems } = useCart();
   const navigate = useNavigate();
   const outletCtx = useOutletContext();
   const shouldHideBottomBar = outletCtx?.shouldHideBottomBar ?? false;
@@ -127,31 +127,17 @@ const Cart = () => {
     updateQuantity(productId, newQty);
   };
 
-  const handleRemove = async (productId, mode) => {
-    const key = productId?.toString();
-
-    if (mode === 'optimistic') {
-      setPendingRemovals(prev => ({ ...prev, [key]: true }));
-      removingRef.current[key] = { committed: false };
-      return;
-    }
-
+  const handleRemove = async (target, mode) => {
     if (mode === 'undo') {
-      setPendingRemovals(prev => { const n = { ...prev }; delete n[key]; return n; });
-      if (removingRef.current[key]) removingRef.current[key].committed = true;
-      return;
-    }
-
-    if (mode === 'commit') {
-      if (removingRef.current[key]?.committed) return;
-      
-      // Call context function to remove item. Auto-save handles DB deletion.
-      removeFromCart(productId);
-
-      if (isMounted.current) {
-        setPendingRemovals(prev => { const n = { ...prev }; delete n[key]; return n; });
+      if (target && typeof target === 'object') {
+        addToCart(target);
       }
       return;
+    }
+
+    const productId = typeof target === 'object' ? (target.productId || target._id) : target;
+    if (productId) {
+      removeFromCart(productId);
     }
   };
 
