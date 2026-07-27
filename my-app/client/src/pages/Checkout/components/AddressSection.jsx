@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, CheckCircle, XCircle, Loader2, Plus, Home, Briefcase, MoreHorizontal } from 'lucide-react';
+import { MapPin, CheckCircle, XCircle, Loader2, Plus, Home, Briefcase, MoreHorizontal, AlertCircle } from 'lucide-react';
 import { getDeliveryEstimate } from '../../../api/checkout';
 import { API_BASE } from '../../../utils/apiConfig';
 
@@ -15,10 +15,16 @@ export const AddressSection = ({ user, token, selectedAddress, onAddressSelect, 
   const [formData, setFormData] = useState(EMPTY_FORM);
   const [serviceability, setServiceability] = useState({}); // { [pincode]: { loading, result } }
   const [savingAddress, setSavingAddress] = useState(false);
+  const [lookupLoading, setLookupLoading] = useState(false);
 
-  // Pre-fill name/phone from user
+  // Pre-fill name/phone from user (safely cleaning "N/A" phone strings)
   useEffect(() => {
-    setFormData(prev => ({ ...prev, name: user?.name || '', phone: user?.phone || '' }));
+    const rawPhone = user?.phone && user.phone !== 'N/A' ? user.phone.replace(/\D/g, '') : '';
+    setFormData(prev => ({ 
+      ...prev, 
+      name: user?.name || '', 
+      phone: rawPhone 
+    }));
   }, [user]);
 
   // When selected address changes, check its pincode
@@ -33,16 +39,55 @@ export const AddressSection = ({ user, token, selectedAddress, onAddressSelect, 
     setServiceability(prev => ({ ...prev, [pincode]: { loading: true, result: null } }));
     const result = await getDeliveryEstimate(pincode);
     setServiceability(prev => ({ ...prev, [pincode]: { loading: false, result } }));
-    onServiceabilityChange(result);
+    if (typeof onServiceabilityChange === 'function') {
+      onServiceabilityChange(result);
+    }
   };
 
-  const handleFormPincodeChange = (val) => {
+  const handleFormPincodeChange = async (val) => {
     const clean = val.replace(/\D/g, '').slice(0, 6);
     setFormData(prev => ({ ...prev, pincode: clean }));
-    if (clean.length === 6) checkPincode(clean);
+
+    if (clean.length === 6) {
+      // Check hub delivery serviceability
+      checkPincode(clean);
+
+      // Auto-fetch State, City & Landmark from India Postal API
+      setLookupLoading(true);
+      try {
+        const res = await fetch(`https://api.postalpincode.in/pincode/${clean}`);
+        const data = await res.json();
+        if (Array.isArray(data) && data[0]?.Status === 'Success' && data[0]?.PostOffice?.length > 0) {
+          const po = data[0].PostOffice[0];
+          setFormData(prev => ({
+            ...prev,
+            state: po.State || prev.state,
+            city: po.District || po.Block || po.Name || prev.city,
+            landmark: prev.landmark ? prev.landmark : (po.Name || ''),
+          }));
+        }
+      } catch (err) {
+        console.error('Postal API lookup error:', err);
+      } finally {
+        setLookupLoading(false);
+      }
+    }
   };
 
+  const handlePhoneChange = (val) => {
+    const clean = val.replace(/\D/g, '').slice(0, 10);
+    setFormData(prev => ({ ...prev, phone: clean }));
+  };
+
+  // Phone Validation: 10 digits starting with 6-9
+  const isPhoneValid = /^[6-9]\d{9}$/.test(formData.phone);
+  const formPincodeStatus = serviceability[formData.pincode];
+  const isServiceable = formPincodeStatus?.result?.isServiceable;
+
   const handleSaveAddress = async () => {
+    if (!isPhoneValid) return;
+    if (formData.pincode.length === 6 && formPincodeStatus?.result && !isServiceable) return;
+
     const required = ['name', 'phone', 'addressLine1', 'city', 'state', 'pincode'];
     const missing = required.filter(f => !formData[f]?.trim());
     if (missing.length) return;
@@ -73,7 +118,6 @@ export const AddressSection = ({ user, token, selectedAddress, onAddressSelect, 
   };
 
   const addresses = user?.addresses || [];
-  const formPincodeStatus = serviceability[formData.pincode];
 
   return (
     <div className="space-y-4">
@@ -146,7 +190,7 @@ export const AddressSection = ({ user, token, selectedAddress, onAddressSelect, 
       {!showForm ? (
         <button
           onClick={() => setShowForm(true)}
-          className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-200 py-3 text-xs font-medium text-slate-500 hover:border-blue-300 hover:text-blue-600 transition-all"
+          className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-slate-200 py-3 text-xs font-medium text-slate-500 hover:border-blue-300 hover:text-blue-600 transition-all cursor-pointer"
         >
           <Plus size={14} /> Add New Address
         </button>
@@ -155,64 +199,184 @@ export const AddressSection = ({ user, token, selectedAddress, onAddressSelect, 
           <p className="text-xs font-semibold text-slate-700 uppercase tracking-wider">New Address</p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {[
-              { key: 'name', label: 'Full Name', span: 2 },
-              { key: 'phone', label: 'Phone Number', type: 'tel' },
-              { key: 'pincode', label: 'Pincode', type: 'tel', onChange: handleFormPincodeChange },
-              { key: 'addressLine1', label: 'Address Line 1', span: 2, placeholder: 'House/Flat No, Building' },
-              { key: 'addressLine2', label: 'Address Line 2 (optional)', span: 2, placeholder: 'Street, Colony' },
-              { key: 'landmark', label: 'Landmark (optional)' },
-              { key: 'city', label: 'City' },
-              { key: 'state', label: 'State' },
-            ].map(({ key, label, span, placeholder, type, onChange }) => (
-              <div key={key} className={span === 2 ? 'col-span-1 sm:col-span-2' : ''}>
-                <label className="block text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-1">{label}</label>
+            {/* Full Name */}
+            <div className="col-span-1 sm:col-span-2">
+              <label className="block text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-1">Full Name</label>
+              <input
+                type="text"
+                value={formData.name}
+                placeholder="Full Name"
+                onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-400 focus:outline-none transition-colors"
+              />
+            </div>
+
+            {/* Phone Number with validation */}
+            <div>
+              <label className="block text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-1">
+                Phone Number <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="tel"
+                value={formData.phone}
+                placeholder="10-digit mobile number"
+                onChange={e => handlePhoneChange(e.target.value)}
+                maxLength={10}
+                className={`w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none transition-colors ${
+                  formData.phone && !isPhoneValid ? 'border-red-400 focus:border-red-500 bg-red-50/20' : 'border-slate-200 focus:border-blue-400'
+                }`}
+              />
+              {formData.phone && !isPhoneValid && (
+                <p className="text-[10px] text-red-500 mt-1 flex items-center gap-1 font-medium">
+                  <AlertCircle size={10} /> Enter valid 10-digit mobile number (starts with 6-9)
+                </p>
+              )}
+            </div>
+
+            {/* Pincode with Auto-Lookup & Serviceability */}
+            <div>
+              <label className="block text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-1">
+                Pincode <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
                 <input
-                  type={type || 'text'}
-                  value={formData[key]}
-                  placeholder={placeholder || label}
-                  onChange={e => onChange ? onChange(e.target.value) : setFormData(prev => ({ ...prev, [key]: e.target.value }))}
+                  type="tel"
+                  value={formData.pincode}
+                  placeholder="6-digit Pincode"
+                  onChange={e => handleFormPincodeChange(e.target.value)}
+                  maxLength={6}
                   className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-400 focus:outline-none transition-colors"
                 />
+                {lookupLoading && (
+                  <div className="absolute right-3 top-2.5">
+                    <Loader2 size={14} className="animate-spin text-blue-500" />
+                  </div>
+                )}
               </div>
-            ))}
+            </div>
+
+            {/* Address Line 1 */}
+            <div className="col-span-1 sm:col-span-2">
+              <label className="block text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-1">Address Line 1</label>
+              <input
+                type="text"
+                value={formData.addressLine1}
+                placeholder="House/Flat No, Building"
+                onChange={e => setFormData(prev => ({ ...prev, addressLine1: e.target.value }))}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-400 focus:outline-none transition-colors"
+              />
+            </div>
+
+            {/* Address Line 2 */}
+            <div className="col-span-1 sm:col-span-2">
+              <label className="block text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-1">Address Line 2 (optional)</label>
+              <input
+                type="text"
+                value={formData.addressLine2}
+                placeholder="Street, Colony"
+                onChange={e => setFormData(prev => ({ ...prev, addressLine2: e.target.value }))}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-400 focus:outline-none transition-colors"
+              />
+            </div>
+
+            {/* Landmark (optional) */}
+            <div>
+              <label className="block text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-1">Landmark (optional)</label>
+              <input
+                type="text"
+                value={formData.landmark}
+                placeholder="Landmark (optional)"
+                onChange={e => setFormData(prev => ({ ...prev, landmark: e.target.value }))}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-400 focus:outline-none transition-colors"
+              />
+            </div>
+
+            {/* City (Auto-filled) */}
+            <div>
+              <label className="block text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-1">City</label>
+              <input
+                type="text"
+                value={formData.city}
+                placeholder="City (Autofilled)"
+                onChange={e => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-400 focus:outline-none transition-colors"
+              />
+            </div>
+
+            {/* State (Auto-filled) */}
+            <div className="col-span-1 sm:col-span-2">
+              <label className="block text-[10px] font-medium text-slate-500 uppercase tracking-wider mb-1">State</label>
+              <input
+                type="text"
+                value={formData.state}
+                placeholder="State (Autofilled)"
+                onChange={e => setFormData(prev => ({ ...prev, state: e.target.value }))}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 focus:border-blue-400 focus:outline-none transition-colors"
+              />
+            </div>
           </div>
 
-          {/* Pincode serviceability inline */}
-          {formData.pincode.length === 6 && formPincodeStatus && (
-            <div className={`flex items-center gap-1.5 text-xs font-medium ${
-              formPincodeStatus.loading ? 'text-slate-400' :
-              formPincodeStatus.result?.isServiceable ? 'text-emerald-600' : 'text-red-500'
-            }`}>
-              {formPincodeStatus.loading ? <><Loader2 size={12} className="animate-spin" /> Checking...</> :
-               formPincodeStatus.result?.isServiceable
-                ? <><CheckCircle size={12} /> Delivery available — {formPincodeStatus.result.deliveryDateString}</>
-                : <><XCircle size={12} /> Not serviceable</>}
+          {/* Pincode Serviceability & Location Status Badge */}
+          {formData.pincode.length === 6 && (
+            <div className="p-3 rounded-lg border bg-white text-xs font-medium space-y-1">
+              {(lookupLoading || formPincodeStatus?.loading) ? (
+                <div className="flex items-center gap-1.5 text-slate-500">
+                  <Loader2 size={13} className="animate-spin text-blue-600" />
+                  <span>Fetching postal details & checking delivery serviceability...</span>
+                </div>
+              ) : formPincodeStatus?.result?.isServiceable ? (
+                <div className="flex items-center gap-1.5 text-emerald-600 font-semibold">
+                  <CheckCircle size={14} className="shrink-0" />
+                  <span>
+                    Delivery Available to {formData.city || 'your area'}{formData.state ? `, ${formData.state}` : ''} · Expected {formPincodeStatus.result.deliveryDateString}
+                  </span>
+                </div>
+              ) : formPincodeStatus?.result ? (
+                <div className="flex items-center gap-1.5 text-red-500 font-semibold">
+                  <XCircle size={14} className="shrink-0" />
+                  <span>Delivery NOT available for pincode {formData.pincode}. Please enter a serviceable pincode.</span>
+                </div>
+              ) : null}
             </div>
           )}
 
           {/* Address Type */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 pt-1">
             {['Home', 'Work', 'Other'].map(type => (
               <button
                 key={type}
+                type="button"
                 onClick={() => setFormData(prev => ({ ...prev, type }))}
-                className={`flex-1 py-2 rounded-lg text-xs font-medium uppercase tracking-wider transition-all ${
-                  formData.type === type ? 'bg-blue-600 text-white' : 'bg-white border border-slate-200 text-slate-500'
+                className={`flex-1 py-2 rounded-lg text-xs font-medium uppercase tracking-wider transition-all cursor-pointer ${
+                  formData.type === type ? 'bg-blue-600 text-white shadow-xs' : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'
                 }`}
               >{type}</button>
             ))}
           </div>
 
-          <div className="flex gap-2 pt-1">
+          <div className="flex gap-2 pt-2">
             <button
+              type="button"
               onClick={handleSaveAddress}
-              disabled={savingAddress || !formData.name || !formData.addressLine1 || !formData.pincode || !formData.city}
-              className="flex-1 py-2.5 rounded-lg bg-blue-600 text-white text-xs font-semibold uppercase tracking-wider disabled:opacity-50 hover:bg-blue-700 transition-colors"
+              disabled={
+                savingAddress || 
+                !formData.name || 
+                !isPhoneValid || 
+                !formData.addressLine1 || 
+                formData.pincode.length !== 6 || 
+                !formData.city || 
+                !formData.state ||
+                (formPincodeStatus?.result && !formPincodeStatus.result.isServiceable)
+              }
+              className="flex-1 py-2.5 rounded-lg bg-blue-600 text-white text-xs font-semibold uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors shadow-sm cursor-pointer"
             >
               {savingAddress ? <Loader2 size={14} className="animate-spin mx-auto" /> : 'Save & Use This Address'}
             </button>
-            <button onClick={() => setShowForm(false)} className="px-4 py-2.5 rounded-lg border border-slate-200 text-slate-500 text-xs font-medium hover:bg-slate-50 transition-colors">
+            <button 
+              type="button" 
+              onClick={() => setShowForm(false)} 
+              className="px-4 py-2.5 rounded-lg border border-slate-200 text-slate-500 text-xs font-medium hover:bg-slate-50 transition-colors cursor-pointer"
+            >
               Cancel
             </button>
           </div>
