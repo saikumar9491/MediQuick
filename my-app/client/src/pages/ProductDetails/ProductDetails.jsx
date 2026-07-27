@@ -167,6 +167,10 @@ const ProductDetails = () => {
   };
 
   const handleAddToCart = () => {
+    if (!user) {
+      toast.error('Please login to add items to cart');
+      return navigate('/login');
+    }
     if (!medicine) return;
     const finalProduct = { ...medicine };
     if (selectedVariant) {
@@ -176,8 +180,10 @@ const ProductDetails = () => {
       finalProduct.selectedVariantLabel = selectedVariant.label;
       finalProduct.countInStock = selectedVariant.countInStock;
     }
-    addToCart(finalProduct, quantity);
-    toast.success(`${medicine.name}${selectedVariant ? ` (${selectedVariant.label})` : ''} added to cart!`);
+    const success = addToCart(finalProduct, quantity);
+    if (success) {
+      toast.success(`${medicine.name}${selectedVariant ? ` (${selectedVariant.label})` : ''} added to cart!`);
+    }
   };
 
   const handleBuyNow = () => {

@@ -142,6 +142,10 @@ const MedicineDetails = () => {
   };
 
   const handleAddBundleToCart = () => {
+    if (!user) {
+      toast.error('Please login to add items to cart');
+      return navigate('/login');
+    }
     let count = 0;
     if (checkedBundleItems.includes(medicine._id)) {
       addToCart(medicine, quantity);
@@ -273,12 +277,18 @@ const MedicineDetails = () => {
     }, 0);
 
   const handleAddToCart = () => {
-    addToCart({
+    if (!user) {
+      toast.error('Please login to add items to cart');
+      return navigate('/login');
+    }
+    const success = addToCart({
       ...medicine,
       price: Math.round(medicine.price * selectedVariant.multiplier),
       discountPrice: medicine.discountPrice ? Math.round(medicine.discountPrice * selectedVariant.multiplier) : null
     }, quantity);
-    toast.success(`${medicine.name} (${selectedVariant.label}) added to cart!`);
+    if (success) {
+      toast.success(`${medicine.name} (${selectedVariant.label}) added to cart!`);
+    }
   };
 
   const handleBuyNow = () => {

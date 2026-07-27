@@ -61,10 +61,16 @@ const ProductCard = ({
   const handleAdd = async (e) => {
     e.stopPropagation();
     if (isOutOfStock) return;
+    if (!user) {
+      toast.error('Please login to add items to cart');
+      return navigate('/login');
+    }
     setAddingToCart(true);
     try {
-      await addToCart({ _id, name, brand, price: finalPrice, image, countInStock });
-      toast.success('Added to cart', { duration: 1500 });
+      const success = await addToCart({ _id, name, brand, price: finalPrice, image, countInStock });
+      if (success) {
+        toast.success('Added to cart', { duration: 1500 });
+      }
     } catch (err) {
       toast.error('Failed to add to cart');
     } finally {

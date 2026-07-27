@@ -115,7 +115,10 @@ export const CartProvider = ({ children }) => {
     if (!user) {
       setAuthModalView('login');
       setShowAuthModal(true);
-      return;
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+        window.location.href = '/login';
+      }
+      return false;
     }
     blockSave.current = false; // Enable saving for this user action
     setCart(prev => {
@@ -123,21 +126,25 @@ export const CartProvider = ({ children }) => {
       if (exists) {
         return prev.map(item => 
           (item._id || item.productId) === (product._id || product.productId) 
-            ? { ...item, quantity: item.quantity + 1 } 
+            ? { ...item, quantity: item.quantity + (product.quantity || 1) } 
             : item
         );
       }
       return [...prev, { ...product, _id: product._id || product.productId, quantity: product.quantity || 1 }];
     });
+    return true;
   };
 
   const addToCartMultiple = (itemsList) => {
     if (!user) {
       setAuthModalView('login');
       setShowAuthModal(true);
-      return;
+      if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login')) {
+        window.location.href = '/login';
+      }
+      return false;
     }
-    if (!Array.isArray(itemsList) || itemsList.length === 0) return;
+    if (!Array.isArray(itemsList) || itemsList.length === 0) return false;
     blockSave.current = false;
     setCart(prev => {
       let updated = [...prev];

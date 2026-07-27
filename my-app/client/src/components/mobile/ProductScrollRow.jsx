@@ -60,9 +60,13 @@ export const MobileProductCard = ({ product }) => {
   const handleAddToCart = (e) => {
     e.stopPropagation();
     if (isOutOfStock) return;
+    if (!token) {
+      toast.error('Please login to add items to cart');
+      return navigate('/login');
+    }
     setLoading(true);
     try {
-      addToCart({
+      const success = addToCart({
         _id,
         name,
         brand,
@@ -70,7 +74,9 @@ export const MobileProductCard = ({ product }) => {
         price: finalPrice,
         countInStock
       });
-      toast.success(`${name} added to cart`, { duration: 1500 });
+      if (success) {
+        toast.success(`${name} added to cart`, { duration: 1500 });
+      }
     } catch (err) {
       toast.error("Failed to add to cart");
     } finally {
