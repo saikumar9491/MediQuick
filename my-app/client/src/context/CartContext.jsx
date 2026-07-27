@@ -4,13 +4,42 @@ import { API_BASE } from '../utils/apiConfig';
 
 const CartContext = createContext();
 
+/**
+ * Robust Product ID extractor that safely converts any item or nested object ID into a clean string.
+ */
+export const getCleanProductId = (item) => {
+  if (!item) return '';
+  if (typeof item === 'string') return item;
+  
+  if (item._id) {
+    if (typeof item._id === 'string') return item._id;
+    if (typeof item._id === 'object' && item._id._id) return item._id._id.toString();
+    return item._id.toString();
+  }
+  
+  if (item.productId) {
+    if (typeof item.productId === 'string') return item.productId;
+    if (typeof item.productId === 'object') {
+      if (item.productId._id) return item.productId._id.toString();
+      if (item.productId.id) return item.productId.id.toString();
+    }
+    return item.productId.toString();
+  }
+
+  return '';
+};
+
 export const CartProvider = ({ children }) => {
   const { user, token, setShowAuthModal, setAuthModalView } = useAuth();
   
   // 🚀 INITIALIZE FROM LOCAL STORAGE FOR INSTANT UI
   const [cart, setCart] = useState(() => {
-    const savedCart = localStorage.getItem('mediQuickCart');
-    return savedCart ? JSON.parse(savedCart) : [];
+    try {
+      const savedCart = localStorage.getItem('mediQuickCart');
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch {
+      return [];
+    }
   });
 
   const [isLoaded, setIsLoaded] = useState(false);
@@ -19,17 +48,29 @@ export const CartProvider = ({ children }) => {
 
   // 📦 PERSIST TO LOCAL STORAGE ON EVERY CHANGE
   useEffect(() => {
-    localStorage.setItem('mediQuickCart', JSON.stringify(cart));
+    try {
+      localStorage.setItem('mediQuickCart', JSON.stringify(cart));
+    } catch (e) {
+      console.error("Failed to save cart to localStorage", e);
+    }
   }, [cart]);
 
-  // Helper for immediate save to backend DB
+  // Helper for immediate, robust save to backend DB
   const saveCartToBackend = async (newCart) => {
     if (!user || !token) return;
     setSaveStatus('saving');
-    const dbPayload = newCart.map(item => ({
-      productId: item._id || item.productId,
-      quantity: item.quantity
-    }));
+    
+    // Safely extract string IDs to prevent Mongoose CastErrors
+    const dbPayload = newCart
+      .map(item => {
+        const idStr = getCleanProductId(item);
+        if (!idStr || idStr === '[object Object]') return null;
+        return {
+          productId: idStr,
+          quantity: Number(item.quantity) || 1
+        };
+      })
+      .filter(Boolean);
 
     try {
       await Promise.all([
@@ -69,8 +110,8 @@ export const CartProvider = ({ children }) => {
           const data = await cartRes.json();
           if (Array.isArray(data?.items)) {
             const backendCart = data.items.map(item => ({
-              _id: item.productId,
               ...item,
+              _id: getCleanProductId(item),
             }));
             setCart(backendCart);
             localStorage.setItem('mediQuickCart', JSON.stringify(backendCart));
@@ -108,12 +149,14 @@ export const CartProvider = ({ children }) => {
     }
     blockSave.current = false;
     
+    const pId = getCleanProductId(product);
+    if (!pId) return false;
+
     let nextCart = [];
-    const pId = product._id || product.productId;
-    const exists = cart.find(item => (item._id || item.productId) === pId);
+    const exists = cart.find(item => getCleanProductId(item) === pId);
     if (exists) {
       nextCart = cart.map(item => 
-        (item._id || item.productId) === pId 
+        getCleanProductId(item) === pId 
           ? { ...item, quantity: item.quantity + (product.quantity || 1) } 
           : item
       );
@@ -141,9 +184,9 @@ export const CartProvider = ({ children }) => {
 
     let updated = [...cart];
     itemsList.forEach(product => {
-      const pId = product.productId?._id || product.productId || product._id;
+      const pId = getCleanProductId(product);
       if (!pId) return;
-      const existsIndex = updated.findIndex(item => (item._id || item.productId) === pId);
+      const existsIndex = updated.findIndex(item => getCleanProductId(item) === pId);
       const addQty = product.quantity || 1;
       if (existsIndex > -1) {
         updated[existsIndex] = {
@@ -172,7 +215,8 @@ export const CartProvider = ({ children }) => {
 
   const removeFromCart = (productId) => {
     blockSave.current = false;
-    const nextCart = cart.filter(item => (item._id || item.productId) !== productId);
+    const targetIdStr = getCleanProductId(productId);
+    const nextCart = cart.filter(item => getCleanProductId(item) !== targetIdStr);
     setCart(nextCart);
     localStorage.setItem('mediQuickCart', JSON.stringify(nextCart));
     saveCartToBackend(nextCart);
@@ -181,8 +225,9 @@ export const CartProvider = ({ children }) => {
   const updateQuantity = (productId, newQty) => {
     if (newQty < 1) return;
     blockSave.current = false;
+    const targetIdStr = getCleanProductId(productId);
     const nextCart = cart.map(item => 
-      (item._id || item.productId) === productId ? { ...item, quantity: newQty } : item
+      getCleanProductId(item) === targetIdStr ? { ...item, quantity: newQty } : item
     );
     setCart(nextCart);
     localStorage.setItem('mediQuickCart', JSON.stringify(nextCart));
