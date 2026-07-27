@@ -6,7 +6,7 @@ import {
   Tag, Zap, Megaphone, ShoppingBag, Cpu, Bell, SplitSquareHorizontal,
   Users, MessageSquare, Star, Search, LifeBuoy,
   AlertOctagon, Radio, Eye, BarChart2, Settings,
-  LogOut, Menu, ChevronRight, Home, ChevronDown, Stethoscope, Calendar, UserCheck, Layout
+  LogOut, Menu, ChevronRight, Home, ChevronDown, Stethoscope, Calendar, UserCheck, Layout, Image
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigate, useLocation, Outlet } from 'react-router-dom';
