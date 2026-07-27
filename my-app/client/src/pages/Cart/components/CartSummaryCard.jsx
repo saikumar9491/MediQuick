@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 import { Tag, CheckCircle, X, Loader2, ShieldCheck, RotateCcw, Award, ArrowRight, AlertCircle } from 'lucide-react';
 import { validateCoupon } from '../../../api/checkout';
-import confetti from 'canvas-confetti';
+import { CouponInput } from '../../Checkout/components/CouponInput';
 
 const FREE_DELIVERY_THRESHOLD = 500;
 const DELIVERY_FEE = 49;
@@ -111,65 +111,14 @@ const CartSummaryCard = ({
 
       {/* Coupon */}
       <div className="px-5 py-4 border-b border-slate-100">
-        {appliedCoupon ? (
-          <div ref={boxRef} className="flex items-center justify-between p-3 bg-orange-50 border border-orange-200 rounded-xl">
-            <div className="flex items-center gap-2">
-              <Tag size={13} className="text-[#FF6B00]" />
-              <div>
-                <p className="text-xs font-semibold text-[#FF6B00]">{appliedCoupon.code}</p>
-                <p className="text-[10px] text-orange-600">You save ₹{appliedCoupon.discountAmount}</p>
-              </div>
-            </div>
-            <button
-              onClick={onCouponRemove}
-              className="p-1 text-slate-400 hover:text-red-500 transition-colors"
-            >
-              <X size={13} />
-            </button>
-          </div>
-        ) : (
-          <div>
-            <button
-              onClick={() => setCouponOpen(o => !o)}
-              className="flex items-center gap-2 text-xs font-medium text-[#0057FF] hover:text-[#003BB5] transition-colors"
-            >
-              <Tag size={13} />
-              Have a coupon code?
-            </button>
-
-            {couponOpen && (
-              <div className="mt-3 space-y-2">
-                <div className="flex gap-2">
-                  <div className="flex-1 flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 focus-within:border-[#0057FF] transition-colors">
-                    <input
-                      type="text"
-                      placeholder="Enter code"
-                      value={code}
-                      onChange={e => { setCode(e.target.value.toUpperCase()); setCouponError(''); }}
-                      onKeyDown={e => e.key === 'Enter' && handleApplyCoupon()}
-                      className="flex-1 bg-transparent text-xs font-medium text-slate-700 placeholder-slate-400 focus:outline-none"
-                    />
-                  </div>
-                  <button
-                    onClick={handleApplyCoupon}
-                    disabled={couponLoading || !code.trim() || !isLoggedIn}
-                    className="px-4 py-2 bg-[#0057FF] text-white rounded-xl text-xs font-semibold hover:bg-[#003BB5] disabled:opacity-50 transition-colors flex items-center gap-1.5"
-                  >
-                    {couponLoading ? <Loader2 size={12} className="animate-spin" /> : 'Apply'}
-                  </button>
-                </div>
-                {couponError && (
-                  <p className="text-xs text-red-500 flex items-center gap-1">
-                    <X size={11} /> {couponError}
-                  </p>
-                )}
-                {!isLoggedIn && (
-                  <p className="text-xs text-slate-400">Log in to apply coupons</p>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+        <CouponInput
+          token={token}
+          subtotal={subtotal}
+          cartCategories={cartCategories}
+          appliedCoupon={appliedCoupon}
+          onApply={onCouponApply}
+          onRemove={onCouponRemove}
+        />
       </div>
 
       {/* Price breakdown */}
