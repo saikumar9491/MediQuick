@@ -15,6 +15,19 @@ export const validateCoupon = async (token, { code, subtotal, cartCategories = [
 };
 
 /**
+ * Fetch public active coupons for checkout display
+ */
+export const fetchActiveCoupons = async () => {
+  try {
+    const res = await fetch(`${API_BASE}/api/coupons/public/active`);
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (err) {
+    return [];
+  }
+};
+
+/**
  * Pre-flight checkout validation (stock, zone, Rx, coupon)
  */
 export const validateCheckout = async (token, payload) => {
