@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { addToWishlist, removeFromWishlist, fetchWishlist } from '../api/wishlist';
 
 const WishlistHeartButton = ({ productId, className = '', size = 16 }) => {
-  const { token } = useAuth();
+  const { token, setShowAuthModal, setAuthModalView } = useAuth();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -33,7 +33,9 @@ const WishlistHeartButton = ({ productId, className = '', size = 16 }) => {
     e.preventDefault();
 
     if (!token) {
-      return toast.error('Please login to save items to your wishlist.');
+      setAuthModalView('login');
+      setShowAuthModal(true);
+      return;
     }
 
     setLoading(true);

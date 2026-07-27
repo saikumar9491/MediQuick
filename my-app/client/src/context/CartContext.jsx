@@ -5,7 +5,7 @@ import { API_BASE } from '../utils/apiConfig';
 const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const { user, token } = useAuth();
+  const { user, token, setShowAuthModal, setAuthModalView } = useAuth();
   
   // 🚀 INITIALIZE FROM LOCAL STORAGE FOR INSTANT UI
   const [cart, setCart] = useState(() => {
@@ -112,6 +112,11 @@ export const CartProvider = ({ children }) => {
 
   // --- ACTIONS ---
   const addToCart = (product) => {
+    if (!user) {
+      setAuthModalView('login');
+      setShowAuthModal(true);
+      return;
+    }
     blockSave.current = false; // Enable saving for this user action
     setCart(prev => {
       const exists = prev.find(item => (item._id || item.productId) === (product._id || product.productId));
@@ -127,6 +132,11 @@ export const CartProvider = ({ children }) => {
   };
 
   const addToCartMultiple = (itemsList) => {
+    if (!user) {
+      setAuthModalView('login');
+      setShowAuthModal(true);
+      return;
+    }
     if (!Array.isArray(itemsList) || itemsList.length === 0) return;
     blockSave.current = false;
     setCart(prev => {
