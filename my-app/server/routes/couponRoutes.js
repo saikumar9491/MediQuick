@@ -96,7 +96,7 @@ router.get('/public/active', async (req, res) => {
       isActive: true,
       validFrom: { $lte: now },
       validTo: { $gte: now }
-    });
+    }).sort({ createdAt: -1 });
     res.json(activeCoupons);
   } catch (error) {
     res.status(500).json({ message: error.message });

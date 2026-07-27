@@ -17,7 +17,7 @@ export const CouponInput = ({ token, subtotal, cartCategories, appliedCoupon, on
   const boxRef = useRef(null);
   const [justApplied, setJustApplied] = useState(false);
   const [showCouponsList, setShowCouponsList] = useState(false);
-  const [availableCoupons, setAvailableCoupons] = useState(FEATURED_COUPONS);
+  const [availableCoupons, setAvailableCoupons] = useState([]);
   const [fetchingCoupons, setFetchingCoupons] = useState(false);
 
   useEffect(() => {
@@ -26,22 +26,29 @@ export const CouponInput = ({ token, subtotal, cartCategories, appliedCoupon, on
       try {
         const fetched = await fetchActiveCoupons();
         if (Array.isArray(fetched) && fetched.length > 0) {
-          // Merge backend active coupons with featured defaults
-          const existingCodes = new Set(fetched.map(c => c.code));
-          const combined = [
-            ...fetched.map(c => ({
-              code: c.code,
-              discountType: c.discountType,
-              discountValue: c.discountValue,
-              description: c.description || (c.discountType === 'Percentage' ? `${c.discountValue}% OFF` : `Flat ₹${c.discountValue} OFF`),
-              minOrderValue: c.minOrderValue || 0,
-            })),
-            ...FEATURED_COUPONS.filter(f => !existingCodes.has(f.code))
-          ];
-          setAvailableCoupons(combined);
+          // If admin has active coupons in DB, show ONLY admin's coupons without duplicates
+          const seen = new Map();
+          fetched.forEach(c => {
+            if (!c.code) return;
+            const upperCode = c.code.trim().toUpperCase();
+            if (!seen.has(upperCode)) {
+              seen.set(upperCode, {
+                code: upperCode,
+                discountType: c.discountType,
+                discountValue: c.discountValue,
+                description: c.description || (c.discountType === 'Percentage' ? `${c.discountValue}% OFF` : `Flat ₹${c.discountValue} OFF`),
+                minOrderValue: c.minOrderValue || 0,
+              });
+            }
+          });
+          setAvailableCoupons(Array.from(seen.values()));
+        } else {
+          // Fallback only if no coupons exist in backend database
+          setAvailableCoupons(FEATURED_COUPONS);
         }
       } catch (err) {
         console.error('Failed to load active coupons:', err);
+        setAvailableCoupons(FEATURED_COUPONS);
       } finally {
         setFetchingCoupons(false);
       }
