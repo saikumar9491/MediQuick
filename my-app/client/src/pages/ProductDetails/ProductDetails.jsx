@@ -104,14 +104,9 @@ const ProductDetails = () => {
 
   useEffect(() => {
     if (!authLoading) {
-      if (!user) {
-        toast.error('Please login to view product details');
-        navigate('/login', { state: { from: `/product/${id}` } });
-        return;
-      }
       fetchProductData();
     }
-  }, [id, authLoading, user, navigate]);
+  }, [id, authLoading]);
 
   // Sync wishlist status if user changes
   useEffect(() => {
