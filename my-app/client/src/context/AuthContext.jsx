@@ -51,6 +51,7 @@ export const AuthProvider = ({ children }) => {
           setToken(null);
           localStorage.removeItem('mediQuickUser');
           localStorage.removeItem('userToken');
+          localStorage.removeItem('mediQuickCart');
           import('react-hot-toast').then(({ default: toast }) => {
             toast.error("Session Expired. Please Login Again.");
           });
@@ -65,6 +66,8 @@ export const AuthProvider = ({ children }) => {
   }, [API_BASE]);
 
   const login = async (userToken, userData) => {
+    // Clear any leftover cart from previous sessions before setting new user
+    localStorage.removeItem('mediQuickCart');
     setToken(userToken);
     localStorage.setItem('userToken', userToken);
 
@@ -95,6 +98,7 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     localStorage.removeItem('mediQuickUser');
     localStorage.removeItem('userToken');
+    localStorage.removeItem('mediQuickCart');
     sessionStorage.removeItem('locationPrompted');
     
     // Aggressively clear Google One Tap cooldown cookies

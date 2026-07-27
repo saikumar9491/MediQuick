@@ -96,10 +96,16 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     const syncWithBackend = async () => {
       if (!user || !token) {
+        setCart([]);
+        localStorage.removeItem('mediQuickCart');
         setIsLoaded(true);
         blockSave.current = false;
         return;
       }
+
+      // Block saving old cart data to new user account
+      blockSave.current = true;
+      setCart([]);
 
       try {
         const cartRes = await fetch(`${API_BASE}/api/cart`, {
@@ -115,7 +121,13 @@ export const CartProvider = ({ children }) => {
             }));
             setCart(backendCart);
             localStorage.setItem('mediQuickCart', JSON.stringify(backendCart));
+          } else {
+            setCart([]);
+            localStorage.removeItem('mediQuickCart');
           }
+        } else {
+          setCart([]);
+          localStorage.removeItem('mediQuickCart');
         }
       } catch (err) {
         console.error('Cart Backend Sync Failed:', err);
