@@ -1,0 +1,56 @@
+[
+  {
+    "id": "tenses_1",
+    "category": "Tenses",
+    "type": "mcq",
+    "questionText": "By the time we arrive, the movie _______.",
+    "options": ["will start", "started", "will have started", "is starting"],
+    "correctAnswer": "will have started",
+    "explanation": "We use the future perfect tense ('will have started') to describe an action that will be completed before a specific time in the future."
+  },
+  {
+    "id": "tenses_2",
+    "category": "Tenses",
+    "type": "mcq",
+    "questionText": "I _______ here since 2015.",
+    "options": ["am living", "have been living", "live", "was living"],
+    "correctAnswer": "have been living",
+    "explanation": "The present perfect continuous ('have been living') is used to talk about an action that started in the past and is continuing now, especially with 'since' or 'for'."
+  },
+  {
+    "id": "prepositions_1",
+    "category": "Prepositions",
+    "type": "mcq",
+    "questionText": "She is very good _______ solving complex problems.",
+    "options": ["in", "at", "with", "on"],
+    "correctAnswer": "at",
+    "explanation": "The correct preposition to use after the adjective 'good' (when referring to an ability) is 'at'."
+  },
+  {
+    "id": "prepositions_2",
+    "category": "Prepositions",
+    "type": "mcq",
+    "questionText": "The meeting is scheduled _______ Monday morning.",
+    "options": ["in", "on", "at", "for"],
+    "correctAnswer": "on",
+    "explanation": "We use the preposition 'on' with days of the week."
+  },
+  {
+    "id": "articles_1",
+    "category": "Articles",
+    "type": "mcq",
+    "questionText": "He is _______ honest man.",
+    "options": ["a", "an", "the", "no article"],
+    "correctAnswer": "an",
+    "explanation": "Although 'honest' starts with a consonant letter, it begins with a vowel sound (silent h). Therefore, 'an' is the correct article."
+  },
+  {
+    "id": "error_1",
+    "category": "Error Detection",
+    "type": "mcq",
+    "questionText": "Identify the incorrect part: (A) Neither of the two brothers / (B) are / (C) going to attend the party. / (D) No error",
+    "options": ["A", "B", "C", "D"],
+    "correctAnswer": "B",
+    "explanation": "'Neither of' takes a singular verb. The correct verb should be 'is', not 'are'."
+  }
+]

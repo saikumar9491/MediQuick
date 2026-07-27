@@ -1,0 +1,7 @@
+[
+  { "id": 1, "text": "The quick brown fox jumps over the lazy dog.", "difficulty": "easy" },
+  { "id": 2, "text": "Artificial intelligence is rapidly changing the way we work and communicate.", "difficulty": "medium" },
+  { "id": 3, "text": "Despite the heavy rain, the outdoor concert was a spectacular success.", "difficulty": "medium" },
+  { "id": 4, "text": "She sells seashells by the seashore.", "difficulty": "hard" },
+  { "id": 5, "text": "Global warming poses a significant threat to our planet's delicate ecosystems.", "difficulty": "hard" }
+]

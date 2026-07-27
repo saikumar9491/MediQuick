@@ -1,0 +1,58 @@
+[
+  {
+    "id": "passage_1",
+    "title": "The Evolution of Remote Work",
+    "content": "In recent years, the landscape of work has undergone a dramatic transformation. What was once considered a rare perk—working from home—has become a standard expectation for millions of employees worldwide. This shift was largely accelerated by global events that forced companies to rapidly adopt digital communication tools and cloud-based collaboration platforms. While many employers initially feared a drop in productivity, studies have shown that remote workers often work longer hours and are highly efficient. However, the lack of physical boundaries between the office and the home has led to new challenges, primarily related to employee burnout and feelings of isolation. To combat this, some organizations are adopting a hybrid model, requiring employees to be in the office a few days a week to foster team bonding while still offering flexibility.",
+    "questions": [
+      {
+        "id": "p1_q1",
+        "questionText": "According to the passage, what was the initial fear of many employers regarding remote work?",
+        "options": ["Increased operational costs", "A drop in productivity", "Technology failures", "Employees quitting"],
+        "correctAnswer": "A drop in productivity",
+        "explanation": "The text states: 'While many employers initially feared a drop in productivity, studies have shown that remote workers often work longer hours and are highly efficient.'"
+      },
+      {
+        "id": "p1_q2",
+        "questionText": "What are the new challenges mentioned that are associated with remote work?",
+        "options": ["Lack of internet access", "Decreased salaries", "Employee burnout and isolation", "Too many team meetings"],
+        "correctAnswer": "Employee burnout and isolation",
+        "explanation": "The passage notes: 'the lack of physical boundaries... has led to new challenges, primarily related to employee burnout and feelings of isolation.'"
+      },
+      {
+        "id": "p1_q3",
+        "questionText": "Why are some organizations adopting a hybrid model?",
+        "options": ["To save money on office rent", "To foster team bonding while offering flexibility", "Because employees demanded it", "To monitor employees more closely"],
+        "correctAnswer": "To foster team bonding while offering flexibility",
+        "explanation": "The passage concludes by saying a hybrid model is adopted 'to foster team bonding while still offering flexibility.'"
+      }
+    ]
+  },
+  {
+    "id": "passage_2",
+    "title": "The Mystery of the Ocean Floor",
+    "content": "Despite covering more than 70 percent of the Earth's surface, the ocean remains largely unexplored. In fact, scientists often say we know more about the surface of the Moon than we do about the deep ocean floor. Deep-sea exploration is incredibly difficult due to the extreme conditions: complete darkness, near-freezing temperatures, and immense pressure that can crush standard equipment. Recently, advancements in uncrewed submersibles and remotely operated vehicles (ROVs) have allowed researchers to map larger sections of the seafloor and discover bizarre new species that thrive near hydrothermal vents. These vents spew mineral-rich, superheated water, creating a unique ecosystem that survives without sunlight through a process called chemosynthesis.",
+    "questions": [
+      {
+        "id": "p2_q1",
+        "questionText": "Why is deep-sea exploration described as incredibly difficult?",
+        "options": ["Lack of funding", "Extreme conditions like immense pressure and darkness", "Political restrictions", "Ocean currents are too fast"],
+        "correctAnswer": "Extreme conditions like immense pressure and darkness",
+        "explanation": "The text lists 'extreme conditions: complete darkness, near-freezing temperatures, and immense pressure' as the reasons."
+      },
+      {
+        "id": "p2_q2",
+        "questionText": "What technological advancement has recently aided ocean exploration?",
+        "options": ["Stronger diving suits", "Uncrewed submersibles and ROVs", "Better satellites", "New oxygen tanks"],
+        "correctAnswer": "Uncrewed submersibles and ROVs",
+        "explanation": "The passage mentions 'advancements in uncrewed submersibles and remotely operated vehicles (ROVs)' as the technology allowing researchers to map the seafloor."
+      },
+      {
+        "id": "p2_q3",
+        "questionText": "How do species near hydrothermal vents survive without sunlight?",
+        "options": ["Through photosynthesis", "By eating rocks", "Through chemosynthesis", "They hibernate in the dark"],
+        "correctAnswer": "Through chemosynthesis",
+        "explanation": "The final sentence states they survive 'without sunlight through a process called chemosynthesis.'"
+      }
+    ]
+  }
+]

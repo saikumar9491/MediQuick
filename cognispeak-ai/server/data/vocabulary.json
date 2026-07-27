@@ -1,0 +1,62 @@
+[
+  {
+    "id": "v1",
+    "word": "Entrepreneur",
+    "phonetic": "/ˌɒntrəprəˈnɜːr/",
+    "definition": "A person who organizes and operates a business or businesses, taking on greater than normal financial risks in order to do so."
+  },
+  {
+    "id": "v2",
+    "word": "Hierarchy",
+    "phonetic": "/ˈhaɪərɑːrki/",
+    "definition": "A system or organization in which people or groups are ranked one above the other according to status or authority."
+  },
+  {
+    "id": "v3",
+    "word": "Syllable",
+    "phonetic": "/ˈsɪləbl/",
+    "definition": "A unit of pronunciation having one vowel sound, with or without surrounding consonants, forming the whole or a part of a word."
+  },
+  {
+    "id": "v4",
+    "word": "Mischievous",
+    "phonetic": "/ˈmɪstʃɪvəs/",
+    "definition": "Causing or showing a fondness for causing trouble in a playful way."
+  },
+  {
+    "id": "v5",
+    "word": "Epitome",
+    "phonetic": "/ɪˈpɪtəmi/",
+    "definition": "A person or thing that is a perfect example of a particular quality or type."
+  },
+  {
+    "id": "v6",
+    "word": "Colleague",
+    "phonetic": "/ˈkɒliːɡ/",
+    "definition": "A person with whom one works in a profession or business."
+  },
+  {
+    "id": "v7",
+    "word": "Accommodate",
+    "phonetic": "/əˈkɒmədeɪt/",
+    "definition": "Provide lodging or sufficient space for; fit in with the wishes or needs of."
+  },
+  {
+    "id": "v8",
+    "word": "Pronunciation",
+    "phonetic": "/prəˌnʌnsiˈeɪʃn/",
+    "definition": "The way in which a word is pronounced."
+  },
+  {
+    "id": "v9",
+    "word": "Fascination",
+    "phonetic": "/ˌfæsɪˈneɪʃn/",
+    "definition": "The power to fascinate someone; the quality of being fascinating."
+  },
+  {
+    "id": "v10",
+    "word": "Simultaneous",
+    "phonetic": "/ˌsɪmlˈteɪniəs/",
+    "definition": "Occurring, operating, or done at the same time."
+  }
+]
