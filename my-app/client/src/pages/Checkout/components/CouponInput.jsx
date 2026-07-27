@@ -1,14 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Tag, CheckCircle, X, Loader2, ChevronDown, ChevronUp, Sparkles, Percent } from 'lucide-react';
+import { Tag, CheckCircle, X, Loader2, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { validateCoupon, fetchActiveCoupons } from '../../../api/checkout';
 import confetti from 'canvas-confetti';
-
-const FEATURED_COUPONS = [
-  { code: 'WELCOME25', discountType: 'Percentage', discountValue: 25, description: '25% OFF on your first order', minOrderValue: 0 },
-  { code: 'HEALTH10', discountType: 'Percentage', discountValue: 10, description: '10% OFF on all health & medicine items', minOrderValue: 0 },
-  { code: 'SAVE100', discountType: 'Fixed', discountValue: 100, description: 'Flat ₹100 OFF on orders above ₹400', minOrderValue: 400 },
-  { code: 'FREESHIP', discountType: 'Fixed', discountValue: 49, description: 'Free Delivery on any order', minOrderValue: 0 },
-];
 
 export const CouponInput = ({ token, subtotal, cartCategories, appliedCoupon, onApply, onRemove }) => {
   const [code, setCode] = useState('');
@@ -26,7 +19,7 @@ export const CouponInput = ({ token, subtotal, cartCategories, appliedCoupon, on
       try {
         const fetched = await fetchActiveCoupons();
         if (Array.isArray(fetched) && fetched.length > 0) {
-          // If admin has active coupons in DB, show ONLY admin's coupons without duplicates
+          // Display STRICTLY active coupons added by Admin from backend DB
           const seen = new Map();
           fetched.forEach(c => {
             if (!c.code) return;
@@ -43,12 +36,11 @@ export const CouponInput = ({ token, subtotal, cartCategories, appliedCoupon, on
           });
           setAvailableCoupons(Array.from(seen.values()));
         } else {
-          // Fallback only if no coupons exist in backend database
-          setAvailableCoupons(FEATURED_COUPONS);
+          setAvailableCoupons([]);
         }
       } catch (err) {
         console.error('Failed to load active coupons:', err);
-        setAvailableCoupons(FEATURED_COUPONS);
+        setAvailableCoupons([]);
       } finally {
         setFetchingCoupons(false);
       }
@@ -147,70 +139,72 @@ export const CouponInput = ({ token, subtotal, cartCategories, appliedCoupon, on
         </div>
       )}
 
-      {/* Available Coupons Toggle */}
-      <div>
-        <button
-          type="button"
-          onClick={() => setShowCouponsList(!showCouponsList)}
-          className="flex items-center justify-between w-full text-left py-1 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors cursor-pointer group"
-        >
-          <span className="flex items-center gap-1.5">
-            <Sparkles size={12} className="text-amber-500 group-hover:rotate-12 transition-transform" />
-            <span>Available Coupons ({availableCoupons.length})</span>
-          </span>
-          {showCouponsList ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-        </button>
+      {/* Available Coupons Toggle — ONLY shown if admin has active coupons in DB */}
+      {availableCoupons.length > 0 && (
+        <div>
+          <button
+            type="button"
+            onClick={() => setShowCouponsList(!showCouponsList)}
+            className="flex items-center justify-between w-full text-left py-1 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors cursor-pointer group"
+          >
+            <span className="flex items-center gap-1.5">
+              <Sparkles size={12} className="text-amber-500 group-hover:rotate-12 transition-transform" />
+              <span>Available Coupons ({availableCoupons.length})</span>
+            </span>
+            {showCouponsList ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+          </button>
 
-        {/* Coupons Card List */}
-        {showCouponsList && (
-          <div className="mt-2 space-y-2 max-h-48 overflow-y-auto pr-1">
-            {fetchingCoupons ? (
-              <div className="flex items-center gap-1.5 text-xs text-slate-400 p-2">
-                <Loader2 size={12} className="animate-spin text-blue-500" /> Loading coupons...
-              </div>
-            ) : availableCoupons.map((c) => {
-              const meetsMinOrder = subtotal >= (c.minOrderValue || 0);
-              return (
-                <div
-                  key={c.code}
-                  className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 transition-all ${
-                    meetsMinOrder
-                      ? 'bg-slate-50 border-slate-200 hover:border-blue-300'
-                      : 'bg-slate-50/50 border-slate-100 opacity-60'
-                  }`}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5 mb-0.5">
-                      <span className="px-2 py-0.5 rounded-md bg-blue-50 border border-blue-200 text-blue-700 font-black text-[10px] uppercase tracking-wider">
-                        {c.code}
-                      </span>
-                      {c.minOrderValue > 0 && !meetsMinOrder && (
-                        <span className="text-[9px] text-amber-600 font-semibold">
-                          Min ₹{c.minOrderValue}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-[11px] font-medium text-slate-700 line-clamp-1">
-                      {c.description}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCode(c.code);
-                      handleApplyCode(c.code);
-                    }}
-                    disabled={loading}
-                    className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-black uppercase tracking-wider transition-all disabled:opacity-50 cursor-pointer shrink-0"
-                  >
-                    Apply
-                  </button>
+          {/* Coupons Card List */}
+          {showCouponsList && (
+            <div className="mt-2 space-y-2 max-h-48 overflow-y-auto pr-1">
+              {fetchingCoupons ? (
+                <div className="flex items-center gap-1.5 text-xs text-slate-400 p-2">
+                  <Loader2 size={12} className="animate-spin text-blue-500" /> Loading coupons...
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+              ) : availableCoupons.map((c) => {
+                const meetsMinOrder = subtotal >= (c.minOrderValue || 0);
+                return (
+                  <div
+                    key={c.code}
+                    className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 transition-all ${
+                      meetsMinOrder
+                        ? 'bg-slate-50 border-slate-200 hover:border-blue-300'
+                        : 'bg-slate-50/50 border-slate-100 opacity-60'
+                    }`}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <span className="px-2 py-0.5 rounded-md bg-blue-50 border border-blue-200 text-blue-700 font-black text-[10px] uppercase tracking-wider">
+                          {c.code}
+                        </span>
+                        {c.minOrderValue > 0 && !meetsMinOrder && (
+                          <span className="text-[9px] text-amber-600 font-semibold">
+                            Min ₹{c.minOrderValue}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] font-medium text-slate-700 line-clamp-1">
+                        {c.description}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCode(c.code);
+                        handleApplyCode(c.code);
+                      }}
+                      disabled={loading}
+                      className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[10px] font-black uppercase tracking-wider transition-all disabled:opacity-50 cursor-pointer shrink-0"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
