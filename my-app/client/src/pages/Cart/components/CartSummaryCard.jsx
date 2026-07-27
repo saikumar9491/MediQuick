@@ -1,6 +1,5 @@
 import React from 'react';
-import { Tag, CheckCircle, X, Loader2, ShieldCheck, RotateCcw, Award, ArrowRight, AlertCircle } from 'lucide-react';
-import { validateCoupon } from '../../../api/checkout';
+import { ShieldCheck, RotateCcw, Award, ArrowRight, AlertCircle } from 'lucide-react';
 import { CouponInput } from '../../Checkout/components/CouponInput';
 
 const FREE_DELIVERY_THRESHOLD = 500;
@@ -15,40 +14,6 @@ const CartSummaryCard = ({
   onProceed,
   isLoggedIn,
 }) => {
-  const [couponOpen, setCouponOpen] = useState(false);
-  const [code, setCode] = useState('');
-  const [couponLoading, setCouponLoading] = useState(false);
-  const [couponError, setCouponError] = useState('');
-  const boxRef = useRef(null);
-  const [justApplied, setJustApplied] = useState(false);
-
-  useEffect(() => {
-    if (appliedCoupon && justApplied && boxRef.current) {
-      const rect = boxRef.current.getBoundingClientRect();
-      const x = (rect.left + rect.width / 2) / window.innerWidth;
-      const y = (rect.top + rect.height / 2) / window.innerHeight;
-
-      const duration = 2000;
-      const end = Date.now() + duration;
-
-      (function frame() {
-        // Global confetti shoots out of the box and across the screen
-        confetti({
-          particleCount: 10,
-          spread: 120,
-          startVelocity: 30,
-          origin: { x, y },
-          colors: ['#f43f5e', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'],
-          zIndex: 9999
-        });
-        if (Date.now() < end) {
-          requestAnimationFrame(frame);
-        }
-      }());
-      setJustApplied(false);
-    }
-  }, [appliedCoupon, justApplied]);
-
   // Only in-stock items count toward totals
   const activeItems = items.filter(i => !i.outOfStock);
   const subtotal = activeItems.reduce((sum, i) => {
@@ -61,26 +26,9 @@ const CartSummaryCard = ({
 
   const couponDiscount = appliedCoupon?.discountAmount || 0;
   const deliveryFee = subtotal >= FREE_DELIVERY_THRESHOLD ? 0 : (subtotal === 0 ? 0 : DELIVERY_FEE);
-  const total = subtotal + deliveryFee - couponDiscount;
+  const total = Math.max(0, subtotal + deliveryFee - couponDiscount);
   const freeDeliveryGap = FREE_DELIVERY_THRESHOLD - subtotal;
   const cartCategories = activeItems.map(i => i.category).filter(Boolean);
-
-  const handleApplyCoupon = async () => {
-    if (!code.trim()) return;
-    setCouponLoading(true);
-    setCouponError('');
-    try {
-      const result = await validateCoupon(token, { code, subtotal, cartCategories });
-      setJustApplied(true);
-      onCouponApply(result);
-      setCode('');
-      setCouponOpen(false);
-    } catch (e) {
-      setCouponError(e.message);
-    } finally {
-      setCouponLoading(false);
-    }
-  };
 
   const canProceed = activeItems.length > 0 && !allOos;
   const disabledReason = !isLoggedIn
@@ -92,8 +40,7 @@ const CartSummaryCard = ({
     : null;
 
   return (
-    <>
-      <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-visible relative">
+    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-visible relative">
       {/* Header */}
       <div className="px-5 py-4 border-b border-slate-100">
         <h3 className="text-sm font-semibold text-slate-800">Order Summary</h3>
@@ -109,7 +56,7 @@ const CartSummaryCard = ({
         </div>
       )}
 
-      {/* Coupon */}
+      {/* Coupon Section with Available Coupons */}
       <div className="px-5 py-4 border-b border-slate-100">
         <CouponInput
           token={token}
@@ -171,7 +118,7 @@ const CartSummaryCard = ({
         <button
           onClick={onProceed}
           disabled={!canProceed || !isLoggedIn}
-          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#0057FF] text-white text-sm font-semibold hover:bg-[#003BB5] active:scale-[0.98] disabled:bg-slate-100 disabled:text-slate-400 transition-all"
+          className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-[#0057FF] text-white text-sm font-semibold hover:bg-[#003BB5] active:scale-[0.98] disabled:bg-slate-100 disabled:text-slate-400 transition-all cursor-pointer"
         >
           Proceed to Checkout <ArrowRight size={15} />
         </button>
@@ -190,8 +137,7 @@ const CartSummaryCard = ({
           ))}
         </div>
       </div>
-      </div>
-    </>
+    </div>
   );
 };
 
