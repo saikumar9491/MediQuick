@@ -15,12 +15,6 @@ const HeroBannerCarousel = ({ banners = [], loading = false }) => {
     return () => clearInterval(timer);
   }, [banners.length]);
 
-  if (loading) {
-    return (
-      <div className="w-full aspect-[21/9] bg-slate-100 animate-pulse rounded-2xl border border-slate-200"></div>
-    );
-  }
-
   // Fallbacks if no banners are returned
   const defaultBanners = [
     {
@@ -81,6 +75,9 @@ const HeroBannerCarousel = ({ banners = [], loading = false }) => {
               <img 
                 src={banner.image} 
                 alt={banner.title} 
+                loading="eager"
+                fetchpriority="high"
+                decoding="async"
                 className="w-full h-full object-cover"
               />
             ) : (

@@ -55,8 +55,38 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   const skinCareScrollRef = useRef(null);
   const ayurScrollRef = useRef(null);
 
+  const DEFAULT_BANNERS = [
+    {
+      _id: 'default-main-1',
+      title: 'FLAT 25% OFF ON MEDICINES',
+      desc: 'Healthcare delivered directly to your doorstep within hours',
+      image: 'https://img.freepik.com/free-vector/flat-medical-healthcare-sales-banner-template_23-2149511116.jpg',
+      bg: 'bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900',
+      category: 'main',
+      link: '/medicines'
+    },
+    {
+      _id: 'default-ayur-1',
+      title: 'AYURVEDIC HEALTH ESSENTIALS',
+      desc: '100% Genuine herbal formulations for everyday natural wellness',
+      image: 'https://img.freepik.com/free-vector/flat-hand-drawn-ayurveda-illustration_23-2149339394.jpg',
+      bg: 'bg-gradient-to-r from-emerald-800 to-teal-900',
+      category: 'ayurveda-promo',
+      link: '/ayurveda'
+    }
+  ];
+
   const [selectedFile, setSelectedFile] = useState(null);
-  const [dbBanners, setDbBanners] = useState([]);
+  const [dbBanners, setDbBanners] = useState(() => {
+    try {
+      const cached = sessionStorage.getItem('mq_cached_banners');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return DEFAULT_BANNERS;
+  });
   const [isUploading, setIsUploading] = useState(false);
   const [isBannerLoading, setIsBannerLoading] = useState(true);
   const [currentBanner, setCurrentBanner] = useState(0);
@@ -70,6 +100,7 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
           setDbBanners(data);
+          sessionStorage.setItem('mq_cached_banners', JSON.stringify(data));
         }
       } catch (err) {
         console.error("Banner fetch failed, using fallbacks:", err);
@@ -82,6 +113,16 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
 
   const displayBanners = dbBanners.filter(b => b.category === 'main');
   const ayurBanners = dbBanners.filter(b => b.category === 'ayurveda-promo');
+
+  // Preload banner images immediately into browser cache for instant transitions
+  useEffect(() => {
+    [...displayBanners, ...ayurBanners].forEach(b => {
+      if (b?.image) {
+        const img = new Image();
+        img.src = b.image;
+      }
+    });
+  }, [displayBanners, ayurBanners]);
 
   useEffect(() => {
     if (displayBanners.length === 0) return;
@@ -185,6 +226,9 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                     src={displayBanners[currentBanner]?.image} 
+                    loading="eager"
+                    fetchpriority="high"
+                    decoding="async"
                     className="h-full w-full object-cover rounded-l-[150px] sm:rounded-l-[350px] border-l-4 sm:border-l-8 border-white/20 shadow-[-20px_0_40px_rgba(0,0,0,0.3)]" 
                     alt="banner" 
                   />

@@ -8,6 +8,7 @@ const router = express.Router();
 // @route   GET /api/banners
 router.get('/', async (req, res) => {
   try {
+    res.set('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
     const banners = await Banner.find({});
     res.json(banners);
   } catch (error) {
