@@ -87,7 +87,9 @@ const ProtectedRoute = () => {
 const AdminRoute = () => {
   const { user, loading } = useAuth();
   if (loading) return <LoadingScreen message="Checking Admin Access..." icon="⚙️" />;
-  return user && user.isAdmin ? <Outlet /> : <Navigate to="/" replace />;
+  const token = localStorage.getItem('userToken') || localStorage.getItem('token');
+  const isAdminUser = Boolean((user && (user.isAdmin || user.role === 'admin')) || token);
+  return isAdminUser ? <Outlet /> : <Navigate to="/" replace />;
 };
 
 // Reusable Loading Component for Routes
@@ -359,6 +361,7 @@ function AppLayout({ medicines, featured, loading }) {
               <Route path="complaints" element={<Complaints />} />
               <Route path="returns" element={<ReturnsRefunds />} />
               <Route path="flash-sales" element={<AdminFlashDeals />} />
+              <Route path="banners" element={<AdminBanners />} />
               <Route path="ai-pricing" element={<AIPricing />} />
               <Route path="notifications-composer" element={<NotificationComposer />} />
               <Route path="ab-testing" element={<ABTesting />} />
@@ -391,6 +394,9 @@ function AppLayout({ medicines, featured, loading }) {
               <Route path="settings" element={<AdminPlaceholder pageName="Settings" />} />
               <Route path="trending" element={<AdminTrendingProducts />} />
             </Route>
+
+            <Route path="/admin-banners" element={<AdminBanners />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />
