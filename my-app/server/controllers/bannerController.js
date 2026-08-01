@@ -176,29 +176,34 @@ export const getBannersSummaryStats = async (req, res) => {
  */
 export const createBanner = async (req, res) => {
   try {
-    const { name, headline, title, imageUrl, image, placement, category, displayOrder } = req.body;
+    const data = { ...req.body };
+    delete data._id;
+    delete data.id;
 
-    const bannerName = name || headline || title;
+    if (data.startDate === '' || data.startDate === undefined) data.startDate = null;
+    if (data.endDate === '' || data.endDate === undefined) data.endDate = null;
+
+    const bannerName = data.name || data.headline || data.title;
     if (!bannerName) {
       return res.status(400).json({ message: 'Banner internal name or headline is required' });
     }
 
     // Auto-calculate next displayOrder for this placement if not provided
-    let finalOrder = displayOrder;
-    if (finalOrder === undefined || finalOrder === null) {
-      const targetPlacement = placement || category || 'homepage-hero';
+    let finalOrder = data.displayOrder;
+    if (finalOrder === undefined || finalOrder === null || isNaN(finalOrder)) {
+      const targetPlacement = data.placement || data.category || 'homepage-hero';
       const highestBanner = await Banner.findOne({ placement: targetPlacement })
         .sort({ displayOrder: -1 });
       finalOrder = highestBanner ? (highestBanner.displayOrder || 0) + 1 : 0;
     }
 
     const newBanner = new Banner({
-      ...req.body,
+      ...data,
       name: bannerName,
-      headline: headline || title || bannerName,
-      title: title || headline || bannerName,
-      imageUrl: imageUrl || image || '',
-      image: image || imageUrl || '',
+      headline: data.headline || data.title || bannerName,
+      title: data.title || data.headline || bannerName,
+      imageUrl: data.imageUrl || data.image || '',
+      image: data.image || data.imageUrl || '',
       displayOrder: Number(finalOrder),
       createdBy: req.user?._id || req.user?.id || null
     });
@@ -217,13 +222,25 @@ export const createBanner = async (req, res) => {
  */
 export const updateBanner = async (req, res) => {
   try {
-    const banner = await Banner.findById(req.params.id);
-    if (!banner) {
+    const updateData = { ...req.body };
+    delete updateData._id;
+    delete updateData.id;
+
+    if (updateData.startDate === '' || updateData.startDate === undefined) updateData.startDate = null;
+    if (updateData.endDate === '' || updateData.endDate === undefined) updateData.endDate = null;
+
+    if (updateData.imageUrl) updateData.image = updateData.imageUrl;
+    if (updateData.headline) updateData.title = updateData.headline;
+
+    const updatedBanner = await Banner.findByIdAndUpdate(
+      req.params.id,
+      { $set: updateData },
+      { new: true, runValidators: false }
+    );
+
+    if (!updatedBanner) {
       return res.status(404).json({ message: 'Banner not found' });
     }
-
-    Object.assign(banner, req.body);
-    const updatedBanner = await banner.save();
 
     res.status(200).json(updatedBanner);
   } catch (error) {

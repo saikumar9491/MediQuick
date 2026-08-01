@@ -129,7 +129,18 @@ const BannerModal = ({
     if (!formData.name.trim()) {
       return toast.error('Internal Banner Name is required');
     }
-    onSubmit(formData);
+
+    const payload = {
+      ...formData,
+      startDate: formData.startDate ? formData.startDate : null,
+      endDate: formData.endDate ? formData.endDate : null,
+      displayOrder: Number(formData.displayOrder) || 0
+    };
+
+    delete payload._id;
+    delete payload.id;
+
+    onSubmit(payload);
   };
 
   return (
