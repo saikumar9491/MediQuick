@@ -151,20 +151,53 @@ const MobileHomeView = ({ medicines = [], featured = [], loading = false }) => {
 
   return (
     <div className="flex flex-col bg-[#F8FAFC] min-h-screen">
-      {/* Category Tab Bar (Horizontal Scroll, Below Search) */}
-      <CategoryTabBar activeTab={activeTab} setActiveTab={handleTabChange} />
+      {/* Category Tab Bar — transparent in hero mode (gradient shows through from MobileAppLayout) */}
+      <CategoryTabBar activeTab={activeTab} setActiveTab={handleTabChange} isHeroMode={true} />
 
       {/* Main content body */}
       <div>
         {activeTab === 'for-you' ? (
-          <div className="space-y-3 pb-8">
-            {/* 1. Animated Hero Banner (mobile-only, warm festive gradient) */}
-            <div className="px-4 pt-3">
+          <div className="pb-1">
+            {/* ── IMMERSIVE HERO SECTION ────────────────────────────────
+                The warm gradient from MobileAppLayout flows through the
+                transparent header, search bar, and tabs above — the
+                AnimatedHeroBanner continues that gradient seamlessly.
+            ──────────────────────────────────────────────────────────── */}
+
+            {/* 1. Animated Hero Banner — transparent bg, inherits gradient */}
+            <div className="px-4 pt-3 pb-1 relative z-10">
               <AnimatedHeroBanner />
             </div>
 
-            {/* 2. Quick Access Grid */}
-            <QuickAccessGrid />
+            {/* Wave SVG Divider — warm section → white content */}
+            <div className="relative w-full overflow-hidden" style={{ marginTop: '-1px', lineHeight: 0 }} aria-hidden="true">
+              <svg
+                viewBox="0 0 390 48"
+                preserveAspectRatio="none"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{ display: 'block', width: '100%', height: '48px' }}
+              >
+                {/* Warm gradient fill matches the hero background */}
+                <defs>
+                  <linearGradient id="waveGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#FFE0B2" />
+                    <stop offset="100%" stopColor="#FFF8EF" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                {/* Upper warm-colored area */}
+                <path d="M0,0 L390,0 L390,28 Q195,52 0,28 Z" fill="#FFE0B2" />
+                {/* Soft wave edge */}
+                <path d="M0,28 Q97.5,52 195,40 Q292.5,28 390,44 L390,48 L0,48 Z" fill="#F8FAFC" />
+              </svg>
+            </div>
+
+            {/* 2. Quick Access Grid — elevated over wave with negative margin-top */}
+            <div className="relative z-20 bg-white mx-0 -mt-2 pt-3 pb-4 px-4 border-b border-slate-100 shadow-sm">
+              <QuickAccessGrid inHeroSection />
+            </div>
+
+            {/* ── WHITE CONTENT SECTION (below wave) ── */}
+            <div className="space-y-3 pb-8">
 
             {/* 3. Flash Deals with Countdown */}
             <FlashDealsRow />
@@ -218,7 +251,8 @@ const MobileHomeView = ({ medicines = [], featured = [], loading = false }) => {
               products={immunityProducts.length > 0 ? immunityProducts : medicines.filter(m => m.category === 'Immunity Boosters').slice(0, 8)}
               seeAllLink="/medicines?filter=immunity"
             />
-          </div>
+            </div>{/* end space-y-3 white section */}
+          </div>{/* end pb-1 hero+wave section */}
         ) : (
           /* Active Category View (2-Column Grid) */
           <div className="p-4 pb-8 space-y-4">

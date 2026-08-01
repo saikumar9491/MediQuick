@@ -84,11 +84,11 @@ const AnimatedHeroBanner = () => {
   }, []);
 
   if (loading) {
-    /* Skeleton — same warm gradient, no flicker */
+    /* Skeleton placeholder — transparent, gradient from parent */
     return (
       <div
         className={styles.banner}
-        style={{ opacity: 0.55, background: 'linear-gradient(135deg,#FFF3E0,#FFE0B2,#FFCC80)' }}
+        style={{ opacity: 0.4 }}
         aria-hidden="true"
       />
     );

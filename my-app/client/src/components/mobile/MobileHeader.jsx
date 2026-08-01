@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { API_BASE } from '../../utils/apiConfig';
 import toast from 'react-hot-toast';
 
-const MobileHeader = ({ isHidden = false }) => {
+const MobileHeader = ({ isHidden = false, isHeroMode = false }) => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -95,7 +95,11 @@ const MobileHeader = ({ isHidden = false }) => {
 
   return (
     <>
-      <header className={`fixed top-0 left-0 right-0 z-40 bg-white border-b border-slate-200/80 h-13 px-2.5 sm:px-4 flex items-center justify-between gap-1 select-none transition-transform duration-300 ease-in-out ${
+      <header className={`fixed top-0 left-0 right-0 z-40 h-13 px-2.5 sm:px-4 flex items-center justify-between gap-1 select-none transition-all duration-300 ease-in-out ${
+        isHeroMode
+          ? 'bg-transparent border-b border-transparent'
+          : 'bg-white border-b border-slate-200/80 shadow-xs'
+      } ${
         isHidden ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'
       }`}>
         {/* 1. Left: Compact Logo */}
@@ -111,7 +115,11 @@ const MobileHeader = ({ isHidden = false }) => {
         {/* 2. Center: Compact Location Pill */}
         <button
           onClick={() => setShowLocationModal(true)}
-          className="flex items-center gap-1 max-w-[105px] xs:max-w-[125px] sm:max-w-[160px] bg-slate-50 border border-slate-200/80 px-2 py-0.5 rounded-full text-[10.5px] font-bold text-slate-700 shadow-3xs active:scale-95 transition-all hover:bg-slate-100 shrink-1 overflow-hidden"
+          className={`flex items-center gap-1 max-w-[105px] xs:max-w-[125px] sm:max-w-[160px] px-2 py-0.5 rounded-full text-[10.5px] font-bold shadow-3xs active:scale-95 transition-all hover:bg-white/80 shrink-1 overflow-hidden ${
+            isHeroMode
+              ? 'bg-white/80 border border-amber-200 text-slate-700'
+              : 'bg-slate-50 border border-slate-200/80 text-slate-700'
+          }`}
           title="Select Location"
         >
           <MapPin size={10} className="text-[#0057FF] shrink-0" />

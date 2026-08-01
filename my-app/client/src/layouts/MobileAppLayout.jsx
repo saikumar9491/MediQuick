@@ -44,7 +44,7 @@ const MobileAppLayout = () => {
 
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Track window scroll position to collapse top header and pin search bar on home page
+  // Track scroll to transition from hero mode to regular white header
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 25);
@@ -53,45 +53,79 @@ const MobileAppLayout = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Hero mode: on home page, not scrolled, header/search are transparent
+  const isHomePage = currentPath === '/';
+  const isHeroMode = isHomePage && !isScrolled && !shouldHideHeader;
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800">
-      {/* 1. Header Bar (Fixed, Slides up when scrolled on home page) */}
-      {!shouldHideHeader && (
-        <MobileHeader isHidden={currentPath === '/' && isScrolled} />
-      )}
 
-      {/* Search Bar (Pins to top-0 when scrolled on home page) */}
-      {currentPath === '/' && !shouldHideHeader && (
-        <MobileSearchBar 
-          isExpandedExternal={isSearchExpanded} 
-          onCloseExternal={() => setIsSearchExpanded(false)} 
-          isScrolled={isScrolled}
+      {/* ── Full-bleed warm gradient backdrop ──────────────────────────────
+          This fixed layer sits BELOW the header/search bar (z-30) but
+          ABOVE the page background, covering the top ~280px with the warm
+          hero gradient. It fades out when the user scrolls (isHeroMode false).
+          Only visible on the home page.
+      ──────────────────────────────────────────────────────────────────── */}
+      {isHomePage && (
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            /* height covers header (52px) + searchbar (52px) + tabs (56px) + banner (210px) + small buffer */
+            height: '390px',
+            background: 'linear-gradient(180deg, #FFE0B2 0%, #FFCC80 45%, #FFE0B2 75%, #FFF8EF 100%)',
+            zIndex: 30,
+            pointerEvents: 'none',
+            transition: 'opacity 350ms ease',
+            opacity: isHeroMode ? 1 : 0,
+          }}
         />
       )}
 
-      {/* Main Content Area (Scrollable with proper padding offsets) */}
+      {/* 1. Header Bar (Fixed, above warm gradient backdrop z-40) */}
+      {!shouldHideHeader && (
+        <MobileHeader
+          isHidden={isHomePage && isScrolled}
+          isHeroMode={isHeroMode}
+        />
+      )}
+
+      {/* Search Bar (pins to top when scrolled) */}
+      {isHomePage && !shouldHideHeader && (
+        <MobileSearchBar
+          isExpandedExternal={isSearchExpanded}
+          onCloseExternal={() => setIsSearchExpanded(false)}
+          isScrolled={isScrolled}
+          isHeroMode={isHeroMode}
+        />
+      )}
+
+      {/* Main Content Area */}
       <main className={`flex-1 flex flex-col ${
-        shouldHideHeader 
-          ? '' 
-          : currentPath === '/' 
-            ? 'pt-28' // Offset for Header (14) + SearchBar (14) = 28 (7rem or 112px)
-            : 'pt-14' // Offset for Header only
+        shouldHideHeader
+          ? ''
+          : isHomePage
+            ? 'pt-28'
+            : 'pt-14'
       } ${shouldHideBottomBar ? '' : 'pb-16'}`}>
         <Outlet context={{ isSearchExpanded, setIsSearchExpanded, shouldHideBottomBar }} />
       </main>
 
-      {/* 2. Search Overlay Triggered from other pages */}
+      {/* 2. Search Overlay from other pages */}
       {currentPath !== '/' && isSearchExpanded && (
-        <MobileSearchBar 
-          isExpandedExternal={isSearchExpanded} 
-          onCloseExternal={() => setIsSearchExpanded(false)} 
+        <MobileSearchBar
+          isExpandedExternal={isSearchExpanded}
+          onCloseExternal={() => setIsSearchExpanded(false)}
         />
       )}
 
-      {/* 3. Bottom Tab Bar (Fixed, Docked at Bottom) */}
+      {/* 3. Bottom Tab Bar */}
       {!shouldHideBottomBar && (
-        <MobileBottomTabBar 
-          onSearchTabClick={() => setIsSearchExpanded(true)} 
+        <MobileBottomTabBar
+          onSearchTabClick={() => setIsSearchExpanded(true)}
         />
       )}
     </div>

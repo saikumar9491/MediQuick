@@ -72,10 +72,9 @@
   width: 100%;
   height: 210px;
   overflow: hidden;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 55%, #FFCC80 100%);
+  border-radius: 0;                /* full-bleed: no rounded corners */
+  background: transparent;         /* inherited from MobileAppLayout gradient */
   animation: bannerFadeIn 400ms ease-out both;
-  /* GPU hint */
   will-change: opacity;
 }
 

@@ -13,7 +13,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 
-const CategoryTabBar = ({ activeTab, setActiveTab }) => {
+const CategoryTabBar = ({ activeTab, setActiveTab, isHeroMode = false }) => {
   const barRef = useRef(null);
 
   const scrollLeft = () => {
@@ -36,11 +36,17 @@ const CategoryTabBar = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <div className="w-full bg-white border-b border-slate-200/80 h-14 flex items-center shrink-0 shadow-2xs relative group px-2">
+    <div className={`w-full h-14 flex items-center shrink-0 relative group px-2 transition-all duration-300 ${
+      isHeroMode
+        ? 'bg-transparent border-b border-amber-200/50'
+        : 'bg-white border-b border-slate-200/80 shadow-2xs'
+    }`}>
       <button
         type="button"
         onClick={scrollLeft}
-        className="p-1 rounded-full bg-white/90 shadow-sm border border-slate-200 text-slate-600 hover:text-[#0057FF] transition-all cursor-pointer shrink-0 z-10 mr-1 active:scale-95"
+        className={`p-1 rounded-full shadow-sm border text-slate-600 hover:text-[#0057FF] transition-all cursor-pointer shrink-0 z-10 mr-1 active:scale-95 ${
+          isHeroMode ? 'bg-white/70 border-amber-200' : 'bg-white/90 border-slate-200'
+        }`}
         title="Scroll Left"
       >
         <ChevronLeft size={14} strokeWidth={2.5} />
@@ -58,12 +64,12 @@ const CategoryTabBar = ({ activeTab, setActiveTab }) => {
               className="flex flex-col items-center gap-1 shrink-0 h-full justify-center relative px-1 transition-all cursor-pointer"
             >
               <div className={`p-1.5 rounded-full transition-colors ${
-                isActive ? tab.tint : 'bg-slate-100 text-slate-500'
+                isActive ? tab.tint : isHeroMode ? 'bg-white/40 text-slate-600' : 'bg-slate-100 text-slate-500'
               }`}>
                 <Icon size={16} className={isActive ? 'fill-current' : ''} />
               </div>
               <span className={`text-[9.5px] font-bold tracking-tight uppercase ${
-                isActive ? 'text-[#0057FF] font-black' : 'text-slate-500'
+                isActive ? 'text-[#0057FF] font-black' : isHeroMode ? 'text-slate-700' : 'text-slate-500'
               }`}>
                 {tab.label}
               </span>
@@ -78,7 +84,9 @@ const CategoryTabBar = ({ activeTab, setActiveTab }) => {
       <button
         type="button"
         onClick={scrollRight}
-        className="p-1 rounded-full bg-white/90 shadow-sm border border-slate-200 text-slate-600 hover:text-[#0057FF] transition-all cursor-pointer shrink-0 z-10 ml-1 active:scale-95"
+        className={`p-1 rounded-full shadow-sm border text-slate-600 hover:text-[#0057FF] transition-all cursor-pointer shrink-0 z-10 ml-1 active:scale-95 ${
+          isHeroMode ? 'bg-white/70 border-amber-200' : 'bg-white/90 border-slate-200'
+        }`}
         title="Scroll Right"
       >
         <ChevronRight size={14} strokeWidth={2.5} />
