@@ -215,66 +215,128 @@ const BannerModal = ({
 
             {/* Video File / URL Upload Box if Floating Video Widget */}
             {(formData.type === 'floating-video' || formData.placement === 'floating-video') && (
-              <div className="border-2 border-amber-200 rounded-xl p-4 bg-amber-50/50 space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="block text-xs font-black text-amber-900 uppercase tracking-wider">
-                    🎥 Floating Video File (MP4, WebM max 15MB)
-                  </label>
+              <div className="border-2 border-amber-300 rounded-2xl p-5 bg-gradient-to-br from-amber-50/90 to-orange-50/60 space-y-4 shadow-sm">
+                <div className="flex items-center justify-between border-b border-amber-200/80 pb-3">
+                  <div>
+                    <label className="block text-xs font-black text-amber-950 uppercase tracking-wider flex items-center gap-1.5">
+                      <span>🎬 Floating LIVE Video Settings</span>
+                    </label>
+                    <p className="text-[11px] font-semibold text-amber-800">
+                      Upload an MP4/WebM video file directly from your computer or paste a direct CDN link
+                    </p>
+                  </div>
                   
                   {/* Is Live Toggle */}
-                  <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-1 rounded-full border border-amber-200 shadow-2xs">
+                  <label className="flex items-center gap-2 cursor-pointer bg-white px-3.5 py-1.5 rounded-full border border-amber-300 shadow-xs hover:border-amber-400 transition-colors">
                     <input
                       type="checkbox"
                       checked={formData.isLive}
                       onChange={(e) => setFormData({ ...formData, isLive: e.target.checked })}
                       className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500 cursor-pointer"
                     />
-                    <span className="text-xs font-black text-rose-600 flex items-center gap-1">
+                    <span className="text-xs font-black text-rose-600 flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping"></span>
                       SHOW RED "LIVE" BADGE
                     </span>
                   </label>
                 </div>
 
-                <div className="flex items-center gap-2">
+                {/* Direct Video Drag & Drop Upload Zone */}
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-bold text-amber-900 uppercase tracking-wider">
+                    Direct Video File Upload
+                  </label>
+                  <div className="h-44 bg-white border-2 border-dashed border-amber-300 rounded-2xl flex flex-col items-center justify-center relative overflow-hidden group hover:border-amber-500 transition-all shadow-2xs">
+                    {formData.videoUrl ? (
+                      <div className="w-full h-full relative flex items-center justify-center bg-slate-950">
+                        <video
+                          src={formData.videoUrl}
+                          autoPlay
+                          loop
+                          muted
+                          playsInline
+                          className="w-full h-full object-cover"
+                        />
+                        <label className="absolute inset-0 bg-slate-950/70 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs font-black uppercase tracking-wider transition-opacity cursor-pointer gap-2 backdrop-blur-xs">
+                          <Upload size={16} />
+                          <span>{videoUploading ? 'Uploading Video...' : 'Change Video File'}</span>
+                          <input
+                            type="file"
+                            accept="video/*"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              setVideoUploading(true);
+                              try {
+                                const data = new FormData();
+                                data.append('image', file);
+                                const res = await uploadProductImage(data);
+                                if (res?.imageUrl || res?.url) {
+                                  setFormData(prev => ({ ...prev, videoUrl: res.imageUrl || res.url }));
+                                  toast.success('Video uploaded successfully!');
+                                }
+                              } catch (err) {
+                                toast.error('Video upload failed');
+                              } finally {
+                                setVideoUploading(false);
+                              }
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                    ) : (
+                      <label className="flex flex-col items-center gap-2 cursor-pointer p-6 text-center w-full h-full justify-center">
+                        <div className="p-3 rounded-full bg-amber-100 text-amber-800 shadow-2xs">
+                          <Upload size={24} />
+                        </div>
+                        <span className="text-xs font-black text-amber-950 uppercase tracking-wider">
+                          {videoUploading ? 'Uploading Video File...' : 'Click to Upload Video File Directly'}
+                        </span>
+                        <span className="text-[10px] text-amber-700 font-bold">
+                          Supports MP4, WebM, MOV, M4V (Max 15MB)
+                        </span>
+                        <input
+                          type="file"
+                          accept="video/*"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            setVideoUploading(true);
+                            try {
+                              const data = new FormData();
+                              data.append('image', file);
+                              const res = await uploadProductImage(data);
+                              if (res?.imageUrl || res?.url) {
+                                setFormData(prev => ({ ...prev, videoUrl: res.imageUrl || res.url }));
+                                toast.success('Video uploaded successfully!');
+                              }
+                            } catch (err) {
+                              toast.error('Video upload failed');
+                            } finally {
+                              setVideoUploading(false);
+                            }
+                          }}
+                          className="hidden"
+                        />
+                      </label>
+                    )}
+                  </div>
+                </div>
+
+                {/* Or Paste Direct Video URL */}
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold text-amber-900 uppercase tracking-wider">
+                    Or Video URL Link (Hosted MP4 / WebM Link)
+                  </label>
                   <input
                     type="text"
                     placeholder="https://... (Direct MP4 / WebM Video URL)"
                     value={formData.videoUrl}
                     onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
-                    className="flex-1 rounded-lg border border-slate-300 bg-white p-2.5 text-xs font-medium outline-none focus:border-[#0057FF]"
+                    className="w-full rounded-xl border border-amber-200 bg-white p-2.5 text-xs font-medium text-slate-800 outline-none focus:border-[#0057FF]"
                   />
-                  <label className="px-4 py-2.5 bg-slate-900 text-white rounded-lg text-xs font-black uppercase tracking-wider flex items-center gap-1.5 cursor-pointer hover:bg-[#0057FF] transition-colors shrink-0">
-                    <Upload size={14} />
-                    <span>{videoUploading ? 'Uploading...' : 'Upload Video'}</span>
-                    <input
-                      type="file"
-                      accept="video/*"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        setVideoUploading(true);
-                        try {
-                          const data = new FormData();
-                          data.append('image', file);
-                          const res = await uploadProductImage(data);
-                          if (res?.imageUrl || res?.url) {
-                            setFormData(prev => ({ ...prev, videoUrl: res.imageUrl || res.url }));
-                            toast.success('Video uploaded successfully!');
-                          }
-                        } catch (err) {
-                          toast.error('Video upload failed');
-                        } finally {
-                          setVideoUploading(false);
-                        }
-                      }}
-                      className="hidden"
-                    />
-                  </label>
                 </div>
-                <p className="text-[11px] text-amber-800 font-medium">
-                  Note: Floating Video Widgets are automatically targeted to Mobile Only devices.
-                </p>
               </div>
             )}
 
