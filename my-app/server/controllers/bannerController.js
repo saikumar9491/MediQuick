@@ -180,22 +180,26 @@ export const createBanner = async (req, res) => {
     delete data._id;
     delete data.id;
 
-    if (data.startDate === '' || data.startDate === undefined) data.startDate = null;
-    if (data.endDate === '' || data.endDate === undefined) data.endDate = null;
+    if (!data.startDate) data.startDate = null;
+    if (!data.endDate) data.endDate = null;
 
-    const bannerName = data.name || data.headline || data.title;
-    if (!bannerName) {
-      return res.status(400).json({ message: 'Banner internal name or headline is required' });
-    }
+    const bannerName = (data.name && data.name.trim()) || 
+      (data.headline && data.headline.trim()) || 
+      (data.title && data.title.trim()) || 
+      (data.type === 'floating-video' || data.placement === 'floating-video' ? 'Floating Video Banner' : 'Promotional Banner');
 
     // Auto-calculate next displayOrder for this placement if not provided
-    let finalOrder = data.displayOrder;
-    if (finalOrder === undefined || finalOrder === null || isNaN(finalOrder)) {
+    let finalOrder = Number(data.displayOrder);
+    if (isNaN(finalOrder)) {
       const targetPlacement = data.placement || data.category || 'homepage-hero';
       const highestBanner = await Banner.findOne({ placement: targetPlacement })
         .sort({ displayOrder: -1 });
       finalOrder = highestBanner ? (highestBanner.displayOrder || 0) + 1 : 0;
     }
+
+    const createdByVal = (req.user?._id && req.user._id.toString().match(/^[0-9a-fA-F]{24}$/)) 
+      ? req.user._id 
+      : null;
 
     const newBanner = new Banner({
       ...data,
@@ -204,15 +208,15 @@ export const createBanner = async (req, res) => {
       title: data.title || data.headline || bannerName,
       imageUrl: data.imageUrl || data.image || '',
       image: data.image || data.imageUrl || '',
-      displayOrder: Number(finalOrder),
-      createdBy: req.user?._id || req.user?.id || null
+      displayOrder: finalOrder,
+      createdBy: createdByVal
     });
 
     const savedBanner = await newBanner.save();
     res.status(201).json(savedBanner);
   } catch (error) {
     console.error('createBanner error:', error);
-    res.status(400).json({ message: 'Failed to create banner', error: error.message });
+    res.status(400).json({ message: error.message || 'Failed to create banner', error: error.message });
   }
 };
 

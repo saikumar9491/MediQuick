@@ -126,12 +126,19 @@ const BannerModal = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.name.trim()) {
-      return toast.error('Internal Banner Name is required');
+
+    // Auto-fill fallback internal name if left blank by user
+    let bannerName = (formData.name || '').trim();
+    if (!bannerName) {
+      if ((formData.headline || '').trim()) bannerName = formData.headline.trim();
+      else if (formData.type === 'floating-video' || formData.placement === 'floating-video') bannerName = 'Floating LIVE Video Banner';
+      else bannerName = 'Promotional Banner';
     }
 
     const payload = {
       ...formData,
+      name: bannerName,
+      headline: (formData.headline || '').trim() || bannerName,
       startDate: formData.startDate ? formData.startDate : null,
       endDate: formData.endDate ? formData.endDate : null,
       displayOrder: Number(formData.displayOrder) || 0
