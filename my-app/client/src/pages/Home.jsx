@@ -55,37 +55,16 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   const skinCareScrollRef = useRef(null);
   const ayurScrollRef = useRef(null);
 
-  const DEFAULT_BANNERS = [
-    {
-      _id: 'default-main-1',
-      title: 'FLAT 25% OFF ON MEDICINES',
-      desc: 'Healthcare delivered directly to your doorstep within hours',
-      image: 'https://img.freepik.com/free-vector/flat-medical-healthcare-sales-banner-template_23-2149511116.jpg',
-      bg: 'bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900',
-      category: 'main',
-      link: '/medicines'
-    },
-    {
-      _id: 'default-ayur-1',
-      title: 'AYURVEDIC HEALTH ESSENTIALS',
-      desc: '100% Genuine herbal formulations for everyday natural wellness',
-      image: 'https://img.freepik.com/free-vector/flat-hand-drawn-ayurveda-illustration_23-2149339394.jpg',
-      bg: 'bg-gradient-to-r from-emerald-800 to-teal-900',
-      category: 'ayurveda-promo',
-      link: '/ayurveda'
-    }
-  ];
-
   const [selectedFile, setSelectedFile] = useState(null);
   const [dbBanners, setDbBanners] = useState(() => {
     try {
       const cached = sessionStorage.getItem('mq_cached_banners');
       if (cached) {
         const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed;
       }
     } catch (e) {}
-    return DEFAULT_BANNERS;
+    return [];
   });
   const [isUploading, setIsUploading] = useState(false);
   const [isBannerLoading, setIsBannerLoading] = useState(true);
@@ -95,15 +74,15 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/banners`);
+        const res = await fetch(`${API_BASE}/api/banners?targetDevice=desktop`);
         if (!res.ok) throw new Error('API Error');
         const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
+        if (Array.isArray(data)) {
           setDbBanners(data);
           sessionStorage.setItem('mq_cached_banners', JSON.stringify(data));
         }
       } catch (err) {
-        console.error("Banner fetch failed, using fallbacks:", err);
+        console.error("Banner fetch failed:", err);
       } finally {
         setIsBannerLoading(false);
       }
@@ -111,8 +90,14 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
     fetchBanners();
   }, []);
 
-  const displayBanners = dbBanners.filter(b => b.category === 'main');
-  const ayurBanners = dbBanners.filter(b => b.category === 'ayurveda-promo');
+  const displayBanners = dbBanners.filter(b => 
+    (b.placement === 'homepage-hero' || b.placement === 'main' || b.category === 'main' || b.category === 'hero') &&
+    (b.status === 'active' || b.isActive !== false)
+  );
+  const ayurBanners = dbBanners.filter(b => 
+    (b.placement === 'ayurveda' || b.category === 'ayurveda-promo') &&
+    (b.status === 'active' || b.isActive !== false)
+  );
 
   // Preload banner images immediately into browser cache for instant transitions
   useEffect(() => {

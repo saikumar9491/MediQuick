@@ -15,27 +15,11 @@ const HeroBannerCarousel = ({ banners = [], loading = false }) => {
     return () => clearInterval(timer);
   }, [banners.length]);
 
-  // Fallbacks if no banners are returned
-  const defaultBanners = [
-    {
-      _id: 'default-1',
-      title: 'Monsoon Wellness Sale',
-      desc: 'Flat 25% Off on Prescriptions',
-      image: 'https://img.freepik.com/free-vector/flat-medical-healthcare-sales-banner-template_23-2149511116.jpg',
-      bg: 'from-[#0057FF] to-blue-800',
-      link: '/medicines'
-    },
-    {
-      _id: 'default-2',
-      title: 'Free Diagnostic Lab Tests',
-      desc: 'Free Consultation with Doctor',
-      image: 'https://img.freepik.com/free-vector/medical-healthcare-banner-design_23-2149488424.jpg',
-      bg: 'from-[#0057FF] to-indigo-800',
-      link: '/lab-tests'
-    }
-  ];
+  const list = banners.filter(b => b.status === 'active' || b.isActive !== false);
 
-  const list = banners.length > 0 ? banners : defaultBanners;
+  if (list.length === 0) {
+    return null;
+  }
 
   const handleTouchStart = (e) => {
     touchStart.current = e.targetTouches[0].clientX;
