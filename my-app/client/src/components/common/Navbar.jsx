@@ -300,12 +300,12 @@ const Navbar = ({ medicines = [] }) => {
         <div className="mx-auto hidden lg:flex max-w-[1440px] items-center justify-between gap-4 lg:gap-8">
           
           {/* Logo (Desktop) */}
-          <Link to="/" className="flex shrink-0 items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded bg-[#00a2a4] text-white">
-              <ShoppingBag size={16} strokeWidth={3} />
+          <Link to="/" className="flex shrink-0 items-center gap-1.5">
+            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#0057FF] text-white shadow-2xs">
+              <span className="text-xs font-black">M</span>
             </div>
-            <span className="text-lg font-black tracking-tighter text-slate-900 uppercase">
-              MEDI<span className="text-[#00a2a4]">QUICK</span>
+            <span className="text-xl font-black tracking-tight uppercase">
+              <span className="text-[#0057FF]">MEDI</span><span className="text-[#FF6B00]">QUICK</span>
             </span>
           </Link>
 
@@ -314,13 +314,13 @@ const Navbar = ({ medicines = [] }) => {
             onClick={() => handleDetectLocation()}
             className="flex items-center gap-2 px-3 py-1.5 hover:bg-slate-50 transition-colors cursor-pointer group shrink-0 border-r border-slate-100 pr-6"
           >
-            <MapPin size={18} className="text-slate-400 group-hover:text-[#00a2a4]" />
+            <MapPin size={18} className="text-slate-400 group-hover:text-[#0057FF]" />
             <div className="flex flex-col">
               <span className="text-[13px] font-bold text-slate-800">
                 {isDetecting ? 'Detecting...' : `${locationName} (${userPincode})`}
               </span>
             </div>
-            <ChevronDown size={14} className="text-slate-400 group-hover:text-[#00a2a4]" />
+            <ChevronDown size={14} className="text-slate-400 group-hover:text-[#0057FF]" />
           </div>
 
           {/* Search Bar (Desktop) */}
@@ -329,7 +329,7 @@ const Navbar = ({ medicines = [] }) => {
               <input
                 type="text"
                 placeholder="Search for Medicines and Health Products"
-                className="w-full rounded bg-slate-50 border border-slate-100 px-4 py-2 text-[13px] font-medium outline-none transition-all focus:border-slate-300 focus:bg-white"
+                className="w-full rounded bg-slate-50 border border-slate-100 px-4 py-2 text-[13px] font-medium outline-none transition-all focus:border-[#0057FF] focus:bg-white"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => searchQuery.length > 0 && setShowSearchSuggestions(true)}
@@ -365,18 +365,18 @@ const Navbar = ({ medicines = [] }) => {
                           <img src={product.image} alt="" className="h-full w-full object-contain" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[12px] font-bold text-slate-800 group-hover:text-[#00a2a4] truncate">{product.name}</p>
+                          <p className="text-[12px] font-bold text-slate-800 group-hover:text-[#0057FF] truncate">{product.name}</p>
                           <p className="text-[10px] text-slate-500 uppercase tracking-tighter">{product.category}</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-[11px] font-black text-[#00a2a4]">₹{product.price}</p>
+                          <p className="text-[11px] font-black text-[#0057FF]">₹{product.price}</p>
                         </div>
                       </Link>
                     ))}
                   </div>
                   <button 
                     onClick={handleSearch}
-                    className="w-full bg-slate-900 py-2.5 text-[11px] font-bold text-white hover:bg-[#00a2a4] transition-colors uppercase tracking-widest"
+                    className="w-full bg-slate-900 py-2.5 text-[11px] font-bold text-white hover:bg-[#0057FF] transition-colors uppercase tracking-widest"
                   >
                     View All Results
                   </button>
@@ -392,8 +392,8 @@ const Navbar = ({ medicines = [] }) => {
               onMouseLeave={() => setShowFlashDeals(false)}
               className="flex items-center gap-1.5 text-[12px] font-medium text-slate-700 cursor-pointer group py-2"
             >
-              <Zap size={14} className="text-red-500 fill-red-500" />
-              <span className="group-hover:text-[#00a2a4] transition-colors">QUICK BUY! Get 25% off on medicines</span>
+              <Zap size={14} className="text-[#FF6B00] fill-[#FF6B00]" />
+              <span className="group-hover:text-[#0057FF] transition-colors">QUICK BUY! Get 25% off on medicines</span>
               <ChevronDown size={14} className={`text-slate-400 transition-transform ${showFlashDeals ? 'rotate-180' : ''}`} />
             </div>
 
@@ -409,7 +409,7 @@ const Navbar = ({ medicines = [] }) => {
                 >
                   <div className="mb-3 flex items-center justify-between border-b border-slate-50 pb-2">
                     <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">Today's Flash Deals</span>
-                    <span className="rounded bg-red-500 px-1.5 py-0.5 text-[8px] font-bold text-white animate-pulse">LIVE</span>
+                    <span className="rounded bg-[#FF6B00] px-1.5 py-0.5 text-[8px] font-bold text-white animate-pulse">LIVE</span>
                   </div>
                   <div className="space-y-3">
                     {flashDeals.length > 0 ? flashDeals.map((deal) => (
@@ -422,8 +422,8 @@ const Navbar = ({ medicines = [] }) => {
                           <img src={deal.image} className="h-full w-full object-contain" alt="" />
                         </div>
                         <div className="flex-1 overflow-hidden">
-                          <p className="truncate text-[11px] font-bold text-slate-700 group-hover:text-[#00a2a4]">{deal.name}</p>
-                          <p className="text-[10px] font-black text-red-500">₹{deal.discountPrice || deal.price}</p>
+                          <p className="truncate text-[11px] font-bold text-slate-700 group-hover:text-[#0057FF]">{deal.name}</p>
+                          <p className="text-[10px] font-black text-[#FF6B00]">₹{deal.discountPrice || deal.price}</p>
                         </div>
                         <ChevronRight size={14} className="text-slate-300" />
                       </Link>
@@ -431,7 +431,7 @@ const Navbar = ({ medicines = [] }) => {
                       <p className="text-center py-4 text-[10px] font-bold text-slate-400 uppercase">Fetching deals...</p>
                     )}
                   </div>
-                  <Link to="/medicines?filter=flash" className="mt-3 block rounded bg-slate-900 py-2 text-center text-[10px] font-bold text-white hover:bg-[#00a2a4] transition-colors uppercase tracking-widest">
+                  <Link to="/medicines?filter=flash" className="mt-3 block rounded bg-slate-900 py-2 text-center text-[10px] font-bold text-white hover:bg-[#0057FF] transition-colors uppercase tracking-widest">
                     View All Offers
                   </Link>
                 </motion.div>
@@ -448,7 +448,7 @@ const Navbar = ({ medicines = [] }) => {
                 onMouseLeave={() => setShowUserDropdown(false)}
               >
                 <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden group-hover:border-teal-400 transition-colors">
+                  <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center border border-slate-200 overflow-hidden group-hover:border-[#0057FF] transition-colors">
                     {user.image ? <img src={user.image} className="h-full w-full object-cover" alt="" /> : <User size={16} className="text-slate-400" />}
                   </div>
                   <ChevronDown size={14} className={`text-slate-400 transition-transform ${showUserDropdown ? 'rotate-180' : ''}`} />
@@ -466,7 +466,7 @@ const Navbar = ({ medicines = [] }) => {
                         <p className="truncate text-[10px] font-bold text-slate-400 uppercase tracking-widest">{user.email}</p>
                       </div>
                       {user.isAdmin && (
-                        <Link to="/admin" className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-[#00a2a4] hover:bg-teal-50 transition-colors">
+                        <Link to="/admin" className="flex items-center gap-2 rounded-lg px-3 py-2 text-[11px] font-bold text-[#0057FF] hover:bg-blue-50 transition-colors">
                           <ShieldCheck size={14} /> Admin Dashboard
                         </Link>
                       )}
@@ -492,16 +492,16 @@ const Navbar = ({ medicines = [] }) => {
                   setAuthModalView('login');
                   setShowAuthModal(true);
                 }}
-                className="text-[13px] font-bold text-slate-700 hover:text-[#00a2a4] whitespace-nowrap"
+                className="text-[13px] font-bold text-slate-700 hover:text-[#0057FF] whitespace-nowrap"
               >
                 Login | Signup
               </button>
             )}
             
-            <Link to="/cart" className="relative text-slate-700 hover:text-[#00a2a4] transition-colors">
+            <Link to="/cart" className="relative text-slate-700 hover:text-[#0057FF] transition-colors">
               <ShoppingCart size={22} />
               {cartItems.length > 0 && (
-                <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#ff6f61] text-[9px] font-bold text-white shadow-sm">
+                <span className="absolute -top-2 -right-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#FF6B00] text-[9px] font-bold text-white shadow-sm">
                   {cartItems.length}
                 </span>
               )}
@@ -524,11 +524,11 @@ const Navbar = ({ medicines = [] }) => {
                   <Menu size={24} />
                 </button>
                 <Link to="/" className="flex items-center gap-1.5">
-                  <div className="flex h-7 w-7 items-center justify-center rounded bg-[#00a2a4] text-white">
-                    <ShoppingBag size={14} strokeWidth={3} />
+                  <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#0057FF] text-white shadow-2xs">
+                    <span className="text-xs font-black">M</span>
                   </div>
-                  <span className="text-sm font-black tracking-tighter text-slate-900 uppercase">
-                    MEDI<span className="text-[#00a2a4]">QUICK</span>
+                  <span className="text-sm font-black tracking-tight text-slate-900 uppercase">
+                    <span className="text-[#0057FF]">MEDI</span><span className="text-[#FF6B00]">QUICK</span>
                   </span>
                 </Link>
               </div>
@@ -567,7 +567,7 @@ const Navbar = ({ medicines = [] }) => {
                onClick={() => handleDetectLocation()}
                className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-250 rounded-full text-xs font-bold text-slate-650 cursor-pointer shadow-xs active:scale-95 transition-all"
              >
-               <MapPin size={12} className="text-[#00a2a4]" />
+               <MapPin size={12} className="text-[#0057FF]" />
                <span className="truncate max-w-[200px]">Near, {isDetecting ? 'Detecting...' : `${locationName} (${userPincode})`}</span>
                <ChevronDown size={10} className="text-slate-450" />
              </div>
@@ -581,7 +581,7 @@ const Navbar = ({ medicines = [] }) => {
                   <input
                     type="text"
                     placeholder="Search for medicines..."
-                    className="w-full rounded-xl bg-slate-50 border border-slate-200 px-10 py-3 text-[14px] font-medium outline-none transition-all focus:border-[#00a2a4] focus:bg-white focus:ring-2 focus:ring-teal-50"
+                    className="w-full rounded-xl bg-slate-50 border border-slate-200 px-10 py-3 text-[14px] font-medium outline-none transition-all focus:border-[#0057FF] focus:bg-white focus:ring-2 focus:ring-blue-50"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onFocus={() => searchQuery.length > 0 && setShowSearchSuggestions(true)}
@@ -626,11 +626,11 @@ const Navbar = ({ medicines = [] }) => {
                               <img src={product.image} alt="" className="h-full w-full object-contain" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-[12px] font-bold text-slate-800 group-hover:text-[#00a2a4] truncate">{product.name}</p>
+                              <p className="text-[12px] font-bold text-slate-800 group-hover:text-[#0057FF] truncate">{product.name}</p>
                               <p className="text-[10px] text-slate-500 uppercase tracking-tighter">{product.category}</p>
                             </div>
                             <div className="text-right">
-                              <p className="text-[11px] font-black text-[#00a2a4]">₹{product.price}</p>
+                              <p className="text-[11px] font-black text-[#0057FF]">₹{product.price}</p>
                             </div>
                           </Link>
                         ))}
@@ -640,7 +640,7 @@ const Navbar = ({ medicines = [] }) => {
                           setIsMobileSearchExpanded(false);
                           handleSearch(e);
                         }}
-                        className="w-full bg-slate-900 py-2.5 text-[11px] font-bold text-white hover:bg-[#00a2a4] transition-colors uppercase tracking-widest"
+                        className="w-full bg-slate-900 py-2.5 text-[11px] font-bold text-white hover:bg-[#0057FF] transition-colors uppercase tracking-widest"
                       >
                         View All Results
                       </button>
@@ -688,7 +688,7 @@ const Navbar = ({ medicines = [] }) => {
                     <div key={cat.name} className="border-b border-slate-50 last:border-0">
                       <button
                         onClick={() => setMobileOpenCategory(mobileOpenCategory === cat.name ? null : cat.name)}
-                        className="flex w-full items-center justify-between p-4 text-sm font-bold text-slate-600 hover:text-[#00a2a4] transition-all"
+                        className="flex w-full items-center justify-between p-4 text-sm font-bold text-slate-600 hover:text-[#0057FF] transition-all"
                       >
                         <div className="flex items-center gap-3">
                           {getCategoryIcon(cat.iconName)}
@@ -696,7 +696,7 @@ const Navbar = ({ medicines = [] }) => {
                         </div>
                         <ChevronDown 
                           size={16} 
-                          className={`transition-transform ${mobileOpenCategory === cat.name ? 'rotate-180 text-[#00a2a4]' : ''}`} 
+                          className={`transition-transform ${mobileOpenCategory === cat.name ? 'rotate-180 text-[#0057FF]' : ''}`} 
                         />
                       </button>
                       
@@ -721,7 +721,7 @@ const Navbar = ({ medicines = [] }) => {
                                     key={name}
                                     to={linkTo}
                                     onClick={() => setIsMenuOpen(false)}
-                                    className="flex items-center justify-between rounded-lg px-4 py-3 text-[12px] font-bold text-slate-500 hover:bg-white hover:text-[#00a2a4] transition-all"
+                                    className="flex items-center justify-between rounded-lg px-4 py-3 text-[12px] font-bold text-slate-500 hover:bg-white hover:text-[#0057FF] transition-all"
                                   >
                                     {name}
                                     <ChevronRight size={14} className="opacity-40" />
@@ -731,7 +731,7 @@ const Navbar = ({ medicines = [] }) => {
                               <Link
                                 to={cat.path}
                                 onClick={() => setIsMenuOpen(false)}
-                                className="mt-2 flex items-center justify-center rounded-lg bg-[#00a2a4] py-3 text-[11px] font-bold text-white shadow-sm"
+                                className="mt-2 flex items-center justify-center rounded-lg bg-[#0057FF] py-3 text-[11px] font-bold text-white shadow-sm"
                               >
                                 View All {cat.name}
                               </Link>
@@ -750,7 +750,7 @@ const Navbar = ({ medicines = [] }) => {
                         <Link 
                           to="/admin" 
                           onClick={() => setIsMenuOpen(false)}
-                          className="w-full mb-3 flex items-center justify-center gap-2 rounded-xl bg-teal-50 py-3 text-sm font-bold text-[#00a2a4] shadow-sm active:scale-95"
+                          className="w-full mb-3 flex items-center justify-center gap-2 rounded-xl bg-blue-50 py-3 text-sm font-bold text-[#0057FF] shadow-sm active:scale-95"
                         >
                           <ShieldCheck size={18} /> Admin Dashboard
                         </Link>
@@ -766,7 +766,7 @@ const Navbar = ({ medicines = [] }) => {
                         setShowAuthModal(true);
                         setIsMenuOpen(false);
                       }} 
-                      className="w-full rounded-xl bg-[#00a2a4] py-4 text-sm font-bold text-white shadow-xl active:scale-95"
+                      className="w-full rounded-xl bg-[#0057FF] py-4 text-sm font-bold text-white shadow-xl active:scale-95"
                     >
                       LOGIN / SIGNUP
                     </button>

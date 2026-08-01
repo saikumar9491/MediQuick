@@ -26,12 +26,12 @@ const Footer = () => {
           
           {/* Brand Section */}
           <div className="space-y-4">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg">
-                <Heart className="h-5 w-5 fill-current" />
+            <Link to="/" className="flex items-center gap-1.5">
+              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#0057FF] text-white shadow-md">
+                <span className="text-sm font-black">M</span>
               </div>
-              <span className="text-xl font-bold text-white tracking-tight">
-                Medi<span className="text-blue-500">Quick</span>
+              <span className="text-xl font-black tracking-tight uppercase text-white">
+                <span className="text-[#0057FF]">MEDI</span><span className="text-[#FF6B00]">QUICK</span>
               </span>
             </Link>
             <p className="text-[13px] leading-relaxed max-w-xs text-slate-400">
