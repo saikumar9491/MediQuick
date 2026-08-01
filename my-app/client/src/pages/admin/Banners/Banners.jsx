@@ -10,7 +10,8 @@ import {
   Clock, 
   AlertTriangle,
   Zap,
-  Sparkles
+  Sparkles,
+  Video
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -125,11 +126,11 @@ const Banners = () => {
   }, [banners, activeTab, searchQuery]);
 
   // Create or Update Submission
-  const handleModalSubmit = async (formData) => {
+  const handleModalSubmit = async (formData, isEditingExisting) => {
     setIsSubmitting(true);
     try {
-      if (editingBanner) {
-        await updateBanner(editingBanner._id, formData);
+      if (isEditingExisting && formData._id) {
+        await updateBanner(formData._id, formData);
         toast.success('Banner updated successfully!');
       } else {
         await createBanner(formData);
@@ -140,7 +141,7 @@ const Banners = () => {
       loadData();
     } catch (err) {
       console.error('Error submitting banner form:', err);
-      toast.error(err.response?.data?.message || 'Failed to save banner');
+      toast.error(err.response?.data?.message || err.message || 'Failed to save banner');
     } finally {
       setIsSubmitting(false);
     }
@@ -227,19 +228,39 @@ const Banners = () => {
             </span>
           </div>
           <p className="text-xs font-semibold text-slate-500 mt-1">
-            Manage promotional banners, hero carousels, category mini-banners, and flash sale slots across desktop and mobile
+            Manage promotional banners, hero carousels, floating video widgets, and category slots
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 shrink-0">
+        {/* Action Buttons: Standard Banner & Floating LIVE Video Banner */}
+        <div className="flex flex-wrap items-center gap-2.5 shrink-0">
           <button
             onClick={() => setIsReorderOpen(true)}
-            className="px-3.5 py-2 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+            className="px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-700 hover:bg-slate-50 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
           >
             <ArrowUpDown size={14} className="text-[#0057FF]" />
             <span>Reorder Priority</span>
           </button>
 
+          {/* Option 1: Add Floating LIVE Video Banner */}
+          <button
+            onClick={() => {
+              setEditingBanner({
+                type: 'floating-video',
+                placement: 'floating-video',
+                targetDevice: 'mobile',
+                isLive: true,
+                name: 'Floating LIVE Video Banner'
+              });
+              setIsModalOpen(true);
+            }}
+            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#FF6B00] to-amber-500 text-white text-xs font-black uppercase tracking-wider hover:from-amber-600 hover:to-orange-600 shadow-md active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
+          >
+            <Video size={16} strokeWidth={2.5} />
+            <span>+ Add Floating Video</span>
+          </button>
+
+          {/* Option 2: Add Standard Image Banner */}
           <button
             onClick={() => {
               setEditingBanner(null);
@@ -248,7 +269,7 @@ const Banners = () => {
             className="px-4 py-2.5 rounded-xl bg-[#0057FF] text-white text-xs font-black uppercase tracking-wider hover:bg-blue-700 shadow-md active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <Plus size={16} strokeWidth={3} />
-            <span>Add Banner</span>
+            <span>+ Add Standard Banner</span>
           </button>
         </div>
       </div>

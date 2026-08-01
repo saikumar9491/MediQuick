@@ -124,6 +124,8 @@ const BannerModal = ({
     }
   };
 
+  const isEditingExisting = Boolean(editingBanner && editingBanner._id);
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -144,10 +146,14 @@ const BannerModal = ({
       displayOrder: Number(formData.displayOrder) || 0
     };
 
-    delete payload._id;
-    delete payload.id;
+    if (isEditingExisting) {
+      payload._id = editingBanner._id;
+    } else {
+      delete payload._id;
+      delete payload.id;
+    }
 
-    onSubmit(payload);
+    onSubmit(payload, isEditingExisting);
   };
 
   return (
@@ -157,8 +163,14 @@ const BannerModal = ({
         {/* Modal Header */}
         <div className="px-6 py-4 border-b border-slate-200/80 flex items-center justify-between bg-slate-50">
           <div>
-            <h2 className="text-base font-black text-slate-900 uppercase tracking-tight">
-              {editingBanner ? 'Edit Promotional Banner' : 'Create New Promotional Banner'}
+            <h2 className="text-base font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
+              <span>
+                {isEditingExisting
+                  ? 'Edit Promotional Banner'
+                  : (formData.type === 'floating-video' || formData.placement === 'floating-video')
+                  ? '🎬 Create Floating LIVE Video Banner'
+                  : 'Create New Promotional Banner'}
+              </span>
             </h2>
             <p className="text-xs font-semibold text-slate-500">
               Configure banner content, placement, schedule, and preview across devices
