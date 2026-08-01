@@ -49,30 +49,40 @@ const HeroBannerCarousel = ({ banners = [], loading = false }) => {
         className="flex transition-transform duration-500 ease-out"
         style={{ transform: `translateX(-${activeIndex * 100}%)` }}
       >
-        {list.map((banner, i) => (
-          <Link
-            key={banner._id || i}
-            to={banner.link || '/medicines'}
-            className="w-full shrink-0 aspect-[20/9] relative block overflow-hidden"
-          >
-            {banner.image ? (
-              <img 
-                src={banner.image} 
-                alt={banner.title} 
-                loading="eager"
-                fetchpriority="high"
-                decoding="async"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className={`w-full h-full bg-gradient-to-r ${banner.bg || 'from-[#0057FF] to-blue-800'} p-4 flex flex-col justify-center text-white`}>
-                <span className="text-[10px] font-black uppercase tracking-widest text-orange-200">Special Offer</span>
-                <h4 className="text-sm font-black mt-1">{banner.title}</h4>
-                <p className="text-[10px] text-blue-50/80 font-medium mt-0.5">{banner.desc}</p>
-              </div>
-            )}
-          </Link>
-        ))}
+        {list.map((banner, i) => {
+          const imgSource = banner.mobileImageUrl || banner.imageUrl || banner.image;
+          const bannerTitle = banner.headline || banner.title || banner.name || 'Special Offer';
+          const bannerDesc = banner.subtext || banner.desc || 'Healthcare delivered to your doorstep.';
+          const bannerLink = banner.ctaUrl || banner.link || '/medicines';
+          const bgStyle = banner.bgColor || banner.bg || 'from-[#0057FF] to-blue-800';
+
+          return (
+            <Link
+              key={banner._id || i}
+              to={bannerLink}
+              className="w-full shrink-0 aspect-[20/9] relative block overflow-hidden"
+            >
+              {imgSource ? (
+                <img 
+                  src={imgSource} 
+                  alt={bannerTitle} 
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="async"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className={`w-full h-full bg-gradient-to-r ${bgStyle} p-4 flex flex-col justify-center text-white`}>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-orange-200">
+                    {banner.badgeText || 'Special Offer'}
+                  </span>
+                  <h4 className="text-sm font-black mt-1 line-clamp-1">{bannerTitle}</h4>
+                  <p className="text-[10px] text-blue-50/80 font-medium mt-0.5 line-clamp-1">{bannerDesc}</p>
+                </div>
+              )}
+            </Link>
+          );
+        })}
       </div>
 
       {/* Slide Dot Indicators */}

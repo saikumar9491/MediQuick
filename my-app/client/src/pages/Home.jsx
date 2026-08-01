@@ -196,58 +196,80 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
           <div className="relative h-[160px] overflow-hidden rounded-2xl bg-slate-900 sm:h-[320px] group">
             <AnimatePresence mode="wait">
               <motion.div 
-                key={`${currentBanner}-${displayBanners[currentBanner]?._id || 'default'}`}
+                key={currentBanner}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-                className={`absolute inset-0 flex items-center transition-colors duration-500 ${displayBanners[currentBanner]?.bg || 'bg-gradient-to-r from-[#6b21a8] to-[#9333ea]'}`}
+                transition={{ duration: 0.8 }}
+                className={`relative flex min-h-[300px] w-full items-center overflow-hidden rounded-2xl shadow-2xl sm:min-h-[420px] ${
+                  (displayBanners[currentBanner]?.bgColor || displayBanners[currentBanner]?.bg || '').includes('from-') 
+                    ? (displayBanners[currentBanner]?.bgColor || displayBanners[currentBanner]?.bg)
+                    : 'bg-gradient-to-r from-blue-700 via-blue-800 to-indigo-900'
+                }`}
+                style={
+                  (displayBanners[currentBanner]?.bgColor || displayBanners[currentBanner]?.bg) && 
+                  !(displayBanners[currentBanner]?.bgColor || displayBanners[currentBanner]?.bg).includes('from-') 
+                    ? { backgroundColor: displayBanners[currentBanner]?.bgColor || displayBanners[currentBanner]?.bg } 
+                    : {}
+                }
               >
-                {/* Right Side Image with Premium Curve - Increased Width */}
-                <div className="absolute right-0 h-full w-[75%] overflow-hidden lg:w-[65%]">
-                  <motion.img 
-                    key={currentBanner + (displayBanners[currentBanner]?._id || 'img')}
-                    initial={{ x: 100, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    src={displayBanners[currentBanner]?.image} 
-                    loading="eager"
-                    fetchpriority="high"
-                    decoding="async"
-                    className="h-full w-full object-cover rounded-l-[150px] sm:rounded-l-[350px] border-l-4 sm:border-l-8 border-white/20 shadow-[-20px_0_40px_rgba(0,0,0,0.3)]" 
-                    alt="banner" 
-                  />
-                </div>
+                {/* Right Side Image with Premium Curve */}
+                {(displayBanners[currentBanner]?.imageUrl || displayBanners[currentBanner]?.image || displayBanners[currentBanner]?.mobileImageUrl) && (
+                  <div className="absolute right-0 h-full w-[75%] overflow-hidden lg:w-[65%]">
+                    <motion.img 
+                      key={currentBanner + (displayBanners[currentBanner]?._id || 'img')}
+                      initial={{ x: 100, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      src={displayBanners[currentBanner]?.imageUrl || displayBanners[currentBanner]?.image || displayBanners[currentBanner]?.mobileImageUrl} 
+                      loading="eager"
+                      fetchpriority="high"
+                      decoding="async"
+                      className="h-full w-full object-cover rounded-l-[150px] sm:rounded-l-[350px] border-l-4 sm:border-l-8 border-white/20 shadow-[-20px_0_40px_rgba(0,0,0,0.3)]" 
+                      alt={displayBanners[currentBanner]?.altText || "Promotional Banner"} 
+                    />
+                  </div>
+                )}
 
                 {/* Left Side Content */}
-                <div className="relative z-10 w-full px-6 sm:w-[40%] sm:px-16">
+                <div className="relative z-10 w-full px-6 sm:w-[45%] sm:px-16 space-y-2">
+                  {displayBanners[currentBanner]?.badgeText && (
+                    <span className="inline-block bg-white/20 text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full backdrop-blur-md">
+                      {displayBanners[currentBanner]?.badgeText}
+                    </span>
+                  )}
                   <motion.h1 
                     key={currentBanner + (displayBanners[currentBanner]?._id || 'h1')}
                     initial={{ x: -50, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
-                    className="text-lg sm:text-4xl md:text-5xl lg:text-6xl font-black italic tracking-tighter text-white uppercase"
+                    className="text-lg sm:text-4xl md:text-5xl lg:text-6xl font-black italic tracking-tighter text-white uppercase line-clamp-2"
                   >
-                    {displayBanners[currentBanner]?.title}
+                    {displayBanners[currentBanner]?.headline || displayBanners[currentBanner]?.title || displayBanners[currentBanner]?.name}
                   </motion.h1>
                   <motion.p 
                     key={currentBanner + (displayBanners[currentBanner]?._id || 'p')}
                     initial={{ x: -50, opacity: 0 }}
                     animate={{ x: 0, opacity: 1 }}
                     transition={{ duration: 0.6, delay: 0.3 }}
-                    className="mt-1.5 max-w-md text-[9px] font-bold text-purple-100 uppercase tracking-[0.2em] sm:text-sm"
+                    className="mt-1.5 max-w-md text-[9px] font-bold text-purple-100 uppercase tracking-[0.2em] sm:text-sm line-clamp-2"
                   >
-                    {displayBanners[currentBanner]?.desc || "Healthcare delivered to your doorstep."}
+                    {displayBanners[currentBanner]?.subtext || displayBanners[currentBanner]?.desc || "Healthcare delivered to your doorstep."}
                   </motion.p>
                   <motion.button 
                     key={currentBanner + (displayBanners[currentBanner]?._id || 'btn')}
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.6, delay: 0.4 }}
-                    onClick={() => navigate(displayBanners[currentBanner]?.link || '/medicines')}
-                    className="mt-3.5 flex w-fit items-center gap-2 rounded-full bg-blue-600 px-5 py-2 text-[9px] font-black text-white shadow-xl hover:bg-white hover:text-blue-600 sm:mt-10 sm:px-12 sm:py-4 sm:text-xs transition-all active:scale-95"
+                    onClick={() => {
+                      const targetUrl = displayBanners[currentBanner]?.ctaUrl || displayBanners[currentBanner]?.link || '/medicines';
+                      if (targetUrl.startsWith('http')) window.open(targetUrl, '_blank');
+                      else navigate(targetUrl);
+                    }}
+                    className="mt-3.5 flex w-fit items-center gap-2 rounded-full bg-[#0057FF] px-5 py-2 text-[9px] font-black text-white shadow-xl hover:bg-white hover:text-[#0057FF] sm:mt-8 sm:px-10 sm:py-3.5 sm:text-xs transition-all active:scale-95 cursor-pointer"
                   >
-                    SHOP NOW <ArrowRight size={14} />
+                    <span>{displayBanners[currentBanner]?.ctaLabel || "SHOP NOW"}</span>
+                    <ArrowRight size={14} />
                   </motion.button>
                 </div>
               </motion.div>

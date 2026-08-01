@@ -47,10 +47,10 @@ const MobileHomeView = ({ medicines = [], featured = [], loading = false }) => {
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/admin/banners`);
+        const res = await fetch(`${API_BASE}/api/banners`);
         if (res.ok) {
           const data = await res.json();
-          if (Array.isArray(data) && data.length > 0) {
+          if (Array.isArray(data)) {
             setDbBanners(data);
             sessionStorage.setItem('mq_cached_banners', JSON.stringify(data));
           }
@@ -131,7 +131,11 @@ const MobileHomeView = ({ medicines = [], featured = [], loading = false }) => {
     fetchCategoryProducts();
   }, [activeTab, medicines]);
 
-  const mainBanners = dbBanners.filter(b => b.category === 'main' && b.isActive !== false);
+  const mainBanners = dbBanners.filter(b => 
+    (b.placement === 'homepage-hero' || b.placement === 'main' || b.placement === 'mobile-homepage' || b.category === 'main' || b.category === 'hero') &&
+    (b.targetDevice === 'both' || b.targetDevice === 'mobile' || !b.targetDevice) &&
+    (b.status === 'active' || b.isActive !== false)
+  );
 
   // Group real products for horizontal scroll rows
   const trendingProducts = medicines.filter(m => m.isTrending && m.isActive !== false);

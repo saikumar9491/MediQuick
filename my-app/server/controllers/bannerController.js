@@ -52,27 +52,23 @@ export const getPublicBanners = async (req, res) => {
       $or: [
         { status: 'active' },
         { isActive: true }
-      ],
-      $and: [
-        { $or: [{ startDate: null }, { startDate: { $lte: now } }] },
-        { $or: [{ endDate: null }, { endDate: { $gte: now } }] }
       ]
     };
 
     if (placement) {
       const placementArr = placement.split(',').map(p => p.trim());
       if (placementArr.length > 1) {
-        query.placement = { $in: placementArr };
+        query.$and = [{ $or: [{ placement: { $in: placementArr } }, { category: { $in: placementArr } }] }];
       } else {
         query.$or = [
           { placement: placement },
-          { category: placement } // Legacy fallback
+          { category: placement }
         ];
       }
     }
 
     if (targetDevice && targetDevice !== 'all') {
-      query.targetDevice = { $in: ['both', targetDevice] };
+      query.targetDevice = { $in: ['both', targetDevice, undefined, null] };
     }
 
     const catParam = categorySlug || category;
@@ -84,7 +80,8 @@ export const getPublicBanners = async (req, res) => {
       ];
     }
 
-    res.set('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
+    // Direct no-cache header so newly published admin banners show up immediately
+    res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
 
     const banners = await Banner.find(query)
       .sort({ displayOrder: 1, createdAt: -1 });
