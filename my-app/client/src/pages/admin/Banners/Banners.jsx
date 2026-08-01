@@ -30,6 +30,7 @@ import BannersFilterTabs from './components/BannersFilterTabs';
 import BannersTable from './components/BannersTable';
 import BannersGrid from './components/BannersGrid';
 import BannerModal from './components/BannerModal';
+import FloatingVideoModal from './components/FloatingVideoModal';
 import DragReorderList from './components/DragReorderList';
 
 const Banners = () => {
@@ -44,6 +45,7 @@ const Banners = () => {
 
   // Modals state
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFloatingModalOpen, setIsFloatingModalOpen] = useState(false);
   const [editingBanner, setEditingBanner] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isReorderOpen, setIsReorderOpen] = useState(false);
@@ -68,6 +70,15 @@ const Banners = () => {
   useEffect(() => {
     loadData();
   }, []);
+
+  const handleEditBanner = (b) => {
+    setEditingBanner(b);
+    if (b.placement === 'floating-video' || b.type === 'floating-video') {
+      setIsFloatingModalOpen(true);
+    } else {
+      setIsModalOpen(true);
+    }
+  };
 
   // Compute category counts for Filter Tabs
   const counts = useMemo(() => {
@@ -137,6 +148,7 @@ const Banners = () => {
         toast.success('New banner created and published!');
       }
       setIsModalOpen(false);
+      setIsFloatingModalOpen(false);
       setEditingBanner(null);
       loadData();
     } catch (err) {
@@ -242,17 +254,11 @@ const Banners = () => {
             <span>Reorder Priority</span>
           </button>
 
-          {/* Option 1: Add Floating LIVE Video Banner */}
+          {/* Dedicated Floating Video Button */}
           <button
             onClick={() => {
-              setEditingBanner({
-                type: 'floating-video',
-                placement: 'floating-video',
-                targetDevice: 'mobile',
-                isLive: true,
-                name: 'Floating LIVE Video Banner'
-              });
-              setIsModalOpen(true);
+              setEditingBanner(null);
+              setIsFloatingModalOpen(true);
             }}
             className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#FF6B00] to-amber-500 text-white text-xs font-black uppercase tracking-wider hover:from-amber-600 hover:to-orange-600 shadow-md active:scale-95 transition-all flex items-center gap-1.5 cursor-pointer"
           >
@@ -260,7 +266,7 @@ const Banners = () => {
             <span>+ Add Floating Video</span>
           </button>
 
-          {/* Option 2: Add Standard Image Banner */}
+          {/* Standard Banner Button */}
           <button
             onClick={() => {
               setEditingBanner(null);
@@ -329,10 +335,7 @@ const Banners = () => {
         <BannersTable
           banners={filteredBanners}
           loading={loading}
-          onEdit={(b) => {
-            setEditingBanner(b);
-            setIsModalOpen(true);
-          }}
+          onEdit={handleEditBanner}
           onDuplicate={handleDuplicate}
           onToggleStatus={handleToggleStatus}
           onDelete={handleDelete}
@@ -341,17 +344,14 @@ const Banners = () => {
         <BannersGrid
           banners={filteredBanners}
           loading={loading}
-          onEdit={(b) => {
-            setEditingBanner(b);
-            setIsModalOpen(true);
-          }}
+          onEdit={handleEditBanner}
           onDuplicate={handleDuplicate}
           onToggleStatus={handleToggleStatus}
           onDelete={handleDelete}
         />
       )}
 
-      {/* 5. Add / Edit Banner Modal */}
+      {/* 5. Standard Add / Edit Banner Modal */}
       <BannerModal
         isOpen={isModalOpen}
         onClose={() => {
@@ -363,7 +363,19 @@ const Banners = () => {
         isSubmitting={isSubmitting}
       />
 
-      {/* 6. Drag & Drop Reordering Drawer */}
+      {/* 6. Dedicated Floating LIVE Video Banner Modal */}
+      <FloatingVideoModal
+        isOpen={isFloatingModalOpen}
+        onClose={() => {
+          setIsFloatingModalOpen(false);
+          setEditingBanner(null);
+        }}
+        onSubmit={handleModalSubmit}
+        editingBanner={editingBanner}
+        isSubmitting={isSubmitting}
+      />
+
+      {/* 7. Drag & Drop Reordering Drawer */}
       <DragReorderList
         banners={banners}
         isOpen={isReorderOpen}
