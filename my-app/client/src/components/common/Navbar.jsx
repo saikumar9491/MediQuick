@@ -278,17 +278,21 @@ const Navbar = ({ medicines = [] }) => {
 
   const [showFlashDeals, setShowFlashDeals] = useState(false);
   const [flashDeals, setFlashDeals] = useState([]);
+  const [loadingFlashDeals, setLoadingFlashDeals] = useState(true);
 
   useEffect(() => {
     const fetchFlashDeals = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/medicines`);
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          setFlashDeals(data.filter(m => m.isFlashDeal).slice(0, 4));
+        const res = await fetch(`${API_BASE}/api/medicines?isFlashDeal=true`);
+        if (res.ok) {
+          const data = await res.json();
+          const list = Array.isArray(data) ? data : (data.medicines || []);
+          setFlashDeals(list.filter(m => m.isFlashDeal && m.isActive !== false).slice(0, 4));
         }
       } catch (err) {
         console.error("Flash deals fetch failed", err);
+      } finally {
+        setLoadingFlashDeals(false);
       }
     };
     fetchFlashDeals();
@@ -412,26 +416,30 @@ const Navbar = ({ medicines = [] }) => {
                     <span className="rounded bg-[#FF6B00] px-1.5 py-0.5 text-[8px] font-bold text-white animate-pulse">LIVE</span>
                   </div>
                   <div className="space-y-3">
-                    {flashDeals.length > 0 ? flashDeals.map((deal) => (
-                      <Link 
-                        key={deal._id} 
-                        to={`/product/${deal._id}`}
-                        className="flex items-center gap-3 rounded-lg p-1.5 hover:bg-slate-50 transition-colors group"
-                      >
-                        <div className="h-10 w-10 shrink-0 rounded bg-white border border-slate-100 p-1">
-                          <img src={deal.image} className="h-full w-full object-contain" alt="" />
-                        </div>
-                        <div className="flex-1 overflow-hidden">
-                          <p className="truncate text-[11px] font-bold text-slate-700 group-hover:text-[#0057FF]">{deal.name}</p>
-                          <p className="text-[10px] font-black text-[#FF6B00]">₹{deal.discountPrice || deal.price}</p>
-                        </div>
-                        <ChevronRight size={14} className="text-slate-300" />
-                      </Link>
-                    )) : (
+                    {loadingFlashDeals ? (
                       <p className="text-center py-4 text-[10px] font-bold text-slate-400 uppercase">Fetching deals...</p>
+                    ) : flashDeals.length > 0 ? (
+                      flashDeals.map((deal) => (
+                        <Link 
+                          key={deal._id} 
+                          to={`/medicines/${deal._id}`}
+                          className="flex items-center gap-3 rounded-lg p-1.5 hover:bg-slate-50 transition-colors group"
+                        >
+                          <div className="h-10 w-10 shrink-0 rounded bg-white border border-slate-100 p-1">
+                            <img src={deal.image} className="h-full w-full object-contain" alt="" />
+                          </div>
+                          <div className="flex-1 overflow-hidden">
+                            <p className="truncate text-[11px] font-bold text-slate-700 group-hover:text-[#0057FF]">{deal.name}</p>
+                            <p className="text-[10px] font-black text-[#FF6B00]">₹{deal.discountPrice || deal.price}</p>
+                          </div>
+                          <ChevronRight size={14} className="text-slate-300" />
+                        </Link>
+                      ))
+                    ) : (
+                      <p className="text-center py-4 text-[10px] font-bold text-slate-400 uppercase">No active flash deals</p>
                     )}
                   </div>
-                  <Link to="/medicines?filter=flash" className="mt-3 block rounded bg-slate-900 py-2 text-center text-[10px] font-bold text-white hover:bg-[#0057FF] transition-colors uppercase tracking-widest">
+                  <Link to="/medicines?isFlashDeal=true" className="mt-3 block rounded bg-slate-900 py-2 text-center text-[10px] font-bold text-white hover:bg-[#0057FF] transition-colors uppercase tracking-widest">
                     View All Offers
                   </Link>
                 </motion.div>
