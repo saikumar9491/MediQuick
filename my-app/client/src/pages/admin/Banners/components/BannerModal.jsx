@@ -16,6 +16,8 @@ const BannerModal = ({
     type: 'image-text',
     imageUrl: '',
     mobileImageUrl: '',
+    videoUrl: '',
+    isLive: false,
     altText: 'Promotional Banner',
     headline: '',
     subtext: '',
@@ -37,14 +39,17 @@ const BannerModal = ({
 
   const [desktopUploading, setDesktopUploading] = useState(false);
   const [mobileUploading, setMobileUploading] = useState(false);
+  const [videoUploading, setVideoUploading] = useState(false);
 
   useEffect(() => {
     if (editingBanner) {
       setFormData({
         name: editingBanner.name || editingBanner.title || '',
-        type: editingBanner.type || 'image-text',
+        type: editingBanner.type || (editingBanner.placement === 'floating-video' ? 'floating-video' : 'image-text'),
         imageUrl: editingBanner.imageUrl || editingBanner.image || '',
         mobileImageUrl: editingBanner.mobileImageUrl || '',
+        videoUrl: editingBanner.videoUrl || '',
+        isLive: Boolean(editingBanner.isLive),
         altText: editingBanner.altText || 'Promotional Banner',
         headline: editingBanner.headline || editingBanner.title || '',
         subtext: editingBanner.subtext || editingBanner.desc || '',
@@ -56,7 +61,7 @@ const BannerModal = ({
         textColor: editingBanner.textColor || 'white',
         placement: editingBanner.placement || editingBanner.category || 'homepage-hero',
         categorySlug: editingBanner.categorySlug || '',
-        targetDevice: editingBanner.targetDevice || 'both',
+        targetDevice: editingBanner.targetDevice || (editingBanner.placement === 'floating-video' ? 'mobile' : 'both'),
         displayOrder: editingBanner.displayOrder ?? 0,
         status: editingBanner.status || (editingBanner.isActive ? 'active' : 'draft'),
         startDate: editingBanner.startDate ? new Date(editingBanner.startDate).toISOString().slice(0, 16) : '',
@@ -69,6 +74,8 @@ const BannerModal = ({
         type: 'image-text',
         imageUrl: '',
         mobileImageUrl: '',
+        videoUrl: '',
+        isLive: false,
         altText: 'Promotional Banner',
         headline: '',
         subtext: '',
@@ -187,15 +194,89 @@ const BannerModal = ({
                 </label>
                 <select
                   value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                  onChange={(e) => {
+                    const newType = e.target.value;
+                    setFormData(prev => ({
+                      ...prev,
+                      type: newType,
+                      placement: newType === 'floating-video' ? 'floating-video' : prev.placement,
+                      targetDevice: newType === 'floating-video' ? 'mobile' : prev.targetDevice
+                    }));
+                  }}
                   className="w-full rounded-lg border border-slate-200 p-2.5 text-xs font-bold outline-none focus:border-[#0057FF] bg-white cursor-pointer"
                 >
                   <option value="image-text">Image + Text Overlay</option>
+                  <option value="floating-video">🎬 Floating Video Widget (Mobile Only)</option>
                   <option value="image">Image Only (Pure Graphic)</option>
                   <option value="text-color">Text + Color Background</option>
                 </select>
               </div>
             </div>
+
+            {/* Video File / URL Upload Box if Floating Video Widget */}
+            {(formData.type === 'floating-video' || formData.placement === 'floating-video') && (
+              <div className="border-2 border-amber-200 rounded-xl p-4 bg-amber-50/50 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-black text-amber-900 uppercase tracking-wider">
+                    🎥 Floating Video File (MP4, WebM max 15MB)
+                  </label>
+                  
+                  {/* Is Live Toggle */}
+                  <label className="flex items-center gap-2 cursor-pointer bg-white px-3 py-1 rounded-full border border-amber-200 shadow-2xs">
+                    <input
+                      type="checkbox"
+                      checked={formData.isLive}
+                      onChange={(e) => setFormData({ ...formData, isLive: e.target.checked })}
+                      className="w-4 h-4 rounded text-rose-600 focus:ring-rose-500 cursor-pointer"
+                    />
+                    <span className="text-xs font-black text-rose-600 flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping"></span>
+                      SHOW RED "LIVE" BADGE
+                    </span>
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="https://... (Direct MP4 / WebM Video URL)"
+                    value={formData.videoUrl}
+                    onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+                    className="flex-1 rounded-lg border border-slate-300 bg-white p-2.5 text-xs font-medium outline-none focus:border-[#0057FF]"
+                  />
+                  <label className="px-4 py-2.5 bg-slate-900 text-white rounded-lg text-xs font-black uppercase tracking-wider flex items-center gap-1.5 cursor-pointer hover:bg-[#0057FF] transition-colors shrink-0">
+                    <Upload size={14} />
+                    <span>{videoUploading ? 'Uploading...' : 'Upload Video'}</span>
+                    <input
+                      type="file"
+                      accept="video/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setVideoUploading(true);
+                        try {
+                          const data = new FormData();
+                          data.append('image', file);
+                          const res = await uploadProductImage(data);
+                          if (res?.imageUrl || res?.url) {
+                            setFormData(prev => ({ ...prev, videoUrl: res.imageUrl || res.url }));
+                            toast.success('Video uploaded successfully!');
+                          }
+                        } catch (err) {
+                          toast.error('Video upload failed');
+                        } finally {
+                          setVideoUploading(false);
+                        }
+                      }}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <p className="text-[11px] text-amber-800 font-medium">
+                  Note: Floating Video Widgets are automatically targeted to Mobile Only devices.
+                </p>
+              </div>
+            )}
 
             {/* Desktop & Mobile Image Upload Inputs */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
@@ -395,10 +476,19 @@ const BannerModal = ({
                 </label>
                 <select
                   value={formData.placement}
-                  onChange={(e) => setFormData({ ...formData, placement: e.target.value })}
+                  onChange={(e) => {
+                    const newPlacement = e.target.value;
+                    setFormData(prev => ({
+                      ...prev,
+                      placement: newPlacement,
+                      type: newPlacement === 'floating-video' ? 'floating-video' : prev.type,
+                      targetDevice: newPlacement === 'floating-video' ? 'mobile' : prev.targetDevice
+                    }));
+                  }}
                   className="w-full rounded-lg border border-slate-200 p-2.5 text-xs font-bold outline-none focus:border-[#0057FF] bg-white cursor-pointer"
                 >
                   <option value="homepage-hero">Homepage Hero Carousel</option>
+                  <option value="floating-video">🎬 Floating Video Widget (Mobile Only)</option>
                   <option value="category-mini">Category Page Mini Banner</option>
                   <option value="mobile-homepage">Mobile Homepage Banner</option>
                   <option value="all-medicines">All Medicines Page Banner</option>

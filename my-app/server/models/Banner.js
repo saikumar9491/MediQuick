@@ -9,8 +9,16 @@ const bannerSchema = new mongoose.Schema(
     },
     type: { 
       type: String, 
-      enum: ['image', 'image-text', 'text-color'], 
+      enum: ['image', 'image-text', 'text-color', 'floating-video'], 
       default: 'image-text' 
+    },
+    videoUrl: {
+      type: String,
+      default: ''
+    },
+    isLive: {
+      type: Boolean,
+      default: false
     },
     imageUrl: { 
       type: String, 
@@ -68,6 +76,7 @@ const bannerSchema = new mongoose.Schema(
         'flash-sale', 
         'lab-tests', 
         'ayurveda',
+        'floating-video',
         'main'
       ], 
       default: 'homepage-hero' 

@@ -11,6 +11,7 @@ const BannersFilterTabs = ({
   const tabs = [
     { id: 'all', label: 'All Banners', count: counts.all || 0 },
     { id: 'homepage-hero', label: 'Homepage Hero', count: counts['homepage-hero'] || 0 },
+    { id: 'floating-video', label: '🎬 Floating Video', count: counts['floating-video'] || 0 },
     { id: 'category-mini', label: 'Category Mini', count: counts['category-mini'] || 0 },
     { id: 'flash-sale', label: 'Flash Sale', count: counts['flash-sale'] || 0 },
     { id: 'mobile-only', label: 'Mobile Only', count: counts['mobile-only'] || 0 },

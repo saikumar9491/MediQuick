@@ -73,6 +73,7 @@ const Banners = () => {
     const res = {
       all: banners.length,
       'homepage-hero': 0,
+      'floating-video': 0,
       'category-mini': 0,
       'flash-sale': 0,
       'mobile-only': 0,
@@ -83,6 +84,7 @@ const Banners = () => {
     banners.forEach((b) => {
       const p = b.placement || b.category;
       if (p === 'homepage-hero' || p === 'main') res['homepage-hero']++;
+      else if (p === 'floating-video' || b.type === 'floating-video') res['floating-video']++;
       else if (p === 'category-mini') res['category-mini']++;
       else if (p === 'flash-sale' || p === 'flash') res['flash-sale']++;
 
@@ -101,6 +103,7 @@ const Banners = () => {
 
       // Tab Filtering
       if (activeTab === 'homepage-hero' && p !== 'homepage-hero' && p !== 'main') return false;
+      if (activeTab === 'floating-video' && p !== 'floating-video' && b.type !== 'floating-video') return false;
       if (activeTab === 'category-mini' && p !== 'category-mini') return false;
       if (activeTab === 'flash-sale' && p !== 'flash-sale' && p !== 'flash') return false;
       if (activeTab === 'mobile-only' && b.targetDevice !== 'mobile') return false;

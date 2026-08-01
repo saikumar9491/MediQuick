@@ -103,6 +103,44 @@ const BannerPreviewPanel = ({ formData = {} }) => {
               </div>
             )}
           </div>
+        ) : (formData.type === 'floating-video' || formData.placement === 'floating-video') ? (
+          /* FLOATING VIDEO WIDGET PREVIEW CARD (125x165px) */
+          <div className="w-[125px] h-[165px] rounded-[18px] bg-slate-950 shadow-2xl border-2 border-white/20 overflow-hidden relative flex flex-col justify-between select-none">
+            {formData.videoUrl && formData.videoUrl.match(/\.(mp4|webm|mov|m4v)(\?.*)?$/i) ? (
+              <video src={formData.videoUrl} autoPlay loop muted playsInline className="absolute inset-0 w-full h-full object-cover" />
+            ) : (
+              <img src={currentImage || 'https://img.freepik.com/free-vector/flat-medical-healthcare-sales-banner-template_23-2149511116.jpg'} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            )}
+
+            {/* Header controls */}
+            <div className="relative z-10 p-2 flex items-center justify-between">
+              <div className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase flex items-center gap-1 shadow-xs ${
+                formData.isLive ? 'bg-rose-600 text-white' : 'bg-gradient-to-r from-[#FF6B00] to-amber-500 text-white'
+              }`}>
+                {formData.isLive ? (
+                  <>
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                    <span>LIVE</span>
+                  </>
+                ) : (
+                  <span>{badgeText || 'OFFER'}</span>
+                )}
+              </div>
+              <div className="w-4 h-4 rounded-full bg-black/60 text-white flex items-center justify-center text-[10px] font-bold">
+                ✕
+              </div>
+            </div>
+
+            {/* Bottom Gradient Overlay Text */}
+            <div className="relative z-10 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent p-2.5 pt-6 text-left">
+              <h5 className="text-[10px] font-black text-white leading-tight uppercase line-clamp-2">
+                {headline || 'Extra 30% Off'}
+              </h5>
+              <p className="text-[8px] font-extrabold text-amber-300 line-clamp-1 mt-0.5">
+                {subtext || 'Winter sale'}
+              </p>
+            </div>
+          </div>
         ) : (
           /* MOBILE BANNER PREVIEW CONTAINER (375px phone ratio) */
           <div className="w-[320px] aspect-[20/9] rounded-2xl overflow-hidden relative shadow-2xl border border-slate-700 flex items-center">

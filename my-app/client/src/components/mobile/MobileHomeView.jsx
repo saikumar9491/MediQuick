@@ -10,6 +10,7 @@ import RecentlyViewed from './RecentlyViewed';
 import ProductScrollRow from './ProductScrollRow';
 import { MobileProductCard } from './ProductScrollRow';
 import { Loader2 } from 'lucide-react';
+import FloatingVideoBanner from './FloatingVideoBanner';
 
 const MobileHomeView = ({ medicines = [], featured = [], loading = false }) => {
   const { token, user } = useAuth();
@@ -245,6 +246,9 @@ const MobileHomeView = ({ medicines = [], featured = [], loading = false }) => {
           </div>
         )}
       </div>
+
+      {/* Floating LIVE Video Widget (Mobile Only) */}
+      <FloatingVideoBanner />
     </div>
   );
 };
