@@ -251,8 +251,8 @@ const MobileHomeView = ({ medicines = [], featured = [], loading = false }) => {
               products={immunityProducts.length > 0 ? immunityProducts : medicines.filter(m => m.category === 'Immunity Boosters').slice(0, 8)}
               seeAllLink="/medicines?filter=immunity"
             />
-            </div>{/* end space-y-3 white section */}
-          </div>{/* end pb-1 hero+wave section */}
+            </div>
+          </div>
         ) : (
           /* Active Category View (2-Column Grid) */
           <div className="p-4 pb-8 space-y-4">
