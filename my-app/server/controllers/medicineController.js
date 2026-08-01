@@ -56,6 +56,10 @@ export const getMedicines = async (req, res) => {
       query.isTrending = true;
     }
 
+    if (req.query.isFlashDeal === 'true' || req.query.filter === 'flash') {
+      query.isFlashDeal = true;
+    }
+
     if (search) {
       query.$or = [
         { name: { $regex: search, $options: 'i' } },

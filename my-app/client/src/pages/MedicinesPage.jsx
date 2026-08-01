@@ -59,17 +59,25 @@ const MedicinesPage = () => {
   // Mobile & Layout View State
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'list'
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [flashOnly, setFlashOnly] = useState(false);
 
   // Handle URL query parameters dynamically (e.g. category, subCategory, filter, search)
   useEffect(() => {
     const cat = searchParams.get('category');
     const filterParam = searchParams.get('filter');
+    const isFlashParam = searchParams.get('isFlashDeal');
     const sub = searchParams.get('subCategory') || searchParams.get('sub');
     const search = searchParams.get('search');
 
+    if (isFlashParam === 'true' || filterParam === 'flash') {
+      setFlashOnly(true);
+    } else {
+      setFlashOnly(false);
+    }
+
     if (cat) {
       setSelectedCategory(cat);
-    } else if (filterParam) {
+    } else if (filterParam && filterParam !== 'flash') {
       const map = {
         'hair-care': 'Hair Care',
         'fitness': 'Fitness & Health',
@@ -135,6 +143,7 @@ const MedicinesPage = () => {
           priceMax: priceMax < 3000 ? priceMax : undefined,
           inStock: inStockOnly ? 'true' : undefined,
           prescriptionRequired: rxFilter !== 'All' ? rxFilter : undefined,
+          isFlashDeal: flashOnly ? 'true' : undefined,
           sort: sortBy
         };
 
@@ -162,12 +171,16 @@ const MedicinesPage = () => {
     priceMax, 
     inStockOnly, 
     rxFilter, 
+    flashOnly,
     sortBy
   ]);
 
   // Active filters list for removable chips
   const activeFilters = useMemo(() => {
     const list = [];
+    if (flashOnly) {
+      list.push({ id: 'flash', label: '⚡ Flash Deals Only', clear: () => { setFlashOnly(false); setSearchParams({}); } });
+    }
     if (selectedCategory && selectedCategory !== 'All') {
       list.push({ id: 'category', label: `Category: ${selectedCategory}`, clear: () => { setSelectedCategory('All'); setSelectedSubCategory(''); } });
     }
@@ -190,9 +203,10 @@ const MedicinesPage = () => {
       list.push({ id: 'price', label: `Price: ₹${priceMin} - ₹${priceMax}`, clear: () => { setPriceMin(0); setPriceMax(3000); } });
     }
     return list;
-  }, [selectedCategory, selectedSubCategory, debouncedSearch, selectedBrands, inStockOnly, rxFilter, priceMin, priceMax]);
+  }, [flashOnly, selectedCategory, selectedSubCategory, debouncedSearch, selectedBrands, inStockOnly, rxFilter, priceMin, priceMax]);
 
   const handleClearAllFilters = () => {
+    setFlashOnly(false);
     setSelectedCategory('All');
     setSelectedSubCategory('');
     setSearchQuery('');

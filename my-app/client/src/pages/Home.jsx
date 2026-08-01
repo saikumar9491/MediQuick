@@ -27,6 +27,7 @@ import toast from 'react-hot-toast';
 
 import FeaturedBrands from '../components/common/FeaturedBrands';
 import MobileHomeView from '../components/mobile/MobileHomeView';
+import DesktopFlashDealsSection from '../components/common/DesktopFlashDealsSection';
 
 
 const Home = ({ medicines = [], featured = [], loading = true }) => {
@@ -306,6 +307,11 @@ const Home = ({ medicines = [], featured = [], loading = true }) => {
           </div>
         </div>
       </section>
+
+      {/* Flash Deals Section (Desktop Only) */}
+      <div className="hidden sm:block">
+        <DesktopFlashDealsSection medicines={medicines} />
+      </div>
 
       {/* Shop by Categories */}
       <section style={{ background: 'linear-gradient(180deg, #ffffff 0%, #f0fafa 100%)', padding: '48px 0' }}>
