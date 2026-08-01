@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { API_BASE } from '../../utils/apiConfig';
 import CategoryTabBar from './CategoryTabBar';
-import HeroBannerCarousel from './HeroBannerCarousel';
+import AnimatedHeroBanner from './AnimatedHeroBanner';
 import QuickAccessGrid from './QuickAccessGrid';
 import FlashDealsRow from './FlashDealsRow';
 import PersonalizedSection from './PersonalizedSection';
@@ -158,9 +158,9 @@ const MobileHomeView = ({ medicines = [], featured = [], loading = false }) => {
       <div>
         {activeTab === 'for-you' ? (
           <div className="space-y-3 pb-8">
-            {/* 1. Hero Carousel */}
+            {/* 1. Animated Hero Banner (mobile-only, warm festive gradient) */}
             <div className="px-4 pt-3">
-              <HeroBannerCarousel banners={mainBanners} loading={isBannerLoading} />
+              <AnimatedHeroBanner />
             </div>
 
             {/* 2. Quick Access Grid */}

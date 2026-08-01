@@ -1,0 +1,370 @@
+/* ============================================================
+   AnimatedHeroBanner.module.css
+   All keyframe animations & component styles for the
+   MediQuick Animated Mobile Hero Banner
+   ============================================================ */
+
+/* ── Entry animations ──────────────────────────────────── */
+@keyframes bannerFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Balloon float ─────────────────────────────────────── */
+@keyframes balloonFloat {
+  0%   { transform: translateY(0)  translateX(0); }
+  30%  { transform: translateY(-10px) translateX(4px); }
+  60%  { transform: translateY(-14px) translateX(-4px); }
+  100% { transform: translateY(0)  translateX(0); }
+}
+
+/* ── Cloud drift ───────────────────────────────────────── */
+@keyframes cloudDrift {
+  0%   { transform: translateX(0); }
+  50%  { transform: translateX(18px); }
+  100% { transform: translateX(0); }
+}
+
+/* ── Sparkle twinkle ───────────────────────────────────── */
+@keyframes twinkle {
+  0%, 100% { opacity: 1;   transform: scale(1); }
+  50%       { opacity: 0.2; transform: scale(0.6); }
+}
+
+/* ── Confetti fall ─────────────────────────────────────── */
+@keyframes confettiFall {
+  0%   { transform: translateY(-24px) rotate(0deg);   opacity: 1; }
+  100% { transform: translateY(220px) rotate(360deg); opacity: 0; }
+}
+
+/* ── Health-icon ring rotation ─────────────────────────── */
+@keyframes ringRotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── CTA pulse ─────────────────────────────────────────── */
+@keyframes ctaPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,87,255,0.25); }
+  50%       { box-shadow: 0 0 0 6px rgba(0,87,255,0); }
+}
+
+/* ============================================================
+   Banner wrapper
+   ============================================================ */
+.banner {
+  position: relative;
+  width: 100%;
+  height: 210px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 55%, #FFCC80 100%);
+  animation: bannerFadeIn 400ms ease-out both;
+  /* GPU hint */
+  will-change: opacity;
+}
+
+/* ── Decorative background radial glow ── */
+.bannerGlow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 80% at 90% 50%, rgba(255,107,0,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 60% at 10% 50%, rgba(0,87,255,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ============================================================
+   Hot-air balloons
+   ============================================================ */
+.balloon {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  will-change: transform;
+  animation: balloonFloat 3.6s ease-in-out infinite;
+}
+.balloonBody {
+  width: 28px;
+  height: 34px;
+  border-radius: 50% 50% 46% 46% / 60% 60% 40% 40%;
+  position: relative;
+  overflow: hidden;
+}
+.balloonShine {
+  position: absolute;
+  top: 5px;
+  left: 6px;
+  width: 8px;
+  height: 10px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 50%;
+  transform: rotate(-30deg);
+}
+.balloonBasket {
+  width: 12px;
+  height: 8px;
+  background: #92400E;
+  border-radius: 2px 2px 4px 4px;
+  margin-top: 1px;
+}
+.balloonRope {
+  width: 1px;
+  height: 5px;
+  background: rgba(0,0,0,0.3);
+}
+
+/* ============================================================
+   Clouds
+   ============================================================ */
+.cloud {
+  position: absolute;
+  will-change: transform;
+  animation: cloudDrift 7s ease-in-out infinite;
+  opacity: 0.55;
+}
+.cloudShape {
+  position: relative;
+  width: 52px;
+  height: 20px;
+  background: #fff;
+  border-radius: 20px;
+  filter: blur(0.5px);
+}
+.cloudShape::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 10px;
+  width: 26px;
+  height: 26px;
+  background: #fff;
+  border-radius: 50%;
+}
+.cloudShape::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 28px;
+  width: 20px;
+  height: 20px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+/* ============================================================
+   Sparkles
+   ============================================================ */
+.sparkle {
+  position: absolute;
+  will-change: opacity, transform;
+  animation: twinkle 1.6s ease-in-out infinite;
+  pointer-events: none;
+}
+.sparkleStar {
+  font-size: 10px;
+  line-height: 1;
+  color: #FF6B00;
+  filter: drop-shadow(0 0 2px rgba(255,107,0,0.6));
+}
+
+/* ============================================================
+   Confetti dots
+   ============================================================ */
+.confettiDot {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  will-change: transform, opacity;
+  animation: confettiFall linear infinite;
+  pointer-events: none;
+}
+
+/* ============================================================
+   Rotating Health Ring (right-side illustration)
+   ============================================================ */
+.healthRingWrapper {
+  position: absolute;
+  right: -30px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 160px;
+  height: 160px;
+  pointer-events: none;
+  animation: slideInRight 500ms 300ms ease-out both;
+}
+.healthRingOuter {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px dashed rgba(255,107,0,0.2);
+  animation: ringRotate 22s linear infinite;
+  will-change: transform;
+}
+.healthRingInner {
+  position: absolute;
+  inset: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(0,87,255,0.12);
+  animation: ringRotate 16s linear infinite reverse;
+  will-change: transform;
+}
+.healthRingCenter {
+  position: absolute;
+  inset: 45px;
+  border-radius: 50%;
+  background: rgba(255,107,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  opacity: 0.7;
+}
+.healthIcon {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transform-origin: center;
+}
+
+/* ============================================================
+   Content layer
+   ============================================================ */
+.contentLayer {
+  position: absolute;
+  inset: 0;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-width: 62%;
+  z-index: 10;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #0057FF;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px 3px 5px;
+  border-radius: 20px;
+  width: fit-content;
+  margin-bottom: 8px;
+  animation: slideInLeft 400ms 300ms ease-out both;
+  will-change: opacity, transform;
+}
+.badgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #FF6B00;
+  flex-shrink: 0;
+}
+
+.headline {
+  font-size: 19px;
+  font-weight: 900;
+  color: #1A1A2E;
+  line-height: 1.18;
+  margin: 0 0 5px 0;
+  letter-spacing: -0.02em;
+  animation: slideUp 500ms 200ms ease-out both;
+  will-change: opacity, transform;
+}
+.headlineSup {
+  font-size: 10px;
+  font-weight: 900;
+  vertical-align: super;
+  letter-spacing: 0;
+}
+
+.subtext {
+  font-size: 11px;
+  font-weight: 600;
+  color: #5F4B2B;
+  line-height: 1.4;
+  margin: 0 0 12px 0;
+  animation: slideUp 500ms 350ms ease-out both;
+  will-change: opacity, transform;
+}
+
+.ctaButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #fff;
+  color: #0057FF;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  width: fit-content;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0,87,255,0.15);
+  animation: slideUp 500ms 450ms ease-out both, ctaPulse 2.5s 1s ease-in-out infinite;
+  will-change: opacity, transform;
+  transition: transform 0.15s ease;
+}
+.ctaButton:active {
+  transform: scale(0.96);
+}
+.ctaArrow {
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 900;
+}
+
+/* ============================================================
+   Reduced-motion: disable ALL animations, show static version
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .banner,
+  .balloon,
+  .cloud,
+  .sparkle,
+  .confettiDot,
+  .healthRingOuter,
+  .healthRingInner,
+  .badge,
+  .headline,
+  .subtext,
+  .ctaButton {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    will-change: auto !important;
+  }
+}
