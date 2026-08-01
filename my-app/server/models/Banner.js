@@ -130,17 +130,17 @@ const bannerSchema = new mongoose.Schema(
 );
 
 // Pre-save hook for sync & auto-status updates
-bannerSchema.pre('save', function (next) {
+bannerSchema.pre('save', async function () {
   // Sync legacy fields
   if (!this.title) this.title = this.headline || this.name;
   if (!this.headline) this.headline = this.title || this.name;
-  if (!this.image) this.image = this.imageUrl || this.mobileImageUrl;
+  if (!this.image) this.image = this.imageUrl || this.mobileImageUrl || '';
   if (!this.imageUrl) this.imageUrl = this.image || '';
-  if (!this.desc) this.desc = this.subtext;
+  if (!this.desc) this.desc = this.subtext || '';
   if (!this.subtext) this.subtext = this.desc || '';
-  if (!this.link) this.link = this.ctaUrl;
+  if (!this.link) this.link = this.ctaUrl || '/medicines';
   if (!this.ctaUrl) this.ctaUrl = this.link || '/medicines';
-  if (!this.bg) this.bg = this.bgColor;
+  if (!this.bg) this.bg = this.bgColor || 'from-blue-700 via-blue-800 to-indigo-900';
   if (!this.bgColor) this.bgColor = this.bg || 'from-blue-700 via-blue-800 to-indigo-900';
   if (!this.category) this.category = this.placement;
 
@@ -158,8 +158,6 @@ bannerSchema.pre('save', function (next) {
   } else {
     this.isActive = false;
   }
-
-  next();
 });
 
 const Banner = mongoose.model('Banner', bannerSchema);
