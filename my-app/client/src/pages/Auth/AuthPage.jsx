@@ -45,12 +45,10 @@ const AuthPage = () => {
         </button>
 
         {/* Compact Logo */}
-        <div className="flex items-center gap-1">
-          <div className="flex h-5.5 w-5.5 items-center justify-center rounded bg-[#0057FF] text-white">
-            <span className="text-[9px] font-black">M</span>
-          </div>
-          <span className="text-xs font-black tracking-tight uppercase">
-            <span className="text-[#0057FF]">MEDI</span><span className="text-[#FF6B00]">QUICK</span>
+        <div className="flex items-center gap-1.5">
+          <img src="/logo_icon.png" className="h-5.5 w-auto object-contain" alt="MediQuick Logo" />
+          <span className="text-xs font-black tracking-tight uppercase text-slate-900">
+            MEDIQUICK
           </span>
         </div>
 

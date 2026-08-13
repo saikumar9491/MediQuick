@@ -30,12 +30,10 @@ const PromoImagePanel = () => {
       {/* Content */}
       <div className="absolute inset-0 flex flex-col justify-between p-8">
         {/* Top: Logo */}
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl shadow-lg" style={{ background: 'linear-gradient(135deg, #00a2a4, #007b7d)' }}>
-            <ShoppingBag size={18} strokeWidth={3} color="white" />
-          </div>
+        <div className="flex items-center gap-2">
+          <img src="/logo_icon.png" className="h-9 w-auto object-contain brightness-0 invert" alt="MediQuick Logo" />
           <span className="text-xl font-black tracking-tighter text-white uppercase">
-            MEDI<span style={{ color: '#00d4d6' }}>QUICK</span>
+            MEDIQUICK
           </span>
         </div>
 

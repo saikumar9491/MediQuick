@@ -1,29 +1,36 @@
 import { useCommandCenter } from '../CommandCenterContext';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { AlertCircle, Info, AlertTriangle, X } from 'lucide-react';
 
 export const AnnouncementsBanner = () => {
-  const [announcements, setAnnouncements] = useState([]);
+  const { insights } = useCommandCenter();
   const [dismissed, setDismissed] = useState([]);
+  const [items, setItems] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // TODO: Connect real endpoint
-        // axios.get('/api/admin/announcements')
-        await new Promise(res => setTimeout(res, 200)); 
-        
-        setAnnouncements([
-          { id: 'ann-1', type: 'warning', message: '5 new prescription approvals need review immediately.' },
-          { id: 'ann-2', type: 'info', message: 'System maintenance scheduled for tonight at 2:00 AM IST.' }
-        ]);
-      } catch (err) {
-        console.error(err);
+    // Generate notification list from both hardcoded system updates and dynamic AI insights
+    const systemAlerts = [
+      { id: 'sys-1', type: 'info', message: 'System maintenance scheduled for tonight at 2:00 AM IST.' }
+    ];
+
+    const dynamicInsights = (insights || []).map((ins, index) => {
+      // Decide styling type based on content keywords
+      let type = 'info';
+      if (ins.text.includes('low in stock') || ins.text.includes('abandoned')) {
+        type = 'warning';
+      } else if (ins.text.includes('lower than')) {
+        type = 'critical';
       }
-    };
-    fetchData();
-  }, []);
+
+      return {
+        id: `insight-${index}`,
+        type,
+        message: ins.text
+      };
+    });
+
+    setItems([...dynamicInsights, ...systemAlerts]);
+  }, [insights]);
 
   const handleDismiss = (id) => {
     setDismissed([...dismissed, id]);
@@ -45,23 +52,23 @@ export const AnnouncementsBanner = () => {
     }
   };
 
-  const visibleAnnouncements = announcements.filter(a => !dismissed.includes(a.id));
+  const visibleItems = items.filter(item => !dismissed.includes(item.id));
 
-  if (visibleAnnouncements.length === 0) return null;
+  if (visibleItems.length === 0) return null;
 
   return (
     <div className="space-y-3 mb-6 animate-in fade-in duration-500 slide-in-from-top-4">
-      {visibleAnnouncements.map(announcement => (
+      {visibleItems.map(item => (
         <div 
-          key={announcement.id} 
-          className={`flex items-start justify-between p-4 border rounded-xl shadow-sm ${getVariantStyles(announcement.type)}`}
+          key={item.id} 
+          className={`flex items-start justify-between p-4 border rounded-xl shadow-sm ${getVariantStyles(item.type)}`}
         >
           <div className="flex items-start gap-3">
-            {getIcon(announcement.type)}
-            <p className="text-sm font-bold mt-0.5">{announcement.message}</p>
+            {getIcon(item.type)}
+            <p className="text-sm font-bold mt-0.5">{item.message}</p>
           </div>
           <button 
-            onClick={() => handleDismiss(announcement.id)}
+            onClick={() => handleDismiss(item.id)}
             className="p-1 hover:bg-black/5 rounded-lg transition-colors"
           >
             <X className="h-4 w-4 opacity-60" />

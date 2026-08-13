@@ -4,6 +4,8 @@ import cors from 'cors';
 import axios from 'axios';
 import connectDB from './config/db.js';
 import mongoose from 'mongoose';
+import { Server } from 'socket.io';
+import Order from './models/Order.js';
 
 // Route Imports
 import customerRoutes from './routes/customerRoutes.js';
@@ -37,6 +39,7 @@ import labTestRoutes from './routes/labTestRoutes.js';
 import doctorRoutes from './routes/doctorRoutes.js';
 import carePlanRoutes from './routes/carePlanRoutes.js';
 import pageContentRoutes from './routes/pageContentRoutes.js';
+import adminStatsRoutes from './routes/adminStats.js';
 
 // ⚙️ INITIALIZATION
 dotenv.config();
@@ -145,6 +148,7 @@ app.use('/api/lab-tests', labTestRoutes);
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/care-plan', carePlanRoutes);
 app.use('/api/page-content', pageContentRoutes);
+app.use('/api/admin/stats', adminStatsRoutes);
 
 /**
  * 4. CLOUD HEALTH MONITOR
@@ -223,7 +227,7 @@ const isVercel = process.env.VERCEL === '1';
 
 if (!isVercel) {
   const PORT = process.env.PORT || 5000; 
-  app.listen(PORT, '0.0.0.0', () => {
+  const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`--- PROTOCOL START ---`);
     console.log(`🚀 Hub Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log(`📡 Satellite Port: ${PORT}`);
@@ -234,6 +238,58 @@ if (!isVercel) {
       keepAlive();
     }
   });
+
+  const io = new Server(server, {
+    cors: {
+      origin: "*",
+      methods: ["GET", "POST"]
+    }
+  });
+  app.set('io', io);
+
+  io.on('connection', (socket) => {
+    console.log(`🔌 Client connected: ${socket.id}`);
+    
+    socket.on('join:admin', () => {
+      socket.join('admin');
+      console.log(`👑 Client joined admin room: ${socket.id}`);
+    });
+    
+    socket.on('disconnect', () => {
+      console.log(`❌ Client disconnected: ${socket.id}`);
+    });
+  });
+
+  // Background interval to emit stats:update
+  setInterval(async () => {
+    try {
+      if (mongoose.connection.readyState === 1) {
+        const todayStart = () => {
+          const now = new Date();
+          const offset = 5.5 * 60 * 60 * 1000;
+          const istNow = new Date(now.getTime() + offset);
+          istNow.setUTCHours(0, 0, 0, 0);
+          return new Date(istNow.getTime() - offset);
+        };
+        const start = todayStart();
+        
+        const [liveOrders, pendingOrders, outForDelivery] = await Promise.all([
+          Order.countDocuments({ createdAt: { $gte: start } }),
+          Order.countDocuments({ status: { $in: ['Placed', 'Confirmed'] } }),
+          Order.countDocuments({ status: 'Out for Delivery' })
+        ]);
+
+        io.to('admin').emit('stats:update', {
+          liveOrders,
+          pendingOrders,
+          outForDelivery,
+          timestamp: new Date().toISOString()
+        });
+      }
+    } catch (err) {
+      console.error('Error emitting live stats update:', err);
+    }
+  }, 10000);
 }
 
 // Export the app for Vercel serverless usage

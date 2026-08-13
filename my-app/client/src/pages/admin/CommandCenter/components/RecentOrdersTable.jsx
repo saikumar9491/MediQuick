@@ -8,15 +8,15 @@ import { RefreshCw, Eye } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const RecentOrdersTable = () => {
-  const { orders, medicines, users, loading: contextLoading } = useCommandCenter();
+  const { recentOrders, loading: contextLoading } = useCommandCenter();
   const [loading, setLoading] = useState(true);
   const [localOrders, setLocalOrders] = useState([]);
   const [filter, setFilter] = useState('All');
 
   useEffect(() => {
-    if (!orders || !Array.isArray(orders)) return;
+    if (!recentOrders || !Array.isArray(recentOrders)) return;
     try {
-      const mapped = orders.map(o => ({
+      const mapped = recentOrders.map(o => ({
         id: o._id ? o._id.substring(0, 8).toUpperCase() : 'UNKNOWN',
         customer: o.userId?.name || o.customerName || 'Guest',
         items: o.items ? o.items.length : 0,
@@ -34,7 +34,7 @@ export const RecentOrdersTable = () => {
     } finally {
       setLoading(contextLoading);
     }
-  }, [orders, filter, contextLoading]);
+  }, [recentOrders, filter, contextLoading]);
 
   const getStatusBadge = (status) => {
     switch(status) {

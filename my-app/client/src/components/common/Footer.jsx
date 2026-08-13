@@ -26,12 +26,10 @@ const Footer = () => {
           
           {/* Brand Section */}
           <div className="space-y-4">
-            <Link to="/" className="flex items-center gap-1.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-md bg-[#0057FF] text-white shadow-md">
-                <span className="text-sm font-black">M</span>
-              </div>
+            <Link to="/" className="flex items-center gap-2">
+              <img src="/logo_icon.png" className="h-8 w-auto object-contain brightness-0 invert" alt="MediQuick Logo" />
               <span className="text-xl font-black tracking-tight uppercase text-white">
-                <span className="text-[#0057FF]">MEDI</span><span className="text-[#FF6B00]">QUICK</span>
+                MEDIQUICK
               </span>
             </Link>
             <p className="text-[13px] leading-relaxed max-w-xs text-slate-400">

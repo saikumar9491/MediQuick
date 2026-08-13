@@ -123,6 +123,17 @@ router.post('/', verifyToken, async (req, res) => {
 
     const savedOrder = await newOrder.save();
 
+    // Emit live stats / notifications via Socket.IO
+    const io = req.app.get('io');
+    if (io) {
+      io.to('admin').emit('order:new', savedOrder);
+      io.to('admin').emit('activity:new', {
+        type: 'order',
+        text: `New order #${savedOrder._id} placed: ₹${savedOrder.totalAmount}`,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     // Clear user cart (online orders) & push order reference to user.orders array
     const targetUserId = isPOS ? (req.body.userId || req.user.id) : req.user.id;
     if (targetUserId) {
@@ -312,6 +323,17 @@ router.patch('/:id/status', verifyToken, isAdmin, async (req, res) => {
 
     order.status = status;
     const updatedOrder = await order.save();
+
+    // Emit live update via Socket.IO
+    const io = req.app.get('io');
+    if (io) {
+      io.to('admin').emit('order:status-changed', updatedOrder);
+      io.to('admin').emit('activity:new', {
+        type: 'status',
+        text: `Order #${updatedOrder._id} status updated to ${status}`,
+        timestamp: new Date().toISOString()
+      });
+    }
     
     // Create rating submission notification if status is Delivered
     if (status === 'Delivered') {

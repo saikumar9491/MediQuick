@@ -77,7 +77,7 @@ const MobileAppLayout = () => {
             /* height covers header (52px) + searchbar (52px) + tabs (56px) + banner (210px) + small buffer */
             height: '390px',
             background: 'linear-gradient(180deg, #FFE0B2 0%, #FFCC80 45%, #FFE0B2 75%, #FFF8EF 100%)',
-            zIndex: 30,
+            zIndex: 1,
             pointerEvents: 'none',
             transition: 'opacity 350ms ease',
             opacity: isHeroMode ? 1 : 0,
@@ -104,7 +104,7 @@ const MobileAppLayout = () => {
       )}
 
       {/* Main Content Area */}
-      <main className={`flex-1 flex flex-col ${
+      <main className={`flex-1 flex flex-col relative z-10 ${
         shouldHideHeader
           ? ''
           : isHomePage

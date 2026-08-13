@@ -35,6 +35,7 @@ export const syncBannerStatuses = async () => {
 };
 
 // Periodic background job running every 60 seconds
+syncBannerStatuses();
 setInterval(syncBannerStatuses, 60000);
 
 /**
@@ -43,8 +44,6 @@ setInterval(syncBannerStatuses, 60000);
  */
 export const getPublicBanners = async (req, res) => {
   try {
-    await syncBannerStatuses();
-
     const { placement, targetDevice, category, categorySlug } = req.query;
     const now = new Date();
 
@@ -99,8 +98,6 @@ export const getPublicBanners = async (req, res) => {
  */
 export const getAdminBanners = async (req, res) => {
   try {
-    await syncBannerStatuses();
-
     const { placement, status, targetDevice, search } = req.query;
     const query = {};
 
@@ -149,8 +146,6 @@ export const getAdminBanners = async (req, res) => {
  */
 export const getBannersSummaryStats = async (req, res) => {
   try {
-    await syncBannerStatuses();
-
     const totalBanners = await Banner.countDocuments({});
     const activeBanners = await Banner.countDocuments({ status: 'active' });
     const scheduledBanners = await Banner.countDocuments({ status: 'scheduled' });

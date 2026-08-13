@@ -37,9 +37,7 @@ const SidebarContent = ({ sidebarOpen, toggleSidebar, activeTab, handleTabClick,
     {/* Brand Header */}
     <div className="flex items-center justify-between px-6 py-5 border-b border-slate-200/80 bg-[#065F60] text-white">
       <div className="flex items-center gap-2.5">
-        <div className="flex h-8 w-8 items-center justify-center rounded bg-teal-500 text-white font-black text-sm flex-shrink-0">
-          M
-        </div>
+        <img src="/logo_icon.png" className="h-8 w-auto object-contain brightness-0 invert" alt="MediQuick Logo" />
         {sidebarOpen && (
           <div>
             <h1 className="text-sm font-black tracking-wider uppercase text-white">Midiquick</h1>

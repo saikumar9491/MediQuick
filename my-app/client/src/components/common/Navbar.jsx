@@ -304,12 +304,10 @@ const Navbar = ({ medicines = [] }) => {
         <div className="mx-auto hidden lg:flex max-w-[1440px] items-center justify-between gap-4 lg:gap-8">
           
           {/* Logo (Desktop) */}
-          <Link to="/" className="flex shrink-0 items-center gap-1.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#0057FF] text-white shadow-2xs">
-              <span className="text-xs font-black">M</span>
-            </div>
-            <span className="text-xl font-black tracking-tight uppercase">
-              <span className="text-[#0057FF]">MEDI</span><span className="text-[#FF6B00]">QUICK</span>
+          <Link to="/" className="flex shrink-0 items-center gap-2">
+            <img src="/logo_icon.png" className="h-7 w-auto object-contain" alt="MediQuick Logo" />
+            <span className="text-xl font-black tracking-tight uppercase text-slate-900">
+              MEDIQUICK
             </span>
           </Link>
 
@@ -531,12 +529,10 @@ const Navbar = ({ medicines = [] }) => {
                 >
                   <Menu size={24} />
                 </button>
-                <Link to="/" className="flex items-center gap-1.5">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[#0057FF] text-white shadow-2xs">
-                    <span className="text-xs font-black">M</span>
-                  </div>
+                <Link to="/" className="flex items-center gap-2">
+                  <img src="/logo_icon.png" className="h-7 w-auto object-contain" alt="MediQuick Logo" />
                   <span className="text-sm font-black tracking-tight text-slate-900 uppercase">
-                    <span className="text-[#0057FF]">MEDI</span><span className="text-[#FF6B00]">QUICK</span>
+                    MEDIQUICK
                   </span>
                 </Link>
               </div>
